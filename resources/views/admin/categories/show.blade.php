@@ -11,6 +11,14 @@
                 <h5 class="mb-0">Category Details</h5>
             </div>
             <div class="card-body">
+                @if($category->image)
+                    <div class="mb-4 text-center">
+                        <img src="{{ asset('storage/' . $category->image) }}" 
+                             alt="{{ $category->name }}" 
+                             class="img-fluid" 
+                             style="max-width: 300px; max-height: 300px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    </div>
+                @endif
                 <table class="table table-borderless">
                     <tr>
                         <th width="200">ID:</th>

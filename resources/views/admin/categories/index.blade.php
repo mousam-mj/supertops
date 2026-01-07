@@ -7,7 +7,10 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">All Categories</h5>
+            <div>
+                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Categories</h4>
+                <p class="text-muted mb-0">Manage your product categories</p>
+            </div>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Category
             </a>
@@ -24,6 +27,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Slug</th>
                                 <th>Parent</th>
@@ -37,6 +41,18 @@
                             @forelse($categories as $category)
                                 <tr>
                                     <td>{{ $category->id }}</td>
+                                    <td>
+                                        @if($category->image)
+                                            <img src="{{ asset('storage/' . $category->image) }}" 
+                                                 alt="{{ $category->name }}" 
+                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                                 style="width: 60px; height: 60px; border-radius: 8px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="fw-semibold">{{ $category->name }}</div>
                                         @if($category->description)
@@ -95,7 +111,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="9" class="text-center py-4">
                                         <p class="text-muted mb-0">No categories found.</p>
                                         <a href="{{ route('admin.categories.create') }}" class="btn btn-sm btn-primary mt-2">
                                             Create First Category
@@ -116,7 +132,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Category Tree</h5>
+                <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Category Tree</h5>
             </div>
             <div class="card-body">
                 <div class="category-tree">
@@ -126,7 +142,13 @@
                     @foreach($mainCategories as $mainCategory)
                         <div class="tree-item mb-3">
                             <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-folder-fill text-warning me-2"></i>
+                                @if($mainCategory->image)
+                                    <img src="{{ asset('storage/' . $mainCategory->image) }}" 
+                                         alt="{{ $mainCategory->name }}" 
+                                         style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px;">
+                                @else
+                                    <i class="bi bi-folder-fill text-warning me-2"></i>
+                                @endif
                                 <strong>{{ $mainCategory->name }}</strong>
                                 @if(!$mainCategory->is_active)
                                     <span class="badge bg-danger ms-2">Inactive</span>
@@ -137,7 +159,13 @@
                                     @foreach($mainCategory->children as $subCategory)
                                         <div class="tree-item mb-2">
                                             <div class="d-flex align-items-center mb-1">
-                                                <i class="bi bi-folder text-info me-2"></i>
+                                                @if($subCategory->image)
+                                                    <img src="{{ asset('storage/' . $subCategory->image) }}" 
+                                                         alt="{{ $subCategory->name }}" 
+                                                         style="width: 35px; height: 35px; object-fit: cover; border-radius: 5px; margin-right: 8px;">
+                                                @else
+                                                    <i class="bi bi-folder text-info me-2"></i>
+                                                @endif
                                                 <span>{{ $subCategory->name }}</span>
                                                 @if(!$subCategory->is_active)
                                                     <span class="badge bg-danger ms-2">Inactive</span>
@@ -145,15 +173,21 @@
                                             </div>
                                             @if($subCategory->children->count() > 0)
                                                 <div class="ms-4">
-                                                    @foreach($subCategory->children as $product)
-                                                        <div class="d-flex align-items-center mb-1">
-                                                            <i class="bi bi-file-earmark text-secondary me-2"></i>
-                                                            <small>{{ $product->name }}</small>
-                                                            @if(!$product->is_active)
-                                                                <span class="badge bg-danger ms-2">Inactive</span>
-                                                            @endif
-                                                        </div>
-                                                    @endforeach
+                                    @foreach($subCategory->children as $product)
+                                        <div class="d-flex align-items-center mb-1">
+                                            @if($product->image)
+                                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                                     alt="{{ $product->name }}" 
+                                                     style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
+                                            @else
+                                                <i class="bi bi-file-earmark text-secondary me-2"></i>
+                                            @endif
+                                            <small>{{ $product->name }}</small>
+                                            @if(!$product->is_active)
+                                                <span class="badge bg-danger ms-2">Inactive</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
                                                 </div>
                                             @endif
                                         </div>

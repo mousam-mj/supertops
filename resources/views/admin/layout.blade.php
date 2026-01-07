@@ -7,36 +7,405 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body {
-            background-color: #f8f9fa;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --sidebar-gradient: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --card-hover-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            background: var(--sidebar-gradient);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
         }
+        
+        .sidebar h4 {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 12px 20px;
-            margin: 5px 0;
-            border-radius: 8px;
-            transition: all 0.3s;
+            color: rgba(255,255,255,0.85);
+            padding: 14px 20px;
+            margin: 4px 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: rgba(255,255,255,0.1);
+        
+        .sidebar .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: white;
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15);
             color: white;
+            transform: translateX(5px);
+            padding-left: 25px;
         }
+        
+        .sidebar .nav-link:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .sidebar .nav-link.active::before {
+            transform: scaleY(1);
+        }
+        
         .navbar {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            margin: 20px 20px 0 20px;
+            padding: 15px 25px;
         }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+        
         .main-content {
             padding: 30px;
         }
+        
         .card {
             border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--card-shadow);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 20px 25px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .table {
             border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .table thead th {
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9ff;
+            transform: scale(1.01);
+        }
+        
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-group .btn {
+            margin: 0 2px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #e11d48;
+            font-size: 0.9em;
+        }
+        
+        .tree-item {
+            padding: 10px;
+            border-left: 3px solid #e2e8f0;
+            margin-left: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .tree-item:hover {
+            border-left-color: #667eea;
+            background: #f8f9ff;
+            border-radius: 6px;
+        }
+        
+        /* Pagination Styling */
+        .pagination {
+            margin-bottom: 0;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        
+        .pagination .page-link {
+            color: #667eea;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            margin: 0;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            min-width: 40px;
+            text-align: center;
+            display: inline-block;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .pagination .page-link {
+            font-size: 14px;
+        }
+        
+        /* Ensure arrow characters are properly sized */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            font-size: 16px;
+            font-weight: normal;
+            line-height: 1.2;
+            padding: 8px 12px;
+            max-width: 50px;
+        }
+        
+        .pagination .page-link:hover:not(.disabled):not([aria-disabled="true"]) {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: var(--primary-gradient);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .pagination .page-item.disabled .page-link,
+        .pagination .page-link[aria-disabled="true"] {
+            color: #cbd5e0;
+            background: #f7fafc;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .pagination .page-item.disabled .page-link:hover {
+            transform: none;
+            box-shadow: none;
+            background: #f7fafc;
+            color: #cbd5e0;
+        }
+        
+        /* Card Footer Styling */
+        .card-footer-pagination {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .card-footer-pagination nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        /* Ensure no large decorative elements */
+        .card-footer-pagination * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .card-footer-pagination .pagination li {
+            list-style: none;
+            display: inline-block;
+        }
+        
+        /* Hide any pseudo-elements that might create large arrows */
+        .card-footer-pagination .pagination::before,
+        .card-footer-pagination .pagination::after,
+        .card-footer-pagination nav::before,
+        .card-footer-pagination nav::after,
+        .card-footer-pagination *::before,
+        .card-footer-pagination *::after {
+            display: none !important;
+            content: none !important;
+        }
+        
+        /* Ensure no large icons or decorative elements */
+        .card-footer-pagination i,
+        .card-footer-pagination svg,
+        .card-footer-pagination .icon {
+            display: none !important;
+        }
+        
+        /* Limit font size for all pagination content */
+        .card-footer-pagination {
+            font-size: 14px;
+        }
+        
+        .card-footer-pagination * {
+            font-size: inherit;
+            max-height: 50px;
+        }
+        
+        /* Ensure pagination links don't have large content */
+        .pagination .page-link {
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .card-footer-pagination .text-muted {
+            color: #64748b !important;
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 576px) {
+            .card-footer-pagination {
+                padding: 15px;
+            }
+            
+            .card-footer-pagination nav {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .card-footer-pagination .pagination {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .card-footer-pagination .text-muted {
+                text-align: center;
+                width: 100%;
+            }
+        }
+        
+        /* Table Container */
+        .table-container {
+            margin-bottom: 0;
+        }
+        
+        .card-body {
+            padding-bottom: 0;
+        }
+        
+        /* Ensure consistent card spacing */
+        .row:last-child {
+            margin-bottom: 30px;
+        }
+        
+        /* Table bottom spacing */
+        .table-responsive {
+            margin-bottom: 0;
+        }
+        
+        /* Empty state styling */
+        .table tbody tr td.text-center {
+            padding: 40px 20px !important;
         }
     </style>
 </head>
@@ -56,8 +425,23 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
+                                <i class="bi bi-box-seam me-2"></i> Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
                                 <i class="bi bi-folder me-2"></i> Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                                <i class="bi bi-cart-check me-2"></i> Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                                <i class="bi bi-people me-2"></i> Users
                             </a>
                         </li>
                         <li class="nav-item">
@@ -96,6 +480,13 @@
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @endif
