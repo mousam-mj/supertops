@@ -1,5 +1,13 @@
 /* Banner */
+.hero-banner-slider {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
 .banner-block {
+    background: transparent;
+    
     .banner-item {
         &:hover {
             .banner-img img {

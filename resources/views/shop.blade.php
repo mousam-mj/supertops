@@ -71,28 +71,11 @@
             </div>
 
             <div class="products-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                @if($category && $category->children->count() > 0)
-                    @foreach($category->children as $subCategory)
-                        @if($subCategory->children->count() > 0)
-                            @foreach($subCategory->children as $product)
-                                <div class="product-item group">
-                                    <div class="product-card bg-white rounded-2xl overflow-hidden border border-line hover:border-black duration-300">
-                                        <div class="product-thumb bg-surface relative overflow-hidden aspect-[3/4]">
-                                            <div class="w-full h-full flex items-center justify-center">
-                                                <span class="text-secondary text-center px-4">{{ $product->name }}</span>
-                                            </div>
-                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 duration-300"></div>
-                                        </div>
-                                        <div class="product-info p-4">
-                                            <div class="product-name text-title mb-1 line-clamp-2">{{ $product->name }}</div>
-                                            <div class="product-category caption1 text-secondary">{{ $subCategory->name }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
+                @if(isset($products) && $products->count() > 0)
+                    @foreach($products as $product)
+                        @include('partials.product-card', ['product' => $product])
                     @endforeach
-                @elseif($category)
+                @else
                     <div class="col-span-full text-center py-16 md:py-20">
                         <div class="max-w-md mx-auto">
                             <i class="ph ph-package text-6xl text-secondary mb-4"></i>
@@ -100,31 +83,14 @@
                             <a href="{{ route('shop') }}" class="button-main inline-block">Browse All Categories</a>
                         </div>
                     </div>
-                @else
-                    <!-- Show all main categories -->
-                    @foreach($categories as $mainCategory)
-                        <a href="{{ route('category', $mainCategory->slug) }}" 
-                           class="product-item group block">
-                            <div class="product-card bg-white rounded-2xl overflow-hidden border border-line hover:border-black duration-300">
-                                <div class="product-thumb bg-surface relative overflow-hidden aspect-[3/4]">
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <span class="text-secondary text-center px-4 heading6">{{ $mainCategory->name }}</span>
-                                    </div>
-                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 duration-300"></div>
-                                </div>
-                                <div class="product-info p-4 text-center">
-                                    <div class="product-name text-title mb-1">{{ $mainCategory->name }}</div>
-                                    <div class="product-category caption1 text-secondary">
-                                        @if($mainCategory->children->count() > 0)
-                                            {{ $mainCategory->children->count() }} {{ $mainCategory->children->count() == 1 ? 'sub-category' : 'sub-categories' }}
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
                 @endif
             </div>
+            
+            @if(isset($products) && $products->hasPages())
+                <div class="pagination-block mt-10 flex justify-center">
+                    {{ $products->links() }}
+                </div>
+            @endif
 
             @if($category && $category->children->count() > 0 && $category->children->sum(fn($c) => $c->children->count()) == 0)
                 <div class="col-span-full text-center py-16 md:py-20">

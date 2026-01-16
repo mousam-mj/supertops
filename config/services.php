@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    'razorpay' => [
+        'key' => env('RAZORPAY_KEY'),
+        'secret' => env('RAZORPAY_SECRET'),
+        'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
+    ],
+
+    'delhivery' => [
+        'client_id' => env('DELHIVERY_CLIENT_ID'),
+        'client_secret' => env('DELHIVERY_CLIENT_SECRET'),
+        'api_endpoint' => env('DELHIVERY_API_ENDPOINT', 'https://staging-express.delhivery.com'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
 ];

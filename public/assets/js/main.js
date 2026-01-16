@@ -493,102 +493,9 @@ modalCartMain.addEventListener("click", (e) => {
 });
 
 
-// Set cart length
-const handleItemModalCart = () => {
-  cartStore = localStorage.getItem("cartStore");
-  cartStore = cartStore ? JSON.parse(cartStore) : [];
-
-  if (cartStore) {
-    cartIcon.querySelector("span").innerHTML = cartStore.length;
-  }
-
-  // Set cart item
-  const listItemCart = document.querySelector(
-    ".modal-cart-block .list-product"
-  );
-
-  listItemCart.innerHTML = "";
-
-  if (cartStore.length === 0) {
-    listItemCart.innerHTML = `<p class='mt-1'>No product in cart</p>`;
-  } else {
-    // Initial money to freeship in cart
-    let moneyForFreeship = 150;
-    let totalCart = 0;
-
-    cartStore.forEach((item) => {
-      totalCart = Number(totalCart) + Number(item.price)
-
-      // Create prd
-      const prdItem = document.createElement("div");
-      prdItem.setAttribute("data-item", item.id);
-      prdItem.classList.add(
-        "item",
-        "py-5",
-        "flex",
-        "items-center",
-        "justify-between",
-        "gap-3",
-        "border-b",
-        "border-line"
-      );
-      prdItem.innerHTML = `
-                <div class="infor flex items-center gap-3 w-full">
-                    <div class="bg-img w-[100px] aspect-square flex-shrink-0 rounded-lg overflow-hidden">
-                        <img src=${item.thumbImage[0]} alt='product'
-                            class='w-full h-full' />
-                    </div>
-                    <div class='w-full'>
-                        <div class="flex items-center justify-between w-full">
-                            <div class="name text-button">${item.name}</div>
-                            <div
-                                class="remove-cart-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">
-                                Remove
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between gap-2 mt-3 w-full">
-                            <div class="flex items-center text-secondary2 capitalize">
-                                ${item.sizes[0]}/${item.variation[0].color}
-                            </div>
-                            <div class="product-price text-title">$${item.price}.00</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-      listItemCart.appendChild(prdItem);
-    });
-
-    // Set money to freeship in cart
-    modalCart.querySelector('.more-price').innerHTML = moneyForFreeship - totalCart
-    modalCart.querySelector('.tow-bar-block .progress-line').style.width = (totalCart / moneyForFreeship * 100) + '%'
-    modalCart.querySelector('.total-cart').innerHTML = '$' + totalCart + '.00'
-    if (moneyForFreeship - totalCart <= 0) {
-      modalCart.querySelector('.more-price').innerHTML = 0
-      modalCart.querySelector('.tow-bar-block .progress-line').style.width = '100%'
-    }
-  }
-
-  const prdItems = listItemCart.querySelectorAll(".item");
-  prdItems.forEach((prd) => {
-    const removeCartBtn = prd.querySelector(".remove-cart-btn");
-    removeCartBtn.addEventListener("click", () => {
-      const prdId = removeCartBtn.closest(".item").getAttribute("data-item");
-      // cartStore
-      const newArray = cartStore.filter((item) => item.id !== prdId);
-      localStorage.setItem("cartStore", JSON.stringify(newArray));
-      handleItemModalCart();
-
-      if (cartStore.length === 0) {
-        modalCart.querySelector('.more-price').innerHTML = 0
-        modalCart.querySelector('.tow-bar-block .progress-line').style.width = '0'
-        modalCart.querySelector('.total-cart').innerHTML = '$0.00'
-      }
-    });
-  });
-};
-
-handleItemModalCart();
+// Set cart length - DISABLED: Now using API-based cart (cart-modal.js handles this)
+// The old localStorage-based cart modal is replaced with API-based cart-modal.js
+// This ensures cart data is synced with the backend database
 
 // Countdown cart
 let timeLeft = 600;
@@ -2343,24 +2250,80 @@ fetch("./assets/data/Product.json")
       }
     }
 
-    // Display the first 8 products
-    if (listEightProduct) {
+    // Display the first 8 products - Updated for server-rendered content
+    const listEightProductContainers = document.querySelectorAll(".list-product.eight-product[data-tab-content]");
+    if (listEightProductContainers.length > 0) {
+      const tabFeaturesBlock = document.querySelector(".tab-features-block");
+      if (tabFeaturesBlock) {
+        const menuItems = tabFeaturesBlock.querySelectorAll(".menu-tab .tab-item");
+        const productListContainers = tabFeaturesBlock.querySelectorAll(".list-product[data-tab-content]");
+
+        // Initialize: show active tab content, hide others
+        menuItems.forEach((item) => {
+          if (item.classList.contains("active")) {
+            const activeTab = item.getAttribute("data-item");
+            productListContainers.forEach((container) => {
+              if (container.getAttribute("data-tab-content") === activeTab) {
+                container.classList.remove("hidden");
+              } else {
+                container.classList.add("hidden");
+              }
+            });
+          }
+        });
+
+        // Handle tab clicks
+        menuItems.forEach((item) => {
+          item.addEventListener("click", () => {
+            const tabName = item.getAttribute("data-item");
+            
+            // Update active class on tab items
+            menuItems.forEach((menuItem) => {
+              menuItem.classList.remove("active");
+            });
+            item.classList.add("active");
+
+            // Show/hide corresponding product list
+            productListContainers.forEach((container) => {
+              if (container.getAttribute("data-tab-content") === tabName) {
+                container.classList.remove("hidden");
+              } else {
+                container.classList.add("hidden");
+              }
+            });
+
+            // Update indicator position (if exists)
+            const indicator = item.parentElement.querySelector(".indicator");
+            if (indicator) {
+              indicator.style.width = item.getBoundingClientRect().width + "px";
+              indicator.style.left =
+                item.getBoundingClientRect().left -
+                item.parentElement.getBoundingClientRect().left +
+                "px";
+            }
+          });
+        });
+      }
+    } else if (listEightProduct) {
+      // Fallback for old structure (if products array exists)
       const parent = listEightProduct.parentElement;
-      if (parent.querySelector(".menu-tab .active")) {
+      if (parent && parent.querySelector(".menu-tab .active")) {
         const menuItemActive = parent
           .querySelector(".menu-tab .active")
           .getAttribute("data-item");
         const menuItems = parent.querySelectorAll(".menu-tab .tab-item");
 
         if (menuItemActive === "best sellers") {
-          products
-            .filter((product) => product.category === "fashion")
-            .sort((a, b) => b.sold - a.sold)
-            .slice(0, 8)
-            .forEach((product) => {
-              const productElement = createProductItem(product);
-              listEightProduct.appendChild(productElement);
-            });
+          if (products && Array.isArray(products)) {
+            products
+              .filter((product) => product.category === "fashion")
+              .sort((a, b) => b.sold - a.sold)
+              .slice(0, 8)
+              .forEach((product) => {
+                const productElement = createProductItem(product);
+                listEightProduct.appendChild(productElement);
+              });
+          }
         }
         menuItems.forEach((item) => {
           item.addEventListener("click", () => {
@@ -2371,45 +2334,47 @@ fetch("./assets/data/Product.json")
               prdItem.remove();
             });
 
-            if (item.getAttribute("data-item") === "best sellers") {
-              products
-                .filter((product) => product.category === "fashion")
-                .sort((a, b) => b.sold - a.sold)
-                .slice(0, 8)
-                .forEach((product) => {
-                  const productElement = createProductItem(product);
-                  listEightProduct.appendChild(productElement);
-                });
-            }
-            if (item.getAttribute("data-item") === "on sale") {
-              products
-                .filter(
-                  (product) => product.sale && product.category === "fashion"
-                )
-                .slice(0, 8)
-                .forEach((product) => {
-                  const productElement = createProductItem(product);
-                  listEightProduct.appendChild(productElement);
-                });
-            }
-            if (item.getAttribute("data-item") === "new arrivals") {
-              products
-                .filter(
-                  (product) => product.new && product.category === "fashion"
-                )
-                .slice(0, 8)
-                .forEach((product) => {
-                  const productElement = createProductItem(product);
-                  listEightProduct.appendChild(productElement);
-                });
-            }
+            if (products && Array.isArray(products)) {
+              if (item.getAttribute("data-item") === "best sellers") {
+                products
+                  .filter((product) => product.category === "fashion")
+                  .sort((a, b) => b.sold - a.sold)
+                  .slice(0, 8)
+                  .forEach((product) => {
+                    const productElement = createProductItem(product);
+                    listEightProduct.appendChild(productElement);
+                  });
+              }
+              if (item.getAttribute("data-item") === "on sale") {
+                products
+                  .filter(
+                    (product) => product.sale && product.category === "fashion"
+                  )
+                  .slice(0, 8)
+                  .forEach((product) => {
+                    const productElement = createProductItem(product);
+                    listEightProduct.appendChild(productElement);
+                  });
+              }
+              if (item.getAttribute("data-item") === "new arrivals") {
+                products
+                  .filter(
+                    (product) => product.new && product.category === "fashion"
+                  )
+                  .slice(0, 8)
+                  .forEach((product) => {
+                    const productElement = createProductItem(product);
+                    listEightProduct.appendChild(productElement);
+                  });
+              }
 
-            handleActiveImgWhenColorChange(products);
-            addEventToProductItem(products);
+              if (handleActiveImgWhenColorChange) handleActiveImgWhenColorChange(products);
+              if (addEventToProductItem) addEventToProductItem(products);
+            }
           });
         });
       } else {
-        if (listEightProduct.getAttribute("data-type")) {
+        if (listEightProduct.getAttribute("data-type") && products && Array.isArray(products)) {
           products
             .filter(
               (product) =>
@@ -2420,7 +2385,7 @@ fetch("./assets/data/Product.json")
               const productElement = createProductItem(product);
               listEightProduct.appendChild(productElement);
             });
-        } else {
+        } else if (products && Array.isArray(products)) {
           products.slice(11, 19).forEach((product) => {
             const productElement = createProductItem(product);
             listEightProduct.appendChild(productElement);

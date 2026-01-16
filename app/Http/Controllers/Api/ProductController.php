@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+class ProductController extends Controller
+{
+    /**
+     * List products with pagination
+     */
+    public function index(Request $request)
+    {
+        $query = Product::where('is_active', true)
+            ->with('category');
+
+        // Filter by category
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Filter by main category (through category)
+        if ($request->has('main_category_id')) {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('main_category_id', $request->main_category_id);
+            });
+        }
+
+        // Filter by featured
+        if ($request->has('featured')) {
+            $query->where('is_featured', $request->boolean('featured'));
+        }
+
+        // Filter by new arrivals
+        if ($request->has('new_arrival')) {
+            $query->where('is_new_arrival', $request->boolean('new_arrival'));
+        }
+
+        // Filter by price range
+        if ($request->has('min_price')) {
+            $query->where(function($q) use ($request) {
+                $q->where('sale_price', '>=', $request->min_price)
+                  ->orWhere(function($q2) use ($request) {
+                      $q2->whereNull('sale_price')
+                         ->where('price', '>=', $request->min_price);
+                  });
+            });
+        }
+
+        if ($request->has('max_price')) {
+            $query->where(function($q) use ($request) {
+                $q->where('sale_price', '<=', $request->max_price)
+                  ->orWhere(function($q2) use ($request) {
+                      $q2->whereNull('sale_price')
+                         ->where('price', '<=', $request->max_price);
+                  });
+            });
+        }
+
+        // Sort
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = $request->get('per_page', 12);
+        $products = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $products,
+        ]);
+    }
+
+    /**
+     * Quick search products
+     */
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        $limit = $request->get('limit', 10);
+
+        if (empty($query)) {
+            return response()->json([
+                'success' => true,
+                'data' => [],
+            ]);
+        }
+
+        $products = Product::where('is_active', true)
+            ->where(function($q) use ($query) {
+                $q->where('name', 'LIKE', '%' . $query . '%')
+                  ->orWhere('description', 'LIKE', '%' . $query . '%')
+                  ->orWhere('short_description', 'LIKE', '%' . $query . '%')
+                  ->orWhere('sku', 'LIKE', '%' . $query . '%');
+            })
+            ->with('category')
+            ->limit($limit)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $products,
+        ]);
+    }
+
+    /**
+     * Get product by slug
+     */
+    public function show($slug)
+    {
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->with(['category', 'inventories'])
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => $product,
+        ]);
+    }
+}
+
+
+

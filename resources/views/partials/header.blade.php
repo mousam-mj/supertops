@@ -54,8 +54,8 @@
                         <div class="menu-mobile-icon lg:hidden flex items-center">
                             <i class="icon-category text-2xl"></i>
                         </div>
-                        <a href="index.php" class="flex items-center">
-                            <img src="./assets/images/perch-logo.png" alt="bg-img" />
+                        <a href="{{ route('home') }}" class="flex items-center">
+                            <img src="{{ asset('assets/images/perch-logo.png') }}" alt="bg-img" />
                         </a>
                         <div class="menu-main h-full max-lg:hidden">
                             <ul class="flex items-center gap-8 h-full">
@@ -1246,19 +1246,19 @@
             <!-- Menu bar -->
             <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
                 <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="index.php" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-house text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Home</span>
                     </a>
-                    <a href="shop-filter-canvas.php" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-list text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Category</span>
                     </a>
-                    <a href="search-result.php" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Search</span>
                     </a>
-                    <a href="cart.php" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <div class="cart-icon relative">
                             <span class="ph-bold ph-handbag text-2xl block"></span>
                             <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
@@ -1267,7 +1267,8 @@
                     </a>
                 </div>
             </div>
-            <!-- Slider -->
+            <!-- Slider - Only show on home page -->
+            @if(request()->routeIs('home'))
             <div class="slider-block style-two xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] w-full">
                 <div class="slider-main h-full w-full">
                     <div class="swiper swiper-slider h-full relative">
@@ -1306,6 +1307,7 @@
                     </div>
                 </div>
             </div>
+            @endif
             <!-- Slider -->
             
         </div>

@@ -3,32 +3,75 @@
 @section('title', 'Perch Bottle - Home')
 
 @section('content')
+@if(isset($heroBanners) && $heroBanners->count() > 0)
+    <div class="hero-banner-slider">
+        <div class="swiper swiper-hero-banner h-[500px] md:h-[600px]">
+            <div class="swiper-wrapper">
+                @foreach($heroBanners as $banner)
+                    <div class="swiper-slide">
+                        <a href="{{ $banner->deeplink ?? route('shop') }}" class="block h-full w-full relative overflow-hidden">
+                            <img src="{{ asset('storage/' . $banner->banner_image) }}" 
+                                 alt="{{ $banner->name }}" 
+                                 class="w-full h-full object-cover" />
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+            @if($heroBanners->count() > 1)
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            @endif
+        </div>
+    </div>
+@endif
+
 <div class="collection-block mt-5">
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
-                <div class="banner-block md:pt-20 pt-10">
+                <div class="banner-block">
             <div class="container">
                 <div class="list-banner grid md:grid-cols-3 gap-[20px]">
-                    <a href="shop-breadcrumb1.php" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                        <div class="banner-img w-full">
-                            <img src="./assets/images/product/Bottle-1.webp" alt="bg-img" class="w-full duration-500" />
-                        </div>
-                        <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
-                        <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                    </a>
-                    <a href="shop-breadcrumb1.php" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                        <div class="banner-img w-full">
-                            <img src="./assets/images/product/Bottle-4.webp" alt="bg-img" class="w-full duration-500" />
-                        </div>
-                        <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
-                        <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                    </a>
-                    <a href="shop-breadcrumb1.php" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                        <div class="banner-img w-full">
-                            <img src="./assets/images/product/Bottle-8.webp" alt="bg-img" class="w-full duration-500" />
-                        </div>
-                        <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kichenware</div>
-                        <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                    </a>
+                    @if(isset($categories) && $categories->count() > 0)
+                        @foreach($categories->take(3) as $index => $category)
+                            <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                                <div class="banner-img w-full">
+                                    @if($category->image)
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                                    @else
+                                        @php
+                                            $images = ['Bottle-1.webp', 'Bottle-4.webp', 'Bottle-8.webp'];
+                                            $image = $images[$index % 3] ?? 'Bottle-1.webp';
+                                        @endphp
+                                        <img src="{{ asset('assets/images/product/' . $image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                                    @endif
+                                </div>
+                                <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
+                                <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+                            </a>
+                        @endforeach
+                    @else
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <div class="banner-img w-full">
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full duration-500" />
+                            </div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
+                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+                        </a>
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <div class="banner-img w-full">
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full duration-500" />
+                            </div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
+                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+                        </a>
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <div class="banner-img w-full">
+                                <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="Kitchenware" class="w-full duration-500" />
+                            </div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kitchenware</div>
+                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -52,334 +95,26 @@
                     </div>
                 </div>
                 <div class="list-product four-product hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 md:mt-10 mt-6">
-                    <div class="product-item grid-type" data-item="1">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase text-white bg-red px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">Sale</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="countdown-time-block py-1.5 flex items-center justify-center">
-                                    <div class="text-xs font-semibold uppercase text-red">
-                                        <span class="countdown-day">24</span>
-                                        <span>D : </span>
-                                        <span class="countdown-hour">14</span>
-                                        <span>H : </span>
-                                        <span class="countdown-minute">36</span>
-                                        <span>M : </span>
-                                        <span class="countdown-second">51</span>
-                                        <span>S</span>
-                                    </div>
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white max-lg:hidden">Quick Shop</div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="quick-shop-block absolute left-5 right-5 bg-white p-5 rounded-[20px]">
-                                        <div class="list-size flex items-center justify-center flex-wrap gap-2">
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">S</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">M</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">L</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">XL</div>
-                                        </div>
-                                        <div class="add-cart-btn button-main w-full text-center rounded-full py-3 mt-4">Add To cart</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">24</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">96</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-name text-title duration-300">Raglan Sleeve T-shirt</div>
-
-                                <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Yellow</div>
-                                    </div>
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                    </div>
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
-                                    </div>
-                                </div>
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$30.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$42.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-30%</div>
-                                </div>
+                    @if(isset($featuredProducts) && $featuredProducts->count() > 0)
+                        @foreach($featuredProducts->take(8) as $product)
+                            @include('partials.product-card', ['product' => $product])
+                        @endforeach
+                    @elseif(isset($newArrivals) && $newArrivals->count() > 0)
+                        @foreach($newArrivals->take(8) as $product)
+                            @include('partials.product-card', ['product' => $product])
+                        @endforeach
+                    @else
+                        <div class="col-span-full text-center py-16 md:py-20">
+                            <div class="max-w-md mx-auto">
+                                <i class="ph ph-package text-6xl text-secondary mb-4"></i>
+                                <p class="body1 text-secondary mb-6">No products found yet.</p>
+                                <a href="{{ route('shop') }}" class="button-main inline-block">Browse All Categories</a>
                             </div>
                         </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="3">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-name text-title duration-300">Off-the-Shoulder Blouse</div>
-                                <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                    <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                    </div>
-                                    <div class="color-item bg-yellow w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">yellow</div>
-                                    </div>
-                                    <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">green</div>
-                                    </div>
-                                </div>
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="4">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase text-white bg-red px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">Sale</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="countdown-time-block py-1.5 flex items-center justify-center">
-                                    <div class="text-xs font-semibold uppercase text-red">
-                                        <span class="countdown-day">24</span>
-                                        <span>D : </span>
-                                        <span class="countdown-hour">14</span>
-                                        <span>H : </span>
-                                        <span class="countdown-minute">36</span>
-                                        <span>M : </span>
-                                        <span class="countdown-second">51</span>
-                                        <span>S</span>
-                                    </div>
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white max-lg:hidden">Quick Shop</div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="quick-shop-block absolute left-5 right-5 bg-white p-5 rounded-[20px]">
-                                        <div class="list-size flex items-center justify-center flex-wrap gap-2">
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">S</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">M</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">L</div>
-                                            <div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black">XL</div>
-                                        </div>
-                                        <div class="add-cart-btn button-main w-full text-center rounded-full py-3 mt-4">Add To cart</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">24</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">96</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-name text-title duration-300">Raglan Sleeve T-shirt</div>
-                                <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Yellow</div>
-                                    </div>
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                    </div>
-                                    <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                        <img src="./assets/images/product/perch-bottal.webp" alt="color" class="rounded-xl w-full h-full object-cover" />
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
-                                    </div>
-                                </div>
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$30.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$42.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-30%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="5">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-name text-title duration-300">Off-the-Shoulder Blouse</div>
-                                <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                    <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                    </div>
-                                    <div class="color-item bg-yellow w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">yellow</div>
-                                    </div>
-                                    <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">green</div>
-                                    </div>
-                                </div>
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
+                
+                {{-- Static products removed - now using dynamic products above --}}
             </div>
         </div>
 
@@ -388,64 +123,14 @@
                 <div class="main-content relative flex max-lg:flex-wrap gap-y-5 items-center lg:justify-end justify-center">
                     <div class="heading bg-white xl:py-20 py-10 xl:px-10 px-8 rounded-2xl lg:w-[30%] lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-0 z-[1] max-lg:text-center">
                         <div class="heading3">Discover the latest collection</div>
-                        <a href="shop-collection.php" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">Shop Collection </a>
+                        <a href="{{ route('shop') }}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">Shop Collection </a>
                     </div>
                     <div class="list popular-product w-3/4 grid sm:grid-cols-2 gap-4 max-lg:w-full">
                         <div class="item relative rounded-xl overflow-hidden">
                             <img src="./assets/images/banner/perch123(1).webp" alt="/images/banner/perch123(1).webp" class="w-full h-full object-cover" />
-                            <!--<div class="dots absolute top-[22%] left-[55%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="product-default.php" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">gold necklace</div>
-                                    <div class="price text-center">$60.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>
-                            <div class="dots absolute top-[42%] left-[32%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="product-default.php" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">golden ring</div>
-                                    <div class="price text-center">$50.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>
-                            <div class="dots bottom-dot absolute bottom-[20%] left-[58%] cursor-pointer">
-                                <div class="bottom-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="product-default.php" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Ruby Ring</div>
-                                    <div class="price text-center">$40.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>-->
                         </div>
                         <div class="item relative rounded-xl overflow-hidden">
                             <img src="./assets/images/banner/perch123(2).webp" alt="/images/banner/perch123(2).webp" class="w-full h-full object-cover" />
-                           <!-- <div class="dots absolute top-[26%] left-[54%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="product-default.php" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Snake Ring</div>
-                                    <div class="price text-center">$45.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>
-                            <div class="dots absolute top-[29%] left-[30%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="product-default.php" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Golden Ring</div>
-                                    <div class="price text-center">$48.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>-->
                         </div>
                     </div>
                 </div>
@@ -453,9 +138,9 @@
         </div>
 
         <div class="banner-block style-one grid sm:grid-cols-1 ">
-            <a href="shop-breadcrumb-img.php" class="banner-item relative block overflow-hidden duration-500">
+            <a href="{{ route('shop') }}" class="banner-item relative block overflow-hidden duration-500">
                 <div class="banner-img">
-                    <img src="./assets/images/banner/Blog-3.webp"  alt="img" />
+                    <img src="{{ asset('assets/images/banner/Blog-3.webp') }}"  alt="Best Sellers" />
                 </div>
                 <div class="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
                     <div class="heading2 text-white">Best Sellers</div>
@@ -463,487 +148,6 @@
                 </div>
             </a>
             
-        </div>
-
-        <div class="tab-features-block filter-prodduct-block md:pt-20 pt-10">
-            <div class="container">
-                <div class="heading flex flex-col items-center text-center">
-                    <div class="menu-tab bg-surface rounded-2xl">
-                        <div class="menu flex items-center gap-2 p-1">
-                            <div class="indicator absolute top-1 bottom-1 bg-white rounded-full shadow-md duration-300"></div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black active" data-item="best sellers">best sellers</div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black" data-item="on sale">on sale</div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black" data-item="new arrivals">new arrivals</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="list-product eight-product hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6">
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-item grid-type" data-item="best sellers">
-                        <div class="product-main cursor-pointer block">
-                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                    <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                        <i class="ph ph-heart text-lg"></i>
-                                    </div>
-                                    <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                        <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                        <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                        <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                    </div>
-                                </div>
-                                <div class="product-img w-full h-full aspect-[3/4]">
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                </div>
-                                <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                    <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Quick View</span>
-                                        <i class="ph ph-eye lg:hidden text-xl"></i>
-                                    </div>
-                                    <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
-                                        <span class="max-lg:hidden">Add To Cart</span>
-                                        <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="product-infor mt-4 lg:mb-7">
-                                <div class="product-sold sm:pb-4 pb-2">
-                                    <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                        <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                            <span class="max-sm:text-xs">12</span>
-                                        </div>
-                                        <div class="text-button-uppercase">
-                                            <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                            <span class="max-sm:text-xs">88</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                    <div class="product-price text-title">$40.00</div>
-                                    <div class="product-origin-price caption1 text-secondary2">
-                                        <del>$50.00</del>
-                                    </div>
-                                    <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="container">
@@ -1087,8 +291,8 @@
                 <div class="container">
                     <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
                         <div class="company-infor basis-1/4 max-lg:basis-full pr-7">
-                            <a href="index.php" class="logo inline-block">
-                                <img src="./assets/images/perch-logo.png" alt="7" />
+                            <a href="{{ route('home') }}" class="logo inline-block">
+                                <img src="{{ asset('assets/images/perch-logo.png') }}" alt="Perch Logo" />
                             </a>
                             <div class="flex gap-3 mt-3">
                                 <div class="flex flex-col">
@@ -1107,26 +311,29 @@
                             <div class="list-nav flex justify-between basis-2/3 max-md:basis-full gap-4">
                                 <div class="item flex flex-col basis-1/3">
                                     <div class="text-button-uppercase pb-3">Infomation</div>
-                                    <a class="caption1 has-line-before duration-300 w-fit" href="contact.php">Contact us </a>
+                                    <a class="caption1 has-line-before duration-300 w-fit" href="#contact">Contact us </a>
                                     <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!"> Career </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="my-account.php"> My Account</a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="order-tracking.php"> Order & Returns</a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="faqs.php">FAQs </a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#account"> My Account</a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#order-tracking"> Order & Returns</a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#faqs">FAQs </a>
                                 </div>
                                 <div class="item flex flex-col basis-1/3">
                                     <div class="text-button-uppercase pb-3">Quick Shop</div>
-                                    <a class="caption1 has-line-before duration-300 w-fit" href="shop-breadcrumb1.php">Women</a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="shop-breadcrumb1.php">Men </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="shop-breadcrumb1.php">Clothes </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="shop-breadcrumb1.php"> Accessories </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="blog-default.php">Blog </a>
+                                    @if(isset($categories) && $categories->count() > 0)
+                                        @foreach($categories->take(4) as $cat)
+                                            <a class="caption1 has-line-before duration-300 w-fit {{ !$loop->first ? 'pt-2' : '' }}" href="{{ route('category', $cat->slug) }}">{{ $cat->name }}</a>
+                                        @endforeach
+                                    @else
+                                        <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('shop') }}">Shop All</a>
+                                    @endif
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#blog">Blog </a>
                                 </div>
                                 <div class="item flex flex-col basis-1/3">
                                     <div class="text-button-uppercase pb-3">Customer Services</div>
-                                    <a class="caption1 has-line-before duration-300 w-fit" href="faqs.php">FAQs </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="faqs.php">Shipping </a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="faqs.php">Privacy Policy</a>
-                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="order-tracking.php">Return & Refund</a>
+                                    <a class="caption1 has-line-before duration-300 w-fit" href="#faqs">FAQs </a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#shipping">Shipping </a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#privacy">Privacy Policy</a>
+                                    <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#returns">Return & Refund</a>
                                 </div>
                             </div>
                             <div class="newsletter basis-1/3 pl-7 max-md:basis-full max-md:pl-0">
@@ -1228,75 +435,8 @@
                             </div>
                             <div class="heading5 pb-5">You May Also Like</div>
                             <div class="list overflow-x-auto sm:pr-6">
-                                <div class="product-item item pb-5 flex items-center justify-between gap-3 border-b border-line" data-item="1">
-                                    <div class="infor flex items-center gap-5">
-                                        <div class="bg-img">
-                                            <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
+                                {{-- Static products removed - can be made dynamic later --}}
                                         </div>
-                                        <div class="">
-                                            <div class="name text-button">Faux-leather trousers</div>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="product-price text-title">$15.00</div>
-                                                <div class="product-origin-price text-title text-secondary2">
-                                                    <del>$25.00</del>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                                </div>
-                                <div class="product-item item py-5 flex items-center justify-between gap-3 border-b border-line" data-item="2">
-                                    <div class="infor flex items-center gap-5">
-                                        <div class="bg-img">
-                                            <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                        </div>
-                                        <div class="">
-                                            <div class="name text-button">Faux-leather trousers</div>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="product-price text-title">$15.00</div>
-                                                <div class="product-origin-price text-title text-secondary2">
-                                                    <del>$25.00</del>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                                </div>
-                                <div class="product-item item py-5 flex items-center justify-between gap-3 border-b border-line" data-item="3">
-                                    <div class="infor flex items-center gap-5">
-                                        <div class="bg-img">
-                                            <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                        </div>
-                                        <div class="">
-                                            <div class="name text-button">Faux-leather trousers</div>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="product-price text-title">$15.00</div>
-                                                <div class="product-origin-price text-title text-secondary2">
-                                                    <del>$25.00</del>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                                </div>
-                                <div class="product-item item py-5 flex items-center justify-between gap-3" data-item="4">
-                                    <div class="infor flex items-center gap-5">
-                                        <div class="bg-img">
-                                            <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                        </div>
-                                        <div class="">
-                                            <div class="name text-button">Faux-leather trousers</div>
-                                            <div class="flex items-center gap-2 mt-2">
-                                                <div class="product-price text-title">$15.00</div>
-                                                <div class="product-origin-price text-title text-secondary2">
-                                                    <del>$25.00</del>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="quick-view-btn button-main sm:py-3 py-2 sm:px-5 px-4 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1321,262 +461,8 @@
                 <div class="list-recent mt-8">
                     <div class="heading6">Recently viewed products</div>
                     <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4">
-                        <div class="product-item grid-type" data-item="14">
-                            <div class="product-main cursor-pointer block">
-                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                            <i class="ph ph-heart text-lg"></i>
+                        {{-- Static products removed - can be made dynamic later --}}
                                         </div>
-                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    </div>
-                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                    </div>
-                                </div>
-                                <div class="product-infor mt-4 lg:mb-7">
-                                    <div class="product-sold sm:pb-4 pb-2">
-                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                <span class="max-sm:text-xs">12</span>
-                                            </div>
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                <span class="max-sm:text-xs">88</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product-name text-title duration-300">Faux-leather trousers</div>
-                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                        <div class="color-item bg-black w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Black</div>
-                                        </div>
-                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
-                                        </div>
-                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                        <div class="product-price text-title">$40.00</div>
-                                        <div class="product-origin-price caption1 text-secondary2">
-                                            <del>$50.00</del>
-                                        </div>
-                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-item grid-type" data-item="13">
-                            <div class="product-main cursor-pointer block">
-                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                            <i class="ph ph-heart text-lg"></i>
-                                        </div>
-                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    </div>
-                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                    </div>
-                                </div>
-                                <div class="product-infor mt-4 lg:mb-7">
-                                    <div class="product-sold sm:pb-4 pb-2">
-                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                <span class="max-sm:text-xs">12</span>
-                                            </div>
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                <span class="max-sm:text-xs">88</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product-name text-title duration-300">Faux-leather trousers</div>
-                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                        <div class="color-item bg-black w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Black</div>
-                                        </div>
-                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
-                                        </div>
-                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                        <div class="product-price text-title">$40.00</div>
-                                        <div class="product-origin-price caption1 text-secondary2">
-                                            <del>$50.00</del>
-                                        </div>
-                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-item grid-type" data-item="12">
-                            <div class="product-main cursor-pointer block">
-                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                            <i class="ph ph-heart text-lg"></i>
-                                        </div>
-                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    </div>
-                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                    </div>
-                                </div>
-                                <div class="product-infor mt-4 lg:mb-7">
-                                    <div class="product-sold sm:pb-4 pb-2">
-                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                <span class="max-sm:text-xs">12</span>
-                                            </div>
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                <span class="max-sm:text-xs">88</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product-name text-title duration-300">Off-the-Shoulder Blouse</div>
-                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                        </div>
-                                        <div class="color-item bg-yellow w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">yellow</div>
-                                        </div>
-                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">green</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                        <div class="product-price text-title">$40.00</div>
-                                        <div class="product-origin-price caption1 text-secondary2">
-                                            <del>$50.00</del>
-                                        </div>
-                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-item grid-type" data-item="11">
-                            <div class="product-main cursor-pointer block">
-                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                            <i class="ph ph-heart text-lg"></i>
-                                        </div>
-                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                    </div>
-                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                    </div>
-                                </div>
-                                <div class="product-infor mt-4 lg:mb-7">
-                                    <div class="product-sold sm:pb-4 pb-2">
-                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                <span class="max-sm:text-xs">12</span>
-                                            </div>
-                                            <div class="text-button-uppercase">
-                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                <span class="max-sm:text-xs">88</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product-name text-title duration-300">Off-the-Shoulder Blouse</div>
-                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                        </div>
-                                        <div class="color-item bg-yellow w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">yellow</div>
-                                        </div>
-                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">green</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                        <div class="product-price text-title">$40.00</div>
-                                        <div class="product-origin-price caption1 text-secondary2">
-                                            <del>$50.00</del>
-                                        </div>
-                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1591,7 +477,7 @@
                 </div>
                 <div class="list-product px-6"></div>
                 <div class="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
-                    <a href="wishlist.php" class="button-main w-full text-center uppercase"> View All Wish List</a>
+                    <a href="{{ route('shop') }}" class="button-main w-full text-center uppercase"> View All Wish List</a>
                     <div class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">Or continue shopping</div>
                 </div>
             </div>
@@ -1602,74 +488,7 @@
                 <div class="left w-1/2 border-r border-line py-6 max-md:hidden">
                     <div class="heading5 px-6 pb-3">You May Also Like</div>
                     <div class="list px-6">
-                        <div class="product-item item py-5 flex items-center justify-between gap-3 border-b border-line" data-item="1">
-                            <div class="infor flex items-center gap-5">
-                                <div class="bg-img">
-                                    <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                </div>
-                                <div class="">
-                                    <div class="name text-button">Faux-leather trousers</div>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="product-price text-title">$15.00</div>
-                                        <div class="product-origin-price text-title text-secondary2">
-                                            <del>$25.00</del>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quick-view-btn button-main py-3 px-5 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                        </div>
-                        <div class="product-item item py-5 flex items-center justify-between gap-3 border-b border-line" data-item="2">
-                            <div class="infor flex items-center gap-5">
-                                <div class="bg-img">
-                                    <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                </div>
-                                <div class="">
-                                    <div class="name text-button">Faux-leather trousers</div>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="product-price text-title">$15.00</div>
-                                        <div class="product-origin-price text-title text-secondary2">
-                                            <del>$25.00</del>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quick-view-btn button-main py-3 px-5 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                        </div>
-                        <div class="product-item item py-5 flex items-center justify-between gap-3 border-b border-line" data-item="3">
-                            <div class="infor flex items-center gap-5">
-                                <div class="bg-img">
-                                    <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                </div>
-                                <div class="">
-                                    <div class="name text-button">Faux-leather trousers</div>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="product-price text-title">$15.00</div>
-                                        <div class="product-origin-price text-title text-secondary2">
-                                            <del>$25.00</del>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quick-view-btn button-main py-3 px-5 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                        </div>
-                        <div class="product-item item py-5 flex items-center justify-between gap-3" data-item="4">
-                            <div class="infor flex items-center gap-5">
-                                <div class="bg-img">
-                                    <img src="./assets/images/product/perch-bottal.webp" alt="img" class="w-[100px] aspect-square flex-shrink-0 rounded-lg" />
-                                </div>
-                                <div class="">
-                                    <div class="name text-button">Faux-leather trousers</div>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="product-price text-title">$15.00</div>
-                                        <div class="product-origin-price text-title text-secondary2">
-                                            <del>$25.00</del>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="quick-view-btn button-main py-3 px-5 bg-black hover:bg-green text-white rounded-full whitespace-nowrap">QUICK VIEW</div>
-                        </div>
+                        {{-- Static products removed - can be made dynamic later --}}
                     </div>
                 </div>
                 <div class="right cart-block md:w-1/2 w-full py-6 relative overflow-hidden">
@@ -1720,8 +539,8 @@
                         </div>
                         <div class="block-button text-center p-6">
                             <div class="flex items-center gap-4">
-                                <a href="cart.php" class="button-main basis-1/2 bg-white border border-black text-black text-center uppercase"> View cart </a>
-                                <a href="checkout.php" class="button-main basis-1/2 text-center uppercase"> Check Out </a>
+                                <a href="{{ route('cart.index') }}" class="button-main basis-1/2 bg-white border border-black text-black text-center uppercase"> View cart </a>
+                                <a href="{{ route('checkout.index') }}" class="button-main basis-1/2 text-center uppercase"> Check Out </a>
                             </div>
                             <div class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">Or continue shopping</div>
                         </div>
@@ -1915,7 +734,7 @@
                         <div class="heading5 flex-shrink-0 max-md:w-full">Compare <br class="max-md:hidden" />Products</div>
                         <div class="list-product flex items-center w-full gap-4"></div>
                         <div class="block-button flex flex-col gap-4 flex-shrink-0">
-                            <a href="compare.php" class="button-main whitespace-nowrap"> Compare Products</a>
+                            <a href="{{ route('shop') }}" class="button-main whitespace-nowrap"> Compare Products</a>
                             <div class="button-main clear whitespace-nowrap border border-black bg-white text-black">Clear All Products</div>
                         </div>
                     </div>
@@ -2024,7 +843,7 @@
                                     <div class="add-cart-btn button-main w-full text-center bg-white text-black border border-black">Add To Cart</div>
                                 </div>
                                 <div class="button-block mt-5">
-                                    <a href="checkout.php" class="button-main w-full text-center">Buy It Now</a>
+                                    <a href="{{ route('checkout.index') }}" class="button-main w-full text-center">Buy It Now</a>
                                 </div>
                             </div>
                             <div class="flex items-center flex-wrap lg:gap-20 gap-8 gap-y-4 mt-5">
@@ -2032,79 +851,44 @@
                                     <div class="compare-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
                                         <i class="ph-fill ph-arrows-counter-clockwise cursor-pointer heading6"></i>
                                     </div>
-                                    <span>Compare</span>
+                                    <div class="caption1">Compare</div>
                                 </div>
-                                <div class="share flex items-center gap-3 cursor-pointer">
-                                    <div class="share-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
-                                        <i class="ph-fill ph-share-network cursor-pointer heading6"></i>
+                                <div class="wishlist flex items-center gap-3 cursor-pointer">
+                                    <div class="add-wishlist-btn md:w-12 md:h-12 w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-xl duration-300 hover:bg-black hover:text-white">
+                                        <i class="ph ph-heart text-xl"></i>
                                     </div>
-                                    <span>Share Products</span>
+                                    <div class="caption1">Add to Wishlist</div>
                                 </div>
                             </div>
-                            <div class="more-infor mt-6">
-                                <div class="flex items-center gap-4 flex-wrap">
-                                    <div class="flex items-center gap-1">
-                                        <i class="ph ph-arrow-clockwise cursor-pointer body1"></i>
-                                        <div class="text-title">Delivery & Return</div>
                                     </div>
-                                    <div class="flex items-center gap-1">
-                                        <i class="ph ph-question cursor-pointer body1"></i>
-                                        <div class="text-title">Ask A Question</div>
                                     </div>
                                 </div>
-                                <div class="flex items-center flex-wrap gap-1 mt-3">
-                                    <i class="ph ph-timer cursor-pointer body1"></i>
-                                    <span class="text-title">Estimated Delivery:</span>
-                                    <span class="text-secondary">14 January - 18 January</span>
                                 </div>
-                                <div class="flex items-center flex-wrap gap-1 mt-3">
-                                    <i class="ph ph-eye cursor-pointer body1"></i>
-                                    <span class="text-title">38</span>
-                                    <span class="text-secondary">people viewing this product right now!</span>
                                 </div>
-                                <div class="flex items-center gap-1 mt-3">
-                                    <div class="text-title">SKU:</div>
-                                    <div class="text-secondary">53453412</div>
                                 </div>
-                                <div class="flex items-center gap-1 mt-3">
-                                    <div class="text-title">Categories:</div>
-                                    <div class="list-category text-secondary">fashion, women</div>
                                 </div>
-                                <div class="flex items-center gap-1 mt-3">
-                                    <div class="text-title">Tag:</div>
-                                    <div class="list-tag text-secondary">dress</div>
-                                </div>
-                            </div>
-                            <div class="list-payment mt-7">
-                                <div class="main-content lg:pt-8 pt-6 lg:pb-6 pb-4 sm:px-4 px-3 border border-line rounded-xl relative max-md:w-2/3 max-sm:w-full">
-                                    <div class="heading6 px-5 bg-white absolute -top-[14px] left-1/2 -translate-x-1/2 whitespace-nowrap">Guranteed safe checkout</div>
-                                    <div class="list grid grid-cols-6">
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-0.png" alt="payment" class="w-full" />
-                                        </div>
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-1.png" alt="payment" class="w-full" />
-                                        </div>
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-2.png" alt="payment" class="w-full" />
-                                        </div>
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-3.png" alt="payment" class="w-full" />
-                                        </div>
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-4.png" alt="payment" class="w-full" />
-                                        </div>
-                                        <div class="item flex items-center justify-center lg:px-3 px-1">
-                                            <img src="./assets/images/payment/Frame-5.png" alt="payment" class="w-full" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+@endsection
 
-        
+@section('scripts')
+@if(isset($heroBanners) && $heroBanners->count() > 1)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const heroSwiper = new Swiper('.swiper-hero-banner', {
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+});
+</script>
+@endif
 @endsection

@@ -14,11 +14,46 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Product::with('category');
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('category', function($categoryQuery) use ($search) {
+                      $categoryQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Filter by status
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+        
+        // Filter by stock
+        if ($request->filled('stock')) {
+            if ($request->stock === 'in_stock') {
+                $query->where('in_stock', true)->where('stock_quantity', '>', 0);
+            } elseif ($request->stock === 'out_of_stock') {
+                $query->where(function($q) {
+                    $q->where('in_stock', false)->orWhere('stock_quantity', '<=', 0);
+                });
+            } elseif ($request->stock === 'low_stock') {
+                $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 10);
+            }
+        }
+        
+        $products = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         
         return view('admin.products.index', compact('products'));
     }
@@ -52,6 +87,7 @@ class ProductController extends Controller
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_new_arrival' => 'boolean',
             'image' => 'nullable|image|max:2048',
             'sort_order' => 'nullable|integer|min:0',
         ]);
@@ -114,6 +150,7 @@ class ProductController extends Controller
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_new_arrival' => 'boolean',
             'image' => 'nullable|image|max:2048',
             'sort_order' => 'nullable|integer|min:0',
         ]);

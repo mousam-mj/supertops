@@ -20,11 +20,16 @@ class Product extends Model
         'sale_price',
         'sku',
         'stock_quantity',
+        'stock',
         'in_stock',
         'is_active',
         'is_featured',
+        'is_new_arrival',
         'image',
         'images',
+        'sizes',
+        'colors',
+        'product_type',
         'sort_order',
     ];
 
@@ -32,10 +37,14 @@ class Product extends Model
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
         'stock_quantity' => 'integer',
+        'stock' => 'integer',
         'in_stock' => 'boolean',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'is_new_arrival' => 'boolean',
         'images' => 'array',
+        'sizes' => 'array',
+        'colors' => 'array',
         'sort_order' => 'integer',
     ];
 
@@ -58,16 +67,49 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * Get cart items for this product
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Get inventories for this product
+     */
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class);
+    }
+
+    /**
+     * Get order items for this product
+     */
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function getFinalPriceAttribute()
+    /**
+     * Get current price (sale_price if available, otherwise price)
+     */
+    public function getCurrentPriceAttribute()
     {
         return $this->sale_price ?? $this->price;
     }
 
+    /**
+     * Get final price (alias for current_price)
+     */
+    public function getFinalPriceAttribute()
+    {
+        return $this->current_price;
+    }
+
+    /**
+     * Get discount percentage
+     */
     public function getDiscountPercentageAttribute()
     {
         if ($this->sale_price && $this->price > $this->sale_price) {
@@ -75,4 +117,33 @@ class Product extends Model
         }
         return 0;
     }
+
+    /**
+     * Get total stock (sum of all inventory quantities)
+     */
+    public function getTotalStockAttribute()
+    {
+        return $this->inventories()->sum('quantity');
+    }
+
+    /**
+     * Get stock for specific color and size
+     */
+    public function getStockForColorSize($color = null, $size = null)
+    {
+        $query = $this->inventories();
+        
+        if ($color) {
+            $query->where('color', $color);
+        }
+        
+        if ($size) {
+            $query->where('size', $size);
+        }
+        
+        return $query->sum('quantity');
+    }
 }
+
+
+

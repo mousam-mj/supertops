@@ -16,6 +16,7 @@ class Category extends Model
         'description',
         'image',
         'parent_id',
+        'main_category_id',
         'sort_order',
         'is_active',
     ];
@@ -36,6 +37,14 @@ class Category extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
+    }
+
+    /**
+     * Get the main category.
+     */
+    public function mainCategory()
+    {
+        return $this->belongsTo(MainCategory::class, 'main_category_id');
     }
 
     /**
@@ -68,6 +77,14 @@ class Category extends Model
     public function hasChildren()
     {
         return $this->children()->count() > 0;
+    }
+
+    /**
+     * Get products in this category
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 
     /**

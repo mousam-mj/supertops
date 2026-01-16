@@ -13,22 +13,44 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'status',
+        'status_locked',
+        'total_amount',
+        'shipping_charge',
+        'coupon_id',
+        'coupon_discount',
+        'shipping_address',
+        'billing_address',
+        'payment_method',
+        'payment_status',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
+        'delhivery_waybill',
+        'delhivery_data',
+        'delhivery_tracking_data',
+        'delhivery_cancelled',
+        'notes',
+        // Legacy fields for backward compatibility
         'customer_name',
         'customer_email',
         'customer_phone',
-        'billing_address',
-        'shipping_address',
         'subtotal',
         'tax',
         'shipping',
         'total',
-        'status',
-        'payment_status',
-        'payment_method',
-        'notes',
     ];
 
     protected $casts = [
+        'status_locked' => 'boolean',
+        'total_amount' => 'decimal:2',
+        'shipping_charge' => 'decimal:2',
+        'coupon_discount' => 'decimal:2',
+        'shipping_address' => 'array',
+        'billing_address' => 'array',
+        'delhivery_data' => 'array',
+        'delhivery_tracking_data' => 'array',
+        'delhivery_cancelled' => 'boolean',
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'shipping' => 'decimal:2',
@@ -41,7 +63,18 @@ class Order extends Model
 
         static::creating(function ($order) {
             if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . strtoupper(Str::random(10));
+                // Generate order number: ORD-YYYYMMDD-XXXXXX
+                $order->order_number = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+            }
+            
+            // Set total_amount from total if not set
+            if (empty($order->total_amount) && !empty($order->total)) {
+                $order->total_amount = $order->total;
+            }
+            
+            // Set shipping_charge from shipping if not set
+            if (empty($order->shipping_charge) && isset($order->shipping)) {
+                $order->shipping_charge = $order->shipping;
             }
         });
     }
@@ -51,7 +84,26 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the coupon used in this order
+     */
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    /**
+     * Get order items
+     */
     public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get order items (alias)
+     */
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

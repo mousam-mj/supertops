@@ -213,6 +213,22 @@
                         </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="is_new_arrival" 
+                                       name="is_new_arrival" 
+                                       value="1" 
+                                       {{ old('is_new_arrival', $product->is_new_arrival) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_new_arrival">
+                                    New Arrival
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between mt-4">
                         <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left me-2"></i>Cancel
