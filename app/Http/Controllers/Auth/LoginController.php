@@ -28,7 +28,14 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+            $user = Auth::user();
             $redirect = $request->get('redirect', route('home'));
+            
+            // Check if email is verified
+            if (!$user->email_verified_at) {
+                return redirect($redirect)->with('warning', 'Please verify your email address. Check your inbox for the verification link.');
+            }
+            
             return redirect($redirect)->with('success', 'Login successful!');
         }
 

@@ -76,6 +76,28 @@ Route::get('/register', function () {
 
 Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->name('register.submit');
 
+// Email verification routes
+Route::get('/email/verify/{token}', [App\Http\Controllers\Auth\RegisterController::class, 'verifyEmail'])->name('email.verify');
+Route::post('/email/resend-verification', [App\Http\Controllers\Auth\RegisterController::class, 'resendVerification'])->name('email.resend');
+
+// Test email route (remove in production)
+Route::get('/test-email', function() {
+    try {
+        Mail::raw('This is a test email from Laravel', function ($message) {
+            $message->to('work@coderpoint.in')
+                ->subject('Test Email - ' . config('app.name'));
+        });
+        return response()->json(['success' => true, 'message' => 'Test email sent! Check work@coderpoint.in']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'error' => $e->getMessage(),
+            'class' => get_class($e),
+            'file' => $e->getFile() . ':' . $e->getLine()
+        ], 500);
+    }
+})->name('test.email');
+
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/category/{slug}', [ShopController::class, 'category'])->name('category');
