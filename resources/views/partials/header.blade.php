@@ -683,9 +683,22 @@
                             </ul>
                         </div>
                         <div class="right flex gap-12 z-[1]">
-                            <div class="max-md:hidden search-icon flex items-center cursor-pointer relative">
+                            <div class="max-md:hidden search-icon flex items-center cursor-pointer relative group">
                                 <i class="ph-bold ph-magnifying-glass text-2xl"></i>
                                 <div class="line absolute bg-line w-px h-6 -right-6"></div>
+                                <!-- Search Modal -->
+                                <div class="search-modal absolute top-full right-0 mt-2 w-96 bg-white border border-line rounded-xl shadow-lg p-4 hidden group-hover:block hover:block z-50">
+                                    <form method="GET" action="{{ route('shop') }}" class="flex gap-2">
+                                        <input type="text" 
+                                               name="search" 
+                                               placeholder="Search products..." 
+                                               class="flex-1 px-4 py-2 border border-line rounded-lg focus:border-black outline-none"
+                                               value="{{ request()->get('search') }}" />
+                                        <button type="submit" class="button-main px-6">
+                                            <i class="ph ph-magnifying-glass"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <div class="list-action flex items-center gap-4">
                                 <div class="user-icon flex items-center justify-center cursor-pointer">
@@ -727,8 +740,14 @@
                                 <a href="index.php" class="logo text-3xl font-semibold text-center">Perch</a>
                             </div>
                             <div class="form-search relative mt-2">
-                                <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
-                                <input type="text" placeholder="What are you looking for?" class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" />
+                                <form method="GET" action="{{ route('shop') }}">
+                                    <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
+                                    <input type="text" 
+                                           name="search" 
+                                           placeholder="What are you looking for?" 
+                                           value="{{ request()->get('search') }}"
+                                           class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" />
+                                </form>
                             </div>
                             <div class="list-nav mt-6">
                                 <ul>
@@ -1254,7 +1273,7 @@
                         <span class="ph-bold ph-list text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Category</span>
                     </a>
-                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('shop') }}?search=" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Search</span>
                     </a>

@@ -25,11 +25,11 @@ class CartController extends Controller
         if (!$sessionId) {
             $sessionCounts = Cart::whereNull('user_id')
                 ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity')
+                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
                 ->groupBy('session_id')
                 ->orderBy('total_quantity', 'desc')
                 ->orderBy('item_count', 'desc')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('latest_created_at', 'desc')
                 ->first();
             
             if ($sessionCounts) {
@@ -55,11 +55,11 @@ class CartController extends Controller
             // First, find the best session ID (one with most items)
             $bestSession = Cart::whereNull('user_id')
                 ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity')
+                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
                 ->groupBy('session_id')
                 ->orderBy('total_quantity', 'desc')
                 ->orderBy('item_count', 'desc')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('latest_created_at', 'desc')
                 ->first();
             
             // Use cookie session ID if available, otherwise use best session

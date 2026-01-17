@@ -59,11 +59,22 @@ Route::get('/', function () {
 })->name('home');
 
 // Regular Login Routes (for /login.html compatibility)
-Route::get('/login.html', function () {
+Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+Route::get('/login.html', function () {
+    return view('auth.login');
+});
+
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
+
+// Register Routes
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->name('register.submit');
 
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
@@ -73,6 +84,12 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.sh
 // Cart & Checkout Routes
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+
+// Order Success Route
+Route::get('/order-success/{id}', function($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    return view('order.success', compact('order'));
+})->name('order.success');
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {

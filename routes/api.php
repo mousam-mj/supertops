@@ -56,6 +56,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
+// Orders (Guest checkout supported)
+Route::post('/orders', [OrderController::class, 'store']); // Public route for guest checkout
+
 // Customer Routes (Requires Authentication)
 Route::middleware('auth:sanctum')->group(function () {
     // Profile
@@ -69,9 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('addresses', AddressController::class);
     Route::post('/addresses/{id}/set-default', [AddressController::class, 'setDefault']);
 
-    // Orders
+    // Orders (Authenticated only)
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
 

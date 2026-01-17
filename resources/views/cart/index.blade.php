@@ -141,7 +141,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('checkout.index') }}" class="button-main w-full text-center block mb-4">
+                        <a href="{{ url('/checkout') }}" class="button-main w-full text-center block mb-4" id="proceed-to-checkout-btn">
                             Proceed to Checkout
                         </a>
 
@@ -253,6 +253,33 @@ document.addEventListener('DOMContentLoaded', function() {
             removeItem(cartId);
         });
     });
+
+    // Proceed to checkout button - ensure it works properly
+    const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+    if (proceedToCheckoutBtn) {
+        // Remove any existing click handlers that might interfere
+        proceedToCheckoutBtn.onclick = null;
+        
+        proceedToCheckoutBtn.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            console.log('Proceed to checkout clicked, href:', href);
+            
+            if (!href || href === '#' || href === '' || href === 'javascript:void(0)') {
+                e.preventDefault();
+                e.stopPropagation();
+                console.error('Invalid href on checkout button:', href);
+                alert('Checkout link is not available. Please try again.');
+                return false;
+            }
+            
+            // Force navigation
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Navigating to checkout:', href);
+            window.location.href = href;
+            return false;
+        });
+    }
 });
 </script>
 @endsection

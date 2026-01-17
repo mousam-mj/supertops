@@ -89,6 +89,7 @@
 
             <form method="POST" action="{{ route('login.submit') }}">
                 @csrf
+                <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('home')) }}">
 
                 <div style="margin-bottom: 20px;">
                     <label for="email" style="display: block; margin-bottom: 8px; font-weight: 500;">Email Address</label>
@@ -136,7 +137,7 @@
             <div style="text-align: center; margin-top: 20px;">
                 <p style="margin: 0; color: #666; font-size: 14px;">
                     Don't have an account? 
-                    <a href="#" style="color: #667eea; text-decoration: none;">Register</a>
+                    <a href="{{ route('register') }}?redirect={{ urlencode(request()->get('redirect', route('home'))) }}" style="color: #667eea; text-decoration: none;">Register</a>
                 </p>
             </div>
 

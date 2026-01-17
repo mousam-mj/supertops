@@ -58,14 +58,77 @@
             </div>
         @endif
 
+        <!-- Search and Filters -->
+        <div class="filters-section bg-white border border-line rounded-2xl p-6 mb-8">
+            <form method="GET" action="{{ route('shop') }}" id="shop-filters-form">
+                @if($category)
+                    <input type="hidden" name="category" value="{{ $category->slug }}" />
+                @endif
+                
+                <div class="grid md:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="md:col-span-2">
+                        <label class="block caption1 text-secondary mb-2">Search Products</label>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request()->get('search') }}" 
+                               placeholder="Search by name, description..." 
+                               class="w-full px-4 py-3 border border-line rounded-lg focus:border-black outline-none" />
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div>
+                        <label class="block caption1 text-secondary mb-2">Min Price</label>
+                        <input type="number" 
+                               name="min_price" 
+                               value="{{ request()->get('min_price') }}" 
+                               placeholder="Min" 
+                               min="0"
+                               class="w-full px-4 py-3 border border-line rounded-lg focus:border-black outline-none" />
+                    </div>
+                    
+                    <div>
+                        <label class="block caption1 text-secondary mb-2">Max Price</label>
+                        <input type="number" 
+                               name="max_price" 
+                               value="{{ request()->get('max_price') }}" 
+                               placeholder="Max" 
+                               min="0"
+                               class="w-full px-4 py-3 border border-line rounded-lg focus:border-black outline-none" />
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between mt-4 pt-4 border-t border-line">
+                    <div>
+                        <label class="block caption1 text-secondary mb-2">Sort By</label>
+                        <select name="sort" class="px-4 py-3 border border-line rounded-lg focus:border-black outline-none">
+                            <option value="default" {{ request()->get('sort') == 'default' ? 'selected' : '' }}>Default</option>
+                            <option value="price_low" {{ request()->get('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_high" {{ request()->get('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                            <option value="name_asc" {{ request()->get('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z</option>
+                            <option value="name_desc" {{ request()->get('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A</option>
+                            <option value="newest" {{ request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="submit" class="button-main">Apply Filters</button>
+                        <a href="{{ route('shop') }}" class="button-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- Products Section -->
         <div class="products-section">
             <div class="flex items-center justify-between mb-6 md:mb-8 pb-4 border-b border-line">
                 <div class="text-secondary body1">
-                    @if($category)
-                        Showing products in <span class="text-black font-semibold">{{ $category->name }}</span>
+                    @if(request()->get('search'))
+                        Showing {{ $products->total() }} results for "<span class="text-black font-semibold">{{ request()->get('search') }}</span>"
+                    @elseif($category)
+                        Showing {{ $products->total() }} products in <span class="text-black font-semibold">{{ $category->name }}</span>
                     @else
-                        Showing all products
+                        Showing {{ $products->total() }} products
                     @endif
                 </div>
             </div>
