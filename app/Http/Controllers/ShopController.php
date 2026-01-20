@@ -157,7 +157,18 @@ class ShopController extends Controller
 
         $products = $products->paginate(16)->withQueryString();
 
-        return view('shop', compact('categories', 'category', 'products'));
+        // Get subcategories for category page
+        $subCategories = $category->children()->where('is_active', true)->get();
+        
+        // Get featured products for "What's new" section
+        $featuredProducts = Product::whereIn('category_id', $categoryIds)
+            ->where('is_active', true)
+            ->where('is_featured', true)
+            ->with('category')
+            ->limit(8)
+            ->get();
+
+        return view('category', compact('categories', 'category', 'products', 'subCategories', 'featuredProducts'));
     }
 
     /**
@@ -197,7 +208,25 @@ class ShopController extends Controller
                     ->get();
             }
 
-            return view('product.show', compact('product', 'relatedProducts'));
+            // Get active coupons for discount codes
+            $coupons = \App\Models\Coupon::where('is_active', true)
+                ->where('valid_from', '<=', now())
+                ->where('valid_until', '>=', now())
+                ->limit(3)
+                ->get();
+
+            // Get previous and next products
+            $prevProduct = Product::where('id', '<', $product->id)
+                ->where('is_active', true)
+                ->orderBy('id', 'desc')
+                ->first();
+            
+            $nextProduct = Product::where('id', '>', $product->id)
+                ->where('is_active', true)
+                ->orderBy('id', 'asc')
+                ->first();
+
+            return view('product.show', compact('product', 'relatedProducts', 'coupons', 'prevProduct', 'nextProduct'));
         } catch (\Exception $e) {
             \Log::error('Product show error: ' . $e->getMessage());
             abort(404, 'Product not found');

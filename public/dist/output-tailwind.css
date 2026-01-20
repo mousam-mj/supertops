@@ -1806,6 +1806,20 @@ video {
   overflow-x: auto;
 }
 
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.scroll2::-webkit-scrollbar {
+  width: 5px;
+}
+ 
+.scroll2::-webkit-scrollbar-thumb {
+  background: #666; 
+  border-radius: 20px;
+}
+
+
 .whitespace-nowrap {
   white-space: nowrap;
 }
@@ -3321,6 +3335,10 @@ video {
 
   .sm\:-mt-\[40px\] {
     margin-top: -40px;
+  }
+
+  .sm\:-mt-\[75px\] {
+    margin-top: -75px;
   }
 
   .sm\:mt-10 {

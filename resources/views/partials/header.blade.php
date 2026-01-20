@@ -48,99 +48,18 @@
         </div>
 
         <div id="header" class="relative w-full">
-            <div class="header-menu style-one relative bg-white w-full md:h-[74px] h-[56px]">
+            <div class="header-menu style-one relative  w-full md:h-[74px] h-[56px]">
                 <div class="container mx-auto h-full">
                     <div class="header-main flex justify-between h-full">
-                        <div class="menu-mobile-icon lg:hidden flex items-center">
+                        <div class="menu-mobile-icon  flex items-center">
                             <i class="icon-category text-2xl"></i>
+                            <a href="{{ route('home') }}" class="flex items-center px-10">
+                                <img src="{{ asset('assets/images/perch-logo.png') }}" alt="bg-img" />
+                            </a>
                         </div>
-                        <a href="{{ route('home') }}" class="flex items-center">
-                            <img src="{{ asset('assets/images/perch-logo.png') }}" alt="bg-img" />
-                        </a>
+                        
                         <div class="menu-main h-full max-lg:hidden">
                             <ul class="flex items-center gap-8 h-full">
-                               <!-- <li class="h-full relative">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center gap-1 active"> Demo </a>
-                                    <div class="sub-menu py-3 px-5 -left-10 w-max absolute grid grid-cols-4 gap-5 bg-white rounded-b-xl">
-                                        <ul>
-                                            <li>
-                                                <a href="index.php" class="link text-secondary duration-300"> Home Fashion 1 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion2.php" class="link text-secondary duration-300 active"> Home Fashion 2 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion3.php" class="link text-secondary duration-300"> Home Fashion 3 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion4.php" class="link text-secondary duration-300"> Home Fashion 4 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion5.php" class="link text-secondary duration-300"> Home Fashion 5 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion6.php" class="link text-secondary duration-300"> Home Fashion 6 </a>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>
-                                                <a href="fashion7.php" class="link text-secondary duration-300"> Home Fashion 7 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion8.php" class="link text-secondary duration-300"> Home Fashion 8 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion9.php" class="link text-secondary duration-300"> Home Fashion 9 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion10.php" class="link text-secondary duration-300"> Home Fashion 10 </a>
-                                            </li>
-                                            <li>
-                                                <a href="fashion11.php" class="link text-secondary duration-300"> Home Fashion 11 </a>
-                                            </li>
-                                            <li>
-                                                <a href="underwear.php" class="link text-secondary duration-300"> Home Underwear </a>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>
-                                                <a href="cosmetic1.php" class="link text-secondary duration-300"> Home Cosmetic 1 </a>
-                                            </li>
-                                            <li>
-                                                <a href="cosmetic2.php" class="link text-secondary duration-300"> Home Cosmetic 2 </a>
-                                            </li>
-                                            <li>
-                                                <a href="cosmetic3.php" class="link text-secondary duration-300"> Home Cosmetic 3 </a>
-                                            </li>
-                                            <li>
-                                                <a href="pet.php" class="link text-secondary duration-300"> Home Pet Store </a>
-                                            </li>
-                                            <li>
-                                                <a href="jewelry.php" class="link text-secondary duration-300"> Home Jewelry </a>
-                                            </li>
-                                            <li>
-                                                <a href="furniture.php" class="link text-secondary duration-300"> Home Furniture </a>
-                                            </li>
-                                        </ul>
-                                        <ul>
-                                            <li>
-                                                <a href="watch.php" class="link text-secondary duration-300"> Home Watch </a>
-                                            </li>
-                                            <li>
-                                                <a href="toys.php" class="link text-secondary duration-300"> Home Toys Kid </a>
-                                            </li>
-                                            <li>
-                                                <a href="yoga.php" class="link text-secondary duration-300"> Home Yoga </a>
-                                            </li>
-                                            <li>
-                                                <a href="organic.php" class="link text-secondary duration-300"> Home Organic </a>
-                                            </li>
-                                            <li>
-                                                <a href="marketplace.php" class="link text-secondary duration-300"> Home Marketplace </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>-->
                                 <li class="h-full">
                                     <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Features </a>
                                     <div class="mega-menu absolute top-[74px] left-0 bg-white w-screen">
@@ -151,19 +70,19 @@
                                                         <div class="text-button-uppercase pb-2">For Men</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -171,19 +90,19 @@
                                                         <div class="text-button-uppercase pb-2">Massimo Dutti</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Shirt | Clothes </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Clothes </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Top | Overshirts </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Top | Overshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Clothes </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Clothes </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Swimwear | Underwear </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Swimwear | Underwear </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -191,19 +110,19 @@
                                                         <div class="text-button-uppercase pb-2">Skincare</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -211,19 +130,19 @@
                                                         <div class="text-button-uppercase pb-2">Health</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -231,19 +150,19 @@
                                                         <div class="text-button-uppercase pb-2">For Women</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -251,19 +170,19 @@
                                                         <div class="text-button-uppercase pb-2">For Kid</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -271,383 +190,63 @@
                                                         <div class="text-button-uppercase pb-2">For Home</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                        <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <div class="banner-ads-block pl-2.5 basis-1/3">
-                                                    <a href="shop-breadcrumb1.php" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer">
+                                            <a href="{{ route('shop') }}" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer">
                                                         <div class="text-content py-14 pl-8 relative z-[1]">
                                                             <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm">Save $10</div>
                                                             <div class="heading6 mt-2">Dive into Savings <br />on Swimwear</div>
                                                             <div class="body1 mt-3 text-secondary">Starting at <span class="text-red">$59.99</span></div>
                                                         </div>
-                                                        <img src="./assets/images/slider/bg2-2.png" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
+                                                <img src="{{ asset('assets/images/slider/bg2-2.png') }}" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
                                                     </a>
-                                                    <a href="shop-breadcrumb1.php" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer mt-8">
+                                            <a href="{{ route('shop') }}" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer mt-8">
                                                         <div class="text-content py-14 pl-8 relative z-[1]">
                                                             <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm">Save $10</div>
                                                             <div class="heading6 mt-2">20% off <br />accessories</div>
                                                             <div class="body1 mt-3 text-secondary">Starting at <span class="text-red">$59.99</span></div>
                                                         </div>
-                                                        <img src="./assets/images/other/bg-feature.png" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
+                                                <img src="{{ asset('assets/images/other/bg-feature.png') }}" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
                                                     </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
-                               <!-- <li class="h-full">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Shop </a>
-                                    <div class="mega-menu absolute top-[74px] left-0 bg-white w-screen">
-                                        <div class="container">
-                                            <div class="flex justify-between py-8">
-                                                <div class="nav-link basis-2/3 flex justify-between pr-12">
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Shop Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb-img.php" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb2.php" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-collection.php" class="link text-secondary duration-300"> Shop Collection </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Shop Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-filter-canvas.php" class="link text-secondary duration-300"> Shop Filter Canvas </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-filter-options.php" class="link text-secondary duration-300"> Shop Filter Options </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-filter-dropdown.php" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-sidebar-list.php" class="link text-secondary duration-300"> Shop Sidebar List </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Shop Layout</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-default.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-default-grid.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-default-list.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-fullwidth.php" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-square.php" class="link text-secondary duration-300"> Shop Square </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Products Pages</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="wishlist.php" class="link text-secondary duration-300"> Wish List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="search-result.php" class="link text-secondary duration-300"> Search Result </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="cart.php" class="link text-secondary duration-300"> Shopping Cart </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="login.php" class="link text-secondary duration-300"> Login/Register </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="forgot-password.php" class="link text-secondary duration-300"> Forgot Password </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="order-tracking.php" class="link text-secondary duration-300"> Order Tracking </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="my-account.php" class="link text-secondary duration-300"> My Account </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="recent-product pl-2.5 basis-1/3">
-                                                    <div class="text-button-uppercase pb-2">Recent Products</div>
-                                                    <div class="list-product hide-product-sold grid grid-cols-2 gap-5 mt-3">
-                                                        <div class="product-item grid-type" data-item="1">
-                                                            <div class="product-main cursor-pointer block">
-                                                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                                                            <i class="ph ph-heart text-lg"></i>
-                                                                        </div>
-                                                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                                                    </div>
-                                                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="product-infor mt-4 lg:mb-7">
-                                                                    <div class="product-sold sm:pb-4 pb-2">
-                                                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                                                        </div>
-                                                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                                                            <div class="text-button-uppercase">
-                                                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                                                <span class="max-sm:text-xs">12</span>
-                                                                            </div>
-                                                                            <div class="text-button-uppercase">
-                                                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                                                <span class="max-sm:text-xs">88</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="product-name text-title duration-300">Faux-leather trousers</div>
-                                                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                                                        <div class="color-item bg-black w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Black</div>
-                                                                        </div>
-                                                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
-                                                                        </div>
-                                                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                                                        <div class="product-price text-title">$40.00</div>
-                                                                        <div class="product-origin-price caption1 text-secondary2">
-                                                                            <del>$50.00</del>
-                                                                        </div>
-                                                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product-item grid-type" data-item="3">
-                                                            <div class="product-main cursor-pointer block">
-                                                                <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
-                                                                    <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-                                                                    <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
-                                                                        <div class="add-wishlist-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Add To Wishlist</div>
-                                                                            <i class="ph ph-heart text-lg"></i>
-                                                                        </div>
-                                                                        <div class="compare-btn w-[32px] h-[32px] flex items-center justify-center rounded-full bg-white duration-300 relative mt-2">
-                                                                            <div class="tag-action bg-black text-white caption2 px-1.5 py-0.5 rounded-sm">Compare Product</div>
-                                                                            <i class="ph ph-arrow-counter-clockwise text-lg compare-icon"></i>
-                                                                            <i class="ph ph-check-circle text-lg checked-icon"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="product-img w-full h-full aspect-[3/4]">
-                                                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                                                        <img class="w-full h-full object-cover duration-700" src="./assets/images/product/perch-bottal.webp" alt="img" />
-                                                                    </div>
-                                                                    <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
-                                                                        <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
-                                                                        <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white">Add To Cart</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="product-infor mt-4 lg:mb-7">
-                                                                    <div class="product-sold sm:pb-4 pb-2">
-                                                                        <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                                                                            <div class="progress-sold bg-red absolute left-0 top-0 h-full"></div>
-                                                                        </div>
-                                                                        <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                                                                            <div class="text-button-uppercase">
-                                                                                <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                                                                                <span class="max-sm:text-xs">12</span>
-                                                                            </div>
-                                                                            <div class="text-button-uppercase">
-                                                                                <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                                                                                <span class="max-sm:text-xs">88</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="product-name text-title duration-300">Off-the-Shoulder Blouse</div>
-                                                                    <div class="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
-                                                                        <div class="color-item bg-red w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
-                                                                        </div>
-                                                                        <div class="color-item bg-yellow w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">yellow</div>
-                                                                        </div>
-                                                                        <div class="color-item bg-green w-8 h-8 rounded-full duration-300 relative">
-                                                                            <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">green</div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                                                                        <div class="product-price text-title">$40.00</div>
-                                                                        <div class="product-origin-price caption1 text-secondary2">
-                                                                            <del>$50.00</del>
-                                                                        </div>
-                                                                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>-->
-                               <!-- <li class="h-full">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Product </a>
-                                    <div class="mega-menu absolute top-[74px] left-0 bg-white w-screen">
-                                        <div class="container">
-                                            <div class="nav-link w-full flex justify-between py-8">
-                                                <div class="nav-item">
-                                                    <div class="text-button-uppercase pb-2">Products Features</div>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="product-default.php" class="link text-secondary duration-300"> Products Defaults </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-sale.php" class="link text-secondary duration-300"> Products Sale </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-countdown-timer.php" class="link text-secondary duration-300"> Products Countdown Timer </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-grouped.php" class="link text-secondary duration-300"> Products Grouped </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-bought-together.php" class="link text-secondary duration-300"> Frequently Bought Together </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-out-of-stock.php" class="link text-secondary duration-300"> Products Out Of Stock </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-variable.php" class="link text-secondary duration-300"> Products Variable </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="nav-item">
-                                                    <div class="text-button-uppercase pb-2">Products Features</div>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="product-external.php" class="link text-secondary duration-300"> Products External </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-on-sale.php" class="link text-secondary duration-300"> Products On Sale </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-discount.php" class="link text-secondary duration-300"> Products With Discount </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-sidebar.php" class="link text-secondary duration-300"> Products With Sidebar </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-fixed-price.php" class="link text-secondary duration-300"> Products Fixed Price </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="nav-item">
-                                                    <div class="text-button-uppercase pb-2">Products Layout</div>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="product-thumbnail-left.php" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-thumbnail-bottom.php" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-one-scrolling.php" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-two-scrolling.php" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-combined-one.php" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-combined-two.php" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="nav-item">
-                                                    <div class="text-button-uppercase pb-2">Products Styles</div>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="product-style1.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-style2.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-style3.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-style4.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="product-style5.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>-->
                                 <li class="h-full relative">
                                     <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Blog </a>
                                     <div class="sub-menu py-3 px-5 -left-10 absolute bg-white rounded-b-xl">
                                         <ul class="w-full">
                                             <li>
-                                                <a href="blog-default.php" class="link text-secondary duration-300"> Blog Default </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Blog Default </a>
                                             </li>
                                             <li>
-                                                <a href="blog-list.php" class="link text-secondary duration-300"> Blog List </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Blog List </a>
                                             </li>
                                             <li>
-                                                <a href="blog-grid.php" class="link text-secondary duration-300"> Blog Grid </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Blog Grid </a>
                                             </li>
                                             <li>
-                                                <a href="blog-detail1.php" class="link text-secondary duration-300"> Blog Detail 1 </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Blog Detail 1 </a>
                                             </li>
                                             <li>
-                                                <a href="blog-detail2.php" class="link text-secondary duration-300"> Blog Detail 2 </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Blog Detail 2 </a>
                                             </li>
                                         </ul>
                                     </div>
@@ -657,25 +256,25 @@
                                     <div class="sub-menu py-3 px-5 -left-10 absolute bg-white rounded-b-xl">
                                         <ul class="w-full">
                                             <li>
-                                                <a href="about.php" class="link text-secondary duration-300"> About Us </a>
+                                        <a href="{{ route('about') }}" class="link text-secondary duration-300"> About Us </a>
                                             </li>
                                             <li>
-                                                <a href="contact.php" class="link text-secondary duration-300"> Contact Us </a>
+                                        <a href="{{ route('contact') }}" class="link text-secondary duration-300"> Contact Us </a>
                                             </li>
                                             <li>
-                                                <a href="store-list.php" class="link text-secondary duration-300"> Store List </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Store List </a>
                                             </li>
                                             <li>
-                                                <a href="page-not-found.php" class="link text-secondary duration-300"> 404 </a>
+                                        <a href="#!" class="link text-secondary duration-300"> 404 </a>
                                             </li>
                                             <li>
-                                                <a href="faqs.php" class="link text-secondary duration-300"> FAQs </a>
+                                        <a href="{{ route('faqs') }}" class="link text-secondary duration-300"> FAQs </a>
                                             </li>
                                             <li>
-                                                <a href="coming-soon.php" class="link text-secondary duration-300"> Coming Soon </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Coming Soon </a>
                                             </li>
                                             <li>
-                                                <a href="customer-feedbacks.php" class="link text-secondary duration-300"> Customer Feedbacks </a>
+                                        <a href="#!" class="link text-secondary duration-300"> Customer Feedbacks </a>
                                             </li>
                                         </ul>
                                     </div>
@@ -683,35 +282,38 @@
                             </ul>
                         </div>
                         <div class="right flex gap-12 z-[1]">
-                            <div class="max-md:hidden search-icon flex items-center cursor-pointer relative group">
+                            <div class="max-md:hidden search-icon flex items-center cursor-pointer relative">
                                 <i class="ph-bold ph-magnifying-glass text-2xl"></i>
                                 <div class="line absolute bg-line w-px h-6 -right-6"></div>
-                                <!-- Search Modal -->
-                                <div class="search-modal absolute top-full right-0 mt-2 w-96 bg-white border border-line rounded-xl shadow-lg p-4 hidden group-hover:block hover:block z-50">
-                                    <form method="GET" action="{{ route('shop') }}" class="flex gap-2">
-                                        <input type="text" 
-                                               name="search" 
-                                               placeholder="Search products..." 
-                                               class="flex-1 px-4 py-2 border border-line rounded-lg focus:border-black outline-none"
-                                               value="{{ request()->get('search') }}" />
-                                        <button type="submit" class="button-main px-6">
-                                            <i class="ph ph-magnifying-glass"></i>
-                                        </button>
-                                    </form>
-                                </div>
                             </div>
                             <div class="list-action flex items-center gap-4">
-                                <div class="user-icon flex items-center justify-center cursor-pointer">
+                                <div class="user-icon flex items-center justify-center cursor-pointer relative">
                                     <i class="ph-bold ph-user text-2xl"></i>
                                     <div class="login-popup absolute top-[74px] w-[320px] p-7 rounded-xl bg-white box-shadow-sm">
-                                        <a href="{{ route('login') }}" class="button-main w-full text-center">Login</a>
-                                        <div class="text-secondary text-center mt-3 pb-4">
-                                            Don’t have an account?
-                                            <a href="register.php" class="text-black pl-1 hover:underline">Register </a>
-                                        </div>
-                                        <a href="{{ route('admin.dashboard') }}" class="button-main bg-white text-black border border-black w-full text-center">Dashboard</a>
-                                        <div class="bottom mt-4 pt-4 border-t border-line"></div>
-                                        <a href="#!" class="body1 hover:underline">Support</a>
+                                        @auth
+                                            <div class="text-center mb-4">
+                                                <div class="body1 text-black font-medium">{{ Auth::user()->name }}</div>
+                                                <div class="caption1 text-secondary">{{ Auth::user()->email }}</div>
+                                            </div>
+                                            <a href="{{ route('my-account') }}" class="button-main w-full text-center">My Account</a>
+                                            @if(Auth::user()->role === 'admin')
+                                                <a href="{{ route('admin.dashboard') }}" class="button-main bg-white text-black border border-black w-full text-center mt-3">Dashboard</a>
+                                            @endif
+                                            <div class="bottom mt-4 pt-4 border-t border-line"></div>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <button type="submit" class="body1 hover:underline w-full text-left">Logout</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('login') }}" class="button-main w-full text-center">Login</a>
+                                            <div class="text-secondary text-center mt-3 pb-4">
+                                                Don't have an account?
+                                                <a href="{{ route('register') }}" class="text-black pl-1 hover:underline">Register </a>
+                                            </div>
+                                            <a href="{{ route('admin.dashboard') }}" class="button-main bg-white text-black border border-black w-full text-center">Dashboard</a>
+                                            <div class="bottom mt-4 pt-4 border-t border-line"></div>
+                                            <a href="#!" class="body1 hover:underline">Support</a>
+                                        @endauth
                                     </div>
                                 </div>
                                 <div class="max-md:hidden wishlist-icon flex items-center relative cursor-pointer">
@@ -732,12 +334,12 @@
             <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
                     <div class="container h-full">
-                        <div class="menu-main h-full overflow-hidden">
+                <div class="menu-main h-full overflow-x-hidden scroll2">
                             <div class="heading py-2 relative flex items-center justify-center">
                                 <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                                     <i class="ph ph-x text-sm"></i>
                                 </div>
-                                <a href="index.php" class="logo text-3xl font-semibold text-center">Perch</a>
+                        <a href="{{ route('home') }}" class="logo text-3xl font-semibold text-center">Perch</a>
                             </div>
                             <div class="form-search relative mt-2">
                                 <form method="GET" action="{{ route('shop') }}">
@@ -749,584 +351,67 @@
                                            class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" />
                                 </form>
                             </div>
+                    
                             <div class="list-nav mt-6">
-                                <ul>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between"
-                                            >Demo
+                        @php
+                            $categories = \App\Models\Category::whereNull('parent_id')
+                                ->with(['children.children'])
+                                ->where('is_active', true)
+                                ->orderBy('sort_order')
+                                ->get();
+                        @endphp
+                        
+                        <ul>
+                            @foreach($categories as $category)
+                                <li>
+                                    <a href="#!" class="text-xl font-semibold flex items-center justify-between">
+                                        {{ $category->name }}
                                             <span class="text-right">
                                                 <i class="ph ph-caret-right text-xl"></i>
                                             </span>
                                         </a>
+                                    @if($category->children->count() > 0)
                                         <div class="sub-nav-mobile">
                                             <div class="back-btn flex items-center gap-3">
                                                 <i class="ph ph-caret-left text-xl"></i>
                                                 Back
                                             </div>
                                             <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
-                                                <ul>
-                                                    <li>
-                                                        <a href="index.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion2.php" class="nav-item-mobile link text-secondary duration-300 active"> Home Fashion 2 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion3.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 3 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion4.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 4 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion5.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 5 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion6.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 6 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion7.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 7 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion8.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 8 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion9.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 9 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion10.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 10 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion11.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 11 </a>
-                                                    </li>
-                                                </ul>
-                                                <ul>
-                                                    <li>
-                                                        <a href="underwear.php" class="nav-item-mobile link text-secondary duration-300"> Home Underwear </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="cosmetic1.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 1 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="cosmetic2.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 2 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="cosmetic3.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 3 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="pet.php" class="nav-item-mobile link text-secondary duration-300"> Home Pet Store </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="jewelry.php" class="nav-item-mobile link text-secondary duration-300"> Home Jewelry </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="furniture.php" class="nav-item-mobile link text-secondary duration-300"> Home Furniture </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="watch.php" class="nav-item-mobile link text-secondary duration-300"> Home Watch </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="toys.php" class="nav-item-mobile link text-secondary duration-300"> Home Toys Kid </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="yoga.php" class="nav-item-mobile link text-secondary duration-300"> Home Yoga </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="organic.php" class="nav-item-mobile link text-secondary duration-300"> Home Organic </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="marketplace.php" class="nav-item-mobile link text-secondary duration-300"> Home Marketplace </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Features
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                        </a>
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
-                                            </div>
-                                            <div class="list-nav-item w-full pt-2 pb-6">
-                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6">
+                                                @foreach($category->children as $subCategory)
                                                     <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Men</div>
-                                                        <ul>
+                                                        <a href="{{ route('shop', ['category' => $subCategory->slug]) }}" class="text-title duration-300">{{ $subCategory->name }}</a>
+                                                        @if($subCategory->children->count() > 0)
+                                                            <ul class="mt-2">
+                                                                @foreach($subCategory->children as $childCategory)
+                                                                    <li>
+                                                                        <a href="{{ route('shop', ['category' => $childCategory->slug]) }}" class="link text-secondary duration-300">{{ $childCategory->name }}</a>
+                                                            </li>
+                                                                @endforeach
+                                                        </ul>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                                    </div>
+                                                    </div>
+                                    @endif
+                                                            </li>
+                            @endforeach
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                <a href="{{ route('shop') }}" class="text-xl font-semibold">Shop</a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                <a href="{{ route('about') }}" class="text-xl font-semibold">About Us</a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                <a href="{{ route('contact') }}" class="text-xl font-semibold">Contact Us</a>
                                                             </li>
                                                             <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                <a href="{{ route('faqs') }}" class="text-xl font-semibold">FAQs</a>
                                                             </li>
                                                         </ul>
                                                     </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Skincare</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Health</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Women</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Kid</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Home</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Shop
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                        </a>
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
-                                            </div>
-                                            <div class="list-nav-item w-full pt-2 pb-6">
-                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6 justify-between">
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-breadcrumb-img.php" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb1.php" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-breadcrumb2.php" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-collection.php" class="link text-secondary duration-300"> Shop Collection </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-filter-canvas.php" class="link text-secondary duration-300"> Shop Filter Canvas </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-filter-options.php" class="link text-secondary duration-300"> Shop Filter Options </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-filter-dropdown.php" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-sidebar-list.php" class="link text-secondary duration-300"> Shop Sidebar List </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Layout</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="shop-default.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-default-grid.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-default-list.php" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-fullwidth.php" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="shop-square.php" class="link text-secondary duration-300"> Shop Square </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Pages</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="wishlist.php" class="link text-secondary duration-300"> Wish List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="search-result.php" class="link text-secondary duration-300"> Search Result </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="cart.php" class="link text-secondary duration-300"> Shopping Cart </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="login.php" class="link text-secondary duration-300"> Login/Register </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="forgot-password.php" class="link text-secondary duration-300"> Forgot Password </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="order-tracking.php" class="link text-secondary duration-300"> Order Tracking </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="my-account.php" class="link text-secondary duration-300"> My Account </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Product
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                        </a>
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
-                                            </div>
-                                            <div class="list-nav-item w-full pt-2 pb-6">
-                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6 justify-between">
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="product-default.php" class="link text-secondary duration-300"> Products Defaults </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-sale.php" class="link text-secondary duration-300"> Products Sale </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-countdown-timer.php" class="link text-secondary duration-300"> Products Countdown Timer </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-grouped.php" class="link text-secondary duration-300"> Products Grouped </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-bought-together.php" class="link text-secondary duration-300"> Frequently Bought Together </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-out-of-stock.php" class="link text-secondary duration-300"> Products Out Of Stock </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-variable.php" class="link text-secondary duration-300"> Products Variable </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Features</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="product-external.php" class="link text-secondary duration-300"> Products External </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-on-sale.php" class="link text-secondary duration-300"> Products On Sale </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-discount.php" class="link text-secondary duration-300"> Products With Discount </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-sidebar.php" class="link text-secondary duration-300"> Products With Sidebar </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-fixed-price.php" class="link text-secondary duration-300"> Products Fixed Price </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Layout</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="product-thumbnail-left.php" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-thumbnail-bottom.php" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-one-scrolling.php" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-two-scrolling.php" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-combined-one.php" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-combined-two.php" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Styles</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="product-style1.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-style2.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-style3.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-style4.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="product-style5.php" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Blog
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                        </a>
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
-                                            </div>
-                                            <div class="list-nav-item w-full pt-2 pb-6">
-                                                <ul class="w-full">
-                                                    <li>
-                                                        <a href="blog-default.php" class="link text-secondary duration-300"> Blog Default </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="blog-list.php" class="link text-secondary duration-300"> Blog List </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="blog-grid.php" class="link text-secondary duration-300"> Blog Grid </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="blog-detail1.php" class="link text-secondary duration-300"> Blog Detail 1 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="blog-detail2.php" class="link text-secondary duration-300"> Blog Detail 2 </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Pages
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                        </a>
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
-                                            </div>
-                                            <div class="list-nav-item w-full pt-2 pb-6">
-                                                <ul class="w-full">
-                                                    <li>
-                                                        <a href="about.php" class="link text-secondary duration-300"> About Us </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="contact.php" class="link text-secondary duration-300"> Contact Us </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="store-list.php" class="link text-secondary duration-300"> Store List </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="page-not-found.php" class="link text-secondary duration-300"> 404 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="faqs.php" class="link text-secondary duration-300"> FAQs </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="coming-soon.php" class="link text-secondary duration-300"> Coming Soon </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="customer-feedbacks.php" class="link text-secondary duration-300"> Customer Feedbacks </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Menu bar -->
-            <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
-                <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-house text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Home</span>
-                    </a>
-                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-list text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Category</span>
-                    </a>
-                    <a href="{{ route('shop') }}?search=" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Search</span>
-                    </a>
-                    <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <div class="cart-icon relative">
-                            <span class="ph-bold ph-handbag text-2xl block"></span>
-                            <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                        </div>
-                        <span class="menu_bar-title caption2 font-semibold">Cart</span>
-                    </a>
-                </div>
-            </div>
-            <!-- Slider - Only show on home page -->
-            @if(request()->routeIs('home'))
-            <div class="slider-block style-two xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] w-full">
-                <div class="slider-main h-full w-full">
-                    <div class="swiper swiper-slider h-full relative">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="slider-item h-full w-full relative overflow-hidden">
-                                    <div class="container w-full h-full">
-                                        <!--<div class="text-content w-full h-full flex flex-col items-center justify-center">
-                                            <div class="text-sub-display text-white text-center">Sale! Up To 50% Off!</div>
-                                            <div class="text-display text-white text-center md:mt-5 mt-2">Trendy Women's <br />Clothing</div>
-                                            <a href="shop-breadcrumb-img.php" class="button-main bg-white text-black hover:bg-black hover:text-white md:mt-8 mt-3"> Shop Now</a>
-                                        </div>-->
-                                        <div class="sub-img absolute left-0 top-0 w-full h-full z-[-1]">
-                                            <img src="./assets/images/slider/03b-scaled.webp" alt="bg4-1" class="w-full h-full object-cover" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="slider-item h-full w-full relative overflow-hidden">
-                                    <div class="container w-full h-full">
-                                        <!--<div class="text-content w-full h-full flex flex-col items-center justify-center">
-                                            <div class="text-sub-display text-white text-center">Sale! Up To 50% Off!</div>
-                                            <div class="text-display text-white text-center md:mt-5 mt-2">Shop the Latest <br />Fashion Trends</div>
-                                            <a href="shop-breadcrumb-img.php" class="button-main bg-white text-black hover:bg-black hover:text-white md:mt-8 mt-3"> Shop Now</a>
-                                        </div>-->
-                                        <div class="sub-img absolute left-0 top-0 w-full h-full z-[-1]">
-                                            <img src="./assets/images/slider/09-1-scaled.webp" alt="bg4-2" class="w-full h-full object-cover" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                        </div>
-                        <!-- <div class="swiper-pagination"></div> -->
-                    </div>
-                </div>
-            </div>
-            @endif
-            <!-- Slider -->
-            
-        </div>

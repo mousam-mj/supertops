@@ -2236,6 +2236,12 @@ input[type=file]::-webkit-file-upload-button {
   pointer-events: unset;
   width: 100%;
 }
+@media (min-width: 768px) {#menu-mobile{ 
+            width: 30% !important;
+            left: 0 !important;
+            position: fixed !important;
+          }
+        }
 #menu-mobile.open .heading,
 #menu-mobile.open .form-search {
   opacity: 1;
@@ -3984,16 +3990,6 @@ input[type=file]::-webkit-file-upload-button {
 }
 
 /* Banner */
-.hero-banner-slider {
-  background: transparent;
-  margin: 0;
-  padding: 0;
-}
-
-.banner-block {
-  background: transparent;
-}
-
 .banner-block .banner-item:hover .banner-img img {
   opacity: 0.9;
   transform: scale(1.07);

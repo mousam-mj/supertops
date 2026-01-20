@@ -3,106 +3,616 @@
 @section('title', 'Register - Perch Bottle')
 
 @section('content')
-<div class="auth-page md:pt-20 pt-10 pb-20">
-    <div class="container">
-        <div class="max-w-md mx-auto">
-            <div class="bg-white border border-line rounded-2xl p-8">
-                <h1 class="heading2 mb-6 text-center">Create Account</h1>
-                
-                @if($errors->any())
-                    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                </svg>
+<div id="menu-mobile" class="">
+                <div class="menu-container bg-white h-full">
+                    <div class="container h-full">
+                        <div class="menu-main h-full overflow-hidden">
+                            <div class="heading py-2 relative flex items-center justify-center">
+                                <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
+                                    <i class="ph ph-x text-sm"></i>
+                                </div>
+                                <a href="{ route('home') }" class="logo text-3xl font-semibold text-center">Anvogue</a>
                             </div>
-                            <div class="ml-3 flex-1">
-                                <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
-                                <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
+                            <div class="form-search relative mt-2">
+                                <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
+                                <input type="text" placeholder="What are you looking for?" class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" />
+                            </div>
+                            <div class="list-nav mt-6">
+                                <ul>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between"
+                                            >Demo
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
+                                                <ul>
+                                                    <li>
+                                                        <a href="{ route('home') }" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion2.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 2 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion3.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 3 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion4.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 4 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion5.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 5 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion6.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 6 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion7.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 7 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion8.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 8 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion9.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 9 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion10.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 10 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="fashion11.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 11 </a>
+                                                    </li>
+                                                </ul>
+                                                <ul>
+                                                    <li>
+                                                        <a href="underwear.html" class="nav-item-mobile link text-secondary duration-300"> Home Underwear </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="cosmetic1.html" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 1 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="cosmetic2.html" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 2 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="cosmetic3.html" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 3 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="pet.html" class="nav-item-mobile link text-secondary duration-300"> Home Pet Store </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="jewelry.html" class="nav-item-mobile link text-secondary duration-300"> Home Jewelry </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="furniture.html" class="nav-item-mobile link text-secondary duration-300"> Home Furniture </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="watch.html" class="nav-item-mobile link text-secondary duration-300"> Home Watch </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="toys.html" class="nav-item-mobile link text-secondary duration-300"> Home Toys Kid </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="yoga.html" class="nav-item-mobile link text-secondary duration-300"> Home Yoga </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="organic.html" class="nav-item-mobile link text-secondary duration-300"> Home Organic </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="marketplace.html" class="nav-item-mobile link text-secondary duration-300"> Home Marketplace </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >Features
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6">
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">For Men</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Skincare</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Health</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">For Women</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">For Kid</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">For Home</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >Shop
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6 justify-between">
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Collection </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Canvas </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Options </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Sidebar List </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Shop Layout</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Square </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Products Pages</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('wishlist') }" class="link text-secondary duration-300"> Wish List </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('search') }" class="link text-secondary duration-300"> Search Result </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('cart.index') }" class="link text-secondary duration-300"> Shopping Cart </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('login') }" class="link text-secondary duration-300 active"> Login/Register </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('forgot-password') }" class="link text-secondary duration-300"> Forgot Password </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('order-tracking') }" class="link text-secondary duration-300"> Order Tracking </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('my-account') }" class="link text-secondary duration-300"> My Account </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >Product
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <div class="nav-link grid grid-cols-2 gap-5 gap-y-6 justify-between">
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Products Features</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Defaults </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Sale </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Countdown Timer </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Grouped </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Frequently Bought Together </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Out Of Stock </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Variable </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Products Features</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products External </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products On Sale </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products With Discount </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products With Sidebar </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Fixed Price </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Products Layout</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="nav-item">
+                                                        <div class="text-button-uppercase pb-1">Products Styles</div>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >Blog
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul class="w-full">
+                                                    <li>
+                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Default </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog List </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Grid </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 1 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 2 </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >Pages
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul class="w-full">
+                                                    <li>
+                                                        <a href="{ route('about') }" class="link text-secondary duration-300"> About Us </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('contact') }" class="link text-secondary duration-300"> Contact Us </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('stores') }" class="link text-secondary duration-300"> Store List </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('404') }" class="link text-secondary duration-300"> 404 </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('faqs') }" class="link text-secondary duration-300"> FAQs </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('coming-soon') }" class="link text-secondary duration-300"> Coming Soon </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{ route('feedbacks') }" class="link text-secondary duration-300"> Customer Feedbacks </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                @endif
-                
-                <form method="POST" action="{{ route('register.submit') }}" id="register-form" onsubmit="document.getElementById('submit-btn').disabled=true; document.getElementById('submit-btn').innerHTML='Creating Account...';">
-                    @csrf
-                    <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('home')) }}">
-                    
-                    <div class="space-y-4">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block caption1 text-secondary mb-2">First Name *</label>
-                                <input type="text" name="first_name" value="{{ old('first_name') }}" class="w-full px-4 py-3 border border-line rounded-lg focus:border-black outline-none" required />
-                                @error('first_name')
-                                    <span class="caption1 text-red-600">{{ $message }}</span>
-                                @enderror
+                </div>
+            </div>
+
+            <!-- Menu bar -->
+            <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
+                <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
+                    <a href="{ route('home') }" class="menu_bar-link flex flex-col items-center gap-1">
+                        <span class="ph-bold ph-house text-2xl block"></span>
+                        <span class="menu_bar-title caption2 font-semibold">Home</span>
+                    </a>
+                    <a href="{ route('shop') }" class="menu_bar-link flex flex-col items-center gap-1">
+                        <span class="ph-bold ph-list text-2xl block"></span>
+                        <span class="menu_bar-title caption2 font-semibold">Category</span>
+                    </a>
+                    <a href="{ route('search') }" class="menu_bar-link flex flex-col items-center gap-1">
+                        <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
+                        <span class="menu_bar-title caption2 font-semibold">Search</span>
+                    </a>
+                    <a href="{ route('cart.index') }" class="menu_bar-link flex flex-col items-center gap-1">
+                        <div class="cart-icon relative">
+                            <span class="ph-bold ph-handbag text-2xl block"></span>
+                            <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
+                        </div>
+                        <span class="menu_bar-title caption2 font-semibold">Cart</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="breadcrumb-block style-shared">
+                <div class="breadcrumb-main bg-linear overflow-hidden">
+                    <div class="container lg:pt-[134px] pt-24 pb-10 relative">
+                        <div class="main-content w-full h-full flex flex-col items-center justify-center relative z-[1]">
+                            <div class="text-content">
+                                <div class="heading2 text-center">Register</div>
+                                <div class="link flex items-center justify-center gap-1 caption1 mt-3">
+                                    <a href="{ route('home') }">Homepage</a>
+                                    <i class="ph ph-caret-right text-sm text-secondary2"></i>
+                                    <div class="text-secondary2 capitalize">Register</div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block caption1 text-secondary mb-2">Last Name *</label>
-                                <input type="text" name="last_name" value="{{ old('last_name') }}" class="w-full px-4 py-3 border border-line rounded-lg focus:border-black outline-none" required />
-                                @error('last_name')
-                                    <span class="caption1 text-red-600">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block caption1 text-secondary mb-2">Email *</label>
-                            <input type="email" name="email" value="{{ old('email') }}" class="w-full px-4 py-3 border {{ $errors->has('email') ? 'border-red-500' : 'border-line' }} rounded-lg focus:border-black outline-none transition-colors" required autocomplete="email" />
-                            @error('email')
-                                <span class="caption1 text-red-600 mt-1 block">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block caption1 text-secondary mb-2">Phone (Optional)</label>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-3 border {{ $errors->has('phone') ? 'border-red-500' : 'border-line' }} rounded-lg focus:border-black outline-none transition-colors" placeholder="+1 234 567 8900" autocomplete="tel" />
-                            @error('phone')
-                                <span class="caption1 text-red-600 mt-1 block">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block caption1 text-secondary mb-2">Password *</label>
-                            <input type="password" name="password" id="password" class="w-full px-4 py-3 border {{ $errors->has('password') ? 'border-red-500' : 'border-line' }} rounded-lg focus:border-black outline-none transition-colors" required autocomplete="new-password" />
-                            <p class="caption2 text-secondary mt-1">Must be at least 8 characters long</p>
-                            @error('password')
-                                <span class="caption1 text-red-600 mt-1 block">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block caption1 text-secondary mb-2">Confirm Password *</label>
-                            <input type="password" name="password_confirmation" class="w-full px-4 py-3 border {{ $errors->has('password_confirmation') ? 'border-red-500' : 'border-line' }} rounded-lg focus:border-black outline-none transition-colors" required autocomplete="new-password" />
-                            @error('password_confirmation')
-                                <span class="caption1 text-red-600 mt-1 block">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
-                    
-                    <div class="mt-6">
-                        <button type="submit" id="submit-btn" class="w-full text-center block" style="background-color: #000; color: #fff; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; font-size: 16px; display: block; width: 100%;" onmouseover="if(!this.disabled) this.style.backgroundColor='#333'" onmouseout="if(!this.disabled) this.style.backgroundColor='#000'">
-                            Create Account
-                        </button>
-                    </div>
-                </form>
-                
-                <div class="mt-6 text-center">
-                    <p class="body2 text-secondary">
-                        Already have an account?
-                        <a href="{{ route('login') }}?redirect={{ urlencode(request()->get('redirect', route('home'))) }}" class="text-black hover:underline">
-                            Login
-                        </a>
-                    </p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-@endsection
 
+        <div class="register-block md:py-20 py-10">
+            <div class="container">
+                <div class="content-main flex gap-y-8 max-md:flex-col">
+                    <div class="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r border-line">
+                        <div class="heading4">Register</div>
+                        <form class="md:mt-7 mt-4">
+                            <div class="email">
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="email" placeholder="Username or email address *" required />
+                            </div>
+                            <div class="pass mt-5">
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" type="password" placeholder="Password *" required />
+                            </div>
+                            <div class="confirm-pass mt-5">
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="confirmPassword" type="password" placeholder="Confirm Password *" required />
+                            </div>
+                            <div class="flex items-center mt-5">
+                                <div class="block-input">
+                                    <input type="checkbox" name="remember" id="remember" />
+                                    <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                </div>
+                                <label for="remember" class="pl-2 cursor-pointer text-secondary2"
+                                    >I agree to the
+                                    <a href="#!" class="text-black hover:underline pl-1">Terms of User</a>
+                                </label>
+                            </div>
+                            <div class="block-button md:mt-7 mt-4">
+                                <button class="button-main">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
+                        <div class="text-content">
+                            <div class="heading4">Already have an account?</div>
+                            <div class="mt-2 text-secondary">Welcome back. Sign in to access your personalized experience, saved preferences, and more. We{String.raw`'re`} thrilled to have you with us again!</div>
+                            <div class="block-button md:mt-7 mt-4">
+                                <a href="{ route('login') }" class="button-main">Login</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+@endsection

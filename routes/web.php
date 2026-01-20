@@ -100,6 +100,7 @@ Route::get('/test-email', function() {
 
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+Route::get('/shop/collection', [ShopController::class, 'index'])->name('shop.collection');
 Route::get('/category/{slug}', [ShopController::class, 'category'])->name('category');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
 
@@ -112,6 +113,115 @@ Route::get('/order-success/{id}', function($id) {
     $order = \App\Models\Order::findOrFail($id);
     return view('order.success', compact('order'));
 })->name('order.success');
+
+// Forgot Password Route
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('forgot-password');
+
+// Order Tracking Route
+Route::get('/order-tracking', function () {
+    $order = null;
+    if(request()->has('order_id') && request()->has('email')) {
+        $order = \App\Models\Order::where('id', request()->get('order_id'))
+            ->where('email', request()->get('email'))
+            ->first();
+    }
+    return view('order-tracking', compact('order'));
+})->name('order-tracking');
+
+// Wishlist Route
+Route::get('/wishlist', function () {
+    $wishlistItems = [];
+    if(auth()->check()) {
+        // Get user's wishlist items - you'll need to implement wishlist functionality
+        $wishlistItems = collect([]);
+    }
+    $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+    return view('wishlist', compact('wishlistItems', 'categories'));
+})->name('wishlist');
+
+// Search Route
+Route::get('/search', function () {
+    $query = request()->get('q', '');
+    $products = collect([]);
+    if($query) {
+        $products = \App\Models\Product::where('is_active', true)
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                  ->orWhere('description', 'like', '%' . $query . '%')
+                  ->orWhere('short_description', 'like', '%' . $query . '%');
+            })
+            ->with('category')
+            ->paginate(20);
+    }
+    return view('search-result', compact('products', 'query'));
+})->name('search');
+
+// About Us Route
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+// Contact Route
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
+Route::post('/contact', function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'message' => 'required|string|max:5000',
+    ]);
+    
+    // Here you can send an email or save to database
+    // For now, just return success message
+    return redirect()->route('contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
+})->name('contact.submit');
+
+// FAQs Route
+Route::get('/faqs', function () {
+    return view('faqs');
+})->name('faqs');
+
+// Newsletter Subscription Route
+Route::post('/newsletter/subscribe', function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'email' => 'required|email|max:255',
+    ]);
+    
+    // Here you can save to database or send to email service
+    // For now, just return success message
+    return redirect()->back()->with('success', 'Thank you for subscribing to our newsletter!');
+})->name('newsletter.subscribe');
+
+// My Account Route (requires authentication)
+Route::get('/my-account', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Please login to access your account.');
+    }
+    $user = auth()->user();
+    $orders = \App\Models\Order::where('user_id', $user->id)
+        ->orWhere('email', $user->email)
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+    $addresses = \App\Models\Address::where('user_id', $user->id)->get();
+    
+    // Get order statistics
+    $awaitingPickup = \App\Models\Order::where(function($q) use ($user) {
+        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+    })->where('status', 'processing')->count();
+    $cancelledOrders = \App\Models\Order::where(function($q) use ($user) {
+        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+    })->where('status', 'cancelled')->count();
+    $totalOrders = \App\Models\Order::where(function($q) use ($user) {
+        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+    })->count();
+    
+    return view('my-account', compact('user', 'orders', 'addresses', 'awaitingPickup', 'cancelledOrders', 'totalOrders'));
+})->middleware('auth')->name('my-account');
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
