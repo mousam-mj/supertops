@@ -69,6 +69,14 @@ Route::get('/login.html', function () {
 
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
 
+// Logout Route
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('home')->with('success', 'You have been logged out successfully.');
+})->name('logout');
+
 // Register Routes
 Route::get('/register', function () {
     return view('auth.register');
