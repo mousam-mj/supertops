@@ -36,7 +36,7 @@
                         <th>Parent Category:</th>
                         <td>
                             @if($category->parent)
-                                <a href="{{ route('admin.categories.show', $category->parent) }}" class="badge bg-info text-decoration-none">
+                                <a href="{{{ route('admin.categories.show', $category->parent) }}}" class="badge bg-info text-decoration-none">
                                     {{ $category->parent->name }}
                                 </a>
                             @else
@@ -82,13 +82,13 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-primary">
+                    <a href="{{{ route('admin.categories.edit', $category) }}}" class="btn btn-primary">
                         <i class="bi bi-pencil me-2"></i>Edit Category
                     </a>
-                    <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">
+                    <a href="{{{ route('admin.categories.index') }}}" class="btn btn-secondary">
                         <i class="bi bi-arrow-left me-2"></i>Back to List
                     </a>
-                    <form action="{{ route('admin.categories.destroy', $category) }}" 
+                    <form action="{{{ route('admin.categories.destroy', $category) }}}" 
                           method="POST" 
                           onsubmit="return confirm('Are you sure you want to delete this category?');">
                         @csrf
@@ -110,7 +110,7 @@
                     <ul class="list-group list-group-flush">
                         @foreach($category->children as $child)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <a href="{{ route('admin.categories.show', $child) }}" class="text-decoration-none">
+                                <a href="{{{ route('admin.categories.show', $child) }}}" class="text-decoration-none">
                                     {{ $child->name }}
                                 </a>
                                 @if($child->children->count() > 0)

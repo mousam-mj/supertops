@@ -108,10 +108,10 @@
                     </tr>
                 </table>
                 <div class="mt-3">
-                    <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-primary">
+                    <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-primary">
                         <i class="bi bi-pencil me-2"></i>Edit Product
                     </a>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                    <a href="{{{ route('admin.products.index') }}}" class="btn btn-secondary">
                         <i class="bi bi-arrow-left me-2"></i>Back to List
                     </a>
                 </div>

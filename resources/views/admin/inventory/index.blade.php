@@ -41,7 +41,7 @@
                                                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
                                                 @endif
                                                 <div>
-                                                    <a href="{{ route('admin.products.show', $product) }}" class="fw-semibold">{{ $product->name }}</a>
+                                                    <a href="{{{ route('admin.products.show', $product) }}}" class="fw-semibold">{{ $product->name }}</a>
                                                     @if($product->sku)
                                                         <div class="text-muted small">{{ $product->sku }}</div>
                                                     @endif
@@ -70,7 +70,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i> Update Stock
                                             </a>
                                         </td>

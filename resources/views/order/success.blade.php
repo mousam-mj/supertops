@@ -40,7 +40,7 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('home') }}" class="button-main">
+                    <a href="{{{ route('home') }}}" class="button-main">
                         Continue Shopping
                     </a>
                     @if(auth()->check())

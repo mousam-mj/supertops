@@ -11,7 +11,7 @@
                                 <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                                     <i class="ph ph-x text-sm"></i>
                                 </div>
-                                <a href="{ route('home') }" class="logo text-3xl font-semibold text-center">Anvogue</a>
+                                <a href="{{ route('home') }}" class="logo text-3xl font-semibold text-center">Anvogue</a>
                             </div>
                             <div class="form-search relative mt-2">
                                 <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
@@ -34,7 +34,7 @@
                                             <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
                                                 <ul>
                                                     <li>
-                                                        <a href="{ route('home') }" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
+                                                        <a href="{{ route('home') }}" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
                                                     </li>
                                                     <li>
                                                         <a href="fashion2.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 2 </a>
@@ -126,19 +126,19 @@
                                                         <div class="text-button-uppercase pb-1">For Men</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -146,19 +146,19 @@
                                                         <div class="text-button-uppercase pb-1">Skincare</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -166,19 +166,19 @@
                                                         <div class="text-button-uppercase pb-1">Health</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -186,19 +186,19 @@
                                                         <div class="text-button-uppercase pb-1">For Women</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -206,19 +206,19 @@
                                                         <div class="text-button-uppercase pb-1">For Kid</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -226,19 +226,19 @@
                                                         <div class="text-button-uppercase pb-1">For Home</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -264,16 +264,16 @@
                                                         <div class="text-button-uppercase pb-1">Shop Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 active"> Shop Collection </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 active"> Shop Collection </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -281,16 +281,16 @@
                                                         <div class="text-button-uppercase pb-1">Shop Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Canvas </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Canvas </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Options </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Options </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Sidebar List </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Sidebar List </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -298,19 +298,19 @@
                                                         <div class="text-button-uppercase pb-1">Shop Layout</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Square </a>
+                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Square </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -318,25 +318,25 @@
                                                         <div class="text-button-uppercase pb-1">Products Pages</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('wishlist') }" class="link text-secondary duration-300"> Wish List </a>
+                                                                <a href="{{ route('wishlist') }}" class="link text-secondary duration-300"> Wish List </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('search') }" class="link text-secondary duration-300"> Search Result </a>
+                                                                <a href="{{ route('search') }}" class="link text-secondary duration-300"> Search Result </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('cart.index') }" class="link text-secondary duration-300"> Shopping Cart </a>
+                                                                <a href="{{ route('cart.index') }}" class="link text-secondary duration-300"> Shopping Cart </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('login') }" class="link text-secondary duration-300"> Login/Register </a>
+                                                                <a href="{{ route('login') }}" class="link text-secondary duration-300"> Login/Register </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('forgot-password') }" class="link text-secondary duration-300"> Forgot Password </a>
+                                                                <a href="{{ route('forgot-password') }}" class="link text-secondary duration-300"> Forgot Password </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('order-tracking') }" class="link text-secondary duration-300"> Order Tracking </a>
+                                                                <a href="{{ route('order-tracking') }}" class="link text-secondary duration-300"> Order Tracking </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('my-account') }" class="link text-secondary duration-300"> My Account </a>
+                                                                <a href="{{ route('my-account') }}" class="link text-secondary duration-300"> My Account </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -362,25 +362,25 @@
                                                         <div class="text-button-uppercase pb-1">Products Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Defaults </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Defaults </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Sale </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Sale </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Countdown Timer </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Countdown Timer </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Grouped </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Grouped </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Frequently Bought Together </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Frequently Bought Together </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Out Of Stock </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Out Of Stock </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Variable </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Variable </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -388,19 +388,19 @@
                                                         <div class="text-button-uppercase pb-1">Products Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products External </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products External </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products On Sale </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products On Sale </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products With Discount </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products With Discount </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products With Sidebar </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products With Sidebar </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Fixed Price </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300"> Products Fixed Price </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -408,22 +408,22 @@
                                                         <div class="text-button-uppercase pb-1">Products Layout</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -431,19 +431,19 @@
                                                         <div class="text-button-uppercase pb-1">Products Styles</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
+                                                                <a href="{{ route('product.show', $product->slug ?? '#') }}" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -466,19 +466,19 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <ul class="w-full">
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Default </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Blog Default </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog List </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Blog List </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Grid </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Blog Grid </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 1 </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Blog Detail 1 </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 2 </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Blog Detail 2 </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -499,25 +499,25 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <ul class="w-full">
                                                     <li>
-                                                        <a href="{ route('about') }" class="link text-secondary duration-300"> About Us </a>
+                                                        <a href="{{ route('about') }}" class="link text-secondary duration-300"> About Us </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('contact') }" class="link text-secondary duration-300"> Contact Us </a>
+                                                        <a href="{{ route('contact') }}" class="link text-secondary duration-300"> Contact Us </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('stores') }" class="link text-secondary duration-300"> Store List </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Store List </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('404') }" class="link text-secondary duration-300"> 404 </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> 404 </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('faqs') }" class="link text-secondary duration-300"> FAQs </a>
+                                                        <a href="{{ route('faqs') }}" class="link text-secondary duration-300"> FAQs </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('coming-soon') }" class="link text-secondary duration-300"> Coming Soon </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Coming Soon </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('feedbacks') }" class="link text-secondary duration-300"> Customer Feedbacks </a>
+                                                        <a href="{{ route('home') }}" class="link text-secondary duration-300"> Customer Feedbacks </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -533,19 +533,19 @@
             <!-- Menu bar -->
             <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
                 <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="{ route('home') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-house text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Home</span>
                     </a>
-                    <a href="{ route('shop') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-list text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Category</span>
                     </a>
-                    <a href="{ route('search') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('search') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Search</span>
                     </a>
-                    <a href="{ route('cart.index') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
                         <div class="cart-icon relative">
                             <span class="ph-bold ph-handbag text-2xl block"></span>
                             <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
@@ -563,7 +563,7 @@
                         <div class="text-content">
                             <div class="heading2 text-center">Shop</div>
                             <div class="link flex items-center justify-center gap-1 caption1 mt-3">
-                                <a href="{ route('home') }">Homepage</a>
+                                <a href="{{ route('home') }}">Homepage</a>
                                 <i class="ph ph-caret-right text-sm text-secondary2"></i>
                                 <div class="text-secondary2 capitalize">Shop</div>
                             </div>
@@ -577,19 +577,19 @@
             <div class="container">
                 <div class="banner-heading rounded-2xl overflow-hidden relative max-lg:h-[300px] max-md:h-[260px]">
                     <div class="bg-img h-full">
-                        <img src="{{ asset(\'assets/images/banner/banner-shop-breadcrumb-img.png" alt="bg" class="w-full h-full object-cover" />
+                        <img src="{{ asset('assets/images/banner/banner-shop-breadcrumb-img.png" alt="bg" class="w-full h-full object-cover') " />
                     </div>
                     <div class="text-content absolute top-1/2 -translate-y-1/2 right-10">
                         <div class="body1 font-semibold uppercase">New Trend 2022</div>
                         <div class="heading1 font-semibold mt-2">Sale Off <br />Up To 30%</div>
-                        <a href="{ route('shop') }" class="button-main lg:mt-10 mt-6">Explore More</a>
+                        <a href="{{ route('shop') }}" class="button-main lg:mt-10 mt-6">Explore More</a>
                     </div>
                 </div>
                 <div class="list-collection md:py-20 py-10">
                     <div class="item">
                         <div class="main flex max-sm:flex-wrap gap-y-8 items-center justify-between">
                             <div class="bg-img sm:w-1/2 lg:pr-[90px] sm:pr-14">
-                                <img src="{{ asset(\'assets/images/product/1000x1000.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl" />
+                                <img src="{{ asset('assets/images/product/1000x1000.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl') " />
                             </div>
                             <div class="right sm:w-1/2">
                                 <div class="heading flex items-center justify-between flex-wrap gap-y-4">
@@ -598,7 +598,7 @@
                                         <div class="heading3 sm:mt-3 mt-1">Linen Wrap Dresses</div>
                                     </div>
                                     <div class="right">
-                                        <a href="{ route('shop') }" class="button-main bg-white text-black border border-black">View All Products </a>
+                                        <a href="{{ route('shop') }}" class="button-main bg-white text-black border border-black">View All Products </a>
                                     </div>
                                 </div>
                                 <div class="list-product hide-product-sold grid grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
@@ -618,8 +618,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -654,15 +654,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>
@@ -693,8 +693,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -729,15 +729,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>
@@ -759,7 +759,7 @@
                     <div class="item md:mt-20 mt-10">
                         <div class="main flex max-sm:flex-wrap gap-y-8 items-center justify-between">
                             <div class="bg-img sm:w-1/2 lg:pr-[90px] sm:pr-14">
-                                <img src="{{ asset(\'assets/images/product/1000x1000.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl" />
+                                <img src="{{ asset('assets/images/product/1000x1000.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl') " />
                             </div>
                             <div class="right sm:w-1/2">
                                 <div class="heading flex items-center justify-between flex-wrap gap-y-4">
@@ -768,7 +768,7 @@
                                         <div class="heading3 sm:mt-3 mt-1">Linen Wrap Dresses</div>
                                     </div>
                                     <div class="right">
-                                        <a href="{ route('shop') }" class="button-main bg-white text-black border border-black">View All Products </a>
+                                        <a href="{{ route('shop') }}" class="button-main bg-white text-black border border-black">View All Products </a>
                                     </div>
                                 </div>
                                 <div class="list-product hide-product-sold grid grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
@@ -788,8 +788,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -824,15 +824,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>
@@ -863,8 +863,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -899,15 +899,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>
@@ -929,7 +929,7 @@
                     <div class="item md:mt-20 mt-10">
                         <div class="main flex max-sm:flex-wrap gap-y-8 items-center justify-between">
                             <div class="bg-img sm:w-1/2 lg:pr-[90px] sm:pr-14">
-                                <img src="{{ asset(\'assets/images/collection/outerwear.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl" />
+                                <img src="{{ asset('assets/images/collection/outerwear.png" alt="bg" class="w-full object-cover aspect-[3/4] rounded-xl') " />
                             </div>
                             <div class="right sm:w-1/2">
                                 <div class="heading flex items-center justify-between flex-wrap gap-y-4">
@@ -938,7 +938,7 @@
                                         <div class="heading3 sm:mt-3 mt-1">Linen Wrap Dresses</div>
                                     </div>
                                     <div class="right">
-                                        <a href="{ route('shop') }" class="button-main bg-white text-black border border-black">View All Products </a>
+                                        <a href="{{ route('shop') }}" class="button-main bg-white text-black border border-black">View All Products </a>
                                     </div>
                                 </div>
                                 <div class="list-product hide-product-sold grid grid-cols-2 md:gap-[30px] gap-5 md:mt-10 mt-6">
@@ -958,8 +958,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -994,15 +994,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>
@@ -1033,8 +1033,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="product-img w-full h-full aspect-[3/4]">
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
-                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset(\'assets/images/product/1000x1000.png" alt="img" />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
+                                                    <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/1000x1000.png" alt="img') " />
                                                 </div>
                                                 <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                                                     <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">Quick View</div>
@@ -1069,15 +1069,15 @@
                                                 <div class="product-name text-title duration-300">Faux-leather trousers</div>
                                                 <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Blue</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                                                     </div>
                                                     <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                                        <img src="{{ asset(\'assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                                        <img src="{{ asset('assets/images/product/color/48x48.png" alt="color" class="rounded-xl w-full h-full object-cover') " />
                                                         <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">White</div>
                                                     </div>
                                                 </div>

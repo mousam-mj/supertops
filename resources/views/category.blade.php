@@ -13,7 +13,7 @@
 
 <div class="banner-block relative">
     <div class="list-banner">
-        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block overflow-hidden duration-500">
+        <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block overflow-hidden duration-500">
             <div class="banner-img w-full">
                 <img src="{{ asset('assets/images/slider/09-1-scaled.webp') }}" alt="bg-img" class="w-full duration-500" />
             </div>
@@ -27,42 +27,42 @@
         <div class="banner-block md:pt-20 pt-10">
             <div class="container">
                 <div class="list-banner grid md:grid-cols-3 gap-[20px]">
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
                         <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                     </a>
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
                         <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                     </a>
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kichenware</div>
                         <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                     </a>
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
                         <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                     </a>
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
                         <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                     </a>
-                    <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                         <div class="banner-img w-full">
                             <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
                         </div>
@@ -83,7 +83,7 @@
 
 <div class="banner-block relative">
     <div class="list-banner">
-        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block overflow-hidden duration-500">
+        <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block overflow-hidden duration-500">
             <div class="banner-img w-full">
                 <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="bg-img" class="w-full duration-500" />
             </div>
@@ -447,7 +447,7 @@
             <div class="text-content xl:w-1/3 w-2/3 xl:pl-[120px] md:pl-20 pl-10 md:py-[85px] py-12">
                 <div class="text-sub-display">Sale Up To 50% Off Today!</div>
                 <div class="heading2 md:mt-4 mt-2">Created to be loved for a lifetime</div>
-                <a href="{{ route('shop') }}" class="button-main md:mt-7 mt-3">Shop Now</a>
+                <a href="{{{ route('shop') }}}" class="button-main md:mt-7 mt-3">Shop Now</a>
             </div>
         </div>
     </div>
@@ -456,7 +456,7 @@
 <div class="banner-block pt-5 px-5">
     <div class="container">
         <div class="list-banner grid lg:grid-cols-2 sm:grid-cols-2 gap-[20px]">
-                <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                     <div class="banner-img w-full">
                         <img src="{{ asset('assets/images/banner/perch123(2).webp') }}" alt="bg-img" class="w-full duration-500">
                     </div>
@@ -465,7 +465,7 @@
                         <div class="text-button text-black relative inline-block pb-1 border-b-2 border-black duration-500 mt-2">Shop Now</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                     <div class="banner-img w-full">
                         <img src="{{ asset('assets/images/banner/perch123(2).webp') }}" alt="bg-img" class="w-full duration-500">
                     </div>
@@ -484,7 +484,7 @@
             <div class="text-content sm:w-1/3 max-sm:pt-10 max-sm:pb-[40px] flex flex-col items-center justify-center z-[1]">
                 <div class="text-sub-display">Sale! Up To 50% Off!</div>
                 <div class="heading1 text-center md:mt-4 mt-2">Perch Bottle <br class="max-xl:hidden">on sale</div>
-                <a href="{{ route('shop') }}" class="button-main md:mt-8 mt-3" tabindex="0">Shop Now</a>
+                <a href="{{{ route('shop') }}}" class="button-main md:mt-8 mt-3" tabindex="0">Shop Now</a>
             </div>
             <div class="sub-img sm:w-2/3 w-full h-full sm:pl-10">
                 <img src="{{ asset('assets/images/banner/perch123(1).webp') }}" alt="bg-toys1" class="w-full h-full object-cover z-[1] relative" />
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Filter products
                 if (typeof window.categorySlug !== 'undefined') {
-                    window.location.href = '{{ route("category", $category->slug ?? "") }}?type=' + type;
+                    window.location.href = '{{{ route("category", $category->slug ?? "") }}}?type=' + type;
                 }
             });
         });

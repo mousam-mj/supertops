@@ -31,9 +31,10 @@ class LoginController extends Controller
             $user = Auth::user();
             $redirect = $request->get('redirect', route('home'));
             
-            // Check if email is verified
+            // Auto-verify email if not verified
             if (!$user->email_verified_at) {
-                return redirect($redirect)->with('warning', 'Please verify your email address. Check your inbox for the verification link.');
+                $user->email_verified_at = now();
+                $user->save();
             }
             
             return redirect($redirect)->with('success', 'Login successful!');

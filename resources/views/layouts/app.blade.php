@@ -60,7 +60,7 @@
                 <div class="flex-1 text-center">
                     <span class="font-semibold">⚠️ {{ session('warning') }}</span>
                     @if(session('email_sent') === false)
-                        <form method="POST" action="{{ route('email.resend') }}" class="inline-block ml-4">
+                        <form method="POST" action="{{{ route('email.resend') }}}" class="inline-block ml-4">
                             @csrf
                             <button type="submit" class="bg-black text-white px-4 py-1 rounded hover:bg-gray-800 text-sm">
                                 Resend Verification Email
@@ -84,25 +84,7 @@
         </div>
     @endif
     
-    {{-- Email Verification Notice --}}
-    @auth
-        @if(!auth()->user()->email_verified_at && !session('warning'))
-        <div class="bg-yellow-500 text-black py-3 px-4 text-center relative z-50">
-            <div class="container mx-auto flex items-center justify-between">
-                <div class="flex-1 text-center">
-                    <span class="font-semibold">⚠️ Please verify your email address.</span>
-                    <span class="ml-2">Check your inbox for the verification link.</span>
-                </div>
-                <form method="POST" action="{{ route('email.resend') }}" class="ml-4">
-                    @csrf
-                    <button type="submit" class="bg-black text-white px-4 py-1 rounded hover:bg-gray-800 text-sm">
-                        Resend Email
-                    </button>
-                </form>
-            </div>
-        </div>
-        @endif
-    @endauth
+    {{-- Email Verification Notice - Disabled --}}
     
     @yield('content')
     
@@ -112,7 +94,7 @@
     <div class="modal-search-block">
         <div class="modal-search-main md:p-10 p-6 rounded-[32px]">
             <div class="form-search relative w-full">
-                <form method="GET" action="{{ route('shop') }}">
+                <form method="GET" action="{{{ route('shop') }}}">
                     <i class="ph ph-magnifying-glass absolute heading5 right-6 top-1/2 -translate-y-1/2 cursor-pointer"></i>
                     <input type="text" name="search" placeholder="Searching..." class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-12" />
                 </form>
@@ -120,10 +102,10 @@
             <div class="keyword mt-8">
                 <div class="heading5">Feature keywords Today</div>
                 <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{ route('shop', ['search' => 'Dress']) }}'">Dress</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{ route('shop', ['search' => 'T-shirt']) }}'">T-shirt</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{ route('shop', ['search' => 'Underwear']) }}'">Underwear</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{ route('shop', ['search' => 'Top']) }}'">Top</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Dress']) }}}'">Dress</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'T-shirt']) }}}'">T-shirt</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Underwear']) }}}'">Underwear</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Top']) }}}'">Top</button>
                 </div>
             </div>
             <div class="list-recent mt-8">
@@ -162,7 +144,7 @@
             </div>
             <div class="list-product px-6"></div>
             <div class="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
-                <a href="{{ route('wishlist') }}" class="button-main w-full text-center uppercase"> View All Wish List</a>
+                <a href="{{{ route('wishlist') }}}" class="button-main w-full text-center uppercase"> View All Wish List</a>
                 <div class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">Or continue shopping</div>
             </div>
         </div>
@@ -211,8 +193,8 @@
                         <div class="text-button-uppercase">Total:</div>
                         <div class="text-title">$<span class="total-price">0.00</span></div>
                     </div>
-                    <a href="{{ route('checkout.index') }}" class="button-main w-full text-center uppercase">Checkout</a>
-                    <a href="{{ route('cart.index') }}" class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">View Cart</a>
+                    <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center uppercase">Checkout</a>
+                    <a href="{{{ route('cart.index') }}}" class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">View Cart</a>
                 </div>
             </div>
         </div>
@@ -287,7 +269,7 @@
             const wishlistIcon = document.querySelector('.wishlist-icon');
             if (wishlistIcon) {
                 wishlistIcon.addEventListener('click', function() {
-                    window.location.href = '{{ route("wishlist") }}';
+                    window.location.href = '{{{ route("wishlist") }}}';
                 });
             }
             
@@ -295,7 +277,7 @@
             const cartIcon = document.querySelector('.cart-icon');
             if (cartIcon) {
                 cartIcon.addEventListener('click', function() {
-                    window.location.href = '{{ route("cart.index") }}';
+                    window.location.href = '{{{ route("cart.index") }}}';
                 });
             }
         });

@@ -11,7 +11,7 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Main Categories</h4>
                 <p class="text-muted mb-0">Manage main product categories</p>
             </div>
-            <a href="{{ route('admin.main-categories.create') }}" class="btn btn-primary">
+            <a href="{{{ route('admin.main-categories.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Main Category
             </a>
         </div>
@@ -53,13 +53,13 @@
                                         <td>{{ $category->categories->count() ?? 0 }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="{{ route('admin.main-categories.show', $category) }}" class="btn btn-sm btn-outline-info">
+                                                <a href="{{{ route('admin.main-categories.show', $category) }}}" class="btn btn-sm btn-outline-info">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <a href="{{ route('admin.main-categories.edit', $category) }}" class="btn btn-sm btn-outline-primary">
+                                                <a href="{{{ route('admin.main-categories.edit', $category) }}}" class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <form action="{{ route('admin.main-categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                                <form action="{{{ route('admin.main-categories.destroy', $category) }}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -76,7 +76,7 @@
                 @else
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>No main categories found. 
-                        <a href="{{ route('admin.main-categories.create') }}">Create your first main category</a>.
+                        <a href="{{{ route('admin.main-categories.create') }}}">Create your first main category</a>.
                     </div>
                 @endif
             </div>

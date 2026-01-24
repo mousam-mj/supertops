@@ -47,7 +47,7 @@
                                 @foreach($lowStockProducts as $product)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.products.show', $product) }}">{{ $product->name }}</a>
+                                            <a href="{{{ route('admin.products.show', $product) }}}">{{ $product->name }}</a>
                                         </td>
                                         <td>
                                             <span class="badge bg-danger">{{ $product->stock_quantity ?? 0 }}</span>
@@ -55,7 +55,7 @@
                                         <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
                                         <td>{{ $product->category->name ?? 'N/A' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i> Update Stock
                                             </a>
                                         </td>
@@ -107,13 +107,13 @@
                                 @foreach($pendingOrders as $order)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.orders.show', $order) }}">{{ $order->order_number ?? 'N/A' }}</a>
+                                            <a href="{{{ route('admin.orders.show', $order) }}}">{{ $order->order_number ?? 'N/A' }}</a>
                                         </td>
                                         <td>{{ $order->customer_name ?? 'Guest' }}</td>
                                         <td>₹{{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</td>
                                         <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
                                         <td>
-                                            <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{{ route('admin.orders.show', $order) }}}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </td>
@@ -166,7 +166,7 @@
                                 @foreach($outOfStockProducts as $product)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.products.show', $product) }}">{{ $product->name }}</a>
+                                            <a href="{{{ route('admin.products.show', $product) }}}">{{ $product->name }}</a>
                                         </td>
                                         <td>
                                             <span class="badge bg-danger">Out of Stock</span>
@@ -174,7 +174,7 @@
                                         <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
                                         <td>{{ $product->category->name ?? 'N/A' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i> Update Stock
                                             </a>
                                         </td>

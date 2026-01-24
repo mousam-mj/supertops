@@ -418,12 +418,12 @@
                     <h5 class="text-white mb-1 small">e-commerce web... Admin Panel</h5>
                     <ul class="nav flex-column mt-4">
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{{ route('admin.dashboard') }}}">
                                 <i class="bi bi-house-door me-2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}" href="{{ route('admin.alerts.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}" href="{{{ route('admin.alerts.index') }}}">
                                 <i class="bi bi-bell me-2"></i> Alerts
                                 @if(isset($alertsCount) && $alertsCount > 0)
                                     <span class="badge bg-danger rounded-pill ms-2">{{ $alertsCount }}</span>
@@ -431,49 +431,49 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.main-categories.*') ? 'active' : '' }}" href="{{ route('admin.main-categories.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.main-categories.*') ? 'active' : '' }}" href="{{{ route('admin.main-categories.index') }}}">
                                 <i class="bi bi-folder me-2"></i> Main Categories
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{{ route('admin.categories.index') }}}">
                                 <i class="bi bi-folder2 me-2"></i> Sub Categories
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{{ route('admin.products.index') }}}">
                                 <i class="bi bi-box-seam me-2"></i> Products
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{{ route('admin.inventory.index') }}}">
                                 <i class="bi bi-boxes me-2"></i> Inventory
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{{ route('admin.orders.index') }}}">
                                 <i class="bi bi-cart-check me-2"></i> Orders
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{{ route('admin.payments.index') }}}">
                                 <i class="bi bi-credit-card me-2"></i> Payments History
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}" href="{{ route('admin.coupons.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}" href="{{{ route('admin.coupons.index') }}}">
                                 <i class="bi bi-ticket-perforated me-2"></i> Coupons
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{{ route('admin.users.index') }}}">
                                 <i class="bi bi-people me-2"></i> Customers
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="position-absolute bottom-0 w-100 p-3">
-                    <form action="{{ route('admin.logout') }}" method="POST">
+                    <form action="{{{ route('admin.logout') }}}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-light w-100">
                             <i class="bi bi-box-arrow-right me-2"></i> Logout
@@ -501,7 +501,7 @@
                                     <div class="text-muted small">Administrator</div>
                                 </div>
                             </div>
-                            <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+                            <form action="{{{ route('admin.logout') }}}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
                                     <i class="bi bi-box-arrow-right me-1"></i> Logout

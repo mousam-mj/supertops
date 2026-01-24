@@ -11,7 +11,7 @@
                 <h5 class="mb-0">Update Order Status</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.orders.update', $order) }}" method="POST">
+                <form action="{{{ route('admin.orders.update', $order) }}}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -60,7 +60,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-secondary">
+                        <a href="{{{ route('admin.orders.show', $order) }}}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left me-2"></i>Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">

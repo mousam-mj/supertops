@@ -140,10 +140,10 @@
         @endif
 
         <div class="d-flex justify-content-between">
-            <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+            <a href="{{{ route('admin.orders.index') }}}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left me-2"></i>Back to List
             </a>
-            <a href="{{ route('admin.orders.edit', $order) }}" class="btn btn-primary">
+            <a href="{{{ route('admin.orders.edit', $order) }}}" class="btn btn-primary">
                 <i class="bi bi-pencil me-2"></i>Edit Order
             </a>
         </div>

@@ -11,7 +11,7 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Coupons</h4>
                 <p class="text-muted mb-0">Manage discount coupons and promotional codes</p>
             </div>
-            <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary">
+            <a href="{{{ route('admin.coupons.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Create New Coupon
             </a>
         </div>
@@ -103,13 +103,13 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="{{ route('admin.coupons.show', $coupon) }}" class="btn btn-sm btn-outline-info">
+                                                <a href="{{{ route('admin.coupons.show', $coupon) }}}" class="btn btn-sm btn-outline-info">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <a href="{{ route('admin.coupons.edit', $coupon) }}" class="btn btn-sm btn-outline-primary">
+                                                <a href="{{{ route('admin.coupons.edit', $coupon) }}}" class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <form action="{{ route('admin.coupons.destroy', $coupon) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+                                                <form action="{{{ route('admin.coupons.destroy', $coupon) }}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -126,7 +126,7 @@
                 @else
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>No coupons found. 
-                        <a href="{{ route('admin.coupons.create') }}">Create your first coupon</a>.
+                        <a href="{{{ route('admin.coupons.create') }}}">Create your first coupon</a>.
                     </div>
                 @endif
             </div>

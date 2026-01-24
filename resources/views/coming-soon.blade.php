@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <script src="{{ asset(\'assets/js/phosphor-icons.js"></script>
+    <script src="{{ asset('assets/js/phosphor-icons.js') "></script>
     <script>
         const countDown = new Date("September 09, 2024 00:00:00").getTime()
             const setCountDown = setInterval(function () {

@@ -37,9 +37,9 @@
                             @forelse($orders as $order)
                                 <tr>
                                     <td><strong>{{ $order->order_number }}</strong></td>
-                                    <td>{{ $order->customer_name }}</td>
-                                    <td>{{ $order->customer_email }}</td>
-                                    <td><strong>${{ number_format($order->total, 2) }}</strong></td>
+                                    <td>{{ $order->user ? $order->user->name : ($order->customer_name ?? 'Guest') }}</td>
+                                    <td>{{ $order->user ? $order->user->email : ($order->customer_email ?? 'N/A') }}</td>
+                                    <td><strong>${{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</strong></td>
                                     <td>
                                         <span class="badge bg-{{ $order->status_badge_class }}">
                                             {{ ucfirst($order->status) }}
@@ -53,17 +53,17 @@
                                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.orders.show', $order) }}" 
+                                            <a href="{{{ route('admin.orders.show', $order) }}}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.orders.edit', $order) }}" 
+                                            <a href="{{{ route('admin.orders.edit', $order) }}}" 
                                                class="btn btn-sm btn-outline-primary" 
                                                title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{ route('admin.orders.destroy', $order) }}" 
+                                            <form action="{{{ route('admin.orders.destroy', $order) }}}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to delete this order?');">

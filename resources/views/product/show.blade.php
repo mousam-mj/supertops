@@ -11,7 +11,7 @@
                                 <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                                     <i class="ph ph-x text-sm"></i>
                                 </div>
-                                <a href="{ route('home') }" class="logo text-3xl font-semibold text-center">Anvogue</a>
+                                <a href="{{{ route('home') }}}" class="logo text-3xl font-semibold text-center">Anvogue</a>
                             </div>
                             <div class="form-search relative mt-2">
                                 <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
@@ -34,7 +34,7 @@
                                             <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
                                                 <ul>
                                                     <li>
-                                                        <a href="{ route('home') }" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
+                                                        <a href="{{{ route('home') }}}" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
                                                     </li>
                                                     <li>
                                                         <a href="fashion2.html" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 2 </a>
@@ -126,19 +126,19 @@
                                                         <div class="text-button-uppercase pb-1">For Men</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -146,19 +146,19 @@
                                                         <div class="text-button-uppercase pb-1">Skincare</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -166,19 +166,19 @@
                                                         <div class="text-button-uppercase pb-1">Health</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -186,19 +186,19 @@
                                                         <div class="text-button-uppercase pb-1">For Women</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -206,19 +206,19 @@
                                                         <div class="text-button-uppercase pb-1">For Kid</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -226,19 +226,19 @@
                                                         <div class="text-button-uppercase pb-1">For Home</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -264,16 +264,16 @@
                                                         <div class="text-button-uppercase pb-1">Shop Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Collection </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Collection </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -281,16 +281,16 @@
                                                         <div class="text-button-uppercase pb-1">Shop Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Canvas </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Filter Canvas </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Options </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Filter Options </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Sidebar List </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Sidebar List </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -298,19 +298,19 @@
                                                         <div class="text-button-uppercase pb-1">Shop Layout</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('shop') }" class="link text-secondary duration-300"> Shop Square </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Shop Square </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -318,25 +318,25 @@
                                                         <div class="text-button-uppercase pb-1">Products Pages</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('wishlist') }" class="link text-secondary duration-300"> Wish List </a>
+                                                                <a href="{{{ route('wishlist') }}}" class="link text-secondary duration-300"> Wish List </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('search') }" class="link text-secondary duration-300"> Search Result </a>
+                                                                <a href="{{{ route('search') }}}" class="link text-secondary duration-300"> Search Result </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('cart.index') }" class="link text-secondary duration-300"> Shopping Cart </a>
+                                                                <a href="{{{ route('cart.index') }}}" class="link text-secondary duration-300"> Shopping Cart </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('login') }" class="link text-secondary duration-300"> Login/Register </a>
+                                                                <a href="{{{ route('login') }}}" class="link text-secondary duration-300"> Login/Register </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('forgot-password') }" class="link text-secondary duration-300"> Forgot Password </a>
+                                                                <a href="{{{ route('forgot-password') }}}" class="link text-secondary duration-300"> Forgot Password </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('order-tracking') }" class="link text-secondary duration-300"> Order Tracking </a>
+                                                                <a href="{{{ route('order-tracking') }}}" class="link text-secondary duration-300"> Order Tracking </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('my-account') }" class="link text-secondary duration-300"> My Account </a>
+                                                                <a href="{{{ route('my-account') }}}" class="link text-secondary duration-300"> My Account </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -362,25 +362,25 @@
                                                         <div class="text-button-uppercase pb-1">Products Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Defaults </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Defaults </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Sale </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Sale </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Countdown Timer </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Countdown Timer </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Grouped </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Grouped </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Frequently Bought Together </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Frequently Bought Together </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Out Of Stock </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Out Of Stock </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Variable </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Variable </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -388,19 +388,19 @@
                                                         <div class="text-button-uppercase pb-1">Products Features</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products External </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products External </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products On Sale </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products On Sale </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 active"> Products With Discount </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 active"> Products With Discount </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products With Sidebar </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products With Sidebar </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300"> Products Fixed Price </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300"> Products Fixed Price </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -408,22 +408,22 @@
                                                         <div class="text-button-uppercase pb-1">Products Layout</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Left </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Thumbnails Bottom </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Grid 1 Scrolling </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Grid 2 Scrolling </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Combined 1 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Combined 2 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -431,19 +431,19 @@
                                                         <div class="text-button-uppercase pb-1">Products Styles</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Style 01 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Style 02 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Style 03 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Style 04 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{ route('product.show', $product->slug ?? '#') }" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
+                                                                <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="link text-secondary duration-300 cursor-pointer"> Products Style 05 </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -466,19 +466,19 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <ul class="w-full">
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Default </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Blog Default </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog List </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Blog List </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog') }" class="link text-secondary duration-300"> Blog Grid </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Blog Grid </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 1 </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Blog Detail 1 </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('blog.show', $post->slug ?? '#') }" class="link text-secondary duration-300"> Blog Detail 2 </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Blog Detail 2 </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -499,25 +499,25 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <ul class="w-full">
                                                     <li>
-                                                        <a href="{ route('about') }" class="link text-secondary duration-300"> About Us </a>
+                                                        <a href="{{{ route('about') }}}" class="link text-secondary duration-300"> About Us </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('contact') }" class="link text-secondary duration-300"> Contact Us </a>
+                                                        <a href="{{{ route('contact') }}}" class="link text-secondary duration-300"> Contact Us </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('stores') }" class="link text-secondary duration-300"> Store List </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Store List </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('404') }" class="link text-secondary duration-300"> 404 </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> 404 </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('faqs') }" class="link text-secondary duration-300"> FAQs </a>
+                                                        <a href="{{{ route('faqs') }}}" class="link text-secondary duration-300"> FAQs </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('coming-soon') }" class="link text-secondary duration-300"> Coming Soon </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Coming Soon </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{ route('feedbacks') }" class="link text-secondary duration-300"> Customer Feedbacks </a>
+                                                        <a href="{{{ route('home') }}}" class="link text-secondary duration-300"> Customer Feedbacks </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -533,19 +533,19 @@
             <!-- Menu bar -->
             <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
                 <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="{ route('home') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{{ route('home') }}}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-house text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Home</span>
                     </a>
-                    <a href="{ route('shop') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{{ route('shop') }}}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-list text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Category</span>
                     </a>
-                    <a href="{ route('search') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{{ route('search') }}}" class="menu_bar-link flex flex-col items-center gap-1">
                         <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                         <span class="menu_bar-title caption2 font-semibold">Search</span>
                     </a>
-                    <a href="{ route('cart.index') }" class="menu_bar-link flex flex-col items-center gap-1">
+                    <a href="{{{ route('cart.index') }}}" class="menu_bar-link flex flex-col items-center gap-1">
                         <div class="cart-icon relative">
                             <span class="ph-bold ph-handbag text-2xl block"></span>
                             <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
@@ -559,21 +559,25 @@
                 <div class="main bg-linear md:pt-[88px] pt-[70px] pb-[14px]">
                     <div class="container flex items-center justify-between flex-wrap gap-3">
                         <div class="left flex items-center gap-1">
-                            <a href="{ route('home') }" class="caption1 text-secondary2 hover:underline">Homepage</a>
+                            <a href="{{ route('home') }}" class="caption1 text-secondary2 hover:underline">Homepage</a>
                             <i class="ph ph-caret-right text-xs text-secondary2"></i>
                             <div class="caption1 text-secondary2">Product</div>
                             <i class="ph ph-caret-right text-xs text-secondary2"></i>
-                            <div class="caption1 capitalize">Product Discount</div>
+                            <div class="caption1 capitalize">{{ $product->name }}</div>
                         </div>
                         <div class="right flex items-center gap-3">
-                            <div class="prev-btn flex items-center cursor-pointer text-secondary hover:text-black pr-3 border-r border-line">
-                                <i class="ph ph-caret-circle-left text-2xl text-black"></i>
-                                <span class="caption1 pl-1">Previous Product</span>
-                            </div>
-                            <div class="next-btn flex items-center cursor-pointer text-secondary hover:text-black">
-                                <span class="caption1 pr-1">Next Product</span>
-                                <i class="ph ph-caret-circle-right text-2xl text-black"></i>
-                            </div>
+                            @if($prevProduct)
+                                <a href="{{ route('product.show', $prevProduct->slug) }}" class="prev-btn flex items-center cursor-pointer text-secondary hover:text-black pr-3 border-r border-line">
+                                    <i class="ph ph-caret-circle-left text-2xl text-black"></i>
+                                    <span class="caption1 pl-1">Previous Product</span>
+                                </a>
+                @endif
+                            @if($nextProduct)
+                                <a href="{{ route('product.show', $nextProduct->slug) }}" class="next-btn flex items-center cursor-pointer text-secondary hover:text-black">
+                                    <span class="caption1 pr-1">Next Product</span>
+                                    <i class="ph ph-caret-circle-right text-2xl text-black"></i>
+                                </a>
+                @endif
                         </div>
                     </div>
                 </div>
@@ -587,21 +591,52 @@
                         <div class="sticky">
                             <div class="swiper mySwiper2 rounded-2xl overflow-hidden">
                                 <div class="swiper-wrapper">
-                                    <!--  -->
-                                </div>
+                                    @php
+                    $getImageUrl = function($path) {
+                        if (!$path) return asset('assets/images/product/perch-bottal.webp');
+                                            if (str_starts_with($path, 'http')) return $path;
+                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
+                            return asset($path);
+                        }
+                        return asset('storage/' . $path);
+                    };
+                    
+                    $mainImage = $getImageUrl($product->image ?? null);
+                                        $allImages = [$mainImage];
+                                        if (isset($product->images) && is_array($product->images)) {
+                                            foreach ($product->images as $img) {
+                                                $allImages[] = $getImageUrl($img);
+                                            }
+                                        }
+                                        $allImages = array_unique($allImages);
+                @endphp
+                                    @foreach($allImages as $img)
+                                        <div class="swiper-slide">
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                </div>
+                                    @endforeach
+                            </div>
                             </div>
                             <div class="swiper mySwiper">
                                 <div class="swiper-wrapper">
-                                    <!--  -->
-                                </div>
+                                    @foreach($allImages as $img)
+                                        <div class="swiper-slide">
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover cursor-pointer" />
                             </div>
-                        </div>
+                        @endforeach
+                    </div>
+            </div>
+                    </div>
                         <div class="swiper popup-img">
                             <span class="close-popup-btn absolute top-4 right-4 z-[2]">
                                 <i class="ph ph-x text-3xl text-white"></i>
                             </span>
                             <div class="swiper-wrapper">
-                                <!--  -->
+                                @foreach($allImages as $img)
+                                    <div class="swiper-slide">
+                                        <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                    </div>
+                                @endforeach
                             </div>
                             <div class="swiper-button-prev"></div>
                             <div class="swiper-button-next"></div>
@@ -611,10 +646,10 @@
                         <div class="sticky">
                             <div class="flex justify-between">
                                 <div>
-                                    <div class="product-category caption2 text-secondary font-semibold uppercase">fashion</div>
-                                    <div class="product-name heading4 mt-1">Off-the-Shoulder Blouse</div>
+                                    <div class="product-category caption2 text-secondary font-semibold uppercase">{{ $product->category->name ?? 'Product' }}</div>
+                                    <div class="product-name heading4 mt-1">{{ $product->name }}</div>
                                 </div>
-                                <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white">
+                                <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white" data-product-id="{{ $product->id }}">
                                     <i class="ph ph-heart text-xl"></i>
                                 </div>
                             </div>
@@ -625,62 +660,82 @@
                                     <i class="ph-fill ph-star text-sm text-yellow"></i>
                                     <i class="ph-fill ph-star text-sm text-yellow"></i><i class="ph-fill ph-star text-sm text-yellow"></i>
                                 </div>
-                                <span class="caption1 text-secondary">(1.234 reviews)</span>
+                                <span class="caption1 text-secondary">({{ rand(10, 999) }} reviews)</span>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
-                                <div class="product-price heading5">$20.00</div>
-                                <div class="w-px h-4 bg-line"></div>
-                                <div class="product-origin-price font-normal text-secondary2">
-                                    <del>$32.00</del>
-                                </div>
-                                <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">-19%</div>
-                                <div class="product-description text-secondary mt-3">Keep your clothes organized, yet elegant with storage cabinets by Onita Patio Furniture. Traditionally designed, they are perfect to be used in the any place where you need to store.</div>
-                            </div>
+                                <div class="product-price heading5">${{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</div>
+                    @if($product->sale_price && $product->price > $product->sale_price)
+                                    <div class="w-px h-4 bg-line"></div>
+                                    <div class="product-origin-price font-normal text-secondary2">
+                            <del>${{ number_format($product->price, 2) }}</del>
+                        </div>
+                        @php
+                            $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
+                        @endphp
+                        @if($discount > 0)
+                                        <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">-{{ $discount }}%</div>
+                        @endif
+                    @endif
+                                <div class="product-description text-secondary mt-3">{{ $product->description ?? $product->short_description ?? 'No description available.' }}</div>
+                </div>
                             <div class="list-action mt-6">
                                 <div class="discount-code">
-                                    <div class="text-title">Useable discount codes:</div>
-                                    <div class="flex items-center gap-3 mt-3">
-                                        <div class="item relative">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="130" height="32" viewBox="0 0 130 32" fill="none">
-                                                <path
-                                                    d="M6.67572e-06 31.0335V31.0335C6.67572e-06 31.5651 0.430976 31.9961 0.962603 31.9961H13.5219C14.2048 31.9961 14.8816 31.4936 15.1194 30.795C15.1604 30.6745 15.0581 30.5573 14.9709 30.4646V30.4646C14.9168 30.407 14.887 30.3321 14.8874 30.2545V29.2172C14.8874 29.1347 14.9215 29.0555 14.9822 28.9972C15.043 28.9388 15.1253 28.906 15.2112 28.906C15.2971 28.906 15.3795 28.9388 15.4402 28.9972C15.5009 29.0555 15.535 29.1347 15.535 29.2172V30.2545C15.5354 30.3322 15.5055 30.4073 15.4511 30.4649V30.4649C15.3637 30.5576 15.261 30.6748 15.3021 30.7955C15.5399 31.4938 16.2158 31.9961 16.9005 31.9961L126 31.9961C128.209 31.9961 130 30.2052 130 27.9961V3.99609C130 1.78695 128.209 -0.00390625 126 -0.00390625L16.8962 -0.00390625C16.117 -0.00390625 15.5003 0.496968 15.2882 1.1946C15.2507 1.31784 15.3567 1.43416 15.4456 1.52737V1.52737C15.5006 1.58504 15.531 1.6605 15.5307 1.73873V2.25736C15.5307 2.3399 15.4966 2.41905 15.4359 2.47741C15.3751 2.53576 15.2928 2.56855 15.2069 2.56855C15.121 2.56855 15.0386 2.53576 14.9779 2.47741C14.9172 2.41905 14.8831 2.3399 14.8831 2.25736V1.73873C14.8826 1.6618 14.9118 1.58742 14.965 1.52995V1.52995C15.0504 1.43773 15.149 1.31968 15.1045 1.20212C14.8388 0.500396 14.0963 -0.00494385 13.5176 -0.00494385H0.481824C0.215723 -0.00494385 6.67572e-06 0.210773 6.67572e-06 0.476873V0.476873C6.67572e-06 0.742974 0.220644 0.951525 0.474363 1.03175C0.697986 1.10246 0.903572 1.22287 1.07316 1.38583C1.35777 1.65934 1.51767 2.03031 1.51767 2.41711C1.51767 2.8039 1.35777 3.17485 1.07316 3.44836C0.903447 3.61144 0.697684 3.73191 0.473869 3.8026C0.220396 3.88265 6.67572e-06 4.09098 6.67572e-06 4.3568V4.3568C6.67572e-06 4.62261 0.220397 4.83095 0.473867 4.91101C0.697682 4.98171 0.903447 5.10218 1.07316 5.26526C1.35777 5.53877 1.51767 5.90972 1.51767 6.29651C1.51767 6.68331 1.35777 7.05426 1.07316 7.32776C0.903447 7.49085 0.697683 7.61132 0.473868 7.68201C0.220397 7.76207 6.67572e-06 7.9704 6.67572e-06 8.23622V8.23622C6.67572e-06 8.50203 0.220397 8.71037 0.473868 8.79042C0.697683 8.86112 0.903447 8.98159 1.07316 9.14467C1.35777 9.41818 1.51767 9.78914 1.51767 10.1759C1.51767 10.5627 1.35777 10.9337 1.07316 11.2072C0.903447 11.3703 0.697683 11.4907 0.473868 11.5614C0.220397 11.6415 6.67572e-06 11.8498 6.67572e-06 12.1156V12.1156C6.67572e-06 12.3815 0.220397 12.5898 0.473868 12.6698C0.697683 12.7405 0.903447 12.861 1.07316 13.0241C1.35777 13.2976 1.51767 13.6685 1.51767 14.0553C1.51767 14.4421 1.35777 14.8131 1.07316 15.0866C0.902084 15.251 0.694377 15.3721 0.468473 15.4425C0.217696 15.5208 6.67572e-06 15.7267 6.67572e-06 15.9894V15.9894C6.67572e-06 16.2569 0.225281 16.4649 0.482009 16.54C0.519464 16.5509 0.556524 16.5633 0.5931 16.577C0.781892 16.6479 0.953983 16.7545 1.09922 16.8904C1.24445 17.0263 1.35989 17.1887 1.43871 17.3682C1.51753 17.5477 1.55815 17.7405 1.55815 17.9353C1.55815 18.1301 1.51753 18.3229 1.43871 18.5024C1.35989 18.6818 1.24445 18.8443 1.09922 18.9802C0.953983 19.1161 0.781892 19.2226 0.5931 19.2936C0.556521 19.3073 0.51946 19.3197 0.482002 19.3306C0.225278 19.4056 6.67572e-06 19.6137 6.67572e-06 19.8812V19.8812C6.67572e-06 20.1438 0.21768 20.3498 0.468455 20.428C0.506373 20.4398 0.54385 20.4531 0.580795 20.4678C0.764926 20.5411 0.932229 20.6485 1.07316 20.784C1.21409 20.9194 1.32588 21.0802 1.40215 21.2571C1.47842 21.4341 1.51767 21.6237 1.51767 21.8152C1.51767 22.0067 1.47842 22.1964 1.40215 22.3733C1.32588 22.5503 1.21409 22.711 1.07316 22.8465C0.932229 22.9819 0.764926 23.0893 0.580795 23.1626C0.545606 23.1766 0.509935 23.1893 0.47386 23.2007C0.220386 23.2808 6.67572e-06 23.4891 6.67572e-06 23.7549V23.7549C6.67572e-06 24.0207 0.220397 24.2291 0.473866 24.3091C0.697682 24.3798 0.903447 24.5003 1.07316 24.6634C1.35777 24.9369 1.51767 25.3078 1.51767 25.6946C1.51767 26.0814 1.35777 26.4524 1.07316 26.7259C0.903447 26.889 0.697683 27.0094 0.473867 27.0801C0.220397 27.1602 6.67572e-06 27.3685 6.67572e-06 27.6343V27.6343C6.67572e-06 27.9002 0.220396 28.1085 0.473867 28.1885C0.697683 28.2592 0.903447 28.3797 1.07316 28.5428C1.35777 28.8163 1.51767 29.1873 1.51767 29.5741C1.51767 29.9608 1.35777 30.3318 1.07316 30.6053C0.788785 30.8786 0.403181 31.0322 0.00104617 31.0325C0.000472754 31.0325 6.67572e-06 31.0329 6.67572e-06 31.0335V31.0335ZM14.8874 4.3288C14.8874 4.24627 14.9215 4.16712 14.9822 4.10876C15.043 4.0504 15.1253 4.01762 15.2112 4.01762C15.2971 4.01762 15.3795 4.0504 15.4402 4.10876C15.5009 4.16712 15.535 4.24627 15.535 4.3288V5.36608C15.535 5.44861 15.5009 5.52776 15.4402 5.58612C15.3795 5.64448 15.2971 5.67726 15.2112 5.67726C15.1253 5.67726 15.043 5.64448 14.9822 5.58612C14.9215 5.52776 14.8874 5.44861 14.8874 5.36608V4.3288ZM14.8874 7.44063C14.8874 7.3581 14.9215 7.27895 14.9822 7.22059C15.043 7.16223 15.1253 7.12945 15.2112 7.12945C15.2971 7.12945 15.3795 7.16223 15.4402 7.22059C15.5009 7.27895 15.535 7.3581 15.535 7.44063V8.47791C15.535 8.56044 15.5009 8.63958 15.4402 8.69794C15.3795 8.7563 15.2971 8.78909 15.2112 8.78909C15.1253 8.78909 15.043 8.7563 14.9822 8.69794C14.9215 8.63958 14.8874 8.56044 14.8874 8.47791V7.44063ZM14.8874 10.5525C14.8874 10.4699 14.9215 10.3908 14.9822 10.3324C15.043 10.2741 15.1253 10.2413 15.2112 10.2413C15.2971 10.2413 15.3795 10.2741 15.4402 10.3324C15.5009 10.3908 15.535 10.4699 15.535 10.5525V11.5897C15.535 11.6723 15.5009 11.7514 15.4402 11.8098C15.3795 11.8681 15.2971 11.9009 15.2112 11.9009C15.1253 11.9009 15.043 11.8681 14.9822 11.8098C14.9215 11.7514 14.8874 11.6723 14.8874 11.5897V10.5525ZM14.8874 13.6643C14.8874 13.5818 14.9215 13.5026 14.9822 13.4443C15.043 13.3859 15.1253 13.3531 15.2112 13.3531C15.2971 13.3531 15.3795 13.3859 15.4402 13.4443C15.5009 13.5026 15.535 13.5818 15.535 13.6643V14.7016C15.535 14.7841 15.5009 14.8632 15.4402 14.9216C15.3795 14.98 15.2971 15.0128 15.2112 15.0128C15.1253 15.0128 15.043 14.98 14.9822 14.9216C14.9215 14.8632 14.8874 14.7841 14.8874 14.7016V13.6643ZM14.8874 16.7761C14.8874 16.6936 14.9215 16.6144 14.9822 16.5561C15.043 16.4977 15.1253 16.4649 15.2112 16.4649C15.2971 16.4649 15.3795 16.4977 15.4402 16.5561C15.5009 16.6144 15.535 16.6936 15.535 16.7761V17.8134C15.535 17.8959 15.5009 17.9751 15.4402 18.0334C15.3795 18.0918 15.2971 18.1246 15.2112 18.1246C15.1253 18.1246 15.043 18.0918 14.9822 18.0334C14.9215 17.9751 14.8874 17.8959 14.8874 17.8134V16.7761ZM14.8874 19.888C14.8874 19.8054 14.9215 19.7263 14.9822 19.6679C15.043 19.6096 15.1253 19.5768 15.2112 19.5768C15.2971 19.5768 15.3795 19.6096 15.4402 19.6679C15.5009 19.7263 15.535 19.8054 15.535 19.888V20.9252C15.535 21.0078 15.5009 21.0869 15.4402 21.1453C15.3795 21.2036 15.2971 21.2364 15.2112 21.2364C15.1253 21.2364 15.043 21.2036 14.9822 21.1453C14.9215 21.0869 14.8874 21.0078 14.8874 20.9252V19.888ZM14.8874 22.9998C14.8874 22.9173 14.9215 22.8381 14.9822 22.7797C15.043 22.7214 15.1253 22.6886 15.2112 22.6886C15.2971 22.6886 15.3795 22.7214 15.4402 22.7797C15.5009 22.8381 15.535 22.9173 15.535 22.9998V24.0371C15.535 24.1196 15.5009 24.1987 15.4402 24.2571C15.3795 24.3155 15.2971 24.3483 15.2112 24.3483C15.1253 24.3483 15.043 24.3155 14.9822 24.2571C14.9215 24.1987 14.8874 24.1196 14.8874 24.0371V22.9998ZM14.8874 26.1116C14.8874 26.0291 14.9215 25.9499 14.9822 25.8916C15.043 25.8332 15.1253 25.8004 15.2112 25.8004C15.2971 25.8004 15.3795 25.8332 15.4402 25.8916C15.5009 25.9499 15.535 26.0291 15.535 26.1116V27.1489C15.535 27.2314 15.5009 27.3106 15.4402 27.3689C15.3795 27.4273 15.2971 27.4601 15.2112 27.4601C15.1253 27.4601 15.043 27.4273 14.9822 27.3689C14.9215 27.3106 14.8874 27.2314 14.8874 27.1489V26.1116Z"
-                                                    fill="#DB4444"
-                                                />
-                                            </svg>
-                                            <div class="content absolute top-1/2 -translate-y-1/2 md:right-1 right-2 flex items-center gap-2">
-                                                <div class="caption1 text-white">15% Off</div>
-                                                <div class="button bg-white font-semibold text-xs py-1 px-2 rounded-full duration-300 hover:bg-black hover:text-white cursor-pointer">Apply</div>
-                                            </div>
+                                    @if($coupons && $coupons->count() > 0)
+                                        <div class="text-title">Useable discount codes:</div>
+                                        <div class="flex items-center gap-3 mt-3">
+                                            @foreach($coupons->take(2) as $coupon)
+                                                <div class="item relative">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="130" height="32" viewBox="0 0 130 32" fill="none">
+                                                        <path
+                                                            d="M6.67572e-06 31.0335V31.0335C6.67572e-06 31.5651 0.430976 31.9961 0.962603 31.9961H13.5219C14.2048 31.9961 14.8816 31.4936 15.1194 30.795C15.1604 30.6745 15.0581 30.5573 14.9709 30.4646V30.4646C14.9168 30.407 14.887 30.3321 14.8874 30.2545V29.2172C14.8874 29.1347 14.9215 29.0555 14.9822 28.9972C15.043 28.9388 15.1253 28.906 15.2112 28.906C15.2971 28.906 15.3795 28.9388 15.4402 28.9972C15.5009 29.0555 15.535 29.1347 15.535 29.2172V30.2545C15.5354 30.3322 15.5055 30.4073 15.4511 30.4649V30.4649C15.3637 30.5576 15.261 30.6748 15.3021 30.7955C15.5399 31.4938 16.2158 31.9961 16.9005 31.9961L126 31.9961C128.209 31.9961 130 30.2052 130 27.9961V3.99609C130 1.78695 128.209 -0.00390625 126 -0.00390625L16.8962 -0.00390625C16.117 -0.00390625 15.5003 0.496968 15.2882 1.1946C15.2507 1.31784 15.3567 1.43416 15.4456 1.52737V1.52737C15.5006 1.58504 15.531 1.6605 15.5307 1.73873V2.25736C15.5307 2.3399 15.4966 2.41905 15.4359 2.47741C15.3751 2.53576 15.2928 2.56855 15.2069 2.56855C15.121 2.56855 15.0386 2.53576 14.9779 2.47741C14.9172 2.41905 14.8831 2.3399 14.8831 2.25736V1.73873C14.8826 1.6618 14.9118 1.58742 14.965 1.52995V1.52995C15.0504 1.43773 15.149 1.31968 15.1045 1.20212C14.8388 0.500396 14.0963 -0.00494385 13.5176 -0.00494385H0.481824C0.215723 -0.00494385 6.67572e-06 0.210773 6.67572e-06 0.476873V0.476873C6.67572e-06 0.742974 0.220644 0.951525 0.474363 1.03175C0.697986 1.10246 0.903572 1.22287 1.07316 1.38583C1.35777 1.65934 1.51767 2.03031 1.51767 2.41711C1.51767 2.8039 1.35777 3.17485 1.07316 3.44836C0.903447 3.61144 0.697684 3.73191 0.473869 3.8026C0.220396 3.88265 6.67572e-06 4.09098 6.67572e-06 4.3568V4.3568C6.67572e-06 4.62261 0.220397 4.83095 0.473867 4.91101C0.697682 4.98171 0.903447 5.10218 1.07316 5.26526C1.35777 5.53877 1.51767 5.90972 1.51767 6.29651C1.51767 6.68331 1.35777 7.05426 1.07316 7.32776C0.903447 7.49085 0.697683 7.61132 0.473868 7.68201C0.220397 7.76207 6.67572e-06 7.9704 6.67572e-06 8.23622V8.23622C6.67572e-06 8.50203 0.220397 8.71037 0.473868 8.79042C0.697683 8.86112 0.903447 8.98159 1.07316 9.14467C1.35777 9.41818 1.51767 9.78914 1.51767 10.1759C1.51767 10.5627 1.35777 10.9337 1.07316 11.2072C0.903447 11.3703 0.697683 11.4907 0.473868 11.5614C0.220397 11.6415 6.67572e-06 11.8498 6.67572e-06 12.1156V12.1156C6.67572e-06 12.3815 0.220397 12.5898 0.473868 12.6698C0.697683 12.7405 0.903447 12.861 1.07316 13.0241C1.35777 13.2976 1.51767 13.6685 1.51767 14.0553C1.51767 14.4421 1.35777 14.8131 1.07316 15.0866C0.902084 15.251 0.694377 15.3721 0.468473 15.4425C0.217696 15.5208 6.67572e-06 15.7267 6.67572e-06 15.9894V15.9894C6.67572e-06 16.2569 0.225281 16.4649 0.482009 16.54C0.519464 16.5509 0.556524 16.5633 0.5931 16.577C0.781892 16.6479 0.953983 16.7545 1.09922 16.8904C1.24445 17.0263 1.35989 17.1887 1.43871 17.3682C1.51753 17.5477 1.55815 17.7405 1.55815 17.9353C1.55815 18.1301 1.51753 18.3229 1.43871 18.5024C1.35989 18.6818 1.24445 18.8443 1.09922 18.9802C0.953983 19.1161 0.781892 19.2226 0.5931 19.2936C0.556521 19.3073 0.51946 19.3197 0.482002 19.3306C0.225278 19.4056 6.67572e-06 19.6137 6.67572e-06 19.8812V19.8812C6.67572e-06 20.1438 0.21768 20.3498 0.468455 20.428C0.506373 20.4398 0.54385 20.4531 0.580795 20.4678C0.764926 20.5411 0.932229 20.6485 1.07316 20.784C1.21409 20.9194 1.32588 21.0802 1.40215 21.2571C1.47842 21.4341 1.51767 21.6237 1.51767 21.8152C1.51767 22.0067 1.47842 22.1964 1.40215 22.3733C1.32588 22.5503 1.21409 22.711 1.07316 22.8465C0.932229 22.9819 0.764926 23.0893 0.580795 23.1626C0.545606 23.1766 0.509935 23.1893 0.47386 23.2007C0.220386 23.2808 6.67572e-06 23.4891 6.67572e-06 23.7549V23.7549C6.67572e-06 24.0207 0.220397 24.2291 0.473866 24.3091C0.697682 24.3798 0.903447 24.5003 1.07316 24.6634C1.35777 24.9369 1.51767 25.3078 1.51767 25.6946C1.51767 26.0814 1.35777 26.4524 1.07316 26.7259C0.903447 26.889 0.697683 27.0094 0.473867 27.0801C0.220397 27.1602 6.67572e-06 27.3685 6.67572e-06 27.6343V27.6343C6.67572e-06 27.9002 0.220396 28.1085 0.473867 28.1885C0.697683 28.2592 0.903447 28.3797 1.07316 28.5428C1.35777 28.8163 1.51767 29.1873 1.51767 29.5741C1.51767 29.9608 1.35777 30.3318 1.07316 30.6053C0.788785 30.8786 0.403181 31.0322 0.00104617 31.0325C0.000472754 31.0325 6.67572e-06 31.0329 6.67572e-06 31.0335V31.0335ZM14.8874 4.3288C14.8874 4.24627 14.9215 4.16712 14.9822 4.10876C15.043 4.0504 15.1253 4.01762 15.2112 4.01762C15.2971 4.01762 15.3795 4.0504 15.4402 4.10876C15.5009 4.16712 15.535 4.24627 15.535 4.3288V5.36608C15.535 5.44861 15.5009 5.52776 15.4402 5.58612C15.3795 5.64448 15.2971 5.67726 15.2112 5.67726C15.1253 5.67726 15.043 5.64448 14.9822 5.58612C14.9215 5.52776 14.8874 5.44861 14.8874 5.36608V4.3288ZM14.8874 7.44063C14.8874 7.3581 14.9215 7.27895 14.9822 7.22059C15.043 7.16223 15.1253 7.12945 15.2112 7.12945C15.2971 7.12945 15.3795 7.16223 15.4402 7.22059C15.5009 7.27895 15.535 7.3581 15.535 7.44063V8.47791C15.535 8.56044 15.5009 8.63958 15.4402 8.69794C15.3795 8.7563 15.2971 8.78909 15.2112 8.78909C15.1253 8.78909 15.043 8.7563 14.9822 8.69794C14.9215 8.63958 14.8874 8.56044 14.8874 8.47791V7.44063ZM14.8874 10.5525C14.8874 10.4699 14.9215 10.3908 14.9822 10.3324C15.043 10.2741 15.1253 10.2413 15.2112 10.2413C15.2971 10.2413 15.3795 10.2741 15.4402 10.3324C15.5009 10.3908 15.535 10.4699 15.535 10.5525V11.5897C15.535 11.6723 15.5009 11.7514 15.4402 11.8098C15.3795 11.8681 15.2971 11.9009 15.2112 11.9009C15.1253 11.9009 15.043 11.8681 14.9822 11.8098C14.9215 11.7514 14.8874 11.6723 14.8874 11.5897V10.5525ZM14.8874 13.6643C14.8874 13.5818 14.9215 13.5026 14.9822 13.4443C15.043 13.3859 15.1253 13.3531 15.2112 13.3531C15.2971 13.3531 15.3795 13.3859 15.4402 13.4443C15.5009 13.5026 15.535 13.5818 15.535 13.6643V14.7016C15.535 14.7841 15.5009 14.8632 15.4402 14.9216C15.3795 14.98 15.2971 15.0128 15.2112 15.0128C15.1253 15.0128 15.043 14.98 14.9822 14.9216C14.9215 14.8632 14.8874 14.7841 14.8874 14.7016V13.6643ZM14.8874 16.7761C14.8874 16.6936 14.9215 16.6144 14.9822 16.5561C15.043 16.4977 15.1253 16.4649 15.2112 16.4649C15.2971 16.4649 15.3795 16.4977 15.4402 16.5561C15.5009 16.6144 15.535 16.6936 15.535 16.7761V17.8134C15.535 17.8959 15.5009 17.9751 15.4402 18.0334C15.3795 18.0918 15.2971 18.1246 15.2112 18.1246C15.1253 18.1246 15.043 18.0918 14.9822 18.0334C14.9215 17.9751 14.8874 17.8959 14.8874 17.8134V16.7761ZM14.8874 19.888C14.8874 19.8054 14.9215 19.7263 14.9822 19.6679C15.043 19.6096 15.1253 19.5768 15.2112 19.5768C15.2971 19.5768 15.3795 19.6096 15.4402 19.6679C15.5009 19.7263 15.535 19.8054 15.535 19.888V20.9252C15.535 21.0078 15.5009 21.0869 15.4402 21.1453C15.3795 21.2036 15.2971 21.2364 15.2112 21.2364C15.1253 21.2364 15.043 21.2036 14.9822 21.1453C14.9215 21.0869 14.8874 21.0078 14.8874 20.9252V19.888ZM14.8874 22.9998C14.8874 22.9173 14.9215 22.8381 14.9822 22.7797C15.043 22.7214 15.1253 22.6886 15.2112 22.6886C15.2971 22.6886 15.3795 22.7214 15.4402 22.7797C15.5009 22.8381 15.535 22.9173 15.535 22.9998V24.0371C15.535 24.1196 15.5009 24.1987 15.4402 24.2571C15.3795 24.3155 15.2971 24.3483 15.2112 24.3483C15.1253 24.3483 15.043 24.3155 14.9822 24.2571C14.9215 24.1987 14.8874 24.1196 14.8874 24.0371V22.9998ZM14.8874 26.1116C14.8874 26.0291 14.9215 25.9499 14.9822 25.8916C15.043 25.8332 15.1253 25.8004 15.2112 25.8004C15.2971 25.8004 15.3795 25.8332 15.4402 25.8916C15.5009 25.9499 15.535 26.0291 15.535 26.1116V27.1489C15.535 27.2314 15.5009 27.3106 15.4402 27.3689C15.3795 27.4273 15.2971 27.4601 15.2112 27.4601C15.1253 27.4601 15.043 27.4273 14.9822 27.3689C14.9215 27.3106 14.8874 27.2314 14.8874 27.1489V26.1116Z"
+                                                            fill="#DB4444"
+                                                        />
+                                                    </svg>
+                                                    <div class="content absolute top-1/2 -translate-y-1/2 md:right-1 right-2 flex items-center gap-2">
+                                                        <div class="caption1 text-white">
+                                                            @if(isset($coupon->discount_type) && $coupon->discount_type === 'percentage')
+                                                                {{ $coupon->discount_value ?? 0 }}% Off
+                                                            @else
+                                                                ${{ number_format($coupon->discount_value ?? 0, 2) }} Off
+                                                            @endif
+                                                        </div>
+                                                        <div class="button bg-white font-semibold text-xs py-1 px-2 rounded-full duration-300 hover:bg-black hover:text-white cursor-pointer apply-coupon-btn" data-coupon-code="{{ $coupon->code }}">Apply</div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                    </div>
+                @endif
+                                </div>
+                                @if(isset($product->colors) && is_array($product->colors) && count($product->colors) > 0)
+                                    <div class="choose-color mt-5">
+                                        <div class="text-title">Colors: <span class="text-title color selected-color"></span></div>
+                                        <div class="list-color flex items-center gap-2 flex-wrap mt-3">
+                                            @foreach($product->colors as $color)
+                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $loop->first ? 'active border-black' : '' }}" 
+                                                     style="background-color: {{ $color }};"
+                                                     data-color="{{ $color }}"
+                                                     title="{{ $color }}">
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <div class="item relative">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="130" height="32" viewBox="0 0 130 32" fill="none">
-                                                <path
-                                                    d="M6.67572e-06 31.0335V31.0335C6.67572e-06 31.5651 0.430976 31.9961 0.962603 31.9961H13.5219C14.2048 31.9961 14.8816 31.4936 15.1194 30.795C15.1604 30.6745 15.0581 30.5573 14.9709 30.4646V30.4646C14.9168 30.407 14.887 30.3321 14.8874 30.2545V29.2172C14.8874 29.1347 14.9215 29.0555 14.9822 28.9972C15.043 28.9388 15.1253 28.906 15.2112 28.906C15.2971 28.906 15.3795 28.9388 15.4402 28.9972C15.5009 29.0555 15.535 29.1347 15.535 29.2172V30.2545C15.5354 30.3322 15.5055 30.4073 15.4511 30.4649V30.4649C15.3637 30.5576 15.261 30.6748 15.3021 30.7955C15.5399 31.4938 16.2158 31.9961 16.9005 31.9961L126 31.9961C128.209 31.9961 130 30.2052 130 27.9961V3.99609C130 1.78695 128.209 -0.00390625 126 -0.00390625L16.8962 -0.00390625C16.117 -0.00390625 15.5003 0.496968 15.2882 1.1946C15.2507 1.31784 15.3567 1.43416 15.4456 1.52737V1.52737C15.5006 1.58504 15.531 1.6605 15.5307 1.73873V2.25736C15.5307 2.3399 15.4966 2.41905 15.4359 2.47741C15.3751 2.53576 15.2928 2.56855 15.2069 2.56855C15.121 2.56855 15.0386 2.53576 14.9779 2.47741C14.9172 2.41905 14.8831 2.3399 14.8831 2.25736V1.73873C14.8826 1.6618 14.9118 1.58742 14.965 1.52995V1.52995C15.0504 1.43773 15.149 1.31968 15.1045 1.20212C14.8388 0.500396 14.0963 -0.00494385 13.5176 -0.00494385H0.481824C0.215723 -0.00494385 6.67572e-06 0.210773 6.67572e-06 0.476873V0.476873C6.67572e-06 0.742974 0.220644 0.951525 0.474363 1.03175C0.697986 1.10246 0.903572 1.22287 1.07316 1.38583C1.35777 1.65934 1.51767 2.03031 1.51767 2.41711C1.51767 2.8039 1.35777 3.17485 1.07316 3.44836C0.903447 3.61144 0.697684 3.73191 0.473869 3.8026C0.220396 3.88265 6.67572e-06 4.09098 6.67572e-06 4.3568V4.3568C6.67572e-06 4.62261 0.220397 4.83095 0.473867 4.91101C0.697682 4.98171 0.903447 5.10218 1.07316 5.26526C1.35777 5.53877 1.51767 5.90972 1.51767 6.29651C1.51767 6.68331 1.35777 7.05426 1.07316 7.32776C0.903447 7.49085 0.697683 7.61132 0.473868 7.68201C0.220397 7.76207 6.67572e-06 7.9704 6.67572e-06 8.23622V8.23622C6.67572e-06 8.50203 0.220397 8.71037 0.473868 8.79042C0.697683 8.86112 0.903447 8.98159 1.07316 9.14467C1.35777 9.41818 1.51767 9.78914 1.51767 10.1759C1.51767 10.5627 1.35777 10.9337 1.07316 11.2072C0.903447 11.3703 0.697683 11.4907 0.473868 11.5614C0.220397 11.6415 6.67572e-06 11.8498 6.67572e-06 12.1156V12.1156C6.67572e-06 12.3815 0.220397 12.5898 0.473868 12.6698C0.697683 12.7405 0.903447 12.861 1.07316 13.0241C1.35777 13.2976 1.51767 13.6685 1.51767 14.0553C1.51767 14.4421 1.35777 14.8131 1.07316 15.0866C0.902084 15.251 0.694377 15.3721 0.468473 15.4425C0.217696 15.5208 6.67572e-06 15.7267 6.67572e-06 15.9894V15.9894C6.67572e-06 16.2569 0.225281 16.4649 0.482009 16.54C0.519464 16.5509 0.556524 16.5633 0.5931 16.577C0.781892 16.6479 0.953983 16.7545 1.09922 16.8904C1.24445 17.0263 1.35989 17.1887 1.43871 17.3682C1.51753 17.5477 1.55815 17.7405 1.55815 17.9353C1.55815 18.1301 1.51753 18.3229 1.43871 18.5024C1.35989 18.6818 1.24445 18.8443 1.09922 18.9802C0.953983 19.1161 0.781892 19.2226 0.5931 19.2936C0.556521 19.3073 0.51946 19.3197 0.482002 19.3306C0.225278 19.4056 6.67572e-06 19.6137 6.67572e-06 19.8812V19.8812C6.67572e-06 20.1438 0.21768 20.3498 0.468455 20.428C0.506373 20.4398 0.54385 20.4531 0.580795 20.4678C0.764926 20.5411 0.932229 20.6485 1.07316 20.784C1.21409 20.9194 1.32588 21.0802 1.40215 21.2571C1.47842 21.4341 1.51767 21.6237 1.51767 21.8152C1.51767 22.0067 1.47842 22.1964 1.40215 22.3733C1.32588 22.5503 1.21409 22.711 1.07316 22.8465C0.932229 22.9819 0.764926 23.0893 0.580795 23.1626C0.545606 23.1766 0.509935 23.1893 0.47386 23.2007C0.220386 23.2808 6.67572e-06 23.4891 6.67572e-06 23.7549V23.7549C6.67572e-06 24.0207 0.220397 24.2291 0.473866 24.3091C0.697682 24.3798 0.903447 24.5003 1.07316 24.6634C1.35777 24.9369 1.51767 25.3078 1.51767 25.6946C1.51767 26.0814 1.35777 26.4524 1.07316 26.7259C0.903447 26.889 0.697683 27.0094 0.473867 27.0801C0.220397 27.1602 6.67572e-06 27.3685 6.67572e-06 27.6343V27.6343C6.67572e-06 27.9002 0.220396 28.1085 0.473867 28.1885C0.697683 28.2592 0.903447 28.3797 1.07316 28.5428C1.35777 28.8163 1.51767 29.1873 1.51767 29.5741C1.51767 29.9608 1.35777 30.3318 1.07316 30.6053C0.788785 30.8786 0.403181 31.0322 0.00104617 31.0325C0.000472754 31.0325 6.67572e-06 31.0329 6.67572e-06 31.0335V31.0335ZM14.8874 4.3288C14.8874 4.24627 14.9215 4.16712 14.9822 4.10876C15.043 4.0504 15.1253 4.01762 15.2112 4.01762C15.2971 4.01762 15.3795 4.0504 15.4402 4.10876C15.5009 4.16712 15.535 4.24627 15.535 4.3288V5.36608C15.535 5.44861 15.5009 5.52776 15.4402 5.58612C15.3795 5.64448 15.2971 5.67726 15.2112 5.67726C15.1253 5.67726 15.043 5.64448 14.9822 5.58612C14.9215 5.52776 14.8874 5.44861 14.8874 5.36608V4.3288ZM14.8874 7.44063C14.8874 7.3581 14.9215 7.27895 14.9822 7.22059C15.043 7.16223 15.1253 7.12945 15.2112 7.12945C15.2971 7.12945 15.3795 7.16223 15.4402 7.22059C15.5009 7.27895 15.535 7.3581 15.535 7.44063V8.47791C15.535 8.56044 15.5009 8.63958 15.4402 8.69794C15.3795 8.7563 15.2971 8.78909 15.2112 8.78909C15.1253 8.78909 15.043 8.7563 14.9822 8.69794C14.9215 8.63958 14.8874 8.56044 14.8874 8.47791V7.44063ZM14.8874 10.5525C14.8874 10.4699 14.9215 10.3908 14.9822 10.3324C15.043 10.2741 15.1253 10.2413 15.2112 10.2413C15.2971 10.2413 15.3795 10.2741 15.4402 10.3324C15.5009 10.3908 15.535 10.4699 15.535 10.5525V11.5897C15.535 11.6723 15.5009 11.7514 15.4402 11.8098C15.3795 11.8681 15.2971 11.9009 15.2112 11.9009C15.1253 11.9009 15.043 11.8681 14.9822 11.8098C14.9215 11.7514 14.8874 11.6723 14.8874 11.5897V10.5525ZM14.8874 13.6643C14.8874 13.5818 14.9215 13.5026 14.9822 13.4443C15.043 13.3859 15.1253 13.3531 15.2112 13.3531C15.2971 13.3531 15.3795 13.3859 15.4402 13.4443C15.5009 13.5026 15.535 13.5818 15.535 13.6643V14.7016C15.535 14.7841 15.5009 14.8632 15.4402 14.9216C15.3795 14.98 15.2971 15.0128 15.2112 15.0128C15.1253 15.0128 15.043 14.98 14.9822 14.9216C14.9215 14.8632 14.8874 14.7841 14.8874 14.7016V13.6643ZM14.8874 16.7761C14.8874 16.6936 14.9215 16.6144 14.9822 16.5561C15.043 16.4977 15.1253 16.4649 15.2112 16.4649C15.2971 16.4649 15.3795 16.4977 15.4402 16.5561C15.5009 16.6144 15.535 16.6936 15.535 16.7761V17.8134C15.535 17.8959 15.5009 17.9751 15.4402 18.0334C15.3795 18.0918 15.2971 18.1246 15.2112 18.1246C15.1253 18.1246 15.043 18.0918 14.9822 18.0334C14.9215 17.9751 14.8874 17.8959 14.8874 17.8134V16.7761ZM14.8874 19.888C14.8874 19.8054 14.9215 19.7263 14.9822 19.6679C15.043 19.6096 15.1253 19.5768 15.2112 19.5768C15.2971 19.5768 15.3795 19.6096 15.4402 19.6679C15.5009 19.7263 15.535 19.8054 15.535 19.888V20.9252C15.535 21.0078 15.5009 21.0869 15.4402 21.1453C15.3795 21.2036 15.2971 21.2364 15.2112 21.2364C15.1253 21.2364 15.043 21.2036 14.9822 21.1453C14.9215 21.0869 14.8874 21.0078 14.8874 20.9252V19.888ZM14.8874 22.9998C14.8874 22.9173 14.9215 22.8381 14.9822 22.7797C15.043 22.7214 15.1253 22.6886 15.2112 22.6886C15.2971 22.6886 15.3795 22.7214 15.4402 22.7797C15.5009 22.8381 15.535 22.9173 15.535 22.9998V24.0371C15.535 24.1196 15.5009 24.1987 15.4402 24.2571C15.3795 24.3155 15.2971 24.3483 15.2112 24.3483C15.1253 24.3483 15.043 24.3155 14.9822 24.2571C14.9215 24.1987 14.8874 24.1196 14.8874 24.0371V22.9998ZM14.8874 26.1116C14.8874 26.0291 14.9215 25.9499 14.9822 25.8916C15.043 25.8332 15.1253 25.8004 15.2112 25.8004C15.2971 25.8004 15.3795 25.8332 15.4402 25.8916C15.5009 25.9499 15.535 26.0291 15.535 26.1116V27.1489C15.535 27.2314 15.5009 27.3106 15.4402 27.3689C15.3795 27.4273 15.2971 27.4601 15.2112 27.4601C15.1253 27.4601 15.043 27.4273 14.9822 27.3689C14.9215 27.3106 14.8874 27.2314 14.8874 27.1489V26.1116Z"
-                                                    fill="#DB4444"
-                                                />
-                                            </svg>
-                                            <div class="content absolute top-1/2 -translate-y-1/2 md:right-1 right-2 flex items-center gap-2">
-                                                <div class="caption1 text-white">25% Off</div>
-                                                <div class="button bg-white font-semibold text-xs py-1 px-2 rounded-full duration-300 hover:bg-black hover:text-white cursor-pointer">Apply</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="choose-color mt-5">
-                                    <div class="text-title">Colors: <span class="text-title color"></span></div>
-                                    <div class="list-color flex items-center gap-2 flex-wrap mt-3">
-                                        <!-- color-item -->
-                                    </div>
-                                </div>
-                                <div class="choose-size mt-5">
-                                    <div class="heading flex items-center justify-between">
-                                        <div class="text-title">Size: <span class="text-title size"></span></div>
-                                        <div class="caption1 size-guide text-red underline">Size Guide</div>
-                                    </div>
-                                    <div class="list-size flex items-center gap-2 flex-wrap mt-3">
-                                        <!-- size-item -->
-                                    </div>
-                                </div>
+                    </div>
+                @endif
+                                @if(isset($product->sizes) && is_array($product->sizes) && count($product->sizes) > 0)
+                                    <div class="choose-size mt-5">
+                                        <div class="heading flex items-center justify-between">
+                                            <div class="text-title">Size: <span class="text-title size selected-size"></span></div>
+                                            <div class="caption1 size-guide text-red underline cursor-pointer">Size Guide</div>
+                        </div>
+                                        <div class="list-size flex items-center gap-2 flex-wrap mt-3">
+                                            @foreach($product->sizes as $size)
+                                                <div class="size-item w-12 h-12 rounded-lg border-2 border-line hover:border-black cursor-pointer duration-300 flex items-center justify-center text-sm font-semibold {{ $loop->first ? 'active border-black bg-black text-white' : '' }}" 
+                                                     data-size="{{ $size }}">
+                                                    {{ $size }}
+                    </div>
+                                            @endforeach
+                    </div>
+                </div>
+                                @endif
                                 <div class="text-title mt-5">Quantity:</div>
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
@@ -688,10 +743,10 @@
                                         <div class="quantity body1 font-semibold">1</div>
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                     </div>
-                                    <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black">Add To Cart</div>
+                                    <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
                                 </div>
                                 <div class="button-block mt-5">
-                                    <a href="{ route('checkout.index') }" class="button-main w-full text-center">Buy It Now</a>
+                                    <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center">Buy It Now</a>
                                 </div>
                                 <div class="more-infor mt-6">
                                     <div class="flex items-center gap-4 flex-wrap">
@@ -713,44 +768,49 @@
                                         <i class="ph ph-eye body1"></i>
                                         <div class="text-title">38</div>
                                         <div class="text-secondary">people viewing this product right now!</div>
-                                    </div>
-                                    <div class="flex items-center gap-1 mt-3">
-                                        <div class="text-title">SKU:</div>
-                                        <div class="text-secondary">53453412</div>
-                                    </div>
-                                    <div class="flex items-center gap-1 mt-3">
-                                        <div class="text-title">Categories:</div>
-                                        <div class="list-category text-secondary">fashion, women</div>
-                                    </div>
-                                    <div class="flex items-center gap-1 mt-3">
-                                        <div class="text-title">Tag:</div>
-                                        <div class="list-tag text-secondary">top</div>
-                                    </div>
-                                </div>
+                </div>
+                    @if($product->sku)
+                                        <div class="flex items-center gap-1 mt-3">
+                                            <div class="text-title">SKU:</div>
+                                            <div class="text-secondary">{{ $product->sku }}</div>
+                        </div>
+                    @endif
+                                    @if($product->category)
+                                        <div class="flex items-center gap-1 mt-3">
+                                            <div class="text-title">Categories:</div>
+                                            <div class="list-category text-secondary">
+                                                <a href="{{ route('category', $product->category->slug) }}" class="hover:underline">{{ $product->category->name }}</a>
+                                                @if($product->category->parent)
+                                                    , <a href="{{ route('category', $product->category->parent->slug) }}" class="hover:underline">{{ $product->category->parent->name }}</a>
+                            @endif
+                                            </div>
+                        </div>
+                    @endif
+                </div>
                                 <div class="list-payment mt-7">
                                     <div class="main-content lg:pt-8 pt-6 lg:pb-6 pb-4 sm:px-4 px-3 border border-line rounded-xl relative max-md:w-2/3 max-sm:w-full">
                                         <div class="heading6 px-5 bg-white absolute -top-[14px] left-1/2 -translate-x-1/2 whitespace-nowrap">Guranteed safe checkout</div>
                                         <div class="list grid grid-cols-6">
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-0.png" alt="payment" class="w-full" />
-                                            </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-0.png') }}" alt="payment" class="w-full" />
+            </div>
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-1.png" alt="payment" class="w-full" />
-                                            </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-1.png') }}" alt="payment" class="w-full" />
+        </div>
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-2.png" alt="payment" class="w-full" />
-                                            </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-2.png') }}" alt="payment" class="w-full" />
+                </div>
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-3.png" alt="payment" class="w-full" />
-                                            </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-3.png') }}" alt="payment" class="w-full" />
+                        </div>
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-4.png" alt="payment" class="w-full" />
-                                            </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-4.png') }}" alt="payment" class="w-full" />
+                    </div>
                                             <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset(\'assets/images/payment/Frame-5.png" alt="payment" class="w-full" />
-                                            </div>
-                                        </div>
-                                    </div>
+                                                <img src="{{ asset('assets/images/payment/Frame-5.png') }}" alt="payment" class="w-full" />
+                        </div>
+                    </div>
+                </div>
                                 </div>
                             </div>
                             <div class="get-it mt-6">
@@ -796,33 +856,41 @@
                                 <div class="left">
                                     <div class="heading6">Description</div>
                                     <div class="text-secondary mt-2">
-                                        Keep your home organized, yet elegant with storage cabinets by Onita Patio Furniture. These cabinets not only make a great storage units, but also bring a great decorative accent to your decor. Traditionally designed, they are perfect to be used in the hallway, living room, bedroom, office or any place where you need to store or display things. Made of high quality materials, they are sturdy and durable for years. Bring one-of-a-kind look to your interior
-                                        with furniture from Onita Furniture!
+                                        {{ $product->description ?? $product->short_description ?? 'No description available for this product.' }}
                                     </div>
                                 </div>
                                 <div class="right">
-                                    <div class="heading6">About This Products</div>
+                                    <div class="heading6">About This Product</div>
                                     <div class="list-feature">
-                                        <div class="item flex gap-1 text-secondary mt-1">
-                                            <i class="ph ph-dot text-2xl"></i>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                                        </div>
-                                        <div class="item flex gap-1 text-secondary mt-1">
-                                            <i class="ph ph-dot text-2xl"></i>
-                                            <p>Nulla luctus libero quis mauris vestibulum dapibus.</p>
-                                        </div>
-                                        <div class="item flex gap-1 text-secondary mt-1">
-                                            <i class="ph ph-dot text-2xl"></i>
-                                            <p>Maecenas ullamcorper erat mi, vel consequat enim suscipit at.</p>
-                                        </div>
-                                        <div class="item flex gap-1 text-secondary mt-1">
-                                            <i class="ph ph-dot text-2xl"></i>
-                                            <p>Quisque consectetur nibh ac urna molestie scelerisque.</p>
-                                        </div>
-                                        <div class="item flex gap-1 text-secondary mt-1">
-                                            <i class="ph ph-dot text-2xl"></i>
-                                            <p>Mauris in nisl scelerisque massa consectetur pretium sed et mauris.</p>
-                                        </div>
+                                        @if($product->short_description)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>{{ $product->short_description }}</p>
+            </div>
+        @endif
+                                        @if($product->category)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>Category: {{ $product->category->name }}</p>
+                                            </div>
+                                        @endif
+                                        @if($product->sku)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>SKU: {{ $product->sku }}</p>
+                                            </div>
+                                        @endif
+                                        @if($product->in_stock)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>In Stock: {{ $product->stock_quantity ?? 'Available' }} units</p>
+                                            </div>
+                                        @else
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>Currently Out of Stock</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -946,8 +1014,8 @@
                                             </defs>
                                         </svg>
                                     </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
                         </div>
                         <div class="desc-item review" data-item="Review">
                             <div class="top-overview flex max-sm:flex-col items-center justify-between gap-12 gap-y-4">
@@ -1045,7 +1113,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset(\'assets/images/avatar/1.png" alt="img" class="w-[52px] aspect-square rounded-full" />
+                                                <img src="{{ asset('assets/images/avatar/1.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1088,7 +1156,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset(\'assets/images/avatar/2.png" alt="img" class="w-[52px] aspect-square rounded-full" />
+                                                <img src="{{ asset('assets/images/avatar/2.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1131,7 +1199,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset(\'assets/images/avatar/3.png" alt="img" class="w-[52px] aspect-square rounded-full" />
+                                                <img src="{{ asset('assets/images/avatar/3.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1145,7 +1213,7 @@
                                                         <i class="ph-fill ph-star text-xs text-yellow"></i>
                                                     </div>
                                                 </div>
-                                                <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2">
                                                     <div class="text-secondary2">1 days ago</div>
                                                     <div class="text-secondary2">-</div>
                                                     <div class="text-secondary2">
@@ -1204,16 +1272,218 @@
                 <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6">
                     <div class="swiper-button-prev2 sm:left-10 left-6">
                         <i class="ph-bold ph-caret-left text-xl"></i>
-                    </div>
+                </div>
                     <div class="swiper swiper-list-product h-full relative">
                         <div class="swiper-wrapper">
-                            <!-- List six product -->
+                            @forelse($relatedProducts as $relatedProduct)
+                                <div class="swiper-slide">
+                        @include('partials.product-card', ['product' => $relatedProduct])
+                </div>
+                            @empty
+                                <div class="swiper-slide col-span-full text-center py-10">
+                                    <p class="text-secondary">No related products available</p>
+            </div>
+                            @endforelse
                         </div>
                     </div>
                     <div class="swiper-button-next2 sm:right-10 right-6">
                         <i class="ph-bold ph-caret-right text-xl"></i>
                     </div>
                 </div>
-            </div>
-        </div>
+    </div>
+</div>
+
+@section('scripts')
+<script>
+    // Product detail page functionality
+    (function() {
+        'use strict';
+        
+        // Color selection
+        document.addEventListener('click', function(e) {
+            const colorItem = e.target.closest('.color-item');
+            if (!colorItem || !colorItem.closest('.choose-color')) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Remove active class from siblings
+            const siblings = colorItem.parentElement.querySelectorAll('.color-item');
+            siblings.forEach(sib => sib.classList.remove('active', 'border-black'));
+            
+            // Add active class to clicked item
+            colorItem.classList.add('active', 'border-black');
+            
+            // Update selected color text
+            const selectedColor = colorItem.getAttribute('data-color');
+            const colorText = document.querySelector('.selected-color');
+            if (colorText) {
+                colorText.textContent = selectedColor;
+            }
+        });
+        
+        // Size selection
+        document.addEventListener('click', function(e) {
+            const sizeItem = e.target.closest('.size-item');
+            if (!sizeItem || !sizeItem.closest('.choose-size')) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Remove active class from siblings
+            const siblings = sizeItem.parentElement.querySelectorAll('.size-item');
+            siblings.forEach(sib => {
+                sib.classList.remove('active', 'border-black', 'bg-black', 'text-white');
+                sib.classList.add('border-line');
+            });
+            
+            // Add active class to clicked item
+            sizeItem.classList.add('active', 'border-black', 'bg-black', 'text-white');
+            sizeItem.classList.remove('border-line');
+            
+            // Update selected size text
+            const selectedSize = sizeItem.getAttribute('data-size');
+            const sizeText = document.querySelector('.selected-size');
+            if (sizeText) {
+                sizeText.textContent = selectedSize;
+            }
+        });
+        
+        // Quantity controls
+        document.addEventListener('click', function(e) {
+            // Check if clicked on plus or minus icon within quantity-block
+            const quantityBlock = e.target.closest('.quantity-block');
+            if (!quantityBlock) return;
+            
+            const minusIcon = e.target.closest('.ph-minus');
+            const plusIcon = e.target.closest('.ph-plus');
+            const quantityElement = quantityBlock.querySelector('.quantity');
+            
+            if (!quantityElement) return;
+            
+            if (minusIcon) {
+                e.preventDefault();
+                e.stopPropagation();
+                let qty = parseInt(quantityElement.textContent) || 1;
+                if (qty > 1) {
+                    qty--;
+                    quantityElement.textContent = qty;
+                }
+            }
+            
+            if (plusIcon) {
+                e.preventDefault();
+                e.stopPropagation();
+                let qty = parseInt(quantityElement.textContent) || 1;
+                qty++;
+                quantityElement.textContent = qty;
+            }
+        });
+        
+        // Add to cart from product detail page
+        document.addEventListener('click', function(e) {
+            const addCartBtn = e.target.closest('.add-cart-btn');
+            if (!addCartBtn || !addCartBtn.closest('.product-infor')) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = addCartBtn.getAttribute('data-product-id');
+            if (!productId) return;
+            
+            // Get selected size and color
+            const selectedSizeItem = document.querySelector('.size-item.active');
+            const selectedColorItem = document.querySelector('.color-item.active');
+            const quantityElement = document.querySelector('.product-infor .quantity-block .quantity');
+            
+            const size = selectedSizeItem?.getAttribute('data-size') || null;
+            const color = selectedColorItem?.getAttribute('data-color') || null;
+            const quantity = parseInt(quantityElement?.textContent) || 1;
+            
+            // Show loading state
+            const originalText = addCartBtn.innerHTML;
+            addCartBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
+            addCartBtn.disabled = true;
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            
+            // Make API call
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    product_id: parseInt(productId),
+                    quantity: quantity,
+                    size: size,
+                    color: color
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
+                    
+                    // Show success message
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Product added to cart!', 'success');
+                    } else {
+                        alert('Product added to cart!');
+                    }
+                    
+                    // Open cart modal if exists
+                    const cartModal = document.querySelector('.modal-cart-block');
+                    if (cartModal) {
+                        cartModal.classList.add('open');
+                        if (typeof window.loadCartItems === 'function') {
+                            window.loadCartItems();
+                        }
+                    }
+                } else {
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification(data.message || 'Failed to add product to cart', 'error');
+                    } else {
+                        alert(data.message || 'Failed to add product to cart');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            })
+            .finally(() => {
+                addCartBtn.innerHTML = originalText;
+                addCartBtn.disabled = false;
+            });
+        });
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    })();
+</script>
 @endsection

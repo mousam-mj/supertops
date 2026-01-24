@@ -146,7 +146,7 @@
                             <tbody>
                                 @foreach($recent_orders as $order)
                                 <tr>
-                                    <td><a href="{{ route('admin.orders.show', $order) }}">{{ $order->order_number ?? 'N/A' }}</a></td>
+                                    <td><a href="{{{ route('admin.orders.show', $order) }}}">{{ $order->order_number ?? 'N/A' }}</a></td>
                                     <td>{{ $order->customer_name ?? 'Guest' }}</td>
                                     <td>₹{{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</td>
                                     <td><span class="badge bg-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'pending' ? 'warning' : 'info') }}">{{ ucfirst($order->status ?? 'Pending') }}</span></td>
@@ -156,7 +156,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-outline-primary mt-2">View All Orders</a>
+                    <a href="{{{ route('admin.orders.index') }}}" class="btn btn-sm btn-outline-primary mt-2">View All Orders</a>
                 @else
                     <p class="text-muted mb-0">No orders yet.</p>
                 @endif
@@ -184,7 +184,7 @@
                             <tbody>
                                 @foreach($top_products as $product)
                                 <tr>
-                                    <td><a href="{{ route('admin.products.show', $product) }}">{{ $product->name }}</a></td>
+                                    <td><a href="{{{ route('admin.products.show', $product) }}}">{{ $product->name }}</a></td>
                                     <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
                                     <td>{{ $product->stock_quantity ?? 0 }}</td>
                                     <td>
@@ -199,7 +199,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-outline-primary mt-2">View All Products</a>
+                    <a href="{{{ route('admin.products.index') }}}" class="btn btn-sm btn-outline-primary mt-2">View All Products</a>
                 @else
                     <p class="text-muted mb-0">No products yet.</p>
                 @endif

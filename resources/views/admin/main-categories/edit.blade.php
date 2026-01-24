@@ -11,7 +11,7 @@
                 <h5 class="mb-0">Main Category Information</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.main-categories.update', $category) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{{ route('admin.main-categories.update', $category) }}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('admin.main-categories.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{{ route('admin.main-categories.index') }}}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update Main Category</button>
                     </div>
                 </form>

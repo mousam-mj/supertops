@@ -11,7 +11,7 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Products</h4>
                 <p class="text-muted mb-0">Manage your product inventory</p>
             </div>
-            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+            <a href="{{{ route('admin.products.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Product
             </a>
         </div>
@@ -19,7 +19,7 @@
         <!-- Search and Filter Form -->
         <div class="card mb-3">
             <div class="card-body">
-                <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
+                <form method="GET" action="{{{ route('admin.products.index') }}}" class="row g-3">
                     <div class="col-md-4">
                         <label for="search" class="form-label">Search</label>
                         <div class="input-group">
@@ -56,7 +56,7 @@
                                 <i class="bi bi-search me-1"></i>Search
                             </button>
                             @if(request()->hasAny(['search', 'status', 'stock']))
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{{ route('admin.products.index') }}}" class="btn btn-outline-secondary">
                                     <i class="bi bi-x-lg"></i>
                                 </a>
                             @endif
@@ -163,17 +163,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.products.show', $product) }}" 
+                                            <a href="{{{ route('admin.products.show', $product) }}}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.products.edit', $product) }}" 
+                                            <a href="{{{ route('admin.products.edit', $product) }}}" 
                                                class="btn btn-sm btn-outline-primary" 
                                                title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{ route('admin.products.destroy', $product) }}" 
+                                            <form action="{{{ route('admin.products.destroy', $product) }}}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to delete this product?');">
@@ -192,7 +192,7 @@
                                 <tr>
                                     <td colspan="8" class="text-center py-4">
                                         <p class="text-muted mb-0">No products found.</p>
-                                        <a href="{{ route('admin.products.create') }}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{{ route('admin.products.create') }}}" class="btn btn-sm btn-primary mt-2">
                                             Create First Product
                                         </a>
                                     </td>

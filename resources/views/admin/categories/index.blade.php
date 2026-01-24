@@ -11,7 +11,7 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Categories</h4>
                 <p class="text-muted mb-0">Manage your product categories</p>
             </div>
-            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
+            <a href="{{{ route('admin.categories.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Category
             </a>
         </div>
@@ -84,17 +84,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.categories.show', $category) }}" 
+                                            <a href="{{{ route('admin.categories.show', $category) }}}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.categories.edit', $category) }}" 
+                                            <a href="{{{ route('admin.categories.edit', $category) }}}" 
                                                class="btn btn-sm btn-outline-primary" 
                                                title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{ route('admin.categories.destroy', $category) }}" 
+                                            <form action="{{{ route('admin.categories.destroy', $category) }}}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to delete this category?');">
@@ -113,7 +113,7 @@
                                 <tr>
                                     <td colspan="9" class="text-center py-4">
                                         <p class="text-muted mb-0">No categories found.</p>
-                                        <a href="{{ route('admin.categories.create') }}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{{ route('admin.categories.create') }}}" class="btn btn-sm btn-primary mt-2">
                                             Create First Category
                                         </a>
                                     </td>

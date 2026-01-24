@@ -12,10 +12,10 @@
                 <p class="text-muted mb-0">Coupon details and usage statistics</p>
             </div>
             <div>
-                <a href="{{ route('admin.coupons.edit', $coupon) }}" class="btn btn-primary">
+                <a href="{{{ route('admin.coupons.edit', $coupon) }}}" class="btn btn-primary">
                     <i class="bi bi-pencil me-2"></i>Edit
                 </a>
-                <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">
+                <a href="{{{ route('admin.coupons.index') }}}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back
                 </a>
             </div>
@@ -153,7 +153,7 @@
                                     <tr>
                                         <td>
                                             @if($usage->order)
-                                                <a href="{{ route('admin.orders.show', $usage->order) }}">{{ $usage->order->order_number ?? 'N/A' }}</a>
+                                                <a href="{{{ route('admin.orders.show', $usage->order) }}}">{{ $usage->order->order_number ?? 'N/A' }}</a>
                                             @else
                                                 N/A
                                             @endif

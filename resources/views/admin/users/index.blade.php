@@ -11,7 +11,7 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Users</h4>
                 <p class="text-muted mb-0">Manage user accounts and permissions</p>
             </div>
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+            <a href="{{{ route('admin.users.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New User
             </a>
         </div>
@@ -52,17 +52,17 @@
                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.users.show', $user) }}" 
+                                            <a href="{{{ route('admin.users.show', $user) }}}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.users.edit', $user) }}" 
+                                            <a href="{{{ route('admin.users.edit', $user) }}}" 
                                                class="btn btn-sm btn-outline-primary" 
                                                title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{ route('admin.users.destroy', $user) }}" 
+                                            <form action="{{{ route('admin.users.destroy', $user) }}}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to delete this user?');">
@@ -81,7 +81,7 @@
                                 <tr>
                                     <td colspan="6" class="text-center py-4">
                                         <p class="text-muted mb-0">No users found.</p>
-                                        <a href="{{ route('admin.users.create') }}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{{ route('admin.users.create') }}}" class="btn btn-sm btn-primary mt-2">
                                             Create First User
                                         </a>
                                     </td>

@@ -43,9 +43,7 @@ class RegisterController extends Controller
             return back()->withErrors($validator)->withInput()->with('error', 'Please correct the errors below.');
         }
 
-        // Generate verification token
-        $verificationToken = Str::random(64);
-
+        // Auto-verify email (no verification required)
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -54,67 +52,17 @@ class RegisterController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'is_admin' => false,
-            'email_verification_token' => $verificationToken,
+            'email_verified_at' => now(), // Auto-verify email
         ]);
 
-        // Send verification email
-        $emailSent = false;
-        $emailError = null;
-        
-        try {
-            // Verify email configuration before sending
-            $mailDriver = config('mail.default');
-            $mailHost = config('mail.mailers.smtp.host');
-            
-            if ($mailDriver !== 'smtp' || empty($mailHost)) {
-                throw new \Exception('Email configuration is not properly set. Please check .env file.');
-            }
-            
-            // Generate verification URL with absolute URL
-            $verificationUrl = url(route('email.verify', ['token' => $verificationToken], false));
-            
-            // Send email synchronously (not queued)
-            Mail::send('emails.verify-email', [
-                'user' => $user,
-                'verificationUrl' => $verificationUrl
-            ], function ($message) use ($user) {
-                $message->to($user->email, $user->name)
-                    ->subject('Verify Your Email Address - ' . config('app.name'));
-            });
-            
-            $emailSent = true;
-            
-            // Log success with details
-            error_log('[' . date('Y-m-d H:i:s') . '] SUCCESS: Verification email sent to: ' . $user->email);
-            error_log('[' . date('Y-m-d H:i:s') . '] Verification URL: ' . $verificationUrl);
-            
-        } catch (\Swift_TransportException $e) {
-            $emailError = 'SMTP Connection Error: ' . $e->getMessage();
-            error_log('[' . date('Y-m-d H:i:s') . '] SMTP ERROR for ' . $user->email . ': ' . $e->getMessage());
-            error_log('[' . date('Y-m-d H:i:s') . '] Error Code: ' . $e->getCode());
-        } catch (\Exception $e) {
-            $emailError = $e->getMessage();
-            error_log('[' . date('Y-m-d H:i:s') . '] EMAIL ERROR for ' . $user->email);
-            error_log('[' . date('Y-m-d H:i:s') . '] Error: ' . $e->getMessage());
-            error_log('[' . date('Y-m-d H:i:s') . '] Class: ' . get_class($e));
-            error_log('[' . date('Y-m-d H:i:s') . '] File: ' . $e->getFile() . ':' . $e->getLine());
-        }
-
-        // Login user but show verification message
+        // Email verification disabled - user is auto-verified
+        // Login user
         Auth::login($user);
 
         $redirect = $request->get('redirect', route('home'));
         
-        if ($emailSent) {
-            return redirect($redirect)
-                ->with('success', 'Registration successful! Please check your email to verify your account.')
-                ->with('email_sent', true);
-        } else {
-            return redirect($redirect)
-                ->with('warning', 'Registration successful! However, we could not send the verification email. Please use the "Resend Verification Email" button below.')
-                ->with('email_sent', false)
-                ->with('email_error', $emailError);
-        }
+        return redirect($redirect)
+            ->with('success', 'Registration successful! You are now logged in.');
     }
 
     /**

@@ -11,7 +11,7 @@
                 <h5 class="mb-0">Coupon Information</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.coupons.update', $coupon) }}" method="POST">
+                <form action="{{{ route('admin.coupons.update', $coupon) }}}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -159,7 +159,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{{ route('admin.coupons.index') }}}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update Coupon</button>
                     </div>
                 </form>

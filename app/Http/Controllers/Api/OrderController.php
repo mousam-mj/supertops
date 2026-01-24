@@ -36,18 +36,38 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $isGuest = !$request->user();
+        $user = $request->user();
         
         $validationRules = [
-            'payment_method' => 'required|in:razorpay,cod',
+            'payment_method' => 'required|in:razorpay,cod,test',
             'coupon_code' => 'nullable|string',
             'notes' => 'nullable|string',
             'razorpay_order_id' => 'nullable|string|required_if:payment_method,razorpay',
             'razorpay_payment_id' => 'nullable|string',
             'razorpay_signature' => 'nullable|string',
+            'shipping_charge' => 'nullable|numeric|min:0',
         ];
 
-        if ($isGuest) {
+        // Determine if this is a logged-in user request or guest request
+        // If shipping_address is provided, treat as logged-in user
+        // Otherwise, if user is authenticated, also treat as logged-in user
+        // Only require guest_info if neither condition is met
+        if ($user || $request->has('shipping_address')) {
+            // For logged-in users, accept either shipping_address_id OR shipping_address
+            $validationRules['shipping_address_id'] = 'required_without:shipping_address|exists:addresses,id';
+            $validationRules['billing_address_id'] = 'nullable|exists:addresses,id';
+            $validationRules['shipping_address'] = 'required_without:shipping_address_id|array';
+            // If shipping_address is provided, validate its fields
+            $validationRules['shipping_address.first_name'] = 'required_with:shipping_address|string|max:255';
+            $validationRules['shipping_address.last_name'] = 'required_with:shipping_address|string|max:255';
+            $validationRules['shipping_address.email'] = 'required_with:shipping_address|email|max:255';
+            $validationRules['shipping_address.phone'] = 'required_with:shipping_address|string|max:20';
+            $validationRules['shipping_address.address_line_1'] = 'required_with:shipping_address|string';
+            $validationRules['shipping_address.city'] = 'required_with:shipping_address|string|max:255';
+            $validationRules['shipping_address.state'] = 'required_with:shipping_address|string|max:255';
+            $validationRules['shipping_address.pincode'] = 'required_with:shipping_address|string|max:10';
+        } else {
+            // For guests, require guest_info
             $validationRules['guest_info'] = 'required|array';
             $validationRules['guest_info.first_name'] = 'required|string|max:255';
             $validationRules['guest_info.last_name'] = 'required|string|max:255';
@@ -57,10 +77,6 @@ class OrderController extends Controller
             $validationRules['guest_info.city'] = 'required|string|max:255';
             $validationRules['guest_info.state'] = 'required|string|max:255';
             $validationRules['guest_info.pincode'] = 'required|string|max:10';
-        } else {
-            $validationRules['shipping_address_id'] = 'required_without:shipping_address|exists:addresses,id';
-            $validationRules['billing_address_id'] = 'nullable|exists:addresses,id';
-            $validationRules['shipping_address'] = 'required_without:shipping_address_id|array';
         }
 
         $request->validate($validationRules);
@@ -70,33 +86,184 @@ class OrderController extends Controller
 
         // Get cart items
         if ($user) {
+            $sessionId = $request->cookie('cart_session_id');
+            
+            // Strategy 1: Get all cart items for this user (regardless of session_id)
             $cartItems = Cart::where('user_id', $user->id)
-                ->whereNull('session_id')
                 ->with('product')
                 ->get();
+            
+            // Strategy 2: If no items found, check for guest cart items in session
+            if ($cartItems->isEmpty() && $sessionId) {
+                $guestCartItems = Cart::where('session_id', $sessionId)
+                    ->whereNull('user_id')
+                    ->with('product')
+                    ->get();
+                
+                // Transfer all guest items to user
+                foreach ($guestCartItems as $guestItem) {
+                    if ($guestItem->product) { // Only transfer if product exists
+                        $guestItem->user_id = $user->id;
+                        $guestItem->session_id = null;
+                        $guestItem->save();
+                        $cartItems->push($guestItem);
+                    }
+                }
+            }
+            
+            // Strategy 3: If still empty, try to find ANY cart items with this user_id (even with session_id)
+            if ($cartItems->isEmpty()) {
+                $cartItems = Cart::where('user_id', $user->id)
+                    ->with('product')
+                    ->get();
+            }
+            
+            // Strategy 4: If still empty and we have session_id, try to find guest items with that session
+            if ($cartItems->isEmpty() && $sessionId) {
+                $guestCartItems = Cart::where('session_id', $sessionId)
+                    ->whereNull('user_id')
+                    ->with('product')
+                    ->get();
+                
+                // Transfer all guest items to user
+                foreach ($guestCartItems as $guestItem) {
+                    if ($guestItem->product) {
+                        $guestItem->user_id = $user->id;
+                        $guestItem->session_id = null;
+                        $guestItem->save();
+                        $cartItems->push($guestItem);
+                    }
+                }
+            }
+            
+            // Strategy 5: If user has items, merge any remaining guest items
+            if (!$cartItems->isEmpty() && $sessionId) {
+                $guestCartItems = Cart::where('session_id', $sessionId)
+                    ->whereNull('user_id')
+                    ->with('product')
+                    ->get();
+                
+                // Merge guest cart items into user cart
+                foreach ($guestCartItems as $guestItem) {
+                    if (!$guestItem->product) {
+                        continue; // Skip items with null products
+                    }
+                    
+                    // Check if user already has this product with same size/color
+                    $existingItem = $cartItems->first(function($item) use ($guestItem) {
+                        return $item->product_id === $guestItem->product_id 
+                            && $item->size === $guestItem->size 
+                            && $item->color === $guestItem->color;
+                    });
+                    
+                    if ($existingItem) {
+                        // Update quantity
+                        $existingItem->quantity += $guestItem->quantity;
+                        $existingItem->save();
+                        // Delete guest item
+                        $guestItem->delete();
+                    } else {
+                        // Transfer guest item to user
+                        $guestItem->user_id = $user->id;
+                        $guestItem->session_id = null;
+                        $guestItem->save();
+                        $cartItems->push($guestItem);
+                    }
+                }
+            }
+            
         } else {
-            // Guest cart
-            if (!$sessionId) {
+            // Guest cart - use same logic as CheckoutController
+            // First, find the best session ID (one with most items)
+            $bestSession = Cart::whereNull('user_id')
+                ->whereNotNull('session_id')
+                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
+                ->groupBy('session_id')
+                ->orderBy('total_quantity', 'desc')
+                ->orderBy('item_count', 'desc')
+                ->orderBy('latest_created_at', 'desc')
+                ->first();
+            
+            // Use cookie session ID if available, otherwise use best session
+            $cookieSessionId = $request->cookie('cart_session_id');
+            
+            // Try to find cart items with cookie session ID first
+            if ($cookieSessionId) {
+                $cartItems = Cart::where('session_id', $cookieSessionId)
+                    ->whereNull('user_id')
+                    ->with('product')
+                    ->get();
+            } else {
+                $cartItems = collect([]);
+            }
+            
+            // If no items found with cookie session, try best session
+            if ($cartItems->isEmpty() && $bestSession) {
+                $cartItems = Cart::where('session_id', $bestSession->session_id)
+                    ->whereNull('user_id')
+                    ->with('product')
+                    ->get();
+                
+                // Update session ID to best session for consistency
+                $sessionId = $bestSession->session_id;
+            } else {
+                $sessionId = $cookieSessionId;
+            }
+            
+            // If still no items, check if there are ANY guest cart items
+            if ($cartItems->isEmpty()) {
+                $anyGuestItems = Cart::whereNull('user_id')
+                    ->whereNotNull('session_id')
+                    ->with('product')
+                    ->get();
+                
+                if (!$anyGuestItems->isEmpty()) {
+                    // Use the session_id from the first item found
+                    $firstItem = $anyGuestItems->first();
+                    $cartItems = Cart::where('session_id', $firstItem->session_id)
+                        ->whereNull('user_id')
+                        ->with('product')
+                        ->get();
+                    $sessionId = $firstItem->session_id;
+                }
+            }
+            
+            if ($cartItems->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cart is empty',
+                    'message' => 'Cart is empty. Please add items to your cart before placing an order. Go to the shop page and add products to your cart first.',
                 ], 400);
             }
-            $cartItems = Cart::where('session_id', $sessionId)
-                ->whereNull('user_id')
-                ->with('product')
-                ->get();
         }
 
+        // Filter out items where product is null or deleted
+        $cartItems = $cartItems->filter(function($item) {
+            return $item->product !== null;
+        });
+        
         if ($cartItems->isEmpty()) {
+            // Log for debugging
+            \Log::info('Cart is empty - Debug Info', [
+                'user_id' => $user?->id,
+                'user_email' => $user?->email,
+                'session_id' => $sessionId ?? 'no session',
+                'user_exists' => $user !== null,
+                'total_cart_items_in_db' => Cart::count(),
+                'user_cart_items_count' => $user ? Cart::where('user_id', $user->id)->count() : 0,
+                'guest_cart_items_count' => isset($sessionId) && $sessionId ? Cart::where('session_id', $sessionId)->whereNull('user_id')->count() : 0,
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Cart is empty',
+                'message' => 'Cart is empty. Please add items to your cart before placing an order. Go to the shop page and add products to your cart first.',
             ], 400);
         }
 
         // Get addresses
-        if ($isGuest) {
+        // Determine if guest based on what was validated (not just $user)
+        $isGuestAfterValidation = !$user && !$request->has('shipping_address');
+        
+        if ($isGuestAfterValidation) {
             $guestInfo = $request->guest_info;
             $shippingAddress = [
                 'first_name' => $guestInfo['first_name'],
@@ -141,8 +308,8 @@ class OrderController extends Controller
             }
         }
 
-        // Calculate shipping (placeholder - use shipping controller)
-        $shippingCharge = 50; // Default shipping charge
+        // Calculate shipping
+        $shippingCharge = $request->shipping_charge ?? 0; // Use provided shipping charge or default to 0
 
         $totalAmount = $subtotal - $couponDiscount + $shippingCharge;
 
@@ -155,21 +322,38 @@ class OrderController extends Controller
                 'status' => 'pending',
                 'status_locked' => false,
                 'total_amount' => $totalAmount,
+                'subtotal' => $subtotal, // Add subtotal field
+                'tax' => 0, // Add tax field (default 0)
+                'shipping' => $shippingCharge, // Add shipping field (legacy)
+                'total' => $totalAmount, // Add total field (legacy)
                 'shipping_charge' => $shippingCharge,
                 'coupon_id' => $coupon?->id,
                 'coupon_discount' => $couponDiscount,
-                'shipping_address' => $shippingAddress,
-                'billing_address' => $billingAddress,
-                'payment_method' => $request->payment_method,
-                'payment_status' => $request->payment_method === 'cod' ? 'pending' : ($request->razorpay_payment_id ? 'paid' : 'pending'),
+                'shipping_address' => is_array($shippingAddress) ? json_encode($shippingAddress) : $shippingAddress,
+                'billing_address' => is_array($billingAddress) ? json_encode($billingAddress) : $billingAddress,
+                'payment_method' => $request->payment_method === 'test' ? 'test' : $request->payment_method,
+                'payment_status' => ($request->payment_method === 'cod' || $request->payment_method === 'test') ? 'paid' : ($request->razorpay_payment_id ? 'paid' : 'pending'),
                 'notes' => $request->notes,
             ];
 
-            // Add guest info if guest checkout
-            if ($isGuest) {
+            // Add customer info (for both guest and logged-in users)
+            if ($isGuestAfterValidation) {
+                // Guest checkout
                 $orderData['customer_name'] = $guestInfo['first_name'] . ' ' . $guestInfo['last_name'];
                 $orderData['customer_email'] = $guestInfo['email'];
                 $orderData['customer_phone'] = $guestInfo['phone'];
+            } else {
+                // Logged-in user checkout - get customer info from user or shipping address
+                if ($user) {
+                    $orderData['customer_name'] = $user->name ?? ($shippingAddress['first_name'] ?? '') . ' ' . ($shippingAddress['last_name'] ?? '');
+                    $orderData['customer_email'] = $user->email ?? $shippingAddress['email'] ?? '';
+                    $orderData['customer_phone'] = $user->phone ?? $shippingAddress['phone'] ?? '';
+                } else {
+                    // Fallback if somehow user is null but not guest
+                    $orderData['customer_name'] = ($shippingAddress['first_name'] ?? '') . ' ' . ($shippingAddress['last_name'] ?? '');
+                    $orderData['customer_email'] = $shippingAddress['email'] ?? '';
+                    $orderData['customer_phone'] = $shippingAddress['phone'] ?? '';
+                }
             }
 
             // Add Razorpay payment details if provided
@@ -189,7 +373,7 @@ class OrderController extends Controller
                 if ($cartItem->size || $cartItem->color) {
                     $stock = $product->getStockForColorSize($cartItem->color, $cartItem->size);
                     if ($stock < $cartItem->quantity) {
-                        throw new \Exception("Insufficient stock for {$product->name}");
+                        throw new \Exception("Insufficient stock for {$product->name}. Available: {$stock}, Requested: {$cartItem->quantity}");
                     }
                     
                     // Update inventory
@@ -202,13 +386,24 @@ class OrderController extends Controller
                         $inventory->quantity -= $cartItem->quantity;
                         $inventory->sold_quantity += $cartItem->quantity;
                         $inventory->save();
+                    } else {
+                        // If no inventory record exists, create one with negative quantity (for tracking)
+                        // Or throw error if inventory is required
+                        throw new \Exception("Inventory record not found for {$product->name} with color: {$cartItem->color}, size: {$cartItem->size}");
                     }
                 } else {
-                    if ($product->stock < $cartItem->quantity) {
-                        throw new \Exception("Insufficient stock for {$product->name}");
+                    // Check main product stock
+                    $availableStock = $product->stock_quantity ?? $product->stock ?? 0;
+                    if ($availableStock < $cartItem->quantity) {
+                        throw new \Exception("Insufficient stock for {$product->name}. Available: {$availableStock}, Requested: {$cartItem->quantity}");
                     }
                     
-                    $product->stock -= $cartItem->quantity;
+                    // Update product stock
+                    if ($product->stock_quantity !== null) {
+                        $product->stock_quantity -= $cartItem->quantity;
+                    } else {
+                        $product->stock -= $cartItem->quantity;
+                    }
                     $product->save();
                 }
 

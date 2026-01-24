@@ -71,7 +71,7 @@
                                 @foreach($payments as $payment)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.orders.show', $payment) }}">{{ $payment->order_number ?? 'N/A' }}</a>
+                                            <a href="{{{ route('admin.orders.show', $payment) }}}">{{ $payment->order_number ?? 'N/A' }}</a>
                                         </td>
                                         <td>{{ $payment->customer_name ?? 'Guest' }}</td>
                                         <td>
@@ -100,7 +100,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.orders.show', $payment) }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{{ route('admin.orders.show', $payment) }}}" class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
                                         </td>

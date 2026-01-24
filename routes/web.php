@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -70,7 +71,7 @@ Route::get('/login.html', function () {
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
 
 // Logout Route
-Route::post('/logout', function (Request $request) {
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
@@ -115,6 +116,11 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.sh
 // Cart & Checkout Routes
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+
+// Test Route
+Route::get('/test/hello', function() {
+    return view('test.hello');
+})->name('test.hello');
 
 // Order Success Route
 Route::get('/order-success/{id}', function($id) {

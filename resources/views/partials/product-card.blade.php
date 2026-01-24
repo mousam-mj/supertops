@@ -19,7 +19,7 @@
                 </div>
             </div>
             
-            <a href="{{ route('product.show', $product->slug ?? '#') }}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
+            <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
                 @php
                     $getImageUrl = function($path) {
                         if (!$path) return asset('assets/images/product/perch-bottal.webp');
@@ -103,7 +103,7 @@
                 </div>
             </div>
             
-            <a href="{{ route('product.show', $product->slug ?? '#') }}" class="product-name text-title duration-300 hover:text-secondary block">{{ $product->name ?? 'Product Name' }}</a>
+            <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-name text-title duration-300 hover:text-secondary block">{{ $product->name ?? 'Product Name' }}</a>
 
             @if(isset($product->colors) && is_array($product->colors) && count($product->colors) > 0)
                 <div class="list-color {{ isset($product->images) && is_array($product->images) && count($product->images) > 0 ? 'list-color-image' : '' }} max-md:hidden flex items-center gap-3 flex-wrap duration-500 py-2">

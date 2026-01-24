@@ -3,7 +3,7 @@
         <div class="container">
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
                 <div class="company-infor basis-1/4 max-lg:basis-full pr-7">
-                    <a href="{{ route('home') }}" class="logo inline-block">
+                    <a href="{{{ route('home') }}}" class="logo inline-block">
                         <img src="{{ asset('assets/images/perch-logo.png') }}" alt="Perch Logo" />
                     </a>
                     @php
@@ -26,33 +26,33 @@
                     <div class="list-nav flex justify-between basis-2/3 max-md:basis-full gap-4">
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Infomation</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('contact') }}">Contact us </a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('contact') }}}">Contact us </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!"> Career </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('my-account') }}"> My Account</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('order-tracking') }}"> Order & Returns</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('faqs') }}">FAQs </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('my-account') }}}"> My Account</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}"> Order & Returns</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">FAQs </a>
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Quick Shop</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('shop') }}">Women</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('shop') }}">Men </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('shop') }}">Clothes </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('shop') }}"> Accessories </a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('shop') }}}">Women</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Men </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Clothes </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}"> Accessories </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!">Blog </a>
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Customer Services</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('faqs') }}">FAQs </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('faqs') }}">Shipping </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('faqs') }}">Privacy Policy</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('order-tracking') }}">Return & Refund</a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('faqs') }}}">FAQs </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Shipping </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Privacy Policy</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}">Return & Refund</a>
                         </div>
                     </div>
                     <div class="newsletter basis-1/3 pl-7 max-md:basis-full max-md:pl-0">
                         <div class="text-button-uppercase">Newletter</div>
                         <div class="caption1 mt-3">Sign up for our newsletter and get 10% off your first purchase</div>
                         <div class="input-block w-full h-[52px] mt-4">
-                            <form class="w-full h-full relative" method="POST" action="{{ route('newsletter.subscribe') }}">
+                            <form class="w-full h-full relative" method="POST" action="{{{ route('newsletter.subscribe') }}}">
                                 @csrf
                                 <input type="email" name="email" placeholder="Enter your e-mail" class="caption1 w-full h-full pl-4 pr-14 rounded-xl border border-line" required />
                                 <button type="submit" class="w-[44px] h-[44px] bg-black flex items-center justify-center rounded-xl absolute top-1 right-1">

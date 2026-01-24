@@ -8,7 +8,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('admin.users.update', $user) }}" method="POST">
+                <form action="{{{ route('admin.users.update', $user) }}}" method="POST">
                     @csrf
                     @method('PUT')
                     
@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{{ route('admin.users.index') }}}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Update User</button>
                     </div>
                 </form>

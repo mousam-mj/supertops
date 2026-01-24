@@ -12,10 +12,10 @@
                 <p class="text-muted mb-0">Main category details</p>
             </div>
             <div>
-                <a href="{{ route('admin.main-categories.edit', $category) }}" class="btn btn-primary">
+                <a href="{{{ route('admin.main-categories.edit', $category) }}}" class="btn btn-primary">
                     <i class="bi bi-pencil me-2"></i>Edit
                 </a>
-                <a href="{{ route('admin.main-categories.index') }}" class="btn btn-secondary">
+                <a href="{{{ route('admin.main-categories.index') }}}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back
                 </a>
             </div>
@@ -107,7 +107,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.categories.show', $subCategory) }}" class="btn btn-sm btn-outline-info">
+                                        <a href="{{{ route('admin.categories.show', $subCategory) }}}" class="btn btn-sm btn-outline-info">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                     </td>

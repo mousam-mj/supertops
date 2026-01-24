@@ -11,7 +11,7 @@
                                 <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                                     <i class="ph ph-x text-sm"></i>
                                 </div>
-                                <a href="{{{ route('home') }}}" class="logo text-3xl font-semibold text-center">Perch Bottle</a>
+                                <a href="{{ route('home') }}" class="logo text-3xl font-semibold text-center">Perch Bottle</a>
                             </div>
                             <div class="form-search relative mt-2">
                                 <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
@@ -580,29 +580,29 @@
                         <div class="heading4">Login</div>
                         @if(session('success'))
                             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-4" role="alert">
-                                {{ session('success') }}}
+                                {{ session('success') }}
                             </div>
                         @endif
                         @if(session('error'))
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4" role="alert">
-                                {{ session('error') }}}
+                                {{ session('error') }}
                             </div>
                         @endif
-                        @if($errors->any())
+            @if($errors->any())
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4" role="alert">
                                 <ul class="list-disc list-inside">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
                         <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mt-4 text-sm" role="alert">
                             <div class="font-semibold mb-2">Default Login Credentials:</div>
                             <div><strong>User:</strong> john@example.com / password</div>
                             <div><strong>Admin:</strong> admin@test.com / password</div>
-                        </div>
-                        
+                </div>
+
                         <form method="POST" action="{{ route('login.submit') }}" class="md:mt-7 mt-4">
                             @csrf
                             <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('home')) }}" />
@@ -635,10 +635,10 @@
                             <div class="heading4">New Customer</div>
                             <div class="mt-2 text-secondary">Be part of our growing family of new customers! Join us today and unlock a world of exclusive benefits, offers, and personalized experiences.</div>
                             <div class="block-button md:mt-7 mt-4">
-                                <a href="{{{ route('register') }}}" class="button-main">Register</a>
+                                <a href="{{ route('register') }}" class="button-main">Register</a>
                             </div>
                         </div>
-                    </div>
+                </div>
                 </div>
             </div>
         </div>
