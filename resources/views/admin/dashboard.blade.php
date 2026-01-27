@@ -6,9 +6,31 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <div>
-            <h4 class="mb-1 fw-bold" style="color: #2d3748;">Dashboard Overview</h4>
-            <p class="text-muted mb-0">Welcome back! Here's what's happening with your store today.</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-1 fw-bold" style="color: #2d3748;">Dashboard Overview</h4>
+                <p class="text-muted mb-0">Welcome back! Here's what's happening with your store today.</p>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="reportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-download"></i> Download Reports
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="reportsDropdown">
+                    <li><h6 class="dropdown-header">Reports</h6></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.inventory') }}">
+                        <i class="bi bi-box-seam"></i> Inventory Report
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.orders') }}">
+                        <i class="bi bi-bag-check"></i> Orders Report
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.revenue') }}">
+                        <i class="bi bi-currency-dollar"></i> Revenue Report
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.customers') }}">
+                        <i class="bi bi-people"></i> Customers Report
+                    </a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -83,12 +105,39 @@
 
 <!-- Charts Section -->
 <div class="row">
-    <!-- Revenue Chart (Last 7 Days) -->
+    <!-- Revenue Chart -->
     <div class="col-md-4 mb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
-                <h6 class="card-title fw-bold mb-1">Revenue (Last 7 Days)</h6>
-                <p class="text-muted small mb-3">Daily revenue trends</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h6 class="card-title fw-bold mb-1">Revenue</h6>
+                        <p class="text-muted small mb-0">Daily revenue trends</p>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="revenueFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="revenueFilterText">Last 7 Days</span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="revenueFilter">
+                            <li><a class="dropdown-item filter-option" href="#" data-days="7" data-chart="revenue">Last 7 Days</a></li>
+                            <li><a class="dropdown-item filter-option" href="#" data-days="15" data-chart="revenue">Last 15 Days</a></li>
+                            <li><a class="dropdown-item filter-option" href="#" data-days="30" data-chart="revenue">Last 30 Days</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item filter-option-custom" href="#" data-chart="revenue">Custom Date Range</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="revenueCustomDateRange" class="mb-2" style="display: none;">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="revenueStartDate" placeholder="Start Date">
+                        </div>
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="revenueEndDate" placeholder="End Date">
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2 w-100" onclick="applyCustomDateRange('revenue')">Apply</button>
+                </div>
                 <div style="position: relative; height: 200px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
@@ -96,12 +145,39 @@
         </div>
     </div>
 
-    <!-- Orders Chart (Last 7 Days) -->
+    <!-- Orders Chart -->
     <div class="col-md-4 mb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
-                <h6 class="card-title fw-bold mb-1">Orders (Last 7 Days)</h6>
-                <p class="text-muted small mb-3">Daily order count</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h6 class="card-title fw-bold mb-1">Orders</h6>
+                        <p class="text-muted small mb-0">Daily order count</p>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="ordersFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="ordersFilterText">Last 7 Days</span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="ordersFilter">
+                            <li><a class="dropdown-item filter-option" href="#" data-days="7" data-chart="orders">Last 7 Days</a></li>
+                            <li><a class="dropdown-item filter-option" href="#" data-days="15" data-chart="orders">Last 15 Days</a></li>
+                            <li><a class="dropdown-item filter-option" href="#" data-days="30" data-chart="orders">Last 30 Days</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item filter-option-custom" href="#" data-chart="orders">Custom Date Range</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="ordersCustomDateRange" class="mb-2" style="display: none;">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="ordersStartDate" placeholder="Start Date">
+                        </div>
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="ordersEndDate" placeholder="End Date">
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2 w-100" onclick="applyCustomDateRange('orders')">Apply</button>
+                </div>
                 <div style="position: relative; height: 200px;">
                     <canvas id="ordersChart"></canvas>
                 </div>
@@ -212,122 +288,256 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Revenue Chart (Line Chart)
-    const revenueCtx = document.getElementById('revenueChart');
-    if (revenueCtx) {
-        const revenueData = @json($last7Days);
-        const maxRevenue = Math.max(...revenueData.map(d => d.revenue), 1);
-        const stepSize = maxRevenue > 0 ? Math.ceil(maxRevenue / 5) : 1;
-        
-        new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: revenueData.map(d => d.date),
-                datasets: [{
-                    label: 'Revenue',
-                    data: revenueData.map(d => parseFloat(d.revenue) || 0),
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '₹' + parseFloat(context.parsed.y).toLocaleString('en-IN');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: stepSize,
-                            callback: function(value) {
-                                return '₹' + value.toLocaleString('en-IN');
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
+let revenueChart = null;
+let ordersChart = null;
+let statusChart = null;
 
-    // Orders Chart (Bar Chart)
-    const ordersCtx = document.getElementById('ordersChart');
-    if (ordersCtx) {
-        const ordersData = @json($last7Days);
-        const maxOrders = Math.max(...ordersData.map(d => d.orders), 1);
-        
-        new Chart(ordersCtx, {
-            type: 'bar',
-            data: {
-                labels: ordersData.map(d => d.date),
-                datasets: [{
-                    label: 'Orders',
-                    data: ordersData.map(d => parseInt(d.orders) || 0),
-                    backgroundColor: '#3b82f6',
-                    borderColor: '#2563eb',
-                    borderWidth: 1,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + ' order' + (context.parsed.y !== 1 ? 's' : '');
-                            }
-                        }
-                    }
+// Function to create or update revenue chart
+function updateRevenueChart(data) {
+    const revenueCtx = document.getElementById('revenueChart');
+    if (!revenueCtx) return;
+    
+    const maxRevenue = Math.max(...data.map(d => d.revenue), 1);
+    const stepSize = maxRevenue > 0 ? Math.ceil(maxRevenue / 5) : 1;
+    
+    const config = {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Revenue',
+                data: data.map(d => parseFloat(d.revenue) || 0),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            precision: 0
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + parseFloat(context.parsed.y).toLocaleString('en-IN');
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: stepSize,
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    };
+    
+    if (revenueChart) {
+        revenueChart.data.labels = config.data.labels;
+        revenueChart.data.datasets[0].data = config.data.datasets[0].data;
+        revenueChart.update();
+    } else {
+        revenueChart = new Chart(revenueCtx, config);
+    }
+}
+
+// Function to create or update orders chart
+function updateOrdersChart(data) {
+    const ordersCtx = document.getElementById('ordersChart');
+    if (!ordersCtx) return;
+    
+    const maxOrders = Math.max(...data.map(d => d.orders), 1);
+    
+    const config = {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Orders',
+                data: data.map(d => parseInt(d.orders) || 0),
+                backgroundColor: '#3b82f6',
+                borderColor: '#2563eb',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' order' + (context.parsed.y !== 1 ? 's' : '');
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    };
+    
+    if (ordersChart) {
+        ordersChart.data.labels = config.data.labels;
+        ordersChart.data.datasets[0].data = config.data.datasets[0].data;
+        ordersChart.update();
+    } else {
+        ordersChart = new Chart(ordersCtx, config);
+    }
+}
+
+// Function to fetch chart data
+function fetchChartData(days = null, startDate = null, endDate = null, chartType = 'both') {
+    const url = '{{ route("admin.dashboard.chart-data") }}';
+    const params = new URLSearchParams();
+    
+    if (days) {
+        params.append('days', days);
+    } else if (startDate && endDate) {
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
+    } else {
+        params.append('days', 7);
+    }
+    
+    fetch(url + '?' + params.toString(), {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (chartType === 'revenue' || chartType === 'both') {
+                updateRevenueChart(data.data);
+            }
+            if (chartType === 'orders' || chartType === 'both') {
+                updateOrdersChart(data.data);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching chart data:', error);
+    });
+}
+
+// Function to apply custom date range
+function applyCustomDateRange(chartType) {
+    const startDateInput = document.getElementById(chartType + 'StartDate');
+    const endDateInput = document.getElementById(chartType + 'EndDate');
+    
+    if (!startDateInput.value || !endDateInput.value) {
+        alert('Please select both start and end dates');
+        return;
+    }
+    
+    if (new Date(startDateInput.value) > new Date(endDateInput.value)) {
+        alert('Start date must be before end date');
+        return;
+    }
+    
+    fetchChartData(null, startDateInput.value, endDateInput.value, chartType);
+    
+    // Update filter text
+    const filterText = document.getElementById(chartType + 'FilterText');
+    const startDate = new Date(startDateInput.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endDate = new Date(endDateInput.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    filterText.textContent = startDate + ' - ' + endDate;
+    
+    // Hide custom date range
+    document.getElementById(chartType + 'CustomDateRange').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts with default data (last 7 days)
+    const revenueData = @json($last7Days);
+    updateRevenueChart(revenueData);
+    
+    const ordersData = @json($last7Days);
+    updateOrdersChart(ordersData);
+    
+    // Event listeners for filter dropdowns
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const days = this.getAttribute('data-days');
+            const chartType = this.getAttribute('data-chart');
+            const filterText = document.getElementById(chartType + 'FilterText');
+            
+            // Update filter text
+            if (days == 7) {
+                filterText.textContent = 'Last 7 Days';
+            } else if (days == 15) {
+                filterText.textContent = 'Last 15 Days';
+            } else if (days == 30) {
+                filterText.textContent = 'Last 30 Days';
+            }
+            
+            // Hide custom date range if visible
+            document.getElementById(chartType + 'CustomDateRange').style.display = 'none';
+            
+            // Fetch and update chart data
+            fetchChartData(days, null, null, chartType);
+        });
+    });
+    
+    // Event listeners for custom date range option
+    document.querySelectorAll('.filter-option-custom').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const chartType = this.getAttribute('data-chart');
+            const customDateRange = document.getElementById(chartType + 'CustomDateRange');
+            
+            // Toggle custom date range visibility
+            if (customDateRange.style.display === 'none') {
+                customDateRange.style.display = 'block';
+            } else {
+                customDateRange.style.display = 'none';
             }
         });
-    }
+    });
 
     // Orders by Status Chart (Doughnut Chart)
     const statusCtx = document.getElementById('statusChart');
@@ -346,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })).filter(item => item.value > 0);
         
         if (filteredData.length > 0) {
-            new Chart(statusCtx, {
+            statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
                     labels: filteredData.map(d => d.label),

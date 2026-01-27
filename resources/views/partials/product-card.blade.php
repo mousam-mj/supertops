@@ -127,10 +127,10 @@
             @endif
 
             <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                <div class="product-price text-title">${{ number_format(($product->sale_price ?? $product->price ?? 0), 2) }}</div>
+                <div class="product-price text-title">₹{{ number_format(($product->sale_price ?? $product->price ?? 0), 2) }}</div>
                 @if(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
                     <div class="product-origin-price caption1 text-secondary2">
-                        <del>${{ number_format($product->price, 2) }}</del>
+                        <del>₹{{ number_format($product->price, 2) }}</del>
                     </div>
                     @php
                         $discount = round((($product->price - $product->sale_price) / $product->price) * 100);

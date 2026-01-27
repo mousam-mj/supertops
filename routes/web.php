@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\AddressController;
 
 Route::get('/', function () {
     $categories = \App\Models\Category::whereNull('parent_id')
@@ -138,7 +139,7 @@ Route::get('/order-tracking', function () {
     $order = null;
     if(request()->has('order_id') && request()->has('email')) {
         $order = \App\Models\Order::where('id', request()->get('order_id'))
-            ->where('email', request()->get('email'))
+            ->where('customer_email', request()->get('email'))
             ->first();
     }
     return view('order-tracking', compact('order'));
@@ -217,7 +218,8 @@ Route::get('/my-account', function () {
     }
     $user = auth()->user();
     $orders = \App\Models\Order::where('user_id', $user->id)
-        ->orWhere('email', $user->email)
+        ->orWhere('customer_email', $user->email)
+        ->with(['items.product.category'])
         ->orderBy('created_at', 'desc')
         ->limit(10)
         ->get();
@@ -225,17 +227,39 @@ Route::get('/my-account', function () {
     
     // Get order statistics
     $awaitingPickup = \App\Models\Order::where(function($q) use ($user) {
-        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+        $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->where('status', 'processing')->count();
     $cancelledOrders = \App\Models\Order::where(function($q) use ($user) {
-        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+        $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->where('status', 'cancelled')->count();
     $totalOrders = \App\Models\Order::where(function($q) use ($user) {
-        $q->where('user_id', $user->id)->orWhere('email', $user->email);
+        $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->count();
     
     return view('my-account', compact('user', 'orders', 'addresses', 'awaitingPickup', 'cancelledOrders', 'totalOrders'));
 })->middleware('auth')->name('my-account');
+
+// Address Management Routes - Using Controller
+// Test route to check if middleware is working
+Route::get('/test-auth', function() {
+    \Log::info('Test auth route hit', [
+        'authenticated' => auth()->check(),
+        'user_id' => auth()->id(),
+        'session_id' => session()->getId(),
+    ]);
+    return response()->json([
+        'authenticated' => auth()->check(),
+        'user_id' => auth()->id(),
+        'user' => auth()->user() ? auth()->user()->email : null,
+    ]);
+})->middleware(['log.auth', 'auth'])->name('test.auth');
+
+Route::middleware(['log.auth', 'auth'])->group(function () {
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{id}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{id}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::post('/addresses/{id}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -247,6 +271,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin Protected Routes
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
+        
+        // Report Downloads
+        Route::get('/dashboard/reports/inventory', [DashboardController::class, 'downloadInventoryReport'])->name('dashboard.reports.inventory');
+        Route::get('/dashboard/reports/orders', [DashboardController::class, 'downloadOrdersReport'])->name('dashboard.reports.orders');
+        Route::get('/dashboard/reports/revenue', [DashboardController::class, 'downloadRevenueReport'])->name('dashboard.reports.revenue');
+        Route::get('/dashboard/reports/customers', [DashboardController::class, 'downloadCustomersReport'])->name('dashboard.reports.customers');
         
         // Resource Routes
         Route::resource('users', UserController::class);

@@ -1,4 +1,4 @@
-<div id="footer" class="footer">
+<div id="footer" class="footer" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both; margin-top: 0;">
     <div class="footer-main bg-surface">
         <div class="container">
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="newsletter basis-1/3 pl-7 max-md:basis-full max-md:pl-0">
-                        <div class="text-button-uppercase">Newletter</div>
+                        <div class="text-button-uppercase">Newsletter</div>
                         <div class="caption1 mt-3">Sign up for our newsletter and get 10% off your first purchase</div>
                         <div class="input-block w-full h-[52px] mt-4">
                             <form class="w-full h-full relative" method="POST" action="{{{ route('newsletter.subscribe') }}}">
@@ -94,6 +94,7 @@
                         </div>
                         <div class="choose-currency flex items-center gap-1.5">
                             <select name="currency" id="chooseCurrencyFooter" class="caption2 bg-transparent">
+                                <option value="INR" selected>INR</option>
                                 <option value="USD">USD</option>
                                 <option value="EUR">EUR</option>
                                 <option value="GBP">GBP</option>

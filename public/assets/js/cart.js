@@ -3,10 +3,24 @@
     'use strict';
 
     // Add to cart functionality
+    let isAddingToCart = false; // Prevent double clicks
+    
     function initAddToCart() {
         document.addEventListener('click', function(e) {
             const addCartBtn = e.target.closest('.add-cart-btn');
             if (!addCartBtn) return;
+
+            // Skip if already processing or if it's from product detail page (handled separately)
+            if (addCartBtn.closest('.product-infor')) {
+                return; // Let product detail page handler take care of it
+            }
+
+            // Prevent double clicks
+            if (isAddingToCart || addCartBtn.disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
 
             e.preventDefault();
             e.stopPropagation();
@@ -17,6 +31,9 @@
                 return;
             }
 
+            // Set flag to prevent double clicks
+            isAddingToCart = true;
+
             // Get size and color if available
             const sizeItem = addCartBtn.closest('.product-item')?.querySelector('.size-item.active');
             const colorItem = addCartBtn.closest('.product-item')?.querySelector('.color-item.active');
@@ -26,8 +43,10 @@
 
             // Show loading state
             const originalText = addCartBtn.innerHTML;
+            const originalDisabled = addCartBtn.disabled;
             addCartBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
             addCartBtn.disabled = true;
+            addCartBtn.style.pointerEvents = 'none';
 
             // Get CSRF token
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -73,8 +92,11 @@
                 showNotification('An error occurred. Please try again.', 'error');
             })
             .finally(() => {
+                // Always reset button state
                 addCartBtn.innerHTML = originalText;
-                addCartBtn.disabled = false;
+                addCartBtn.disabled = originalDisabled;
+                addCartBtn.style.pointerEvents = '';
+                isAddingToCart = false;
             });
         });
     }
@@ -137,7 +159,7 @@
         const productPrice = modal.querySelector('.product-price');
         if (productPrice) {
             const price = product.sale_price || product.price;
-            productPrice.textContent = `$${parseFloat(price).toFixed(2)}`;
+            productPrice.textContent = `₹${parseFloat(price).toFixed(2)}`;
         }
 
         const productImage = modal.querySelector('.product-img img');
@@ -251,21 +273,28 @@
         const totalPrice = price * item.quantity;
         
         div.innerHTML = `
-            <div class="infor flex items-center gap-5">
+            <div class="infor flex items-center gap-5 w-full">
                 <div class="bg-img">
                     <img src="${imageUrl}" alt="${item.product?.name || 'Product'}" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" />
                 </div>
-                <div>
+                <div class="flex-1">
                     <div class="name text-button">${item.product?.name || 'Product'}</div>
                     <div class="flex items-center gap-2 mt-2">
-                        <div class="product-price text-title">$${price.toFixed(2)}</div>
+                        <div class="product-price text-title">₹${price.toFixed(2)}</div>
                         ${item.size ? `<span class="text-sm text-secondary2">Size: ${item.size}</span>` : ''}
                         ${item.color ? `<span class="text-sm text-secondary2">Color: ${item.color}</span>` : ''}
                     </div>
-                    <div class="text-sm text-secondary2 mt-1">Qty: ${item.quantity} × $${price.toFixed(2)} = $${totalPrice.toFixed(2)}</div>
+                    <div class="flex items-center gap-3 mt-3">
+                        <div class="quantity-block flex items-center gap-2 border border-line rounded-lg px-2 py-1">
+                            <i class="ph-bold ph-minus cursor-pointer text-sm quantity-decrease text-secondary2 hover:text-black" data-cart-id="${item.id}"></i>
+                            <div class="quantity text-button font-semibold min-w-[30px] text-center">${item.quantity}</div>
+                            <i class="ph-bold ph-plus cursor-pointer text-sm quantity-increase text-secondary2 hover:text-black" data-cart-id="${item.id}"></i>
+                        </div>
+                        <div class="text-sm text-secondary2 item-total-price">= ₹${totalPrice.toFixed(2)}</div>
+                    </div>
                 </div>
             </div>
-            <button class="remove-cart-item button-main sm:py-3 py-2 sm:px-5 px-4 bg-red hover:bg-red-700 text-white rounded-full cursor-pointer" data-cart-id="${item.id}">Remove</button>
+            <button class="remove-cart-item button-main sm:py-3 py-2 sm:px-5 px-4 bg-red hover:bg-red-700 text-white rounded-full cursor-pointer flex-shrink-0" data-cart-id="${item.id}">Remove</button>
         `;
         
         // Add remove functionality
@@ -277,8 +306,72 @@
                 removeCartItem(item.id);
             });
         }
+
+        // Add quantity increase/decrease functionality
+        const decreaseBtn = div.querySelector('.quantity-decrease');
+        const increaseBtn = div.querySelector('.quantity-increase');
+        const quantityElement = div.querySelector('.quantity');
+        const totalPriceElement = div.querySelector('.item-total-price');
+
+        if (decreaseBtn && quantityElement) {
+            decreaseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                let qty = parseInt(quantityElement.textContent) || 1;
+                if (qty > 1) {
+                    qty--;
+                    updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
+                }
+            });
+        }
+
+        if (increaseBtn && quantityElement) {
+            increaseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                let qty = parseInt(quantityElement.textContent) || 1;
+                qty++;
+                updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
+            });
+        }
         
         return div;
+    }
+
+    // Update cart item quantity in modal
+    function updateCartItemQuantityInModal(cartId, quantity, quantityElement, totalPriceElement, unitPrice) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        
+        fetch(`/api/cart/update/${cartId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                quantityElement.textContent = quantity;
+                const totalPrice = unitPrice * quantity;
+                if (totalPriceElement) {
+                    totalPriceElement.textContent = `= ₹${totalPrice.toFixed(2)}`;
+                }
+                // Reload cart to update totals
+                loadCartItems();
+                updateCartCount();
+            } else {
+                showNotification(data.message || 'Failed to update quantity', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating quantity:', error);
+            showNotification('An error occurred', 'error');
+        });
     }
     
     // Remove cart item
@@ -299,6 +392,10 @@
             if (data.success) {
                 updateCartCount();
                 loadCartItems();
+                // Also reload cart page if on cart page
+                if (document.querySelector('.list-product-main')) {
+                    loadCartPageItems();
+                }
                 showNotification('Item removed from cart', 'success');
             } else {
                 showNotification(data.message || 'Failed to remove item', 'error');
@@ -561,7 +658,7 @@
         const totalPrice = price * item.quantity;
         
         row.innerHTML = `
-            <div class="w-1/2 flex items-center gap-4">
+            <div class="w-2/5 flex items-center gap-4">
                 <div class="bg-img">
                     <img src="${imageUrl}" alt="${item.product?.name || 'Product'}" class="w-20 h-20 object-cover rounded-lg" />
                 </div>
@@ -577,7 +674,7 @@
                 </div>
             </div>
             <div class="w-1/12 text-center">
-                <div class="product-price text-title">$${price.toFixed(2)}</div>
+                <div class="product-price text-title">₹${price.toFixed(2)}</div>
             </div>
             <div class="w-1/6 flex items-center justify-center">
                 <div class="quantity-block flex items-center gap-3 border border-line rounded-lg px-3 py-2">
@@ -587,7 +684,12 @@
                 </div>
             </div>
             <div class="w-1/6 text-center">
-                <div class="total-price text-title">$${totalPrice.toFixed(2)}</div>
+                <div class="total-price text-title">₹${totalPrice.toFixed(2)}</div>
+            </div>
+            <div class="w-1/12 text-center">
+                <button class="remove-cart-item-btn text-red hover:text-red-700 cursor-pointer font-semibold text-sm underline" data-cart-id="${item.id}">
+                    Remove
+                </button>
             </div>
         `;
         
@@ -620,6 +722,19 @@
                 updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
             });
         }
+
+        // Add remove button functionality
+        const removeBtn = row.querySelector('.remove-cart-item-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const cartId = this.getAttribute('data-cart-id');
+                if (confirm('Are you sure you want to remove this item from your cart?')) {
+                    removeCartItem(cartId);
+                }
+            });
+        }
         
         return row;
     }
@@ -644,7 +759,7 @@
             if (data.success) {
                 quantityElement.textContent = quantity;
                 const totalPrice = unitPrice * quantity;
-                totalPriceElement.textContent = '$' + totalPrice.toFixed(2);
+                totalPriceElement.textContent = '₹' + totalPrice.toFixed(2);
                 updateCartCount();
                 loadCartPageItems(); // Reload to update totals
             } else {
@@ -758,7 +873,7 @@
                     <div class="text-xs text-secondary2 mt-1">Qty: ${item.quantity}</div>
                 </div>
             </div>
-            <div class="text-title">$${totalPrice.toFixed(2)}</div>
+            <div class="text-title">₹${totalPrice.toFixed(2)}</div>
         `;
         
         return div;

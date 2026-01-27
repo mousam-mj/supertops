@@ -623,7 +623,7 @@
                                 <a href="{{ route('forgot-password') }}" class="font-semibold hover:underline">Forgot Your Password? </a>
                             </div>
                             <div class="block-button md:mt-7 mt-4">
-                                <button type="submit" class="button-main w-full">Login</button>
+                                <button type="submit" class="button-main bg-white text-black border border-black w-full text-center block">Login</button>
                             </div>
                             <div class="block-button mt-3">
                                 <a href="{{ route('admin.login') }}" class="button-main bg-white text-black border border-black w-full text-center block">Admin Login</a>

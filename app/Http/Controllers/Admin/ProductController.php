@@ -89,6 +89,9 @@ class ProductController extends Controller
             'is_featured' => 'boolean',
             'is_new_arrival' => 'boolean',
             'image' => 'nullable|image|max:2048',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'image|max:2048',
+            'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
@@ -104,6 +107,22 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        // Handle gallery images (multiple)
+        $galleryPaths = [];
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $file) {
+                $galleryPaths[] = $file->store('products/gallery', 'public');
+            }
+        }
+        if (!empty($galleryPaths)) {
+            $validated['images'] = $galleryPaths;
+        }
+
+        // Handle product video
+        if ($request->hasFile('video')) {
+            $validated['video'] = $request->file('video')->store('products/videos', 'public');
         }
 
         Product::create($validated);
@@ -152,6 +171,9 @@ class ProductController extends Controller
             'is_featured' => 'boolean',
             'is_new_arrival' => 'boolean',
             'image' => 'nullable|image|max:2048',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'image|max:2048',
+            'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
@@ -176,6 +198,26 @@ class ProductController extends Controller
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
+        // Handle gallery images (append to existing list)
+        $galleryPaths = [];
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $file) {
+                $galleryPaths[] = $file->store('products/gallery', 'public');
+            }
+        }
+        if (!empty($galleryPaths)) {
+            $existing = is_array($product->images) ? $product->images : [];
+            $validated['images'] = array_values(array_unique(array_merge($existing, $galleryPaths)));
+        }
+
+        // Handle product video (replace existing)
+        if ($request->hasFile('video')) {
+            if ($product->video) {
+                Storage::disk('public')->delete($product->video);
+            }
+            $validated['video'] = $request->file('video')->store('products/videos', 'public');
+        }
+
         $product->update($validated);
 
         return redirect()->route('admin.products.index')
@@ -190,6 +232,18 @@ class ProductController extends Controller
         // Delete image if exists
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
+        }
+
+        // Delete gallery images if exist
+        if (is_array($product->images)) {
+            foreach ($product->images as $img) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        // Delete video if exists
+        if ($product->video) {
+            Storage::disk('public')->delete($product->video);
         }
 
         $product->delete();

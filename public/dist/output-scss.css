@@ -3091,15 +3091,31 @@ input[type=file]::-webkit-file-upload-button {
   visibility: hidden;
   z-index: 1000;
   transition: all ease 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.product-detail .popup-img .swiper-wrapper {
+  display: flex;
+  align-items: center;
+}
+.product-detail .popup-img .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .product-detail .popup-img img {
   width: auto;
   height: 100vh;
+  max-width: 90vw;
+  object-fit: contain;
   margin: 0 auto;
 }
 .product-detail .popup-img.open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 .product-detail .popup-img .swiper-button-next::after,
 .product-detail .popup-img .swiper-button-prev::after {

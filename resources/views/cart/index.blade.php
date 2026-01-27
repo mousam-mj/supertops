@@ -588,7 +588,7 @@
                         <div class="heading banner mt-5">
                             <div class="text">
                                 Buy
-                                <span class="text-button"> $<span class="more-price">250</span>.00 </span>
+                                <span class="text-button"> ₹<span class="more-price">250</span>.00 </span>
                                 <span>more to get </span>
                                 <span class="text-button">freeship</span>
                             </div>
@@ -600,7 +600,7 @@
                             <div class="w-full">
                                 <div class="heading bg-surface bora-4 pt-4 pb-4">
                                     <div class="flex">
-                                        <div class="w-1/2">
+                                        <div class="w-2/5">
                                             <div class="text-button text-center">Products</div>
                                         </div>
                                         <div class="w-1/12">
@@ -611,6 +611,9 @@
                                         </div>
                                         <div class="w-1/6">
                                             <div class="text-button text-center">Total Price</div>
+                                        </div>
+                                        <div class="w-1/12">
+                                            <div class="text-button text-center">Action</div>
                                         </div>
                                     </div>
                                 </div>
@@ -631,7 +634,7 @@
                                         <div class="caption1 font-bold">10% OFF</div>
                                     </div>
                                     <div class="right">
-                                        <div class="caption1">For all orders <br />from 200$</div>
+                                        <div class="caption1">For all orders <br />from ₹200</div>
                                     </div>
                                 </div>
                                 <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
@@ -646,7 +649,7 @@
                                         <div class="caption1 font-bold">15% OFF</div>
                                     </div>
                                     <div class="right">
-                                        <div class="caption1">For all orders <br />from 300$</div>
+                                        <div class="caption1">For all orders <br />from ₹300</div>
                                     </div>
                                 </div>
                                 <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
@@ -661,7 +664,7 @@
                                         <div class="caption1 font-bold">20% OFF</div>
                                     </div>
                                     <div class="right">
-                                        <div class="caption1">For all orders <br />from 400$</div>
+                                        <div class="caption1">For all orders <br />from ₹400</div>
                                     </div>
                                 </div>
                                 <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
@@ -676,11 +679,11 @@
                             <div class="heading5">Order Summary</div>
                             <div class="total-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Subtotal</div>
-                                <div class="text-title">$<span class="total-product">136</span><span>.00</span></div>
+                                <div class="text-title">₹<span class="total-product">136</span><span>.00</span></div>
                             </div>
                             <div class="discount-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Discounts</div>
-                                <div class="text-title"><span>-$</span><span class="discount">0</span><span>.00</span></div>
+                                <div class="text-title"><span>-₹</span><span class="discount">0</span><span>.00</span></div>
                             </div>
                             <div class="ship-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Shipping</div>
@@ -700,9 +703,9 @@
                                         </div>
                                     </div>
                                     <div class="right">
-                                        <div class="ship">$0.00</div>
-                                        <div class="local text-on-surface-variant1 mt-1">$30.00</div>
-                                        <div class="flat text-on-surface-variant1 mt-1">$40.00</div>
+                                        <div class="ship">₹0.00</div>
+                                        <div class="local text-on-surface-variant1 mt-1">₹30.00</div>
+                                        <div class="flat text-on-surface-variant1 mt-1">₹40.00</div>
                                     </div>
                                 </div>
                             </div>

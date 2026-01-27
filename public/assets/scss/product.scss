@@ -629,16 +629,34 @@
         visibility: hidden;
         z-index: 1000;
         transition: all ease 0.4s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+
+        .swiper-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .swiper-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         img {
             width: auto;
             height: 100vh;
+            max-width: 90vw;
+            object-fit: contain;
             margin: 0 auto;
         }
 
         &.open {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
         .swiper-button-next,

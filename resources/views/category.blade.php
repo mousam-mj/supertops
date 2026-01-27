@@ -195,9 +195,9 @@
                         </div>
 
                         <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                            <div class="product-price text-title">$30.00</div>
+                            <div class="product-price text-title">₹30.00</div>
                             <div class="product-origin-price caption1 text-secondary2">
-                                <del>$42.00</del>
+                                <del>₹42.00</del>
                             </div>
                             <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-30%</div>
                         </div>
@@ -264,9 +264,9 @@
                         </div>
 
                         <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                            <div class="product-price text-title">$40.00</div>
+                            <div class="product-price text-title">₹40.00</div>
                             <div class="product-origin-price caption1 text-secondary2">
-                                <del>$50.00</del>
+                                <del>₹50.00</del>
                             </div>
                             <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
                         </div>
@@ -358,9 +358,9 @@
                         </div>
 
                         <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                            <div class="product-price text-title">$30.00</div>
+                            <div class="product-price text-title">₹30.00</div>
                             <div class="product-origin-price caption1 text-secondary2">
-                                <del>$42.00</del>
+                                <del>₹42.00</del>
                             </div>
                             <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-30%</div>
                         </div>
@@ -427,9 +427,9 @@
                         </div>
 
                         <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                            <div class="product-price text-title">$40.00</div>
+                            <div class="product-price text-title">₹40.00</div>
                             <div class="product-origin-price caption1 text-secondary2">
-                                <del>$50.00</del>
+                                <del>₹50.00</del>
                             </div>
                             <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-20%</div>
                         </div>

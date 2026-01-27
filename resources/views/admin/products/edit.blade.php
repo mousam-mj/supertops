@@ -169,6 +169,46 @@
                                 <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="gallery_images" class="form-label">Gallery Images</label>
+                            @if(is_array($product->images) && count($product->images) > 0)
+                                <div class="mb-2 d-flex flex-wrap gap-2">
+                                    @foreach($product->images as $img)
+                                        <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    @endforeach
+                                </div>
+                            @endif
+                            <input type="file"
+                                   class="form-control @error('gallery_images') is-invalid @enderror @error('gallery_images.*') is-invalid @enderror"
+                                   id="gallery_images"
+                                   name="gallery_images[]"
+                                   accept="image/*"
+                                   multiple>
+                            @error('gallery_images')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @error('gallery_images.*')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Select additional images to add to the gallery. Existing images will be kept.</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="video" class="form-label">Product Video</label>
+                            @if($product->video)
+                                <div class="mb-2">
+                                    <video src="{{ asset('storage/' . $product->video) }}" controls style="max-width: 200px; border-radius: 4px;"></video>
+                                </div>
+                            @endif
+                            <input type="file"
+                                   class="form-control @error('video') is-invalid @enderror"
+                                   id="video"
+                                   name="video"
+                                   accept="video/*">
+                            @error('video')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Upload a new video to replace the current one. Max size: 50MB.</small>
+                        </div>
                     </div>
 
                     <div class="row mb-3">

@@ -426,9 +426,9 @@ const handleItemModalWishlist = () => {
                     <div class=''>
                         <div class="name text-button">${item.name}</div>
                         <div class="flex items-center gap-2 mt-2">
-                            <div class="product-price text-title">$${item.price}.00</div>
+                            <div class="product-price text-title">₹${item.price}.00</div>
                             <div class="product-origin-price text-title text-secondary2">
-                                <del>$${item.originPrice}.00</del>
+                                <del>₹${item.originPrice}.00</del>
                             </div>
                         </div>
                     </div>
@@ -551,6 +551,11 @@ const handleItemModalCart = () => {
     ".modal-cart-block .list-product"
   );
 
+  if (!listItemCart) {
+    console.warn("Cart modal list not found");
+    return;
+  }
+
   listItemCart.innerHTML = "";
 
   if (cartStore.length === 0) {
@@ -561,7 +566,9 @@ const handleItemModalCart = () => {
     let totalCart = 0;
 
     cartStore.forEach((item) => {
-      totalCart = Number(totalCart) + Number(item.price)
+      const itemPrice = Number(item.price) || 0;
+      const itemQuantity = Number(item.quantity || item.quantityPurchase || 1);
+      totalCart = Number(totalCart) + (itemPrice * itemQuantity);
 
       // Create prd
       const prdItem = document.createElement("div");
@@ -592,10 +599,11 @@ const handleItemModalCart = () => {
                         </div>
                         <div class="flex items-center justify-between gap-2 mt-3 w-full">
                             <div class="flex items-center text-secondary2 capitalize">
-                                ${item.sizes[0]}/${item.variation[0].color}
+                                ${item.sizes?.[0] || ''}/${item.variation?.[0]?.color || ''}
                             </div>
-                            <div class="product-price text-title">$${item.price}.00</div>
+                            <div class="product-price text-title">₹${itemPrice.toFixed(2)}</div>
                         </div>
+                        ${itemQuantity > 1 ? `<div class="text-sm text-secondary2 mt-1">Qty: ${itemQuantity} × ₹${itemPrice.toFixed(2)} = ₹${(itemPrice * itemQuantity).toFixed(2)}</div>` : ''}
                     </div>
                 </div>
             `;
@@ -604,9 +612,9 @@ const handleItemModalCart = () => {
     });
 
     // Set money to freeship in cart
-    modalCart.querySelector('.more-price').innerHTML = moneyForFreeship - totalCart
+    modalCart.querySelector('.more-price').innerHTML = (moneyForFreeship - totalCart).toFixed(2)
     modalCart.querySelector('.tow-bar-block .progress-line').style.width = (totalCart / moneyForFreeship * 100) + '%'
-    modalCart.querySelector('.total-cart').innerHTML = '$' + totalCart + '.00'
+    modalCart.querySelector('.total-cart').innerHTML = '₹' + totalCart.toFixed(2)
     if (moneyForFreeship - totalCart <= 0) {
       modalCart.querySelector('.more-price').innerHTML = 0
       modalCart.querySelector('.tow-bar-block .progress-line').style.width = '100%'
@@ -626,7 +634,7 @@ const handleItemModalCart = () => {
       if (cartStore.length === 0) {
         modalCart.querySelector('.more-price').innerHTML = 0
         modalCart.querySelector('.tow-bar-block .progress-line').style.width = '0'
-        modalCart.querySelector('.total-cart').innerHTML = '$0.00'
+        modalCart.querySelector('.total-cart').innerHTML = '₹0.00'
       }
     });
   });
@@ -674,43 +682,61 @@ const couponPopup = modalCart.querySelector(".coupon-block");
 
 if (modalCart) {
   // note block
-  noteBtn.addEventListener("click", () => {
-    notePopup.classList.toggle("active");
-  });
+  if (noteBtn) {
+    noteBtn.addEventListener("click", () => {
+      notePopup.classList.toggle("active");
+    });
+  }
 
-  notePopup.querySelector(".button-main").addEventListener("click", () => {
-    notePopup.classList.remove("active");
-  });
+  if (notePopup && notePopup.querySelector(".button-main")) {
+    notePopup.querySelector(".button-main").addEventListener("click", () => {
+      notePopup.classList.remove("active");
+    });
+  }
 
-  notePopup.querySelector(".cancel-btn").addEventListener("click", () => {
-    notePopup.classList.remove("active");
-  });
+  if (notePopup && notePopup.querySelector(".cancel-btn")) {
+    notePopup.querySelector(".cancel-btn").addEventListener("click", () => {
+      notePopup.classList.remove("active");
+    });
+  }
 
   // shipping block
-  shippingBtn.addEventListener("click", () => {
-    shippingPopup.classList.toggle("active");
-  });
+  if (shippingBtn && shippingPopup) {
+    shippingBtn.addEventListener("click", () => {
+      shippingPopup.classList.toggle("active");
+    });
+  }
 
-  shippingPopup.querySelector(".button-main").addEventListener("click", () => {
-    shippingPopup.classList.remove("active");
-  });
+  if (shippingPopup && shippingPopup.querySelector(".button-main")) {
+    shippingPopup.querySelector(".button-main").addEventListener("click", () => {
+      shippingPopup.classList.remove("active");
+    });
+  }
 
-  shippingPopup.querySelector(".cancel-btn").addEventListener("click", () => {
-    shippingPopup.classList.remove("active");
-  });
+  if (shippingPopup && shippingPopup.querySelector(".cancel-btn")) {
+    shippingPopup.querySelector(".cancel-btn").addEventListener("click", () => {
+      shippingPopup.classList.remove("active");
+    });
+  }
 
   // coupon block
-  couponBtn.addEventListener("click", () => {
-    couponPopup.classList.toggle("active");
-  });
+  if (couponBtn && couponPopup) {
+    couponBtn.addEventListener("click", () => {
+      couponPopup.classList.toggle("active");
+    });
+  }
 
-  couponPopup.querySelector(".button-main").addEventListener("click", () => {
-    couponPopup.classList.remove("active");
-  });
+  if (couponPopup && couponPopup.querySelector(".button-main")) {
+    couponPopup.querySelector(".button-main").addEventListener("click", () => {
+      couponPopup.classList.remove("active");
+    });
+  }
 
-  couponPopup.querySelector(".cancel-btn").addEventListener("click", () => {
-    couponPopup.classList.remove("active");
-  });
+  if (couponPopup && couponPopup.querySelector(".cancel-btn")) {
+    couponPopup.querySelector(".cancel-btn").addEventListener("click", () => {
+      couponPopup.classList.remove("active");
+    });
+  }
 }
 
 // sub-menu-department
@@ -1165,6 +1191,147 @@ var swiper2 = new Swiper(".mySwiper2", {
   },
 });
 
+// Product detail image popup (Laravel version)
+document.addEventListener("DOMContentLoaded", function () {
+  const productDetail = document.querySelector(".product-detail");
+  if (!productDetail) {
+    console.log("Product detail not found");
+    return;
+  }
+
+  // Popup wrapper lives inside product-detail
+  const popupImg = productDetail.querySelector(".popup-img");
+  const closePopupBtn = popupImg
+    ? popupImg.querySelector(".close-popup-btn")
+    : null;
+  
+  // Get both main images and thumbnail images
+  const mainImages = productDetail.querySelectorAll(
+    ".list-img .mySwiper2 .swiper-slide img"
+  );
+  const thumbImages = productDetail.querySelectorAll(
+    ".list-img .mySwiper .swiper-slide img"
+  );
+
+  console.log("Popup setup:", {
+    popupImg: !!popupImg,
+    mainImages: mainImages.length,
+    thumbImages: thumbImages.length,
+    closePopupBtn: !!closePopupBtn
+  });
+
+  if (!popupImg) {
+    console.log("Popup element not found");
+    return;
+  }
+
+  if (mainImages.length === 0 && thumbImages.length === 0) {
+    console.log("No images found to click");
+    return;
+  }
+
+  let popupSwiper = null;
+
+  // Function to open popup with specific image index
+  function openPopup(index) {
+    console.log("Opening popup at index:", index);
+    if (!popupImg) {
+      console.error("Popup element not available");
+      return;
+    }
+    popupImg.classList.add("open");
+    document.body.style.overflow = "hidden"; // Prevent background scrolling
+
+    if (!popupSwiper) {
+      const nextBtn = popupImg.querySelector(".swiper-button-next");
+      const prevBtn = popupImg.querySelector(".swiper-button-prev");
+      console.log("Initializing Swiper:", { nextBtn: !!nextBtn, prevBtn: !!prevBtn });
+      
+      popupSwiper = new Swiper(popupImg, {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 0,
+        centeredSlides: true,
+        navigation: {
+          nextEl: nextBtn,
+          prevEl: prevBtn,
+        },
+        initialSlide: index,
+      });
+      console.log("Swiper initialized");
+    } else {
+      if (popupSwiper.slideToLoop) {
+        popupSwiper.slideToLoop(index);
+      } else {
+        popupSwiper.slideTo(index);
+      }
+    }
+  }
+
+  // Add click handlers to main images
+  mainImages.forEach((img, index) => {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Main image clicked:", index);
+      openPopup(index);
+    });
+  });
+
+  // Add click handlers to thumbnail images
+  thumbImages.forEach((img, index) => {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Thumbnail image clicked:", index);
+      openPopup(index);
+    });
+  });
+
+  // Close popup handler
+  if (closePopupBtn) {
+    closePopupBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("Close button clicked");
+      popupImg.classList.remove("open");
+      document.body.style.overflow = ""; // Restore scrolling
+      if (popupSwiper) {
+        popupSwiper.destroy(true, true);
+        popupSwiper = null;
+      }
+    });
+  }
+
+  // Close popup on background click
+  popupImg.addEventListener("click", function (e) {
+    if (e.target === popupImg || e.target.closest('.swiper-wrapper') === null) {
+      console.log("Background clicked, closing popup");
+      popupImg.classList.remove("open");
+      document.body.style.overflow = ""; // Restore scrolling
+      if (popupSwiper) {
+        popupSwiper.destroy(true, true);
+        popupSwiper = null;
+      }
+    }
+  });
+
+  // Close popup on Escape key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && popupImg.classList.contains("open")) {
+      console.log("Escape key pressed, closing popup");
+      popupImg.classList.remove("open");
+      document.body.style.overflow = ""; // Restore scrolling
+      if (popupSwiper) {
+        popupSwiper.destroy(true, true);
+        popupSwiper = null;
+      }
+    }
+  });
+});
+
 // Modal Compare
 const modalCompareMain = document.querySelector(
   ".modal-compare-block .modal-compare-main"
@@ -1219,7 +1386,7 @@ const handleItemModalCompare = () => {
                     </div>
                     <div class=''>
                         <div class="name text-title">${item.name}</div>
-                        <div class="product-price text-title mt-2">$${item.price}.00</div>
+                        <div class="product-price text-title mt-2">₹${item.price}.00</div>
                     </div>
                 </div>
                 <div
@@ -3434,7 +3601,7 @@ const handleInforCart = () => {
       quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
         product.quantityPurchase++;
         quantityProduct.textContent = product.quantityPurchase;
-        totalPriceProduct.textContent = `$${product.quantityPurchase * product.price
+        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price
           }.00`;
         updateTotalCart();
 
@@ -3538,7 +3705,7 @@ if (listProductCheckout) {
                     <span class='quantity'>${product.quantityPurchase}</span>
                     <span class='px-1'>x</span>
                     <span>
-                        $${product.price}.00
+                        ₹${product.price}.00
                     </span>
                 </div>
             </div>
@@ -3548,7 +3715,7 @@ if (listProductCheckout) {
     totalCart += product.price * product.quantityPurchase;
     document.querySelector(
       ".total-cart-block .total-cart"
-    ).innerHTML = `$${totalCart}.00`;
+    ).innerHTML = `₹${totalCart}.00`;
   });
 }
 

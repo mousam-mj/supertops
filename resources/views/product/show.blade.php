@@ -663,11 +663,11 @@
                                 <span class="caption1 text-secondary">({{ rand(10, 999) }} reviews)</span>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
-                                <div class="product-price heading5">${{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</div>
+                                <div class="product-price heading5">₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</div>
                     @if($product->sale_price && $product->price > $product->sale_price)
                                     <div class="w-px h-4 bg-line"></div>
                                     <div class="product-origin-price font-normal text-secondary2">
-                            <del>${{ number_format($product->price, 2) }}</del>
+                            <del>₹{{ number_format($product->price, 2) }}</del>
                         </div>
                         @php
                             $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
@@ -696,7 +696,7 @@
                                                             @if(isset($coupon->discount_type) && $coupon->discount_type === 'percentage')
                                                                 {{ $coupon->discount_value ?? 0 }}% Off
                                                             @else
-                                                                ${{ number_format($coupon->discount_value ?? 0, 2) }} Off
+                                                                ₹{{ number_format($coupon->discount_value ?? 0, 2) }} Off
                                                             @endif
                                                         </div>
                                                         <div class="button bg-white font-semibold text-xs py-1 px-2 rounded-full duration-300 hover:bg-black hover:text-white cursor-pointer apply-coupon-btn" data-coupon-code="{{ $coupon->code }}">Apply</div>
@@ -736,13 +736,13 @@
                     </div>
                 </div>
                                 @endif
-                                <div class="text-title mt-5">Quantity:</div>
+                                <!-- <div class="text-title mt-5">Quantity:</div> -->
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
-                                    <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
+                                    <!-- <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1"></i>
                                         <div class="quantity body1 font-semibold">1</div>
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
-                                    </div>
+                                    </div> -->
                                     <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
                                 </div>
                                 <div class="button-block mt-5">
@@ -819,7 +819,7 @@
                                     <div class="icon-delivery-truck text-4xl"></div>
                                     <div>
                                         <div class="text-title">Free shipping</div>
-                                        <div class="caption1 text-secondary mt-1">Free shipping on orders over $75.</div>
+                                        <div class="caption1 text-secondary mt-1">Free shipping on orders over ₹75.</div>
                                     </div>
                                 </div>
                                 <div class="item flex items-center gap-3 mt-4">
@@ -1113,7 +1113,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/1.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
+                                                <img src="{{ asset('assets/images/avatar/1.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1156,7 +1156,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/2.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
+                                                <img src="{{ asset('assets/images/avatar/2.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1199,7 +1199,7 @@
                                     <div class="heading flex items-center justify-between">
                                         <div class="user-infor flex gap-4">
                                             <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/3.png" alt="img" class="w-[52px] aspect-square rounded-full') " />
+                                                <img src="{{ asset('assets/images/avatar/3.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
                                             </div>
                                             <div class="user">
                                                 <div class="flex items-center gap-2">
@@ -1265,6 +1265,24 @@
                 </div>
             </div>
         </div>
+
+        @if($product->video)
+            <div class="container py-10">
+                <div class="heading3 text-center mb-6">Product Video</div>
+                <div class="w-full max-w-[720px] mx-auto rounded-2xl overflow-hidden bg-black shadow-lg" style="position: relative; padding-bottom: 56.25%; height: 0;">
+                    <video 
+                        controls 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
+                        preload="metadata"
+                    >
+                        <source src="{{ asset('storage/' . $product->video) }}#t=0.1" type="video/mp4">
+                        <source src="{{ asset('storage/' . $product->video) }}" type="video/mp4">
+                        <source src="{{ asset('storage/' . $product->video) }}" type="video/quicktime">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        @endif
 
         <div class="tab-features-block filter-product-block md:py-20 py-10">
             <div class="container">
@@ -1381,15 +1399,27 @@
         });
         
         // Add to cart from product detail page
+        let isAddingToCart = false; // Prevent double clicks
+        
         document.addEventListener('click', function(e) {
             const addCartBtn = e.target.closest('.add-cart-btn');
             if (!addCartBtn || !addCartBtn.closest('.product-infor')) return;
+            
+            // Prevent double clicks
+            if (isAddingToCart || addCartBtn.disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
             
             e.preventDefault();
             e.stopPropagation();
             
             const productId = addCartBtn.getAttribute('data-product-id');
             if (!productId) return;
+            
+            // Set flag to prevent double clicks
+            isAddingToCart = true;
             
             // Get selected size and color
             const selectedSizeItem = document.querySelector('.size-item.active');
@@ -1398,12 +1428,20 @@
             
             const size = selectedSizeItem?.getAttribute('data-size') || null;
             const color = selectedColorItem?.getAttribute('data-color') || null;
-            const quantity = parseInt(quantityElement?.textContent) || 1;
+            // Get quantity from the quantity element, ensure it's at least 1
+            let quantity = 1;
+            if (quantityElement) {
+                const qtyText = quantityElement.textContent.trim();
+                quantity = parseInt(qtyText) || 1;
+                if (quantity < 1) quantity = 1;
+            }
             
             // Show loading state
             const originalText = addCartBtn.innerHTML;
+            const originalDisabled = addCartBtn.disabled;
             addCartBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
             addCartBtn.disabled = true;
+            addCartBtn.style.pointerEvents = 'none';
             
             // Get CSRF token
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -1458,11 +1496,18 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('An error occurred. Please try again.', 'error');
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('An error occurred. Please try again.', 'error');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
             })
             .finally(() => {
+                // Always reset button state
                 addCartBtn.innerHTML = originalText;
-                addCartBtn.disabled = false;
+                addCartBtn.disabled = originalDisabled;
+                addCartBtn.style.pointerEvents = '';
+                isAddingToCart = false;
             });
         });
         
@@ -1483,6 +1528,150 @@
                 notification.style.transition = 'opacity 0.3s';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
+        }
+    })();
+
+    // Product image popup functionality - Direct implementation
+    (function() {
+        'use strict';
+        
+        function initImagePopup() {
+            const productDetail = document.querySelector(".product-detail");
+            if (!productDetail) {
+                console.log("[Popup] Product detail not found");
+                return;
+            }
+
+            const popupImg = productDetail.querySelector(".popup-img");
+            if (!popupImg) {
+                console.log("[Popup] Popup element not found");
+                return;
+            }
+
+            const closePopupBtn = popupImg.querySelector(".close-popup-btn");
+            
+            const mainImages = productDetail.querySelectorAll(".list-img .mySwiper2 .swiper-slide img");
+            const thumbImages = productDetail.querySelectorAll(".list-img .mySwiper .swiper-slide img");
+
+            console.log("[Popup] Setup:", {
+                popupImg: !!popupImg,
+                mainImages: mainImages.length,
+                thumbImages: thumbImages.length,
+                closePopupBtn: !!closePopupBtn
+            });
+
+            if (mainImages.length === 0 && thumbImages.length === 0) {
+                console.log("[Popup] No images found");
+                return;
+            }
+
+            let popupSwiper = null;
+
+            function openPopup(index) {
+                console.log("[Popup] Opening at index:", index);
+                popupImg.classList.add("open");
+                document.body.style.overflow = "hidden";
+
+                if (!popupSwiper) {
+                    const nextBtn = popupImg.querySelector(".swiper-button-next");
+                    const prevBtn = popupImg.querySelector(".swiper-button-prev");
+                    
+                    popupSwiper = new Swiper(popupImg, {
+                        loop: true,
+                        slidesPerView: 1,
+                        spaceBetween: 0,
+                        centeredSlides: true,
+                        navigation: {
+                            nextEl: nextBtn,
+                            prevEl: prevBtn,
+                        },
+                        initialSlide: index,
+                    });
+                    console.log("[Popup] Swiper initialized");
+                } else {
+                    if (popupSwiper.slideToLoop) {
+                        popupSwiper.slideToLoop(index);
+                    } else {
+                        popupSwiper.slideTo(index);
+                    }
+                }
+            }
+
+            function closePopup() {
+                console.log("[Popup] Closing");
+                popupImg.classList.remove("open");
+                document.body.style.overflow = "";
+                if (popupSwiper) {
+                    popupSwiper.destroy(true, true);
+                    popupSwiper = null;
+                }
+            }
+
+            // Add click handlers to main images
+            mainImages.forEach((img, index) => {
+                img.style.cursor = "pointer";
+                img.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("[Popup] Main image clicked:", index);
+                    openPopup(index);
+                });
+            });
+
+            // Add click handlers to thumbnail images
+            thumbImages.forEach((img, index) => {
+                img.style.cursor = "pointer";
+                img.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("[Popup] Thumbnail clicked:", index);
+                    openPopup(index);
+                });
+            });
+
+            // Close button
+            if (closePopupBtn) {
+                closePopupBtn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closePopup();
+                });
+            }
+
+            // Close on background click (but not on navigation buttons or swiper content)
+            popupImg.addEventListener("click", function (e) {
+                // Don't close if clicking on:
+                // - Navigation buttons
+                // - Swiper wrapper/slides
+                // - Close button (handled separately)
+                if (e.target.closest('.swiper-button-next') || 
+                    e.target.closest('.swiper-button-prev') || 
+                    e.target.closest('.swiper-wrapper') || 
+                    e.target.closest('.swiper-slide') ||
+                    e.target.closest('.close-popup-btn')) {
+                    return; // Don't close
+                }
+                // Only close if clicking directly on the popup background
+                if (e.target === popupImg) {
+                    closePopup();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && popupImg.classList.contains("open")) {
+                    closePopup();
+                }
+            });
+
+            console.log("[Popup] Event listeners attached");
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initImagePopup);
+        } else {
+            initImagePopup();
         }
     })();
 </script>

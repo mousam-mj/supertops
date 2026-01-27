@@ -162,6 +162,34 @@
                                 <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </div>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="gallery_images" class="form-label">Gallery Images</label>
+                            <input type="file"
+                                   class="form-control @error('gallery_images') is-invalid @enderror @error('gallery_images.*') is-invalid @enderror"
+                                   id="gallery_images"
+                                   name="gallery_images[]"
+                                   accept="image/*"
+                                   multiple>
+                            @error('gallery_images')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            @error('gallery_images.*')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">You can select multiple images for the product gallery. Max size: 2MB each.</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="video" class="form-label">Product Video</label>
+                            <input type="file"
+                                   class="form-control @error('video') is-invalid @enderror"
+                                   id="video"
+                                   name="video"
+                                   accept="video/*">
+                            @error('video')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Optional product video (MP4, MOV, AVI, MKV). Max size: 50MB.</small>
+                        </div>
                     </div>
 
                     <div class="row mb-3">

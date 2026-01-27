@@ -598,6 +598,24 @@
                         </div>
                         <div class="information mt-5">
                             <div class="heading5">Information</div>
+                            @if(auth()->check() && $addresses && $addresses->count() > 0)
+                                <div class="mt-4 mb-4">
+                                    <label class="caption1 capitalize mb-2 block">Select Saved Address:</label>
+                                    <div class="select-block">
+                                        <select class="border border-line px-4 py-3 w-full rounded-lg" id="savedAddressSelect" onchange="fillAddressFromSaved(this.value)">
+                                            <option value="">Use New Address</option>
+                                            @foreach($addresses as $address)
+                                                <option value="{{ $address->id }}" data-address='@json($address)' {{ $address->is_default ? 'selected' : '' }}>
+                                                    {{ $address->label ?? 'Address' }} - {{ $address->address_line_1 }}, {{ $address->city }}
+                                                    @if($address->is_default) (Default) @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <i class="ph ph-caret-down arrow-down"></i>
+                                    </div>
+                                    <input type="hidden" id="selectedAddressId" name="shipping_address_id" value="{{ $defaultAddress->id ?? '' }}">
+                                </div>
+                            @endif
                             <div class="form-checkout mt-5">
                                 <form onsubmit="return false;" id="checkout-form-element">
                                     <div class="grid sm:grid-cols-2 gap-4 gap-y-5 flex-wrap">
@@ -769,7 +787,7 @@
                             <div class="list-product-checkout"></div>
                             <div class="discount-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Discounts</div>
-                                <div class="text-title">-$<span class="discount">0</span><span>.00</span></div>
+                                <div class="text-title">-₹<span class="discount">0</span><span>.00</span></div>
                             </div>
                             <div class="ship-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Shipping</div>
@@ -777,7 +795,7 @@
                             </div>
                             <div class="total-cart-block pt-5 flex justify-between">
                                 <div class="heading5">Total</div>
-                                <div class="heading5 total-cart">$0.00</div>
+                                <div class="heading5 total-cart">₹0.00</div>
                             </div>
                         </div>
                     </div>
@@ -886,25 +904,37 @@ function validateForm() {
     // Check if user is logged in
     const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
     
+    // Get selected address ID if available
+    const selectedAddressId = document.getElementById('selectedAddressId')?.value;
+    
     // Prepare order data based on login status
     let orderData;
     if (isLoggedIn) {
-        // For logged in users, send shipping_address
-        orderData = {
-            shipping_address: {
-                first_name: formData.first_name,
-                last_name: formData.last_name,
-                email: formData.email,
-                phone: formData.phone,
-                address_line_1: formData.address,
-                city: formData.city,
-                state: formData.state,
-                pincode: formData.pincode
-            },
-            payment_method: formData.payment_method,
-            notes: formData.notes,
-            shipping_charge: shipping
-        };
+        // For logged in users, use address_id if selected, otherwise send shipping_address
+        if (selectedAddressId) {
+            orderData = {
+                shipping_address_id: selectedAddressId,
+                payment_method: formData.payment_method,
+                notes: formData.notes,
+                shipping_charge: shipping
+            };
+        } else {
+            orderData = {
+                shipping_address: {
+                    first_name: formData.first_name,
+                    last_name: formData.last_name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    address_line_1: formData.address,
+                    city: formData.city,
+                    state: formData.state,
+                    pincode: formData.pincode
+                },
+                payment_method: formData.payment_method,
+                notes: formData.notes,
+                shipping_charge: shipping
+            };
+        }
     } else {
         // For guests, send guest_info - ensure all fields are present
         orderData = {
@@ -1111,6 +1141,75 @@ if (testBtn) {
     }
     
     // Try after short delays
+    // Function to fill address form from saved address
+    window.fillAddressFromSaved = function(addressId) {
+        const selectElement = document.getElementById('savedAddressSelect');
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        
+        if (!addressId || !selectedOption || !selectedOption.dataset.address) {
+            // Clear address ID if "Use New Address" is selected
+            document.getElementById('selectedAddressId').value = '';
+            return;
+        }
+        
+        try {
+            const address = JSON.parse(selectedOption.dataset.address);
+            
+            // Set the address ID
+            document.getElementById('selectedAddressId').value = addressId;
+            
+            // Split full name into first and last name
+            const nameParts = (address.full_name || '').split(' ', 2);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts[1] || '';
+            
+            // Fill form fields
+            if (document.getElementById('firstName')) {
+                document.getElementById('firstName').value = firstName;
+            }
+            if (document.getElementById('lastName')) {
+                document.getElementById('lastName').value = lastName;
+            }
+            if (document.getElementById('phoneNumber')) {
+                document.getElementById('phoneNumber').value = address.phone || '';
+            }
+            if (document.getElementById('city')) {
+                document.getElementById('city').value = address.city || '';
+            }
+            if (document.getElementById('apartment')) {
+                document.getElementById('apartment').value = address.address_line_1 || '';
+            }
+            if (document.getElementById('postal')) {
+                document.getElementById('postal').value = address.pincode || '';
+            }
+            
+            // Set state/country dropdowns
+            const stateValue = address.state || '';
+            const countrySelect = document.getElementById('country');
+            const regionSelect = document.getElementById('region');
+            
+            if (countrySelect && stateValue) {
+                for (let option of countrySelect.options) {
+                    if (option.value === stateValue || option.text.includes(stateValue)) {
+                        countrySelect.value = option.value;
+                        break;
+                    }
+                }
+            }
+            
+            if (regionSelect && stateValue) {
+                for (let option of regionSelect.options) {
+                    if (option.value === stateValue || option.text.includes(stateValue)) {
+                        regionSelect.value = option.value;
+                        break;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing address data:', error);
+        }
+    };
+    
     setTimeout(function() {
         console.log('Timeout 100ms - initializing');
         initCheckout();

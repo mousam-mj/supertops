@@ -27,6 +27,7 @@ class Product extends Model
         'is_new_arrival',
         'image',
         'images',
+        'video',
         'sizes',
         'colors',
         'product_type',

@@ -123,7 +123,7 @@
                                 </div>
                                 <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
                                     <div class="text-title name">gold necklace</div>
-                                    <div class="price text-center">$60.00</div>
+                                    <div class="price text-center">₹60.00</div>
                                     <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
                                 </a>
                             </div>
@@ -133,7 +133,7 @@
                                 </div>
                                 <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
                                     <div class="text-title name">golden ring</div>
-                                    <div class="price text-center">$50.00</div>
+                                    <div class="price text-center">₹50.00</div>
                                     <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
                                 </a>
                             </div>
@@ -143,7 +143,7 @@
                                 </div>
                                 <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
                                     <div class="text-title name">Ruby Ring</div>
-                                    <div class="price text-center">$40.00</div>
+                                    <div class="price text-center">₹40.00</div>
                                     <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
                                 </a>
                             </div>-->
@@ -156,7 +156,7 @@
                         </div>
                                 <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
                                     <div class="text-title name">Snake Ring</div>
-                                    <div class="price text-center">$45.00</div>
+                                    <div class="price text-center">₹45.00</div>
                                     <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
                                 </a>
                     </div>
@@ -353,10 +353,6 @@
                 </div>
             </div>
         </div>
-
-
-
-        <a class="scroll-to-top-btn" href="#top-nav"><i class="ph-bold ph-caret-up"></i></a>
 
         <!-- Modal -->
         <div class="modal-newsletter">
@@ -1001,6 +997,6 @@
                         </div>
                     </div>
                 </div>
-                                </div>
-                                </div>
+            </div>
+        </div>
 @endsection

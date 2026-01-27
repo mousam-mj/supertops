@@ -177,7 +177,7 @@
                 </div>
                 <div class="heading banner mt-3 px-6">
                     <div class="text">
-                        Buy <span class="text-button"> $<span class="more-price">150</span>.00 </span>
+                        Buy <span class="text-button"> ₹<span class="more-price">150</span>.00 </span>
                         <span>more to get </span>
                         <span class="text-button">freeship</span>
                     </div>
@@ -191,7 +191,7 @@
                 <div class="footer-cart p-6 border-t border-line bg-white absolute bottom-0 left-0 w-full">
                     <div class="total flex items-center justify-between mb-4">
                         <div class="text-button-uppercase">Total:</div>
-                        <div class="text-title">$<span class="total-price">0.00</span></div>
+                        <div class="text-title">₹<span class="total-price">0.00</span></div>
                     </div>
                     <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center uppercase">Checkout</a>
                     <a href="{{{ route('cart.index') }}}" class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">View Cart</a>
