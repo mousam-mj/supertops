@@ -6,9 +6,14 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <div>
-            <h4 class="mb-1 fw-bold" style="color: #2d3748;">Payment History</h4>
-            <p class="text-muted mb-0">View all successful payments</p>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h4 class="mb-1 fw-bold" style="color: #2d3748;">Payment History</h4>
+                <p class="text-muted mb-0">View all successful payments</p>
+            </div>
+            <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-download me-1"></i> Download Reports
+            </a>
         </div>
     </div>
 </div>

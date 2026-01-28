@@ -863,11 +863,11 @@
                                                 <div class="flex items-center gap-2">
                                                     <button type="button" class="button-main bg-surface border border-line hover:bg-black text-black hover:text-white text-sm px-4 py-2" onclick="editAddress({{ $address->id }})">Edit</button>
                                                     @if(!$address->is_default)
-                                                        <form method="POST" action="{{ route('addresses.set-default', $address->id) }}" class="inline">
+                                                        <form method="POST" action="/addresses/{{ $address->id }}/set-default" class="inline">
                                                             @csrf
                                                             <button type="submit" class="button-main bg-surface border border-line hover:bg-black text-black hover:text-white text-sm px-4 py-2">Set Default</button>
                                                         </form>
-                                                        <form method="POST" action="{{ route('addresses.destroy', $address->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                                        <form method="POST" action="/addresses/{{ $address->id }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this address?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="button-main bg-red border border-red hover:bg-red-600 text-white text-sm px-4 py-2">Delete</button>
@@ -885,54 +885,67 @@
                                 </div>
                             @endif
                             
+                            @php
+                                $addressFormEdit = $errors->any() && request('tab') === 'address' && request('edit');
+                            @endphp
                             <!-- Add/Edit Address Form (Hidden by default) -->
-                            <div id="addressForm" class="hidden mt-6 border-t border-line pt-6">
-                                <h6 class="heading6 mb-4" id="formTitle">Add New Address</h6>
-                                <form id="addressFormElement" method="POST" action="{{ route('addresses.store') }}">
+                            <div id="addressForm" class="{{ ($errors->any() && request('tab') === 'address') ? '' : 'hidden' }} mt-6 border-t border-line pt-6">
+                                <h6 class="heading6 mb-4" id="formTitle">{{ $addressFormEdit ? 'Edit Address' : 'Add New Address' }}</h6>
+                                <form id="addressFormElement" method="POST" action="/my-account">
                                     @csrf
-                                    <input type="hidden" name="address_id" id="addressId" value="">
+                                    <input type="hidden" name="address_id" id="addressId" value="{{ $addressFormEdit ? request('edit') : '' }}">
+                                    @if($errors->has('error'))
+                                        <div class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 caption1">{{ $errors->first('error') }}</div>
+                                    @endif
                                     <div class="grid sm:grid-cols-2 gap-4 gap-y-5">
                                         <div class="label">
                                             <label for="addressLabel" class="caption1 capitalize">Label <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLabel" name="label" type="text" value="Home" placeholder="Home, Office, etc." required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLabel" name="label" type="text" value="{{ old('label', 'Home') }}" placeholder="Home, Office, etc." required />
+                                            @error('label')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="full-name">
                                             <label for="addressFullName" class="caption1 capitalize">Full Name <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressFullName" name="full_name" type="text" value="{{ $user->name ?? '' }}" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressFullName" name="full_name" type="text" value="{{ old('full_name', $user->name ?? '') }}" required />
+                                            @error('full_name')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="phone">
                                             <label for="addressPhone" class="caption1 capitalize">Phone <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressPhone" name="phone" type="text" value="{{ $user->phone ?? '' }}" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressPhone" name="phone" type="text" value="{{ old('phone', $user->phone ?? '') }}" required />
+                                            @error('phone')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="address-line-1">
                                             <label for="addressLine1" class="caption1 capitalize">Address Line 1 <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLine1" name="address_line_1" type="text" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLine1" name="address_line_1" type="text" value="{{ old('address_line_1') }}" required />
+                                            @error('address_line_1')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="address-line-2">
                                             <label for="addressLine2" class="caption1 capitalize">Address Line 2 (Optional)</label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLine2" name="address_line_2" type="text" />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressLine2" name="address_line_2" type="text" value="{{ old('address_line_2') }}" />
                                         </div>
                                         <div class="city">
                                             <label for="addressCity" class="caption1 capitalize">City <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressCity" name="city" type="text" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressCity" name="city" type="text" value="{{ old('city') }}" required />
+                                            @error('city')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="state">
                                             <label for="addressState" class="caption1 capitalize">State <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressState" name="state" type="text" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressState" name="state" type="text" value="{{ old('state') }}" required />
+                                            @error('state')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="pincode">
                                             <label for="addressPincode" class="caption1 capitalize">Pincode <span class="text-red">*</span></label>
-                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressPincode" name="pincode" type="text" maxlength="6" required />
+                                            <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="addressPincode" name="pincode" type="text" maxlength="6" value="{{ old('pincode') }}" required />
+                                            @error('pincode')<p class="text-red text-sm mt-1">{{ $message }}</p>@enderror
                                         </div>
                                         <div class="is-default col-span-full">
                                             <label class="flex items-center gap-2 cursor-pointer">
-                                                <input type="checkbox" name="is_default" id="addressIsDefault" value="1" class="w-4 h-4">
+                                                <input type="checkbox" name="is_default" id="addressIsDefault" value="1" class="w-4 h-4" {{ old('is_default') ? 'checked' : '' }}>
                                                 <span class="caption1">Set as default address</span>
                                             </label>
                                         </div>
                                     </div>
                                     <div class="flex gap-4 mt-6">
-                                        <button type="submit" class="button-main bg-black" id="saveAddressBtn">Save Address</button>
+                                        <button type="submit" class="button-main bg-black" id="saveAddressBtn">{{ $addressFormEdit ? 'Update Address' : 'Save Address' }}</button>
                                         <button type="button" class="button-main bg-surface border border-line hover:bg-black text-black hover:text-white" onclick="hideAddressForm()">Cancel</button>
                                     </div>
                                 </form>
@@ -1037,14 +1050,8 @@ function showAddAddressForm() {
     document.getElementById('formTitle').textContent = 'Add New Address';
     formElement.reset();
     document.getElementById('addressId').value = '';
-    formElement.action = '{{ route("addresses.store") }}';
-    formElement.method = 'POST';
-    
-    // Remove _method input if exists
-    const existingMethod = formElement.querySelector('input[name="_method"]');
-    if (existingMethod) existingMethod.remove();
-    
-    // Reset submit button
+    formElement.action = '/my-account';
+
     const submitBtn = document.getElementById('saveAddressBtn');
     if (submitBtn) {
         submitBtn.disabled = false;
@@ -1076,20 +1083,11 @@ function editAddress(addressId) {
         document.getElementById('addressIsDefault').checked = address.is_default || false;
         
         document.getElementById('formTitle').textContent = 'Edit Address';
-        document.getElementById('addressFormElement').action = `{{ url('/addresses') }}/${addressId}`;
-        document.getElementById('addressFormElement').method = 'POST';
-        
-        // Remove existing _method input if any
-        const existingMethod = document.querySelector('input[name="_method"]');
-        if (existingMethod) existingMethod.remove();
-        
-        // Add method override for PUT
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'PUT';
-        document.getElementById('addressFormElement').appendChild(methodInput);
-        
+        document.getElementById('addressFormElement').action = '/my-account';
+
+        const saveBtn = document.getElementById('saveAddressBtn');
+        if (saveBtn) saveBtn.textContent = 'Update Address';
+
         document.getElementById('addressForm').classList.remove('hidden');
         document.getElementById('addressForm').scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -1100,28 +1098,35 @@ function editAddress(addressId) {
 
 // setDefaultAddress and deleteAddress are now handled by form submissions
 
-// Address form submission - ensure form submits properly
+// Address form submission - traditional POST so browser sends session cookies (fixes 401 Unauthenticated)
 document.addEventListener('DOMContentLoaded', function() {
     const addressForm = document.getElementById('addressFormElement');
-    if (addressForm) {
-        console.log('Address form found, setting up submit handler');
-        
+    const submitBtn = document.getElementById('saveAddressBtn');
+    if (addressForm && submitBtn) {
         addressForm.addEventListener('submit', function(e) {
-            console.log('Form submit event triggered');
-            console.log('Form action:', this.action);
-            console.log('Form method:', this.method);
-            console.log('CSRF token present:', !!document.querySelector('input[name="_token"]'));
-            
-            // Just update button state, don't prevent default
-            const submitBtn = document.getElementById('saveAddressBtn');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Saving...';
+            const t = this.querySelector('input[name="_token"]');
+            if (!t || !t.value) {
+                e.preventDefault();
+                alert('Please refresh the page and try again.');
+                return;
             }
-            // Form will submit normally - no e.preventDefault()
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
         });
-    } else {
-        console.warn('Address form not found on page load');
+    }
+
+    // Switch to address tab if ?tab=address (e.g. after save redirect)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'address') {
+        const cat = document.querySelector('.category-item[data-item="address"]');
+        const filter = document.querySelector('.filter-item[data-item="address"]');
+        if (cat && filter) {
+            document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.filter-item').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
+            cat.classList.add('active');
+            filter.classList.add('active');
+            filter.style.display = 'block';
+        }
     }
 });
 

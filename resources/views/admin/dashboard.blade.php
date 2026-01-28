@@ -18,16 +18,23 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="reportsDropdown">
                     <li><h6 class="dropdown-header">Reports</h6></li>
                     <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.inventory') }}">
-                        <i class="bi bi-box-seam"></i> Inventory Report
+                        <i class="bi bi-box-seam"></i> Inventory
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.skus') }}">
+                        <i class="bi bi-upc-scan"></i> SKUs
                     </a></li>
                     <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.orders') }}">
-                        <i class="bi bi-bag-check"></i> Orders Report
+                        <i class="bi bi-bag-check"></i> Orders
                     </a></li>
                     <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.revenue') }}">
-                        <i class="bi bi-currency-dollar"></i> Revenue Report
+                        <i class="bi bi-currency-dollar"></i> Revenue
                     </a></li>
                     <li><a class="dropdown-item" href="{{ route('admin.dashboard.reports.customers') }}">
-                        <i class="bi bi-people"></i> Customers Report
+                        <i class="bi bi-people"></i> Customers
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.reports.index') }}">
+                        <i class="bi bi-collection"></i> All reports &amp; filters
                     </a></li>
                 </ul>
             </div>

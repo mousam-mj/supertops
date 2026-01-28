@@ -6,46 +6,27 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AddressController extends Controller
 {
     // Middleware is applied in routes, no need to duplicate here
     
-    public function __construct()
-    {
-        // Log when controller is instantiated
-        \Log::info('AddressController instantiated');
-    }
-
     /**
      * Store a newly created address
      */
     public function store(Request $request)
     {
-        // Log request for debugging - this will help us see if request reaches here
-        Log::info('=== Address store request received ===', [
-            'user_id' => Auth::id(),
-            'authenticated' => Auth::check(),
-            'has_csrf' => $request->has('_token'),
-            'csrf_value' => $request->input('_token'),
-            'session_id' => $request->session()->getId(),
-            'ip' => $request->ip(),
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-        ]);
-        
-        // If we reach here, middleware passed, but double check
+        $wantsJson = $request->ajax() || $request->wantsJson();
         if (!Auth::check()) {
-            Log::error('=== Address store: User not authenticated AFTER middleware ===', [
-                'session_id' => $request->session()->getId(),
-                'ip' => $request->ip(),
-            ]);
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'message' => 'Session expired. Please login again.'], 401);
+            }
             return redirect()->route('login')
                 ->with('error', 'Your session has expired. Please login again.');
         }
 
-        // Validate the request
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'label' => 'nullable|string|max:255',
             'full_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -57,6 +38,17 @@ class AddressController extends Controller
             'is_default' => 'nullable',
         ]);
 
+        if ($validator->fails()) {
+            $redirect = redirect()->route('my-account', ['tab' => 'address'])
+                ->withErrors($validator)
+                ->withInput();
+            if ($wantsJson) {
+                return response()->json(['message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
+            }
+            return $redirect;
+        }
+
+        $validated = $validator->validated();
         $isDefault = $request->has('is_default') && ($request->is_default == '1' || $request->is_default === true);
 
         // If this is set as default, unset other defaults
@@ -66,7 +58,7 @@ class AddressController extends Controller
         }
 
         try {
-            $address = Address::create([
+            Address::create([
                 'user_id' => Auth::id(),
                 'label' => $validated['label'] ?? 'Home',
                 'full_name' => $validated['full_name'],
@@ -79,20 +71,31 @@ class AddressController extends Controller
                 'is_default' => $isDefault,
             ]);
 
-            Log::info('Address saved successfully', [
-                'address_id' => $address->id,
-                'user_id' => Auth::id()
-            ]);
+            $redirectUrl = route('my-account', ['tab' => 'address']);
 
-            return redirect()->route('my-account')
-                ->with('success', 'Address added successfully!');
+            if ($wantsJson) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Address added successfully!',
+                    'redirect' => $redirectUrl,
+                ]);
+            }
+
+            return redirect($redirectUrl)->with('success', 'Address added successfully!');
         } catch (\Exception $e) {
             Log::error('Address save error: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->route('my-account')
+            if ($wantsJson) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to save address. Please try again.',
+                ], 500);
+            }
+
+            return redirect()->route('my-account', ['tab' => 'address'])
                 ->withErrors(['error' => 'Failed to save address. Please try again.'])
                 ->withInput();
         }
@@ -103,10 +106,11 @@ class AddressController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $wantsJson = $request->ajax() || $request->wantsJson();
         $address = Address::where('user_id', Auth::id())
             ->findOrFail($id);
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'label' => 'nullable|string|max:255',
             'full_name' => 'sometimes|required|string|max:255',
             'phone' => 'sometimes|required|string|max:20',
@@ -118,9 +122,19 @@ class AddressController extends Controller
             'is_default' => 'nullable',
         ]);
 
+        if ($validator->fails()) {
+            $redirect = redirect()->route('my-account', ['tab' => 'address', 'edit' => $id])
+                ->withErrors($validator)
+                ->withInput();
+            if ($wantsJson) {
+                return response()->json(['message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
+            }
+            return $redirect;
+        }
+
+        $validated = $validator->validated();
         $isDefault = $request->has('is_default') && ($request->is_default == '1' || $request->is_default === true);
 
-        // If this is set as default, unset other defaults
         if ($isDefault) {
             Address::where('user_id', Auth::id())
                 ->where('id', '!=', $id)
@@ -128,18 +142,26 @@ class AddressController extends Controller
         }
 
         try {
-            $updateData = array_merge($validated, [
-                'is_default' => $isDefault
-            ]);
+            $address->update(array_merge($validated, ['is_default' => $isDefault]));
 
-            $address->update($updateData);
-
-            return redirect()->route('my-account')
-                ->with('success', 'Address updated successfully!');
+            $redirectUrl = route('my-account', ['tab' => 'address']);
+            if ($wantsJson) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Address updated successfully!',
+                    'redirect' => $redirectUrl,
+                ]);
+            }
+            return redirect($redirectUrl)->with('success', 'Address updated successfully!');
         } catch (\Exception $e) {
             Log::error('Address update error: ' . $e->getMessage());
-
-            return redirect()->route('my-account')
+            if ($wantsJson) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update address. Please try again.',
+                ], 500);
+            }
+            return redirect()->route('my-account', ['tab' => 'address'])
                 ->withErrors(['error' => 'Failed to update address. Please try again.'])
                 ->withInput();
         }

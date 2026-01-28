@@ -117,6 +117,7 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.sh
 // Cart & Checkout Routes
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/place-order', [App\Http\Controllers\Api\OrderController::class, 'store'])->name('place-order');
 
 // Test Route
 Route::get('/test/hello', function() {
@@ -239,6 +240,80 @@ Route::get('/my-account', function () {
     return view('my-account', compact('user', 'orders', 'addresses', 'awaitingPickup', 'cancelledOrders', 'totalOrders'));
 })->middleware('auth')->name('my-account');
 
+// POST /my-account – save address (same URL as page, so cookies always match)
+Route::post('/my-account', function (\Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Please login to access your account.');
+    }
+    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        'label' => 'nullable|string|max:255',
+        'full_name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'address_line_1' => 'required|string|max:255',
+        'address_line_2' => 'nullable|string|max:255',
+        'city' => 'required|string|max:255',
+        'state' => 'required|string|max:255',
+        'pincode' => 'required|string|min:5|max:6',
+        'is_default' => 'nullable',
+    ]);
+    if ($validator->fails()) {
+        return redirect()->to('/my-account?tab=address' . ($request->input('address_id') ? '&edit=' . $request->input('address_id') : ''))
+            ->withErrors($validator)
+            ->withInput();
+    }
+    $validated = $validator->validated();
+    $isDefault = $request->has('is_default') && in_array($request->input('is_default'), ['1', 1, true], true);
+    $uid = auth()->id();
+    $id = $request->input('address_id');
+    
+    try {
+        if ($id) {
+            $addr = \App\Models\Address::where('user_id', $uid)->find((int) $id);
+            if (!$addr) {
+                return redirect()->to('/my-account?tab=address')->withErrors(['error' => 'Address not found.'])->withInput();
+            }
+            if ($isDefault) {
+                \App\Models\Address::where('user_id', $uid)->where('id', '!=', $id)->update(['is_default' => false]);
+            }
+            $addr->update([
+                'label' => $validated['label'] ?? 'Home',
+                'full_name' => $validated['full_name'],
+                'phone' => $validated['phone'],
+                'address_line_1' => $validated['address_line_1'],
+                'address_line_2' => $validated['address_line_2'] ?? null,
+                'city' => $validated['city'],
+                'state' => $validated['state'],
+                'pincode' => $validated['pincode'],
+                'is_default' => $isDefault,
+            ]);
+            $msg = 'Address updated successfully!';
+        } else {
+            if ($isDefault) {
+                \App\Models\Address::where('user_id', $uid)->update(['is_default' => false]);
+            }
+            \App\Models\Address::create([
+                'user_id' => $uid,
+                'label' => $validated['label'] ?? 'Home',
+                'full_name' => $validated['full_name'],
+                'phone' => $validated['phone'],
+                'address_line_1' => $validated['address_line_1'],
+                'address_line_2' => $validated['address_line_2'] ?? null,
+                'city' => $validated['city'],
+                'state' => $validated['state'],
+                'pincode' => $validated['pincode'],
+                'is_default' => $isDefault,
+            ]);
+            $msg = 'Address added successfully!';
+        }
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error('Address save error: ' . $e->getMessage());
+        return redirect()->to('/my-account?tab=address' . ($id ? '&edit=' . $id : ''))
+            ->withErrors(['error' => 'Failed to save address. Please try again.'])
+            ->withInput();
+    }
+    return redirect()->to('/my-account?tab=address')->with('success', $msg);
+})->middleware('auth')->name('my-account.address.save');
+
 // Address Management Routes - Using Controller
 // Test route to check if middleware is working
 Route::get('/test-auth', function() {
@@ -254,7 +329,7 @@ Route::get('/test-auth', function() {
     ]);
 })->middleware(['log.auth', 'auth'])->name('test.auth');
 
-Route::middleware(['log.auth', 'auth'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::put('/addresses/{id}', [AddressController::class, 'update'])->name('addresses.update');
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy'])->name('addresses.destroy');
@@ -278,6 +353,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard/reports/orders', [DashboardController::class, 'downloadOrdersReport'])->name('dashboard.reports.orders');
         Route::get('/dashboard/reports/revenue', [DashboardController::class, 'downloadRevenueReport'])->name('dashboard.reports.revenue');
         Route::get('/dashboard/reports/customers', [DashboardController::class, 'downloadCustomersReport'])->name('dashboard.reports.customers');
+        Route::get('/dashboard/reports/skus', [DashboardController::class, 'downloadSkusReport'])->name('dashboard.reports.skus');
+
+        // Reports hub (all downloads in one place)
+        Route::get('/reports', [DashboardController::class, 'reportsIndex'])->name('reports.index');
         
         // Resource Routes
         Route::resource('users', UserController::class);

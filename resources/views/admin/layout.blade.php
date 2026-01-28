@@ -466,6 +466,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" href="{{{ route('admin.reports.index') }}}">
+                                <i class="bi bi-download me-2"></i> Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{{ route('admin.users.index') }}}">
                                 <i class="bi bi-people me-2"></i> Customers
                             </a>

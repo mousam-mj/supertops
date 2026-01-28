@@ -85,9 +85,11 @@
     @endif
     
     {{-- Email Verification Notice - Disabled --}}
-    
-    @yield('content')
-    
+
+    <main id="main-content" class="min-h-[50vh]">
+        @yield('content')
+    </main>
+
     @include('partials.footer')
     
     <!-- Search Modal -->

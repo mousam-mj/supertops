@@ -95,6 +95,14 @@ class DashboardController extends Controller
     }
 
     /**
+     * Reports hub – all report downloads in one place.
+     */
+    public function reportsIndex()
+    {
+        return view('admin.reports.index');
+    }
+
+    /**
      * Get chart data for a specific date range
      */
     public function getChartData(Request $request)
@@ -433,6 +441,57 @@ class DashboardController extends Controller
                 ]);
             }
 
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Download SKUs Report (CSV) – all products with SKU, stock, etc.
+     */
+    public function downloadSkusReport(Request $request)
+    {
+        $products = Product::with('category')
+            ->orderBy('sku')
+            ->get();
+
+        $filename = 'skus_report_' . now()->format('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($products) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, [
+                'SKU',
+                'Product ID',
+                'Product Name',
+                'Category',
+                'Price',
+                'Sale Price',
+                'Stock',
+                'Low Stock',
+                'Status',
+                'Created At',
+            ]);
+            foreach ($products as $p) {
+                fputcsv($file, [
+                    $p->sku ?? 'N/A',
+                    $p->id,
+                    $p->name ?? 'N/A',
+                    $p->category->name ?? 'N/A',
+                    $p->price ?? 0,
+                    $p->sale_price ?? $p->price ?? 0,
+                    $p->stock_quantity ?? 0,
+                    ($p->stock_quantity ?? 0) < 10 ? 'Yes' : 'No',
+                    $p->is_active ? 'Active' : 'Inactive',
+                    $p->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
             fclose($file);
         };
 

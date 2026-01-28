@@ -93,20 +93,46 @@ class OrderController extends Controller
                 ->with('product')
                 ->get();
             
-            // Strategy 2: If no items found, check for guest cart items in session
+            // Strategy 2: If no items found, check for guest cart items in session (cookie)
             if ($cartItems->isEmpty() && $sessionId) {
                 $guestCartItems = Cart::where('session_id', $sessionId)
                     ->whereNull('user_id')
                     ->with('product')
                     ->get();
-                
-                // Transfer all guest items to user
                 foreach ($guestCartItems as $guestItem) {
-                    if ($guestItem->product) { // Only transfer if product exists
+                    if ($guestItem->product) {
                         $guestItem->user_id = $user->id;
                         $guestItem->session_id = null;
                         $guestItem->save();
                         $cartItems->push($guestItem);
+                    }
+                }
+            }
+            
+            // Strategy 2b: If still empty, use "best" guest session (same as Cart API / checkout)
+            // Cart API uses guest cart when no session auth; checkout display can show those items.
+            if ($cartItems->isEmpty()) {
+                $bestSession = Cart::whereNull('user_id')
+                    ->whereNotNull('session_id')
+                    ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
+                    ->groupBy('session_id')
+                    ->orderBy('total_quantity', 'desc')
+                    ->orderBy('item_count', 'desc')
+                    ->orderBy('latest_created_at', 'desc')
+                    ->first();
+                if ($bestSession) {
+                    $sessionId = $bestSession->session_id;
+                    $guestCartItems = Cart::where('session_id', $sessionId)
+                        ->whereNull('user_id')
+                        ->with('product')
+                        ->get();
+                    foreach ($guestCartItems as $guestItem) {
+                        if ($guestItem->product) {
+                            $guestItem->user_id = $user->id;
+                            $guestItem->session_id = null;
+                            $guestItem->save();
+                            $cartItems->push($guestItem);
+                        }
                     }
                 }
             }
@@ -124,8 +150,6 @@ class OrderController extends Controller
                     ->whereNull('user_id')
                     ->with('product')
                     ->get();
-                
-                // Transfer all guest items to user
                 foreach ($guestCartItems as $guestItem) {
                     if ($guestItem->product) {
                         $guestItem->user_id = $user->id;

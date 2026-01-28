@@ -6,14 +6,19 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Users</h4>
                 <p class="text-muted mb-0">Manage user accounts and permissions</p>
             </div>
-            <a href="{{{ route('admin.users.create') }}}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add New User
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-download me-1"></i> Download Reports
+                </a>
+                <a href="{{{ route('admin.users.create') }}}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add New User
+                </a>
+            </div>
         </div>
     </div>
 </div>

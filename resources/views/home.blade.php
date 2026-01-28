@@ -3,6 +3,7 @@
 @section('title', 'Index - Perch Bottle')
 
 @section('content')
+<div id="home-content">
 <!-- Slider -->
             <div class="slider-block style-two xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] sm:-mt-[75px] w-full">
                 <div class="slider-main h-full w-full">
@@ -43,9 +44,6 @@
                 </div>
             </div>
             <!-- Slider -->
-            
-        </div>
-
 
 <div class="collection-block mt-5">
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
@@ -442,9 +440,6 @@
                 </div>
             </div>
         </div>
-                        </div>
-                </div>
-            </div>
         </div>
 
         <div class="modal-search-block">
@@ -999,4 +994,5 @@
                 </div>
             </div>
         </div>
+</div>{{-- /#home-content --}}
 @endsection

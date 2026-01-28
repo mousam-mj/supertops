@@ -1,4 +1,4 @@
-<div id="footer" class="footer" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both; margin-top: 0;">
+<div id="footer" class="footer mt-8" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both;">
     <div class="footer-main bg-surface">
         <div class="container">
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
@@ -7,7 +7,9 @@
                         <img src="{{ asset('assets/images/perch-logo.png') }}" alt="Perch Logo" />
                     </a>
                     @php
-                        $setting = \App\Models\Setting::first();
+                        $footerEmail = \App\Models\Setting::get('email', 'info@perch.in');
+                        $footerPhone = \App\Models\Setting::get('phone', '91-9874563210');
+                        $footerAddress = \App\Models\Setting::get('address', 'Delhi India');
                     @endphp
                     <div class="flex gap-3 mt-3">
                         <div class="flex flex-col">
@@ -16,9 +18,9 @@
                             <span class="text-button mt-3">Address:</span>
                         </div>
                         <div class="flex flex-col">
-                            <span>{{ $setting->email ?? 'info@perch.in' }}</span>
-                            <span class="mt-[14px]">{{ $setting->phone ?? '91-9874563210' }}</span>
-                            <span class="mt-3 pt-1">{{ $setting->address ?? 'Delhi India' }}</span>
+                            <span>{{ $footerEmail }}</span>
+                            <span class="mt-[14px]">{{ $footerPhone }}</span>
+                            <span class="mt-3 pt-1">{{ $footerAddress }}</span>
                         </div>
                     </div>
                 </div>
