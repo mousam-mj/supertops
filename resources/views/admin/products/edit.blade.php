@@ -149,10 +149,15 @@
                         <div class="col-md-4 mb-3">
                             <label for="image" class="form-label">Product Image</label>
                             @if($product->image)
-                                <div class="mb-2">
+                                <div class="mb-2 position-relative d-inline-block">
                                     <img src="{{ asset('storage/' . $product->image) }}" 
                                          alt="{{ $product->name }}" 
+                                         id="currentProductImage"
                                          style="max-width: 150px; max-height: 150px; border-radius: 4px;">
+                                    <input type="hidden" name="remove_image" value="0" id="removeImageInput">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" id="removeImageBtn" onclick="toggleRemoveImage()">
+                                        <i class="bi bi-trash me-1"></i>Remove Image
+                                    </button>
                                 </div>
                             @endif
                             <input type="file" 
@@ -172,11 +177,17 @@
                         <div class="col-md-4 mb-3">
                             <label for="gallery_images" class="form-label">Gallery Images</label>
                             @if(is_array($product->images) && count($product->images) > 0)
-                                <div class="mb-2 d-flex flex-wrap gap-2">
-                                    @foreach($product->images as $img)
-                                        <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                <div class="mb-2 d-flex flex-wrap gap-2" id="galleryThumbnails">
+                                    @foreach($product->images as $idx => $img)
+                                        <div class="position-relative d-inline-block gallery-thumb-wrap" data-path="{{ $img }}">
+                                            <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-0 rounded-end gallery-remove-btn" style="padding: 2px 6px; font-size: 10px;" data-path="{{ $img }}" title="Remove">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
                                     @endforeach
                                 </div>
+                                <div id="removeGalleryInputs"></div>
                             @endif
                             <input type="file"
                                    class="form-control @error('gallery_images') is-invalid @enderror @error('gallery_images.*') is-invalid @enderror"
@@ -190,13 +201,17 @@
                             @error('gallery_images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Select additional images to add to the gallery. Existing images will be kept.</small>
+                            <small class="form-text text-muted">Select additional images to add to the gallery. Click × on thumbnails to remove.</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="video" class="form-label">Product Video</label>
                             @if($product->video)
                                 <div class="mb-2">
-                                    <video src="{{ asset('storage/' . $product->video) }}" controls style="max-width: 200px; border-radius: 4px;"></video>
+                                    <video src="{{ asset('storage/' . $product->video) }}" controls id="currentProductVideo" style="max-width: 200px; border-radius: 4px;"></video>
+                                    <input type="hidden" name="remove_video" value="0" id="removeVideoInput">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" id="removeVideoBtn" onclick="toggleRemoveVideo()">
+                                        <i class="bi bi-trash me-1"></i>Remove Video
+                                    </button>
                                 </div>
                             @endif
                             <input type="file"
@@ -302,6 +317,61 @@
             preview.style.display = 'none';
         }
     }
+
+    function toggleRemoveImage() {
+        const input = document.getElementById('removeImageInput');
+        const btn = document.getElementById('removeImageBtn');
+        const img = document.getElementById('currentProductImage');
+        if (!input) return;
+        const isRemoving = input.value === '1';
+        input.value = isRemoving ? '0' : '1';
+        if (img) img.style.opacity = isRemoving ? '1' : '0.4';
+        if (btn) {
+            btn.classList.toggle('btn-outline-danger', isRemoving);
+            btn.classList.toggle('btn-danger', !isRemoving);
+            btn.innerHTML = isRemoving ? '<i class="bi bi-trash me-1"></i>Remove Image' : '<i class="bi bi-arrow-counterclockwise me-1"></i>Undo Remove';
+        }
+    }
+
+    function toggleRemoveVideo() {
+        const input = document.getElementById('removeVideoInput');
+        const btn = document.getElementById('removeVideoBtn');
+        const video = document.getElementById('currentProductVideo');
+        if (!input) return;
+        const isRemoving = input.value === '1';
+        input.value = isRemoving ? '0' : '1';
+        if (video) video.style.opacity = isRemoving ? '1' : '0.4';
+        if (btn) {
+            btn.classList.toggle('btn-outline-danger', isRemoving);
+            btn.classList.toggle('btn-danger', !isRemoving);
+            btn.innerHTML = isRemoving ? '<i class="bi bi-trash me-1"></i>Remove Video' : '<i class="bi bi-arrow-counterclockwise me-1"></i>Undo Remove';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.gallery-remove-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const path = this.getAttribute('data-path');
+                const wrap = this.closest('.gallery-thumb-wrap');
+                const container = document.getElementById('removeGalleryInputs');
+                if (!wrap || !container) return;
+                const inp = Array.from(container.querySelectorAll('input[name="remove_gallery_images[]"]')).find(function(i) { return i.value === path; });
+                if (inp) {
+                    wrap.style.opacity = '1';
+                    this.innerHTML = '<i class="bi bi-x"></i>';
+                    inp.remove();
+                } else {
+                    wrap.style.opacity = '0.4';
+                    this.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+                    const newInp = document.createElement('input');
+                    newInp.type = 'hidden';
+                    newInp.name = 'remove_gallery_images[]';
+                    newInp.value = path;
+                    container.appendChild(newInp);
+                }
+            });
+        });
+    });
 </script>
 @endpush
 @endsection

@@ -190,28 +190,52 @@ class ProductController extends Controller
             }
         }
 
-        if ($request->hasFile('image')) {
-            // Delete old image
+        // Handle remove_image
+        if ($request->filled('remove_image') && $request->remove_image == '1') {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+                $validated['image'] = null;
+            }
+        } elseif ($request->hasFile('image')) {
+            // Delete old image when uploading new one
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        // Handle gallery images (append to existing list)
-        $galleryPaths = [];
-        if ($request->hasFile('gallery_images')) {
-            foreach ($request->file('gallery_images') as $file) {
-                $galleryPaths[] = $file->store('products/gallery', 'public');
+        // Handle remove_gallery_images
+        $removeGalleryPaths = $request->input('remove_gallery_images', []);
+        if (!is_array($removeGalleryPaths)) {
+            $removeGalleryPaths = array_filter([$removeGalleryPaths]);
+        }
+        $existingImages = is_array($product->images) ? $product->images : [];
+        if (!empty($removeGalleryPaths)) {
+            foreach ($removeGalleryPaths as $path) {
+                if (in_array($path, $existingImages)) {
+                    Storage::disk('public')->delete($path);
+                    $existingImages = array_values(array_filter($existingImages, fn($img) => $img !== $path));
+                }
             }
         }
-        if (!empty($galleryPaths)) {
-            $existing = is_array($product->images) ? $product->images : [];
-            $validated['images'] = array_values(array_unique(array_merge($existing, $galleryPaths)));
+
+        // Handle gallery images (append to existing list)
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $file) {
+                $existingImages[] = $file->store('products/gallery', 'public');
+            }
+        }
+        if (isset($existingImages)) {
+            $validated['images'] = array_values(array_unique($existingImages));
         }
 
-        // Handle product video (replace existing)
-        if ($request->hasFile('video')) {
+        // Handle remove_video
+        if ($request->filled('remove_video') && $request->remove_video == '1') {
+            if ($product->video) {
+                Storage::disk('public')->delete($product->video);
+                $validated['video'] = null;
+            }
+        } elseif ($request->hasFile('video')) {
             if ($product->video) {
                 Storage::disk('public')->delete($product->video);
             }

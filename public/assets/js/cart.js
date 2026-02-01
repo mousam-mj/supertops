@@ -77,10 +77,11 @@
                     // Show success message
                     showNotification('Product added to cart!', 'success');
                     
-                    // Open cart modal if exists
-                    const cartModal = document.querySelector('.modal-cart-block');
-                    if (cartModal) {
-                        cartModal.classList.add('open');
+                    // Open cart modal - use layout's modal (last in DOM when home has duplicates)
+                    const allCart = document.querySelectorAll('.modal-cart-block .modal-cart-main');
+                    const cartModalMain = allCart.length ? allCart[allCart.length - 1] : null;
+                    if (cartModalMain) {
+                        cartModalMain.classList.add('open');
                         loadCartItems();
                     }
                 } else {
@@ -101,7 +102,7 @@
         });
     }
 
-    // Quick view functionality
+    // Quick view functionality - open modal with product (capture:true to run first)
     function initQuickView() {
         document.addEventListener('click', function(e) {
             const quickViewBtn = e.target.closest('.quick-view-btn');
@@ -110,68 +111,131 @@
             e.preventDefault();
             e.stopPropagation();
 
-            const productId = quickViewBtn.getAttribute('data-product-id');
-            const productSlug = quickViewBtn.getAttribute('data-product-slug');
+            let productId = quickViewBtn.getAttribute('data-product-id');
+            let productSlug = quickViewBtn.getAttribute('data-product-slug');
+            if (!productSlug && !productId) {
+                const productItem = quickViewBtn.closest('.product-item, [data-item]');
+                if (productItem) {
+                    productId = productId || productItem.getAttribute('data-item');
+                    const slugEl = productItem.querySelector('[data-product-slug]');
+                    productSlug = productSlug || (slugEl ? slugEl.getAttribute('data-product-slug') : null);
+                }
+            }
 
             if (productSlug) {
-                // Redirect to product page
-                window.location.href = `/product/${productSlug}`;
+                loadQuickViewProductBySlug(productSlug);
             } else if (productId) {
-                // Load product via API and show in modal
-                loadQuickViewProduct(productId);
+                loadQuickViewProductById(productId);
+            } else {
+                console.warn('[QUICK VIEW] No product slug or id found');
             }
+        }, true);
+
+        // Close quick view on overlay/close click
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.modal-quickview-block .close-btn') || (e.target.closest('.modal-quickview-block') && !e.target.closest('.modal-quickview-main'))) {
+                const all = document.querySelectorAll('.modal-quickview-block .modal-quickview-main');
+                const main = all.length ? all[all.length - 1] : null;
+                if (main) {
+                    main.classList.remove('open');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+        document.querySelectorAll('.modal-quickview-main').forEach(function(m) {
+            m.addEventListener('click', function(e) { e.stopPropagation(); });
         });
     }
 
-    // Load product for quick view
-    function loadQuickViewProduct(productId) {
-        // Get product slug from data attribute or fetch from API
+    function getQuickViewModal() {
+        const all = document.querySelectorAll('.modal-quickview-block .modal-quickview-main');
+        return all.length ? all[all.length - 1] : null;
+    }
+
+    function loadQuickViewProductBySlug(slug) {
+        fetch(`/api/products/${encodeURIComponent(slug)}`, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(response => response.ok ? response.json() : null)
+            .then(data => {
+                if (data && data.success && data.data) {
+                    showQuickViewModal(data.data);
+                } else {
+                    window.location.href = `/product/${slug}`;
+                }
+            })
+            .catch(() => { window.location.href = `/product/${slug}`; });
+    }
+
+    function loadQuickViewProductById(productId) {
         const productItem = document.querySelector(`[data-item="${productId}"]`);
-        const productSlug = productItem?.querySelector('.quick-view-btn')?.getAttribute('data-product-slug');
-        
-        if (productSlug) {
-            // Redirect to product page for quick view
-            window.location.href = `/product/${productSlug}`;
+        const slug = productItem?.querySelector('.quick-view-btn')?.getAttribute('data-product-slug');
+        if (slug) {
+            loadQuickViewProductBySlug(slug);
         } else {
-            // Try to find product by ID in products list
             fetch(`/api/products?per_page=100`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success && data.data.data) {
-                        const product = data.data.data.find(p => p.id == productId);
-                        if (product) {
-                            window.location.href = `/product/${product.slug}`;
-                        }
+                    if (data.success && data.data?.data) {
+                        const p = data.data.data.find(x => x.id == productId);
+                        if (p?.slug) loadQuickViewProductBySlug(p.slug);
                     }
                 })
-                .catch(error => {
-                    console.error('Error loading product:', error);
-                });
+                .catch(() => {});
         }
     }
 
-    // Populate quick view modal
-    function populateQuickViewModal(product, modal) {
-        // Update modal content with product data
-        const productName = modal.querySelector('.product-name');
-        if (productName) productName.textContent = product.name;
+    function getImageUrl(path) {
+        if (!path) return '/assets/images/product/perch-bottal.webp';
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('assets/') || path.startsWith('/assets/')) return path.startsWith('/') ? path : '/' + path;
+        return path.startsWith('storage/') ? '/' + path : '/storage/' + path;
+    }
 
-        const productPrice = modal.querySelector('.product-price');
-        if (productPrice) {
-            const price = product.sale_price || product.price;
-            productPrice.textContent = `₹${parseFloat(price).toFixed(2)}`;
+    function showQuickViewModal(product) {
+        const main = getQuickViewModal();
+        if (!main) return;
+
+        const img = product.image || (product.images && product.images[0]);
+        const imgUrl = getImageUrl(img);
+        const listImg = main.querySelector('.list-img');
+        if (listImg) {
+            listImg.innerHTML = `<div class="bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6"><img src="${imgUrl}" alt="${(product.name || '').replace(/"/g, '&quot;')}" class="w-full h-full object-cover" /></div>`;
         }
 
-        const productImage = modal.querySelector('.product-img img');
-        if (productImage && product.image) {
-            productImage.src = product.image.startsWith('http') ? product.image : `/storage/${product.image}`;
+        const category = main.querySelector('.product-infor .category');
+        if (category) category.textContent = product.category?.name || '';
+
+        const name = main.querySelector('.product-infor .name');
+        if (name) name.textContent = product.name || '';
+
+        const price = main.querySelector('.product-infor .product-price');
+        const salePrice = parseFloat(product.sale_price || product.price || 0);
+        const origPrice = parseFloat(product.price || 0);
+        if (price) price.textContent = '₹' + salePrice.toFixed(2);
+        const origEl = main.querySelector('.product-infor .product-origin-price');
+        if (origEl) {
+            origEl.style.display = origPrice > salePrice ? 'block' : 'none';
+            const del = origEl.querySelector('del');
+            if (del) del.textContent = '₹' + origPrice.toFixed(2);
+        }
+        const saleEl = main.querySelector('.product-infor .product-sale');
+        if (saleEl && origPrice > salePrice) {
+            const pct = Math.round(((origPrice - salePrice) / origPrice) * 100);
+            saleEl.textContent = '-' + pct + '%';
+            saleEl.style.display = 'inline-block';
         }
 
-        // Set product ID for add to cart
-        const addCartBtn = modal.querySelector('.add-cart-btn');
-        if (addCartBtn) {
-            addCartBtn.setAttribute('data-product-id', product.id);
+        const addCart = main.querySelector('.add-cart-btn');
+        if (addCart) {
+            addCart.setAttribute('data-product-id', product.id);
         }
+        const viewLink = main.querySelector('.view-product-link');
+        if (viewLink && product.slug) viewLink.href = '/product/' + product.slug;
+
+        main.classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
 
     // Update cart count
@@ -205,7 +269,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const cartList = document.querySelector('.list-cart, .list-product.cart-items, .cart-items');
+                    // Use layout's modal (last in DOM when home has duplicates)
+                    const allBlocks = document.querySelectorAll('.modal-cart-block');
+                    const cartBlock = allBlocks.length ? allBlocks[allBlocks.length - 1] : null;
+                    const cartList = cartBlock ? cartBlock.querySelector('.list-cart, .list-product.cart-items, .cart-items') : document.querySelector('.list-cart, .list-product.cart-items, .cart-items');
                     if (cartList) {
                         cartList.innerHTML = '';
                         // API returns data.data.items or data.data directly
@@ -221,13 +288,13 @@
                             
                             // Update total - use API total if available, otherwise calculate
                             const totalFromAPI = data.data?.total || total;
-                            const totalElement = document.querySelector('.total-price');
+                            const totalElement = cartBlock ? cartBlock.querySelector('.total-price') : document.querySelector('.total-price');
                             if (totalElement) {
                                 totalElement.textContent = totalFromAPI.toFixed(2);
                             }
                         } else {
                             cartList.innerHTML = '<div class="text-center py-10 text-secondary">Your cart is empty</div>';
-                            const totalElement = document.querySelector('.total-price');
+                            const totalElement = cartBlock ? cartBlock.querySelector('.total-price') : document.querySelector('.total-price');
                             if (totalElement) {
                                 totalElement.textContent = '0.00';
                             }
@@ -427,23 +494,22 @@
         }, 3000);
     }
 
-    // Quick shop functionality
+    // Quick shop = opens Quick View modal (same as Quick View, for quick add-to-cart)
     function initQuickShop() {
         document.addEventListener('click', function(e) {
             const quickShopBtn = e.target.closest('.quick-shop-btn');
             if (!quickShopBtn) return;
-
             e.preventDefault();
             e.stopPropagation();
-
-            const productId = quickShopBtn.getAttribute('data-product-id');
-            const productItem = quickShopBtn.closest('.product-item');
-            const quickShopBlock = productItem?.querySelector('.quick-shop-block');
-            
-            if (quickShopBlock) {
-                quickShopBlock.classList.toggle('hidden');
+            let slug = quickShopBtn.getAttribute('data-product-slug');
+            let id = quickShopBtn.getAttribute('data-product-id');
+            if (!slug && id) {
+                const qv = quickShopBtn.closest('.product-item')?.querySelector('.quick-view-btn');
+                if (qv) slug = qv.getAttribute('data-product-slug');
             }
-        });
+            if (slug) loadQuickViewProductBySlug(slug);
+            else if (id) loadQuickViewProductById(id);
+        }, true);
         
         // Handle size selection
         document.addEventListener('click', function(e) {
@@ -926,6 +992,7 @@
     window.loadCartPageItems = loadCartPageItems;
     window.removeCartItem = removeCartItem;
     window.showNotification = showNotification;
+    window.openQuickView = function(slug) { if(slug) loadQuickViewProductBySlug(slug); };
 
     // Run when DOM is ready
     if (document.readyState === 'loading') {

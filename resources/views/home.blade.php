@@ -352,8 +352,8 @@
             </div>
         </div>
 
-        <!-- Modal -->
-        <div class="modal-newsletter">
+        <!-- Modal Newsletter - hidden to prevent click/interference issues -->
+        <div class="modal-newsletter" style="display: none !important; pointer-events: none !important;">
             <div class="container h-full flex items-center justify-center w-full">
                 <div class="modal-newsletter-main">
                     <div class="main-content flex rounded-[20px] overflow-hidden w-full">
@@ -442,33 +442,7 @@
         </div>
         </div>
 
-        <div class="modal-search-block">
-            <div class="modal-search-main md:p-10 p-6 rounded-[32px]">
-                <div class="form-search relative w-full">
-                    <i class="ph ph-magnifying-glass absolute heading5 right-6 top-1/2 -translate-y-1/2 cursor-pointer"></i>
-                    <input type="text" placeholder="Searching..." class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-12" />
-                </div>
-                <div class="keyword mt-8">
-                    <div class="heading5">Feature keywords Today</div>
-                    <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
-                        <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Dress</button>
-                        <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">T-shirt</button>
-                        <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Underwear</button>
-                        <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Top</button>
-                    </div>
-                </div>
-                <div class="list-recent mt-8">
-                    <div class="heading6">Recently viewed products</div>
-                    <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4">
-                        @forelse($newArrivals->take(4) as $product)
-                            @include('partials.product-card', ['product' => $product])
-                        @empty
-                            <div class="col-span-full text-center py-10">
-                                <p class="text-secondary">No products available</p>
-                            </div>
-                        @endforelse
-            </div>
-        </div>
+        {{-- Search modal is in layouts/app.blade.php --}}
 
         <div class="modal-wishlist-block">
             <div class="modal-wishlist-main py-6">

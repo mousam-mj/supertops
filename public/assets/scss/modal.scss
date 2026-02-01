@@ -518,6 +518,12 @@
     align-items: center;
     justify-content: center;
     z-index: 102;
+    /* Reduce shadow/backdrop on card/modal click */
+    background: rgba(0, 0, 0, 0.35);
+
+    .modal-newsletter-main {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
 }
 
 .modal-quickview-block {

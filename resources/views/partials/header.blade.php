@@ -25,7 +25,7 @@
                             <i class="ph ph-caret-down text-xs text-white"></i>
                         </div>
                     </div>
-                    <div class="text-center text-button-uppercase text-white flex items-center">Free shipping on all orders over $50</div>
+                    <div class="text-center text-button-uppercase text-white flex items-center">Free shipping on all orders over ₹75</div>
                     <div class="right-content flex items-center gap-5 max-md:hidden">
                         <a href="https://www.facebook.com/" target="_blank">
                             <i class="icon-facebook text-white"></i>
@@ -316,14 +316,14 @@
                                         @endauth
                                     </div>
                                 </div>
-                                <div class="max-md:hidden wishlist-icon flex items-center relative cursor-pointer">
+                                <a href="javascript:void(0)" role="button" class="max-md:hidden wishlist-icon flex items-center relative cursor-pointer no-underline text-inherit" onclick="var m=document.querySelectorAll('.modal-wishlist-block .modal-wishlist-main');var el=m.length?m[m.length-1]:null;if(el){el.classList.add('open');document.body.style.overflow='hidden';if(window.handleItemModalWishlist)window.handleItemModalWishlist();}return false">
                                     <i class="ph-bold ph-heart text-2xl"></i>
                                     <span class="quantity wishlist-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                                </div>
-                                <div class="max-md:hidden cart-icon flex items-center relative cursor-pointer">
+                                </a>
+                                <a href="javascript:void(0)" role="button" class="max-md:hidden cart-icon flex items-center relative cursor-pointer no-underline text-inherit" onclick="var m=document.querySelectorAll('.modal-cart-block .modal-cart-main');var el=m.length?m[m.length-1]:null;if(el){el.classList.add('open');document.body.style.overflow='hidden';if(window.loadCartItems)window.loadCartItems();}return false">
                                     <i class="ph-bold ph-handbag text-2xl"></i>
                                     <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>

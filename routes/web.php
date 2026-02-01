@@ -161,18 +161,39 @@ Route::get('/wishlist', function () {
 Route::get('/search', function () {
     $query = request()->get('q', '');
     $products = collect([]);
-    if($query) {
+    if ($query) {
         $products = \App\Models\Product::where('is_active', true)
-            ->where(function($q) use ($query) {
+            ->where(function ($q) use ($query) {
                 $q->where('name', 'like', '%' . $query . '%')
-                  ->orWhere('description', 'like', '%' . $query . '%')
-                  ->orWhere('short_description', 'like', '%' . $query . '%');
+                    ->orWhere('description', 'like', '%' . $query . '%')
+                    ->orWhere('short_description', 'like', '%' . $query . '%')
+                    ->orWhere('sku', 'like', '%' . $query . '%');
             })
             ->with('category')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
     }
     return view('search-result', compact('products', 'query'));
 })->name('search');
+
+// AJAX search for modal (returns HTML)
+Route::get('/search/ajax', function () {
+    $query = request()->get('q', '');
+    $products = collect([]);
+    if ($query && strlen(trim($query)) >= 2) {
+        $products = \App\Models\Product::where('is_active', true)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                    ->orWhere('description', 'like', '%' . $query . '%')
+                    ->orWhere('short_description', 'like', '%' . $query . '%')
+                    ->orWhere('sku', 'like', '%' . $query . '%');
+            })
+            ->with('category')
+            ->limit(8)
+            ->get();
+    }
+    return response()->view('partials.search-results', ['products' => $products, 'query' => $query]);
+})->name('search.ajax');
 
 // About Us Route
 Route::get('/about', function () {

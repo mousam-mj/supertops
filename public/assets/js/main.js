@@ -1,3 +1,23 @@
+// Cart & Wishlist modal openers - define first so they're always available
+window.openModalCart = function () {
+  const all = document.querySelectorAll(".modal-cart-block .modal-cart-main");
+  const cm = all.length ? all[all.length - 1] : null;
+  if (cm) {
+    cm.classList.add("open");
+    document.body.style.overflow = "hidden";
+    if (typeof window.loadCartItems === "function") window.loadCartItems();
+  }
+};
+window.openModalWishlist = function () {
+  const all = document.querySelectorAll(".modal-wishlist-block .modal-wishlist-main");
+  const wm = all.length ? all[all.length - 1] : null;
+  if (wm) {
+    wm.classList.add("open");
+    document.body.style.overflow = "hidden";
+    if (typeof window.handleItemModalWishlist === "function") window.handleItemModalWishlist();
+  }
+};
+
 // Table of contents
 /**** Select language, money top nav ****/
 /**** Add fixed header ****/
@@ -80,10 +100,12 @@ if (chooseType) {
 const headerMain = document.querySelector(".header-menu");
 
 window.addEventListener("scroll", () => {
-  if (window.scrollY > 100) {
-    headerMain.classList.add("fixed");
-  } else {
-    headerMain.classList.remove("fixed");
+  if (headerMain) {
+    if (window.scrollY > 100) {
+      headerMain.classList.add("fixed");
+    } else {
+      headerMain.classList.remove("fixed");
+    }
   }
 });
 
@@ -147,44 +169,44 @@ backMenuBtns.forEach((btn) => {
 
 // Modal Newsletter
 const modalNewsletter = document.querySelector(".modal-newsletter");
-const modalNewsletterMain = document.querySelector(
-  ".modal-newsletter .modal-newsletter-main"
-);
+const modalNewsletterMain = document.querySelector(".modal-newsletter .modal-newsletter-main");
 const closeBtnModalNewsletter = document.querySelector(".modal-newsletter .close-newsletter-btn");
 
-
-if (modalNewsletter) {
-  setTimeout(() => {
-    modalNewsletterMain.classList.add('open')
-  }, 3000);
-
-  modalNewsletter.addEventListener('click', () => {
-    modalNewsletterMain.classList.remove('open')
-  })
-
-  closeBtnModalNewsletter.addEventListener('click', () => {
-    modalNewsletterMain.classList.remove('open')
-  })
-
-  modalNewsletterMain.addEventListener('click', (e) => {
-    e.stopPropagation()
-  })
+function closeModalNewsletter() {
+  const el = document.querySelector(".modal-newsletter .modal-newsletter-main");
+  if (el) {
+    el.classList.remove("open");
+    document.body.style.overflow = "";
+  }
 }
 
-// Modal Search
-const searchIcon = document.querySelector(".search-icon");
+if (modalNewsletter && modalNewsletterMain) {
+  /* Newsletter modal auto-open disabled - was causing shadow on card click */
+  /* setTimeout(() => { modalNewsletterMain.classList.add('open') }, 3000); */
+
+  modalNewsletter.addEventListener("click", closeModalNewsletter);
+
+  if (closeBtnModalNewsletter) {
+    closeBtnModalNewsletter.addEventListener("click", closeModalNewsletter);
+  }
+
+  modalNewsletterMain.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+}
+
+// Modal Search - open/close handled by layout's capture-phase script
 const modalSearch = document.querySelector(".modal-search-block");
 const modalSearchMain = document.querySelector(
   ".modal-search-block .modal-search-main"
 );
 
-if (searchIcon) {
-  searchIcon.addEventListener("click", () => {
-    modalSearchMain.classList.add("open");
-  });
-
-  modalSearch.addEventListener("click", () => {
-    modalSearchMain.classList.remove("open");
+if (modalSearch && modalSearchMain) {
+  modalSearch.addEventListener("click", (e) => {
+    if (e.target === modalSearch) {
+      modalSearchMain.classList.remove("open");
+      document.body.style.overflow = "";
+    }
   });
 
   modalSearchMain.addEventListener("click", (e) => {
@@ -192,30 +214,19 @@ if (searchIcon) {
   });
 }
 
-// Redirect to search-results when enter or click form search
+// Form search - keyword buttons and fallback for forms without action
 const formSearch = document.querySelectorAll(".form-search");
-
 if (formSearch) {
-  formSearch.forEach((form) => {
-    const formInput = form.querySelector("input");
-    const searchIcon = form.querySelector("i.ph-magnifying-glass");
-    const searchBtn = form.querySelector("button");
-
-    formInput.addEventListener("keyup", (e) => {
-      if (e.key === "Enter") {
-        window.location.href = `search-result.html?query=${formInput.value}`;
-      }
-    });
-
-    if (searchIcon) {
-      searchIcon.addEventListener("click", (e) => {
-        window.location.href = `search-result.html?query=${formInput.value}`;
-      });
-    }
-
-    if (searchBtn) {
-      searchBtn.addEventListener("click", (e) => {
-        window.location.href = `search-result.html?query=${formInput.value}`;
+  formSearch.forEach((wrap) => {
+    const form = wrap.querySelector("form");
+    const formInput = wrap.querySelector("input");
+    if (formInput && form && (!form.action || form.action.includes("search-result"))) {
+      formInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const q = (formInput.value || "").trim();
+          window.location.href = "/search?q=" + encodeURIComponent(q);
+        }
       });
     }
   });
@@ -226,8 +237,8 @@ const keywordSearch = document.querySelectorAll(".list-keyword .item");
 if (keywordSearch) {
   keywordSearch.forEach((item) => {
     item.addEventListener("click", (e) => {
-      const query = item.innerHTML.toLowerCase().replace(/\s+/g, "");
-      window.location.href = `search-result.html?query=${query}`;
+      const query = (item.textContent || item.innerHTML || "").trim().toLowerCase().replace(/\s+/g, " ");
+      window.location.href = "/search?q=" + encodeURIComponent(query);
     });
   });
 }
@@ -235,49 +246,30 @@ if (keywordSearch) {
 // Filter product in search-results
 const listSearchResults = document.querySelector(".search-result-block");
 
+// Search results - Laravel renders server-side via /search?q=xxx; skip old static JSON logic
 if (listSearchResults) {
-  // get curent URL
-  const urlParams = new URLSearchParams(window.location.search);
-
-  // get value 'query'
-  const queryValue = urlParams.get("query");
-
   const listProductResult = document.querySelector(".list-product-result");
-  if (queryValue) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryValue = urlParams.get("query") || urlParams.get("q");
+  // Only run if using old ?query= param and no server-rendered products
+  if (queryValue && listProductResult && listProductResult.children.length === 0) {
     fetch("./assets/data/Product.json")
       .then((response) => response.json())
       .then((products) => {
         const filterPrd = products.filter(
-          (product) =>
-            product.type.includes(queryValue) ||
-            product.category.includes(queryValue) ||
-            product.name.includes(queryValue)
+          (p) => (p.type || "").includes(queryValue) || (p.category || "").includes(queryValue) || (p.name || "").includes(queryValue)
         );
         const result = listSearchResults.querySelectorAll(".result");
-        const resultQuantity =
-          listSearchResults.querySelector(".result-quantity");
-
-        // Set number of results
-        resultQuantity.innerHTML = filterPrd.length;
-
-        // Set text result
-        result.forEach((item) => {
-          item.innerHTML = queryValue;
-        });
-
-        // Show product results
+        const resultQuantity = listSearchResults.querySelector(".result-quantity");
+        if (resultQuantity) resultQuantity.innerHTML = filterPrd.length;
+        result.forEach((item) => { item.innerHTML = queryValue; });
         filterPrd.forEach((product) => {
-          const productElement = createProductItem(product);
-          listProductResult.appendChild(productElement);
+          const el = createProductItem(product);
+          if (el) listProductResult.appendChild(el);
         });
-
-        if (filterPrd.length === 0) {
-          listProductResult.innerHTML = `<p>No product found.</p>`;
-        }
+        if (filterPrd.length === 0) listProductResult.innerHTML = `<p>No product found.</p>`;
       })
       .catch((error) => console.error("Error loading products:", error));
-  } else {
-    listProductResult.innerHTML = `<p>No product searched.</p>`;
   }
 }
 
@@ -310,29 +302,37 @@ if (quickViewStore === null) {
   localStorage.setItem("quickViewStore", JSON.stringify([]));
 }
 
-// Modal Wishlist
+// Modal Wishlist - use last modal (layout's) when duplicates exist (e.g. home page)
 const wishlistIcon = document.querySelector(".wishlist-icon");
-const modalWishlist = document.querySelector(".modal-wishlist-block");
-const modalWishlistMain = document.querySelector(
-  ".modal-wishlist-block .modal-wishlist-main"
-);
-const closeWishlistIcon = document.querySelector(
-  ".modal-wishlist-main .close-btn"
-);
-const continueWishlistIcon = document.querySelector(
-  ".modal-wishlist-main .continue"
-);
+const getWishlistModal = () => {
+  const all = document.querySelectorAll(".modal-wishlist-block");
+  return all.length ? all[all.length - 1] : null;
+};
+const getWishlistModalMain = () => {
+  const block = getWishlistModal();
+  return block ? block.querySelector(".modal-wishlist-main") : null;
+};
+const modalWishlist = getWishlistModal();
+const modalWishlistMain = getWishlistModalMain();
+const closeWishlistIcon = modalWishlistMain ? modalWishlistMain.querySelector(".close-btn") : null;
+const continueWishlistIcon = modalWishlistMain ? modalWishlistMain.querySelector(".continue") : null;
 const addWishlistBtns = document.querySelectorAll(".add-wishlist-btn");
 
 const openModalWishlist = () => {
-  if (modalWishlistMain) {
-    modalWishlistMain.classList.add("open");
+  const wm = getWishlistModalMain();
+  if (wm) {
+    wm.classList.add("open");
+    document.body.style.overflow = "hidden";
+    handleItemModalWishlist(); // Refresh wishlist items when opening
   }
 };
+window.openModalWishlist = openModalWishlist;
 
 const closeModalWishlist = () => {
-  if (modalWishlistMain) {
-    modalWishlistMain.classList.remove("open");
+  const wm = getWishlistModalMain();
+  if (wm) {
+    wm.classList.remove("open");
+    document.body.style.overflow = "";
   }
 };
 
@@ -382,18 +382,19 @@ if (modalWishlistMain) {
 // Set wishlist length
 const handleItemModalWishlist = () => {
   wishlistStore = localStorage.getItem("wishlistStore");
+  let items = wishlistStore ? JSON.parse(wishlistStore) : [];
+  if (!Array.isArray(items)) items = [];
 
-  if (wishlistStore && wishlistIcon) {
+  if (wishlistIcon) {
     const wishlistSpan = wishlistIcon.querySelector("span");
     if (wishlistSpan) {
-      wishlistSpan.innerHTML = JSON.parse(wishlistStore).length;
+      wishlistSpan.innerHTML = items.length;
     }
   }
 
-  // Set wishlist item
-  const listItemWishlist = document.querySelector(
-    ".modal-wishlist-block .list-product"
-  );
+  // Set wishlist item - use layout's modal (last in DOM)
+  const block = getWishlistModal();
+  const listItemWishlist = block ? block.querySelector(".list-product") : null;
 
   if (!listItemWishlist) {
     return;
@@ -401,10 +402,10 @@ const handleItemModalWishlist = () => {
 
   listItemWishlist.innerHTML = "";
 
-  if (JSON.parse(wishlistStore).length === 0) {
+  if (items.length === 0) {
     listItemWishlist.innerHTML = `<p class='mt-1'>No product in wishlist</p>`;
   } else {
-    JSON.parse(wishlistStore).forEach((item) => {
+    items.forEach((item) => {
       const prdItem = document.createElement("div");
       prdItem.setAttribute("data-item", item.id);
       prdItem.classList.add(
@@ -450,8 +451,9 @@ const handleItemModalWishlist = () => {
       const prdId = removeWishlistBtn
         .closest(".item")
         .getAttribute("data-item");
-      // JSON.parse(wishlistStore)
-      const newArray = JSON.parse(wishlistStore).filter(
+      const stored = localStorage.getItem("wishlistStore");
+      const current = stored ? JSON.parse(stored) : [];
+      const newArray = (Array.isArray(current) ? current : []).filter(
         (item) => item.id !== prdId
       );
       localStorage.setItem("wishlistStore", JSON.stringify(newArray));
@@ -487,25 +489,40 @@ const updateWishlistIcons = () => {
 
 handleItemModalWishlist();
 
-// Modal Cart
+// Modal Cart - use last modal (layout's) when duplicates exist (e.g. home page)
 const cartIcon = document.querySelector(".cart-icon");
-const modalCart = document.querySelector(".modal-cart-block");
-const modalCartMain = document.querySelector(
-  ".modal-cart-block .modal-cart-main"
-);
-const closeCartIcon = document.querySelector(".modal-cart-main .close-btn");
-const continueCartIcon = document.querySelector(".modal-cart-main .continue");
+const getCartModal = () => {
+  const all = document.querySelectorAll(".modal-cart-block");
+  return all.length ? all[all.length - 1] : null;
+};
+const getCartModalMain = () => {
+  const block = getCartModal();
+  return block ? block.querySelector(".modal-cart-main") : null;
+};
+const modalCart = getCartModal();
+const modalCartMain = getCartModalMain();
+const closeCartIcon = modalCartMain ? modalCartMain.querySelector(".close-btn") : null;
+const continueCartIcon = modalCartMain ? modalCartMain.querySelector(".continue") : null;
 const addCartBtns = document.querySelectorAll(".add-cart-btn");
 
 const openModalCart = () => {
-  if (modalCartMain) {
-    modalCartMain.classList.add("open");
+  const cm = getCartModalMain();
+  if (cm) {
+    cm.classList.add("open");
+    document.body.style.overflow = "hidden";
+    // Load cart items from API (cart.js exposes loadCartItems)
+    if (typeof window.loadCartItems === "function") {
+      window.loadCartItems();
+    }
   }
 };
+window.openModalCart = openModalCart;
 
 const closeModalCart = () => {
-  if (modalCartMain) {
-    modalCartMain.classList.remove("open");
+  const cm = getCartModalMain();
+  if (cm) {
+    cm.classList.remove("open");
+    document.body.style.overflow = "";
   }
 };
 
@@ -542,19 +559,16 @@ const handleItemModalCart = () => {
   cartStore = localStorage.getItem("cartStore");
   cartStore = cartStore ? JSON.parse(cartStore) : [];
 
-  if (cartStore) {
-    cartIcon.querySelector("span").innerHTML = cartStore.length;
+  if (cartStore && cartIcon) {
+    const span = cartIcon.querySelector("span");
+    if (span) span.innerHTML = cartStore.length;
   }
 
-  // Set cart item
-  const listItemCart = document.querySelector(
-    ".modal-cart-block .list-product"
-  );
+  // Set cart item - use layout's modal (last in DOM)
+  const block = getCartModal();
+  const listItemCart = block ? block.querySelector(".list-cart, .list-product") : null;
 
-  if (!listItemCart) {
-    console.warn("Cart modal list not found");
-    return;
-  }
+  if (!listItemCart) return;
 
   listItemCart.innerHTML = "";
 
@@ -612,29 +626,37 @@ const handleItemModalCart = () => {
     });
 
     // Set money to freeship in cart
-    modalCart.querySelector('.more-price').innerHTML = (moneyForFreeship - totalCart).toFixed(2)
-    modalCart.querySelector('.tow-bar-block .progress-line').style.width = (totalCart / moneyForFreeship * 100) + '%'
-    modalCart.querySelector('.total-cart').innerHTML = '₹' + totalCart.toFixed(2)
-    if (moneyForFreeship - totalCart <= 0) {
-      modalCart.querySelector('.more-price').innerHTML = 0
-      modalCart.querySelector('.tow-bar-block .progress-line').style.width = '100%'
+    const cartBlock = getCartModal();
+    if (cartBlock) {
+      const mp = cartBlock.querySelector('.more-price');
+      const prog = cartBlock.querySelector('.tow-bar-block .progress-line');
+      const tc = cartBlock.querySelector('.total-price, .total-cart');
+      if (mp) mp.innerHTML = (moneyForFreeship - totalCart <= 0 ? 0 : (moneyForFreeship - totalCart).toFixed(2));
+      if (prog) prog.style.width = (moneyForFreeship - totalCart <= 0 ? '100%' : (totalCart / moneyForFreeship * 100) + '%');
+      if (tc) tc.innerHTML = '₹' + totalCart.toFixed(2);
     }
   }
 
   const prdItems = listItemCart.querySelectorAll(".item");
   prdItems.forEach((prd) => {
     const removeCartBtn = prd.querySelector(".remove-cart-btn");
+    if (!removeCartBtn) return;
     removeCartBtn.addEventListener("click", () => {
-      const prdId = removeCartBtn.closest(".item").getAttribute("data-item");
-      // cartStore
+      const itemEl = removeCartBtn.closest(".item");
+      const prdId = itemEl ? itemEl.getAttribute("data-item") : null;
+      if (!prdId) return;
       const newArray = cartStore.filter((item) => item.id !== prdId);
       localStorage.setItem("cartStore", JSON.stringify(newArray));
       handleItemModalCart();
 
-      if (cartStore.length === 0) {
-        modalCart.querySelector('.more-price').innerHTML = 0
-        modalCart.querySelector('.tow-bar-block .progress-line').style.width = '0'
-        modalCart.querySelector('.total-cart').innerHTML = '₹0.00'
+      const cartBlock = getCartModal();
+      if (cartStore.length === 0 && cartBlock) {
+        const mp = cartBlock.querySelector('.more-price');
+        const prog = cartBlock.querySelector('.tow-bar-block .progress-line');
+        const tc = cartBlock.querySelector('.total-price, .total-cart');
+        if (mp) mp.innerHTML = 0;
+        if (prog) prog.style.width = '0';
+        if (tc) tc.innerHTML = '₹0.00';
       }
     });
   });
@@ -894,7 +916,7 @@ const setCountDown = setInterval(function () {
   }
 
   if (distance < 0) {
-    clearInterval(x);
+    clearInterval(setCountDown);
     if (dayTime) {
       dayTime.forEach((time) => {
         time.innerHTML = "00";
@@ -1194,10 +1216,7 @@ var swiper2 = new Swiper(".mySwiper2", {
 // Product detail image popup (Laravel version)
 document.addEventListener("DOMContentLoaded", function () {
   const productDetail = document.querySelector(".product-detail");
-  if (!productDetail) {
-    console.log("Product detail not found");
-    return;
-  }
+  if (!productDetail) return;
 
   // Popup wrapper lives inside product-detail
   const popupImg = productDetail.querySelector(".popup-img");
@@ -1279,14 +1298,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Add click handlers to thumbnail images
+  // Thumbnail click: only change center/main image, do NOT open popup
   thumbImages.forEach((img, index) => {
     img.style.cursor = "pointer";
     img.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Thumbnail image clicked:", index);
-      openPopup(index);
+      if (typeof swiper2 !== "undefined" && swiper2) {
+        swiper2.slideTo(index);
+      }
     });
   });
 
@@ -1455,11 +1475,14 @@ const closeQuickviewIcon = document.querySelector(
 );
 
 const openModalQuickview = () => {
-  modalQuickviewMain.classList.add("open");
+  if (modalQuickviewMain) modalQuickviewMain.classList.add("open");
 };
 
 const closeModalQuickview = () => {
-  modalQuickviewMain.classList.remove("open");
+  if (modalQuickviewMain) {
+    modalQuickviewMain.classList.remove("open");
+    document.body.style.overflow = "";
+  }
 };
 
 modalQuickview?.addEventListener("click", closeModalQuickview);

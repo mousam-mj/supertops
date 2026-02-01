@@ -1,6 +1,6 @@
-<div class="product-item grid-type group" data-item="{{ $product->id ?? '1' }}">
-    <div class="product-main cursor-pointer block">
-        <div class="product-thumb bg-white relative overflow-hidden rounded-2xl">
+<div class="product-item grid-type group relative" data-item="{{ $product->id ?? '1' }}">
+    <div class="product-main cursor-pointer block relative">
+        <div class="product-thumb bg-white relative rounded-2xl overflow-hidden">
             @if(isset($product->is_new_arrival) && $product->is_new_arrival)
                 <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
             @elseif(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
@@ -57,17 +57,17 @@
                 </div>
             @endif
             
-            <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}">
+            <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 opacity-0 group-hover:opacity-100 max-md:opacity-100 max-md:group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-auto">
+                <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer select-none" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}">
                     <span class="max-lg:hidden">Quick View</span>
                     <i class="ph ph-eye lg:hidden text-xl"></i>
                 </div>
-                <div class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white max-lg:hidden cursor-pointer" data-product-id="{{ $product->id ?? '' }}">Quick Shop</div>
+                <div class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white cursor-pointer select-none" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}" role="button" tabindex="0" onclick="event.preventDefault();event.stopPropagation();var s=this.getAttribute('data-product-slug');if(s&&window.openQuickView){window.openQuickView(s)}">Quick Shop</div>
                 <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden cursor-pointer" data-product-id="{{ $product->id ?? '' }}">
                     <span class="max-lg:hidden">Add To Cart</span>
                     <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
                 </div>
-                <div class="quick-shop-block absolute left-5 right-5 bg-white p-5 rounded-[20px] hidden">
+                <div class="quick-shop-block absolute left-2 right-2 bottom-full mb-2 bg-white p-5 rounded-[20px] hidden z-30 shadow-xl border border-line">
                     @if(isset($product->sizes) && is_array($product->sizes) && count($product->sizes) > 0)
                         <div class="list-size flex items-center justify-center flex-wrap gap-2">
                             @foreach($product->sizes as $size)

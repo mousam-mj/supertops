@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" />
     <link rel="stylesheet" href="{{ asset('dist/output-tailwind.css') }}" />
     <style>
+        /* Cart, Wishlist & Search icons - ensure clickable */
+        .header-menu .cart-icon,
+        .header-menu .wishlist-icon,
+        .header-menu .search-icon {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
         /* Header hover states */
         .user-icon .login-popup {
             opacity: 0;
@@ -29,6 +37,32 @@
 
     
 <body>
+    {{-- Cart, Wishlist & Search - load first, before any other script --}}
+    <script>
+    (function(){
+        function openCart() {
+            var all = document.querySelectorAll('.modal-cart-block .modal-cart-main');
+            var m = all.length ? all[all.length - 1] : null;
+            if (m) { m.classList.add('open'); document.body.style.overflow='hidden'; if(window.loadCartItems) window.loadCartItems(); }
+            else location.href='{{ route("cart.index") }}';
+        }
+        function openWishlist() {
+            var all = document.querySelectorAll('.modal-wishlist-block .modal-wishlist-main');
+            var m = all.length ? all[all.length - 1] : null;
+            if (m) { m.classList.add('open'); document.body.style.overflow='hidden'; if(window.handleItemModalWishlist) window.handleItemModalWishlist(); }
+            else location.href='{{ route("wishlist") }}';
+        }
+        function openSearch() {
+            var main = document.querySelector('.modal-search-block .modal-search-main');
+            if (main) { main.classList.add('open'); document.body.style.overflow='hidden'; }
+        }
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.cart-icon')) { e.preventDefault(); e.stopPropagation(); openCart(); }
+            else if (e.target.closest('.wishlist-icon')) { e.preventDefault(); e.stopPropagation(); openWishlist(); }
+            else if (e.target.closest('.search-icon')) { e.preventDefault(); e.stopPropagation(); openSearch(); }
+        }, true);
+    })();
+    </script>
     @include('partials.header')
     
     {{-- Session Messages --}}
@@ -92,45 +126,52 @@
 
     @include('partials.footer')
     
-    <!-- Search Modal -->
+    <!-- Search Modal - Dynamic live search -->
     <div class="modal-search-block">
-        <div class="modal-search-main md:p-10 p-6 rounded-[32px]">
+        <div class="modal-search-main md:p-10 p-6 rounded-[32px] relative">
+            <div class="close-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-surface flex items-center justify-center duration-300 cursor-pointer hover:bg-black hover:text-white z-10" onclick="document.querySelector('.modal-search-block .modal-search-main')?.classList.remove('open');document.body.style.overflow=''">
+                <i class="ph ph-x text-xl"></i>
+            </div>
             <div class="form-search relative w-full">
-                <form method="GET" action="{{{ route('shop') }}}">
-                    <i class="ph ph-magnifying-glass absolute heading5 right-6 top-1/2 -translate-y-1/2 cursor-pointer"></i>
-                    <input type="text" name="search" placeholder="Searching..." class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-12" />
+                <form method="GET" action="{{{ route('search') }}}" id="searchModalForm">
+                    <input type="text" name="q" id="searchModalInput" placeholder="What are you looking for?" class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-14" autocomplete="off" />
+                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/5 rounded-full">
+                        <i class="ph ph-magnifying-glass heading5"></i>
+                    </button>
                 </form>
             </div>
             <div class="keyword mt-8">
-                <div class="heading5">Feature keywords Today</div>
+                <div class="heading5">Popular searches</div>
                 <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Dress']) }}}'">Dress</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'T-shirt']) }}}'">T-shirt</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Underwear']) }}}'">Underwear</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('shop', ['search' => 'Top']) }}}'">Top</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Dress']) }}}'">Dress</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'T-shirt']) }}}'">T-shirt</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Bottle']) }}}'">Bottle</button>
+                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Top']) }}}'">Top</button>
                 </div>
             </div>
-            <div class="list-recent mt-8">
-                <div class="heading6">Recently viewed products</div>
-                <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4">
+            <div class="search-results-dynamic mt-8" id="searchModalResults">
+                <div class="heading6" id="searchResultsTitle">Latest products</div>
+                <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4" id="searchModalProductList">
                     @php
                         $recentProducts = \App\Models\Product::where('is_active', true)
                             ->orderBy('created_at', 'desc')
                             ->limit(4)
                             ->get();
                     @endphp
-                    @if($recentProducts->count() > 0)
-                        @foreach($recentProducts as $product)
-                            <div class="product-item grid-type">
-                                @include('partials.product-card', ['product' => $product])
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="col-span-full text-center py-8">
-                            <p class="body1 text-secondary">No recent products</p>
+                    @forelse($recentProducts as $product)
+                        <div class="product-item grid-type search-default-product">
+                            @include('partials.product-card', ['product' => $product])
                         </div>
-                    @endif
+                    @empty
+                        <div class="col-span-full text-center py-8">
+                            <p class="body1 text-secondary">No products yet. Start typing to search.</p>
+                        </div>
+                    @endforelse
                 </div>
+                <div class="search-loading hidden text-center py-6" id="searchModalLoading">
+                    <span class="body1 text-secondary">Searching...</span>
+                </div>
+                <a href="{{{ route('search') }}}" class="button-main w-full text-center mt-4 hidden" id="searchModalViewAll">View all results</a>
             </div>
         </div>
     </div>
@@ -148,6 +189,59 @@
             <div class="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
                 <a href="{{{ route('wishlist') }}}" class="button-main w-full text-center uppercase"> View All Wish List</a>
                 <div class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">Or continue shopping</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick View Modal -->
+    <div class="modal-quickview-block">
+        <div class="modal-quickview-main py-6">
+            <div class="flex h-full max-md:flex-col-reverse gap-y-6">
+                <div class="left lg:w-[388px] md:w-[300px] flex-shrink-0 px-6">
+                    <div class="list-img max-md:flex items-center gap-4">
+                        <div class="bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6">
+                            <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="item" class="w-full h-full object-cover" />
+                        </div>
+                    </div>
+                </div>
+                <div class="right w-full px-6">
+                    <div class="heading pb-6 flex items-center justify-between relative">
+                        <div class="heading5">Quick View</div>
+                        <div class="close-btn absolute right-0 top-0 w-6 h-6 rounded-full bg-surface flex items-center justify-center duration-300 cursor-pointer hover:bg-black hover:text-white">
+                            <i class="ph ph-x text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="product-infor">
+                        <div class="flex justify-between">
+                            <div>
+                                <div class="category caption2 text-secondary font-semibold uppercase"></div>
+                                <div class="name heading4 mt-1"></div>
+                            </div>
+                            <div class="add-wishlist-btn w-10 h-10 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white" data-product-id="">
+                                <i class="ph ph-heart text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
+                            <div class="product-price heading5"></div>
+                            <div class="product-origin-price font-normal text-secondary2" style="display:none"><del></del></div>
+                            <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full" style="display:none"></div>
+                            <div class="desc text-secondary mt-3" style="display:none"></div>
+                        </div>
+                        <div class="list-action mt-6">
+                            <div class="list-color flex items-center gap-2 flex-wrap mt-3" style="display:none"></div>
+                            <div class="list-size flex items-center gap-2 flex-wrap mt-3" style="display:none"></div>
+                            <div class="choose-quantity flex items-center gap-5 mt-3">
+                                <div class="quantity-block md:p-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
+                                    <i class="ph-bold ph-minus cursor-pointer body1 quantity-decrease-qv"></i>
+                                    <div class="quantity body1 font-semibold">1</div>
+                                    <i class="ph-bold ph-plus cursor-pointer body1 quantity-increase-qv"></i>
+                                </div>
+                                <div class="add-cart-btn button-main w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="">Add To Cart</div>
+                            </div>
+                            <a href="#" class="button-main w-full text-center mt-5 block view-product-link">View Full Details</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -227,38 +321,25 @@
                 });
             }
             
-            // Search icon click to open modal
-            const searchIcon = document.querySelector('.search-icon');
+            // Close search modal (backdrop click + ESC)
             const searchModal = document.querySelector('.modal-search-block');
-            if (searchIcon && searchModal) {
-                searchIcon.addEventListener('click', function() {
-                    searchModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            // Close search modal
-            const closeSearchModal = function() {
-                if (searchModal) {
-                    searchModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            };
-            
-            // Close on backdrop click
-            if (searchModal) {
+            const searchModalMain = document.querySelector('.modal-search-block .modal-search-main');
+            if (searchModal && searchModalMain) {
                 searchModal.addEventListener('click', function(e) {
                     if (e.target === searchModal) {
-                        closeSearchModal();
+                        searchModalMain.classList.remove('open');
+                        document.body.style.overflow = '';
                     }
                 });
+                searchModalMain.addEventListener('click', function(e) { e.stopPropagation(); });
             }
             
-            // Close on ESC key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    if (searchModal && searchModal.classList.contains('active')) {
-                        closeSearchModal();
+                    const sm = document.querySelector('.modal-search-block .modal-search-main');
+                    if (sm && sm.classList.contains('open')) {
+                        sm.classList.remove('open');
+                        document.body.style.overflow = '';
                     }
                     if (menuMobile && menuMobile.classList.contains('active')) {
                         menuMobile.classList.remove('active');
@@ -266,22 +347,61 @@
                     }
                 }
             });
-            
-            // Wishlist icon click
-            const wishlistIcon = document.querySelector('.wishlist-icon');
-            if (wishlistIcon) {
-                wishlistIcon.addEventListener('click', function() {
-                    window.location.href = '{{{ route("wishlist") }}}';
+
+            // Dynamic live search in modal
+            const searchInput = document.getElementById('searchModalInput');
+            const searchList = document.getElementById('searchModalProductList');
+            const searchTitle = document.getElementById('searchResultsTitle');
+            const searchLoading = document.getElementById('searchModalLoading');
+            const searchViewAll = document.getElementById('searchModalViewAll');
+            const defaultProducts = searchList ? searchList.innerHTML : '';
+            let searchTimeout = null;
+            if (searchInput && searchList) {
+                searchInput.addEventListener('input', function() {
+                    const q = (this.value || '').trim();
+                    clearTimeout(searchTimeout);
+                    if (q.length >= 2) {
+                        searchLoading.classList.remove('hidden');
+                        searchList.classList.add('hidden');
+                        searchViewAll.classList.add('hidden');
+                        searchTimeout = setTimeout(function() {
+                            fetch('{{ url("/search/ajax") }}?q=' + encodeURIComponent(q))
+                                .then(r => r.text())
+                                .then(html => {
+                                    searchList.innerHTML = html || '<div class="col-span-full text-center py-8"><p class="body1 text-secondary">No products found</p></div>';
+                                    searchList.classList.remove('hidden');
+                                    searchTitle.textContent = 'Search results for "' + q + '"';
+                                    searchViewAll.href = '{{ url("/search") }}?q=' + encodeURIComponent(q);
+                                    searchViewAll.classList.remove('hidden');
+                                })
+                                .catch(function() {
+                                    searchList.innerHTML = '<div class="col-span-full text-center py-8"><p class="body1 text-secondary">Search failed. Try again.</p></div>';
+                                    searchList.classList.remove('hidden');
+                                })
+                                .finally(function() {
+                                    searchLoading.classList.add('hidden');
+                                    if (window.handleItemModalWishlist) window.handleItemModalWishlist();
+                                    if (window.initQuickView) window.initQuickView?.();
+                                });
+                        }, 300);
+                    } else {
+                        searchList.innerHTML = defaultProducts;
+                        searchList.classList.remove('hidden');
+                        searchTitle.textContent = q.length ? 'Type at least 2 characters...' : 'Latest products';
+                        searchViewAll.classList.add('hidden');
+                        searchLoading.classList.add('hidden');
+                    }
+                });
+                searchInput.addEventListener('focus', function() {
+                    const q = (this.value || '').trim();
+                    if (q.length >= 2) {
+                        searchTitle.textContent = 'Search results for "' + q + '"';
+                        searchViewAll.href = '{{ url("/search") }}?q=' + encodeURIComponent(q);
+                        searchViewAll.classList.remove('hidden');
+                    }
                 });
             }
             
-            // Cart icon click
-            const cartIcon = document.querySelector('.cart-icon');
-            if (cartIcon) {
-                cartIcon.addEventListener('click', function() {
-                    window.location.href = '{{{ route("cart.index") }}}';
-                });
-            }
         });
     </script>
 </body>

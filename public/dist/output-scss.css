@@ -684,7 +684,7 @@ input[type=file]::-webkit-file-upload-button {
   opacity: 0;
   visibility: hidden;
   transition: all ease 0.4s;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 101;
 }
 .modal-newsletter:has(.modal-newsletter-main.open), .modal-newsletter:has(.modal-video-main.open), .modal-newsletter:has(.modal-sizeguide-main.open), .modal-newsletter:has(.modal-quickview-main.open), .modal-newsletter:has(.modal-order-detail-main.open), .modal-newsletter:has(.modal-cart-main.open), .modal-newsletter:has(.modal-wishlist-main.open), .modal-newsletter:has(.modal-search-main.open),
@@ -1947,6 +1947,10 @@ input[type=file]::-webkit-file-upload-button {
   align-items: center;
   justify-content: center;
   z-index: 102;
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+.modal-newsletter .modal-newsletter-main {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 .modal-quickview-block {
