@@ -3,50 +3,56 @@
 @section('title', 'Cart - Perch Bottle')
 
 @section('content')
-
-            <!-- Menu bar -->
-            <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
-                <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-house text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Home</span>
-                    </a>
-                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-list text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Category</span>
-                    </a>
-                    <a href="{{ route('search') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Search</span>
-                    </a>
-                    <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <div class="cart-icon relative">
-                            <span class="ph-bold ph-handbag text-2xl block"></span>
-                            <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                        </div>
-                        <span class="menu_bar-title caption2 font-semibold">Cart</span>
-                    </a>
+<style>
+    /* Cart - compact breadcrumb, reduce gap */
+    .cart-page-content .cart-breadcrumb { min-height: unset !important; }
+    .cart-page-content .cart-breadcrumb .breadcrumb-main { min-height: unset !important; }
+</style>
+<div class="page-content cart-page-content">
+    <!-- Menu bar (mobile) -->
+    <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
+        <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
+            <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                <span class="ph-bold ph-house text-2xl block"></span>
+                <span class="menu_bar-title caption2 font-semibold">Home</span>
+            </a>
+            <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                <span class="ph-bold ph-list text-2xl block"></span>
+                <span class="menu_bar-title caption2 font-semibold">Category</span>
+            </a>
+            <a href="{{ route('search') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
+                <span class="menu_bar-title caption2 font-semibold">Search</span>
+            </a>
+            <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                <div class="cart-icon relative">
+                    <span class="ph-bold ph-handbag text-2xl block"></span>
+                    <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
                 </div>
-            </div>
+                <span class="menu_bar-title caption2 font-semibold">Cart</span>
+            </a>
+        </div>
+    </div>
 
-            <div class="breadcrumb-block style-shared">
-                <div class="breadcrumb-main bg-linear overflow-hidden">
-                    <div class="container lg:pt-[134px] pt-24 pb-10 relative">
-                        <div class="main-content w-full h-full flex flex-col items-center justify-center relative z-[1]">
-                            <div class="text-content">
-                                <div class="heading2 text-center">Shopping Cart</div>
-                                <div class="link flex items-center justify-center gap-1 caption1 mt-3">
-                                    <a href="{{ route('home') }}">Homepage</a>
-                                    <i class="ph ph-caret-right text-sm text-secondary2"></i>
-                                    <div class="text-secondary2 capitalize">Shopping Cart</div>
-                                </div>
-                            </div>
+    <!-- Compact breadcrumb - minimal gap -->
+    <div class="breadcrumb-block cart-breadcrumb">
+        <div class="breadcrumb-main bg-linear overflow-hidden">
+            <div class="container py-4 relative">
+                <div class="main-content w-full flex flex-col items-center justify-center relative z-[1]">
+                    <div class="text-content">
+                        <div class="heading2 text-center">Shopping Cart</div>
+                        <div class="link flex items-center justify-center gap-1 caption1 mt-1">
+                            <a href="{{ route('home') }}">Homepage</a>
+                            <i class="ph ph-caret-right text-sm text-secondary2"></i>
+                            <span class="text-secondary2 capitalize">Shopping Cart</span>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-        <div class="cart-block md:py-20 py-10">
+    <div class="cart-block md:py-6 py-4">
             <div class="container">
                 <div class="content-main flex justify-between max-xl:flex-col gap-y-8">
                     <div class="xl:w-2/3 xl:pr-3 w-full">
@@ -197,4 +203,5 @@
                 </div>
             </div>
         </div>
+</div>
 
