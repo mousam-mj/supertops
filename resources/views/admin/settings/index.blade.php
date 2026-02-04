@@ -136,6 +136,42 @@
                                 <label class="form-label">Meta Description (SEO)</label>
                                 <textarea name="meta_description" class="form-control" rows="2">{{ old('meta_description', $settings['meta_description'] ?? '') }}</textarea>
                             </div>
+                            <hr class="my-4">
+                            <h6 class="mb-3">Product Page Features (shown on product detail page)</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 1 Title</label>
+                                    <input type="text" name="product_feature_1_title" class="form-control" value="{{ old('product_feature_1_title', $settings['product_feature_1_title'] ?? 'Shipping Faster') }}" placeholder="Shipping Faster">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 1 Text</label>
+                                    <input type="text" name="product_feature_1_text" class="form-control" value="{{ old('product_feature_1_text', $settings['product_feature_1_text'] ?? '') }}" placeholder="Free shipping on orders over ₹75">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 2 Title</label>
+                                    <input type="text" name="product_feature_2_title" class="form-control" value="{{ old('product_feature_2_title', $settings['product_feature_2_title'] ?? 'Premium Material') }}" placeholder="Premium Material">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 2 Text</label>
+                                    <input type="text" name="product_feature_2_text" class="form-control" value="{{ old('product_feature_2_text', $settings['product_feature_2_text'] ?? '') }}" placeholder="Crafted from high-quality materials">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 3 Title</label>
+                                    <input type="text" name="product_feature_3_title" class="form-control" value="{{ old('product_feature_3_title', $settings['product_feature_3_title'] ?? 'High Quality') }}" placeholder="High Quality">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 3 Text</label>
+                                    <input type="text" name="product_feature_3_text" class="form-control" value="{{ old('product_feature_3_text', $settings['product_feature_3_text'] ?? '') }}" placeholder="Built to last">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 4 Title</label>
+                                    <input type="text" name="product_feature_4_title" class="form-control" value="{{ old('product_feature_4_title', $settings['product_feature_4_title'] ?? 'Highly Compatible') }}" placeholder="Highly Compatible">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Feature 4 Text</label>
+                                    <input type="text" name="product_feature_4_text" class="form-control" value="{{ old('product_feature_4_text', $settings['product_feature_4_text'] ?? '') }}" placeholder="Works beautifully everywhere">
+                                </div>
+                            </div>
                         </div>
                     </div>
 

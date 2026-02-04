@@ -38,6 +38,14 @@ class SettingsController extends Controller
             'copyright_text',
             'free_shipping_text',
             'meta_description',
+            'product_feature_1_title',
+            'product_feature_1_text',
+            'product_feature_2_title',
+            'product_feature_2_text',
+            'product_feature_3_title',
+            'product_feature_3_text',
+            'product_feature_4_title',
+            'product_feature_4_text',
         ],
     ];
 
@@ -74,6 +82,14 @@ class SettingsController extends Controller
             'copyright_text' => 'nullable|string|max:500',
             'free_shipping_text' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'product_feature_1_title' => 'nullable|string|max:100',
+            'product_feature_1_text' => 'nullable|string|max:500',
+            'product_feature_2_title' => 'nullable|string|max:100',
+            'product_feature_2_text' => 'nullable|string|max:500',
+            'product_feature_3_title' => 'nullable|string|max:100',
+            'product_feature_3_text' => 'nullable|string|max:500',
+            'product_feature_4_title' => 'nullable|string|max:100',
+            'product_feature_4_text' => 'nullable|string|max:500',
         ]);
 
         // Handle logo upload

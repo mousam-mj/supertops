@@ -3,6 +3,10 @@
 @section('title', 'Product Discount - Perch Bottle')
 
 @section('content')
+<style>
+.desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.about-truncated { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+</style>
 <div class="product-page-content">
             <!-- Menu bar -->
             <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
@@ -149,7 +153,7 @@
                                         <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">-{{ $discount }}%</div>
                         @endif
                     @endif
-                                <div class="product-description text-secondary mt-3">{{ $product->description ?? $product->short_description ?? 'No description available.' }}</div>
+                                <div class="product-description text-secondary mt-3">{{ $product->short_description ?? ($product->description ? \Illuminate\Support\Str::limit($product->description, 150) : 'No description available.') }}</div>
                 </div>
                             <div class="list-action mt-6">
                                 <div class="discount-code">
@@ -324,23 +328,40 @@
                         </div>
                     </div>
                     <div class="desc-block mt-8">
-                        <div class="desc-item description" data-item="Description">
+                        <div class="desc-item description open" data-item="Description">
                             <div class="grid md:grid-cols-2 gap-8 gap-y-5">
                                 <div class="left">
-                                    <div class="heading6">Description</div>
-                                    <div class="text-secondary mt-2">
-                                        {{ $product->description ?? $product->short_description ?? 'No description available for this product.' }}
+                                    <div class="heading6">Detailed Description</div>
+                                    @php
+                                        $detailedText = $product->description ?: ($product->short_description ?: 'No detailed description has been added for this product.');
+                                    @endphp
+                                    <div class="desc-detail-wrapper">
+                                        <div class="text-secondary mt-2 whitespace-pre-line desc-detail-content {{ strlen(strip_tags($detailedText)) > 300 ? 'desc-truncated' : '' }}">
+                                            @if($product->description)
+                                                {!! nl2br(e($product->description)) !!}
+                                            @else
+                                                <span class="text-secondary2">{{ $product->short_description ?: 'No detailed description has been added for this product.' }}</span>
+                                            @endif
+                                        </div>
+                                        @if(strlen(strip_tags($detailedText)) > 300)
+                                            <button type="button" class="see-more-btn text-button text-black hover:underline mt-2 cursor-pointer font-semibold" data-target=".desc-detail-content">See more</button>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="right">
                                     <div class="heading6">About This Product</div>
                                     <div class="list-feature">
                                         @if($product->short_description)
-                                            <div class="item flex gap-1 text-secondary mt-1">
-                                                <i class="ph ph-dot text-2xl"></i>
-                                                <p>{{ $product->short_description }}</p>
-            </div>
-        @endif
+                                            <div class="item flex gap-1 text-secondary mt-1 about-short-wrap">
+                                                <i class="ph ph-dot text-2xl flex-shrink-0"></i>
+                                                <div>
+                                                    <p class="about-short-content {{ strlen($product->short_description) > 120 ? 'about-truncated' : '' }}">{{ $product->short_description }}</p>
+                                                    @if(strlen($product->short_description) > 120)
+                                                        <button type="button" class="see-more-btn text-button text-black hover:underline mt-1 cursor-pointer font-semibold text-sm" data-target=".about-short-content">See more</button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endif
                                         @if($product->category)
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
@@ -368,25 +389,35 @@
                                 </div>
                             </div>
                             <div class="grid lg:grid-cols-4 grid-cols-2 gap-[30px] md:mt-10 mt-6">
+                                @php
+                                    $f1Title = \App\Models\Setting::get('product_feature_1_title', 'Shipping Faster');
+                                    $f1Text = \App\Models\Setting::get('product_feature_1_text', 'Free shipping on orders over ₹75. Fast delivery across India.');
+                                    $f2Title = \App\Models\Setting::get('product_feature_2_title', 'Premium Material');
+                                    $f2Text = \App\Models\Setting::get('product_feature_2_text', 'Crafted from high-quality materials for durability and style.');
+                                    $f3Title = \App\Models\Setting::get('product_feature_3_title', 'High Quality');
+                                    $f3Text = \App\Models\Setting::get('product_feature_3_text', 'Built to last. Every product is designed for everyday excellence.');
+                                    $f4Title = \App\Models\Setting::get('product_feature_4_title', 'Highly Compatible');
+                                    $f4Text = \App\Models\Setting::get('product_feature_4_text', 'Works beautifully at home, work, travel, and for gifting.');
+                                @endphp
                                 <div class="item">
                                     <div class="icon-delivery-truck text-4xl"></div>
-                                    <div class="heading6 mt-4">Shipping Faster</div>
-                                    <div class="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                    <div class="heading6 mt-4">{{ $f1Title }}</div>
+                                    <div class="text-secondary mt-2">{{ $f1Text }}</div>
                                 </div>
                                 <div class="item">
                                     <div class="icon-cotton text-4xl"></div>
-                                    <div class="heading6 mt-4">Cotton Material</div>
-                                    <div class="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                    <div class="heading6 mt-4">{{ $f2Title }}</div>
+                                    <div class="text-secondary mt-2">{{ $f2Text }}</div>
                                 </div>
                                 <div class="item">
                                     <div class="icon-guarantee text-4xl"></div>
-                                    <div class="heading6 mt-4">High Quality</div>
-                                    <div class="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                    <div class="heading6 mt-4">{{ $f3Title }}</div>
+                                    <div class="text-secondary mt-2">{{ $f3Text }}</div>
                                 </div>
                                 <div class="item">
                                     <div class="icon-leaves-compatible text-4xl"></div>
-                                    <div class="heading6 mt-4">highly compatible</div>
-                                    <div class="text-secondary mt-2">Use on walls, furniture, doors and many more surfaces. The possibilities are endless.</div>
+                                    <div class="heading6 mt-4">{{ $f4Title }}</div>
+                                    <div class="text-secondary mt-2">{{ $f4Text }}</div>
                                 </div>
                             </div>
                         </div>
@@ -785,7 +816,26 @@
 </div>
 
 @section('scripts')
+<script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
+    // See more / See less for descriptions
+    document.querySelectorAll('.see-more-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var targetSel = this.getAttribute('data-target');
+            var target = this.closest('.desc-detail-wrapper, .about-short-wrap')?.querySelector(targetSel);
+            if (!target) return;
+            var isDesc = target.classList.contains('desc-detail-content');
+            var truncatedClass = isDesc ? 'desc-truncated' : 'about-truncated';
+            if (target.classList.contains(truncatedClass)) {
+                target.classList.remove(truncatedClass);
+                this.textContent = 'See less';
+            } else {
+                target.classList.add(truncatedClass);
+                this.textContent = 'See more';
+            }
+        });
+    });
+
     // Product detail page functionality
     (function() {
         'use strict';

@@ -51,18 +51,22 @@
                         <textarea class="form-control @error('short_description') is-invalid @enderror" 
                                   id="short_description" 
                                   name="short_description" 
-                                  rows="2">{{ old('short_description') }}</textarea>
+                                  rows="3" 
+                                  placeholder="Brief summary (shown in product cards and below price)">{{ old('short_description') }}</textarea>
+                        <small class="text-muted">Brief teaser text, max 500 characters. Shown in product listings and below price.</small>
                         @error('short_description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
+                        <label for="description" class="form-label">Detailed Description</label>
                         <textarea class="form-control @error('description') is-invalid @enderror" 
                                   id="description" 
                                   name="description" 
-                                  rows="4">{{ old('description') }}</textarea>
+                                  rows="8"
+                                  placeholder="Full product details (shown in Description tab)">{{ old('description') }}</textarea>
+                        <small class="text-muted">Full product description. Shown in the Description tab on the product page. Line breaks are preserved.</small>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
