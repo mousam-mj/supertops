@@ -69,8 +69,13 @@
                         <div class="heading3 text-center">About Perch</div>
                         <div class="heading4 text-center">Modern Lifestyle Brand for Everyday Essentials</div>
                         <div class="body1 text-center md:mt-7 mt-5">
-                            Perch is a modern lifestyle brand creating thoughtfully designed everyday essentials for work, home, travel, and everything in between. What started with premium insulated bottles has evolved into a growing collection across drinkware, barware, kitchenware, tiffin boxes, and utility essentials — with many more categories launching soon.
-                            Built for people who value design, functionality, and quality, Perch brings together products that look good, feel premium, and perform effortlessly in everyday life.
+                            @php $aboutContent = \App\Models\Setting::get('about_us'); @endphp
+                            @if($aboutContent)
+                                {!! nl2br(e($aboutContent)) !!}
+                            @else
+                                Perch is a modern lifestyle brand creating thoughtfully designed everyday essentials for work, home, travel, and everything in between. What started with premium insulated bottles has evolved into a growing collection across drinkware, barware, kitchenware, tiffin boxes, and utility essentials — with many more categories launching soon.
+                                Built for people who value design, functionality, and quality, Perch brings together products that look good, feel premium, and perform effortlessly in everyday life.
+                            @endif
                         </div>
                     </div>
                 </div>

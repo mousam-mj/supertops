@@ -475,6 +475,11 @@
                                 <i class="bi bi-people me-2"></i> Customers
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{{ route('admin.settings.index') }}}">
+                                <i class="bi bi-gear me-2"></i> Settings
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="position-absolute bottom-0 w-100 p-3">

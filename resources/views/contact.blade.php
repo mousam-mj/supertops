@@ -599,9 +599,18 @@
                     <div class="right lg:w-1/4 lg:pl-4">
                         <div class="item">
                             <div class="heading4">Our Store</div>
-                            <p class="mt-3">2163 Phillips Gap Rd, West Jefferson, North Carolina, United States</p>
-                            <p class="mt-3">Phone: <span class="whitespace-nowrap">+1 666 8888</span></p>
-                            <p class="mt-1">Email: <span class="whitespace-nowrap">hi.avitex@gmail.com</span></p>
+                            @php
+                                $addr = \App\Models\Setting::get('contact_address', '');
+                                $city = \App\Models\Setting::get('contact_city', '');
+                                $state = \App\Models\Setting::get('contact_state', '');
+                                $pincode = \App\Models\Setting::get('contact_pincode', '');
+                                $storeAddress = trim(implode(', ', array_filter([$addr, $city, $state, $pincode]))) ?: '2163 Phillips Gap Rd, West Jefferson, North Carolina, United States';
+                                $storePhone = \App\Models\Setting::get('contact_phone', '+1 666 8888');
+                                $storeEmail = \App\Models\Setting::get('contact_email', 'ecom@perchbottle.in');
+                            @endphp
+                            <p class="mt-3">{{ $storeAddress }}</p>
+                            <p class="mt-3">Phone: <span class="whitespace-nowrap">{{ $storePhone }}</span></p>
+                            <p class="mt-1">Email: <a href="mailto:{{ $storeEmail }}" class="whitespace-nowrap">{{ $storeEmail }}</a></p>
                         </div>
                         <div class="item mt-10">
                             <div class="heading4">Open Hours</div>

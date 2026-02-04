@@ -4,12 +4,17 @@
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
                 <div class="company-infor basis-1/4 max-lg:basis-full pr-7">
                     <a href="{{{ route('home') }}}" class="logo inline-block">
-                        <img src="{{ asset('assets/images/perch-logo.png') }}" alt="Perch Logo" />
+                        @php $footerLogo = \App\Models\Setting::get('site_logo'); @endphp
+                        <img src="{{ $footerLogo ? asset('storage/' . $footerLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" />
                     </a>
                     @php
-                        $footerEmail = \App\Models\Setting::get('email', 'info@perch.in');
-                        $footerPhone = \App\Models\Setting::get('phone', '91-9874563210');
-                        $footerAddress = \App\Models\Setting::get('address', 'Delhi India');
+                        $footerEmail = \App\Models\Setting::get('contact_email', 'ecom@perchbottle.in');
+                        $footerPhone = \App\Models\Setting::get('contact_phone', '');
+                        $addr = \App\Models\Setting::get('contact_address', '');
+                        $city = \App\Models\Setting::get('contact_city', '');
+                        $state = \App\Models\Setting::get('contact_state', '');
+                        $pincode = \App\Models\Setting::get('contact_pincode', '');
+                        $footerAddress = trim(implode(', ', array_filter([$addr, $city, $state, $pincode]))) ?: 'Delhi, India';
                     @endphp
                     <div class="flex gap-3 mt-3">
                         <div class="flex flex-col">
@@ -46,7 +51,7 @@
                             <div class="text-button-uppercase pb-3">Customer Services</div>
                             <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('faqs') }}}">FAQs </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Shipping </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Privacy Policy</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('privacy-policy') }}}">Privacy Policy</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}">Return & Refund</a>
                         </div>
                     </div>
@@ -63,28 +68,23 @@
                             </form>
                         </div>
                         <div class="list-social flex items-center gap-6 mt-4">
-                            <a href="https://www.facebook.com/" target="_blank">
-                                <div class="icon-facebook text-2xl text-black"></div>
-                            </a>
-                            <a href="https://www.instagram.com/" target="_blank">
-                                <div class="icon-instagram text-2xl text-black"></div>
-                            </a>
-                            <a href="https://www.twitter.com/" target="_blank">
-                                <div class="icon-twitter text-2xl text-black"></div>
-                            </a>
-                            <a href="https://www.youtube.com/" target="_blank">
-                                <div class="icon-youtube text-2xl text-black"></div>
-                            </a>
-                            <a href="https://www.pinterest.com/" target="_blank">
-                                <div class="icon-pinterest text-2xl text-black"></div>
-                            </a>
+                            @php $sfb = \App\Models\Setting::get('facebook_url'); @endphp
+                            @if($sfb)<a href="{{ $sfb }}" target="_blank"><div class="icon-facebook text-2xl text-black"></div></a>@endif
+                            @php $sig = \App\Models\Setting::get('instagram_url'); @endphp
+                            @if($sig)<a href="{{ $sig }}" target="_blank"><div class="icon-instagram text-2xl text-black"></div></a>@endif
+                            @php $stw = \App\Models\Setting::get('twitter_url'); @endphp
+                            @if($stw)<a href="{{ $stw }}" target="_blank"><div class="icon-twitter text-2xl text-black"></div></a>@endif
+                            @php $syt = \App\Models\Setting::get('youtube_url'); @endphp
+                            @if($syt)<a href="{{ $syt }}" target="_blank"><div class="icon-youtube text-2xl text-black"></div></a>@endif
+                            @php $spin = \App\Models\Setting::get('pinterest_url'); @endphp
+                            @if($spin)<a href="{{ $spin }}" target="_blank"><div class="icon-pinterest text-2xl text-black"></div></a>@endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom py-3 flex items-center justify-between gap-5 max-lg:justify-center max-lg:flex-col border-t border-line">
                 <div class="left flex items-center gap-8">
-                    <div class="copyright caption1 text-secondary">©2025 Perch. All Rights Reserved.</div>
+                    <div class="copyright caption1 text-secondary">{{ \App\Models\Setting::get('copyright_text', '©2025 Perch. All Rights Reserved.') ?: '©2025 Perch. All Rights Reserved.' }}</div>
                     <div class="select-block flex items-center gap-5 max-md:hidden">
                         <div class="choose-language flex items-center gap-1.5">
                             <select name="language" id="chooseLanguageFooter" class="caption2 bg-transparent">

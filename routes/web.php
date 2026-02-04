@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AddressController;
 
@@ -207,11 +208,14 @@ Route::get('/contact', function () {
 
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
     $validated = $request->validate([
-        'name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
+        'contact_number' => 'nullable|string|max:20',
+        'subject' => 'required|string|max:255',
         'message' => 'required|string|max:5000',
     ]);
-    
+
     // Here you can send an email or save to database
     // For now, just return success message
     return redirect()->route('contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
@@ -221,6 +225,11 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 Route::get('/faqs', function () {
     return view('faqs');
 })->name('faqs');
+
+// Privacy Policy Route
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
 
 // Newsletter Subscription Route
 Route::post('/newsletter/subscribe', function (\Illuminate\Http\Request $request) {
@@ -384,6 +393,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);
+
+        // Settings
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
         
         // Additional Admin Routes
         Route::get('/alerts', function() {

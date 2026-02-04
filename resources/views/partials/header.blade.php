@@ -25,23 +25,18 @@
                             <i class="ph ph-caret-down text-xs text-white"></i>
                         </div>
                     </div>
-                    <div class="text-center text-button-uppercase text-white flex items-center">Free shipping on all orders over ₹75</div>
+                    <div class="text-center text-button-uppercase text-white flex items-center">{{ \App\Models\Setting::get('free_shipping_text', 'FREE SHIPPING ON ALL ORDERS OVER ₹75') }}</div>
                     <div class="right-content flex items-center gap-5 max-md:hidden">
-                        <a href="https://www.facebook.com/" target="_blank">
-                            <i class="icon-facebook text-white"></i>
-                        </a>
-                        <a href="https://www.instagram.com/" target="_blank">
-                            <i class="icon-instagram text-white"></i>
-                        </a>
-                        <a href="https://www.youtube.com/" target="_blank">
-                            <i class="icon-youtube text-white"></i>
-                        </a>
-                        <a href="https://twitter.com/" target="_blank">
-                            <i class="icon-twitter text-white"></i>
-                        </a>
-                        <a href="https://pinterest.com/" target="_blank">
-                            <i class="icon-pinterest text-white"></i>
-                        </a>
+                        @php $fb = \App\Models\Setting::get('facebook_url'); @endphp
+                        @if($fb)<a href="{{ $fb }}" target="_blank"><i class="icon-facebook text-white"></i></a>@endif
+                        @php $ig = \App\Models\Setting::get('instagram_url'); @endphp
+                        @if($ig)<a href="{{ $ig }}" target="_blank"><i class="icon-instagram text-white"></i></a>@endif
+                        @php $yt = \App\Models\Setting::get('youtube_url'); @endphp
+                        @if($yt)<a href="{{ $yt }}" target="_blank"><i class="icon-youtube text-white"></i></a>@endif
+                        @php $tw = \App\Models\Setting::get('twitter_url'); @endphp
+                        @if($tw)<a href="{{ $tw }}" target="_blank"><i class="icon-twitter text-white"></i></a>@endif
+                        @php $pin = \App\Models\Setting::get('pinterest_url'); @endphp
+                        @if($pin)<a href="{{ $pin }}" target="_blank"><i class="icon-pinterest text-white"></i></a>@endif
                     </div>
                 </div>
             </div>
@@ -54,7 +49,8 @@
                         <div class="menu-mobile-icon  flex items-center">
                             <i class="icon-category text-2xl"></i>
                             <a href="{{{ route('home') }}}" class="flex items-center px-10">
-                                <img src="{{ asset('assets/images/perch-logo.png') }}" alt="bg-img" />
+                                @php $logo = \App\Models\Setting::get('site_logo'); @endphp
+                                <img src="{{ $logo ? asset('storage/' . $logo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-8 md:h-10 object-contain" />
                             </a>
                         </div>
                         

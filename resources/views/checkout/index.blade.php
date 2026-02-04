@@ -57,8 +57,8 @@
                 <div class="content-main flex max-lg:flex-col-reverse gap-y-10 justify-between">
                     <div class="left lg:w-1/2">
                         <div class="login bg-surface py-3 px-4 flex justify-between rounded-lg">
-                            <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><span class="text-button text-on-surface hover-underline cursor-pointer hover:underline">Login</span></div>
-                            <div class="right"><i class="ph ph-caret-down fs-20 cursor-pointer"></i></div>
+                            <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
+                            <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
                         </div>
                         <div class="form-login-block mt-3">
                             <form class="p-5 border border-line rounded-lg">
