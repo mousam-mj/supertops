@@ -106,6 +106,45 @@ class ProductController extends Controller
     }
 
     /**
+     * Get product by ID (for wishlist/add-to-wishlist)
+     */
+    public function showById(Request $request, $id)
+    {
+        $product = Product::where('id', (int) $id)
+            ->where('is_active', true)
+            ->with('category')
+            ->firstOrFail();
+
+        $baseUrl = rtrim($request->getSchemeAndHttpHost() ?: config('app.url'), '/');
+        $thumbImage = $product->image
+            ? (str_starts_with($product->image, 'http') ? $product->image : $baseUrl . '/storage/' . ltrim($product->image, '/'))
+            : $baseUrl . '/assets/images/product/perch-bottal.webp';
+        $images = $product->images && is_array($product->images) ? $product->images : [];
+        $thumbImages = array_map(function ($img) use ($baseUrl) {
+            return str_starts_with($img, 'http') ? $img : $baseUrl . '/storage/' . ltrim($img, '/');
+        }, array_merge([$thumbImage], $images));
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => (string) $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => number_format((float) $product->price, 2, '.', ''),
+                'originPrice' => $product->sale_price ? number_format((float) $product->price, 2, '.', '') : null,
+                'sale' => (bool) ($product->sale_price && $product->sale_price < $product->price),
+                'new' => (bool) $product->is_new_arrival,
+                'thumbImage' => $thumbImages,
+                'sold' => 0,
+                'quantity' => (int) ($product->stock_quantity ?? 100),
+                'sizes' => $product->sizes && is_array($product->sizes) ? $product->sizes : [],
+                'variation' => [],
+                'action' => 'quick shop',
+            ],
+        ]);
+    }
+
+    /**
      * Get product by slug
      */
     public function show($slug)

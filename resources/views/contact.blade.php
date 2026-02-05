@@ -3,7 +3,13 @@
 @section('title', 'Contact - Perch Bottle')
 
 @section('content')
-<div id="menu-mobile" class="">
+<style>
+    /* Contact - compact breadcrumb, same as checkout */
+    .contact-page-content .contact-breadcrumb { min-height: unset !important; }
+    .contact-page-content .contact-breadcrumb .breadcrumb-main { min-height: unset !important; }
+</style>
+<div class="page-content contact-page-content">
+    <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
                     <div class="container h-full">
                         <div class="menu-main h-full overflow-hidden">
@@ -555,16 +561,17 @@
                 </div>
             </div>
 
-            <div class="breadcrumb-block style-shared">
+            <!-- Compact breadcrumb - same as checkout -->
+            <div class="breadcrumb-block contact-breadcrumb">
                 <div class="breadcrumb-main bg-linear overflow-hidden">
-                    <div class="container lg:pt-[134px] pt-24 pb-10 relative">
-                        <div class="main-content w-full h-full flex flex-col items-center justify-center relative z-[1]">
+                    <div class="container py-4 relative">
+                        <div class="main-content w-full flex flex-col items-center justify-center relative z-[1]">
                             <div class="text-content">
                                 <div class="heading2 text-center">Contact Us</div>
-                                <div class="link flex items-center justify-center gap-1 caption1 mt-3">
+                                <div class="link flex items-center justify-center gap-1 caption1 mt-1">
                                     <a href="{{ route('home') }}">Homepage</a>
                                     <i class="ph ph-caret-right text-sm text-secondary2"></i>
-                                    <div class="text-secondary2 capitalize">Contact Us</div>
+                                    <span class="text-secondary2 capitalize">Contact Us</span>
                                 </div>
                             </div>
                         </div>
@@ -573,7 +580,8 @@
             </div>
         </div>
 
-        <div class="contact-us md:py-20 py-10">
+        <div class="contact-block md:py-6 py-4">
+            <div class="contact-us md:py-20 py-10">
             <div class="container">
                 <div class="flex justify-between max-lg:flex-col gap-y-10">
                     <div class="left lg:w-2/3 lg:pr-4">
@@ -623,7 +631,9 @@
             </div>
         </div>
 
-        <div class="map xl:h-[600px] sm:h-[500px] h-[450px] overflow-hidden">
-            <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1087.1466107534056!2d-81.49247136581288!3d36.40281150719292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8851ac9789084bdd%3A0x854168300ff0fb4b!2sDr%20Pepper.Grapette%20Bottling%20Co.!5e1!3m2!1svi!2s!4v1721783628866!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="map xl:h-[600px] sm:h-[500px] h-[450px] overflow-hidden">
+                <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1087.1466107534056!2d-81.49247136581288!3d36.40281150719292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8851ac9789084bdd%3A0x854168300ff0fb4b!2sDr%20Pepper.Grapette%20Bottling%20Co.!5e1!3m2!1svi!2s!4v1721783628866!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
         </div>
+</div>
 @endsection

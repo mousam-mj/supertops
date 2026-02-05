@@ -340,22 +340,43 @@ if (addWishlistBtns && addWishlistBtns.length > 0) {
   addWishlistBtns.forEach((addWishlistBtn) => {
     addWishlistBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      addWishlistBtn.classList.toggle("active");
+      const productId = addWishlistBtn.getAttribute("data-product-id");
+      let wishlistStore = localStorage.getItem("wishlistStore");
+      let items = wishlistStore ? JSON.parse(wishlistStore) : [];
+      if (!Array.isArray(items)) items = [];
+      const existingIndex = productId ? items.findIndex((item) => String(item.id) === String(productId)) : -1;
 
-      if (addWishlistBtn.classList.contains("active")) {
+      if (existingIndex > -1) {
+        items.splice(existingIndex, 1);
+        addWishlistBtn.classList.remove("active");
         const icon = addWishlistBtn.querySelector("i");
-        if (icon) {
-          icon.classList.remove("ph");
-          icon.classList.add("ph-fill");
-        }
-        openModalWishlist();
-      } else {
-        const icon = addWishlistBtn.querySelector("i");
-        if (icon) {
-          icon.classList.add("ph");
-          icon.classList.remove("ph-fill");
-        }
+        if (icon) { icon.classList.add("ph"); icon.classList.remove("ph-fill"); }
+        localStorage.setItem("wishlistStore", JSON.stringify(items));
+        handleItemModalWishlist();
+        if (typeof updateWishlistIcons === "function") updateWishlistIcons();
+        return;
       }
+      if (!productId) return;
+      addWishlistBtn.classList.add("active");
+      const icon = addWishlistBtn.querySelector("i");
+      if (icon) { icon.classList.remove("ph"); icon.classList.add("ph-fill"); }
+      const apiBase = window.location.origin + "/api";
+      fetch(apiBase + "/products/by-id/" + productId)
+        .then((r) => r.json())
+        .then((res) => {
+          if (res.success && res.data) {
+            const alreadyIn = items.some((item) => String(item.id) === String(res.data.id));
+            if (!alreadyIn) items.push(res.data);
+            localStorage.setItem("wishlistStore", JSON.stringify(items));
+            handleItemModalWishlist();
+            openModalWishlist();
+            if (typeof updateWishlistIcons === "function") updateWishlistIcons();
+          }
+        })
+        .catch(() => {
+          addWishlistBtn.classList.remove("active");
+          if (icon) { icon.classList.add("ph"); icon.classList.remove("ph-fill"); }
+        });
     });
   });
 }
@@ -418,19 +439,19 @@ const handleItemModalWishlist = () => {
         "border-b",
         "border-line"
       );
+      const modalImgSrc = (item.thumbImage && item.thumbImage[0]) ? item.thumbImage[0] : (typeof window.location !== 'undefined' ? window.location.origin : '') + '/assets/images/product/perch-bottal.webp';
+      const modalImgAlt = (item.name || 'product').replace(/'/g, '&#39;');
       prdItem.innerHTML = `
                 <div class="infor flex items-center gap-5">
                     <div class="bg-img">
-                        <img src=${item.thumbImage[0]} alt='product'
-                            class='w-[100px] aspect-square flex-shrink-0 rounded-lg' />
+                        <img src="${modalImgSrc}" alt="${modalImgAlt}"
+                            class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=(window.location.origin||'')+'/assets/images/product/perch-bottal.webp'" />
                     </div>
                     <div class=''>
-                        <div class="name text-button">${item.name}</div>
+                        <div class="name text-button">${item.name || 'Product'}</div>
                         <div class="flex items-center gap-2 mt-2">
-                            <div class="product-price text-title">₹${item.price}.00</div>
-                            <div class="product-origin-price text-title text-secondary2">
-                                <del>₹${item.originPrice}.00</del>
-                            </div>
+                            <div class="product-price text-title">₹${(item.price != null ? Number(item.price).toFixed(2) : '0.00')}</div>
+                            ${item.originPrice != null ? `<div class="product-origin-price text-title text-secondary2"><del>₹${Number(item.originPrice).toFixed(2)}</del></div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1937,6 +1958,7 @@ const createProductItem = (product) => {
 
   return productItem;
 };
+window.createProductItem = createProductItem;
 
 function addEventToProductItem(products) {
   // Product item
@@ -1945,10 +1967,16 @@ function addEventToProductItem(products) {
   if (productItems) {
     productItems.forEach((product) => {
       const productId = product.getAttribute("data-item");
-
-      product.addEventListener("click", () => {
-        window.location.href = `product-default.html?id=${productId}`;
-      });
+      const slug = product.getAttribute("data-slug");
+      const productMain = product.querySelector(".product-main");
+      if (productMain && !productMain._wishlistClickBound) {
+        productMain._wishlistClickBound = true;
+        productMain.addEventListener("click", (e) => {
+          if (e.target.closest(".remove-from-wishlist") || e.target.closest(".add-wishlist-btn") || e.target.closest(".compare-btn") || e.target.closest(".add-cart-btn") || e.target.closest(".quick-view-btn") || e.target.closest(".quick-shop-btn")) return;
+          if (slug) window.location.href = window.location.origin + "/product/" + slug;
+          else window.location.href = `product-default.html?id=${productId}`;
+        });
+      }
 
       const compareIcon = product.querySelector(".compare-btn");
       const addWishlistIcon = product.querySelector(".add-wishlist-btn");

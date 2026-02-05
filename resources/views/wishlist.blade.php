@@ -634,8 +634,190 @@
                         </div>
                     </div>
 
-                    <div class="list-product hide-product-sold grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7"></div>
+                    <div class="list-product hide-product-sold grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7" id="wishlist-product-list">
+                        {{-- Filled by JS from localStorage --}}
+                    </div>
+                    <div class="wishlist-empty hidden text-center py-16" id="wishlist-empty-state">
+                        <p class="text-title text-secondary2 mb-4">Your wishlist is empty.</p>
+                        <a href="{{ route('shop') }}" class="button-main inline-block">Continue Shopping</a>
+                    </div>
                 </div>
             </div>
         </div>
+@endsection
+
+@section('scripts')
+<script>
+(function() {
+    var listEl = document.getElementById('wishlist-product-list');
+    var emptyEl = document.getElementById('wishlist-empty-state');
+    if (!listEl) return;
+
+    var origin = (typeof window.location !== 'undefined' && window.location.origin) ? window.location.origin.replace(/\/$/, '') : '{{ url("") }}'.replace(/\/$/, '');
+    var baseUrl = origin;
+    var apiBase = origin + '/api';
+    var defaultImg = origin + '/assets/images/product/perch-bottal.webp';
+
+    function toAbsoluteImgUrl(url) {
+        if (!url) return defaultImg;
+        url = String(url).trim();
+        if (url.indexOf('http') === 0) return url;
+        if (url.indexOf('//') === 0) return (window.location.protocol || 'http:') + url;
+        if (url.indexOf('/') === 0) return origin + url;
+        return origin + '/storage/' + url.replace(/^\/+/, '');
+    }
+
+    function normalizeProduct(p) {
+        if (!p) return null;
+        var id = String(p.id);
+        var thumbImage = p.thumbImage;
+        if (!Array.isArray(thumbImage) || thumbImage.length === 0) {
+            var img = p.image || (p.images && p.images[0]);
+            thumbImage = [img ? toAbsoluteImgUrl(img) : defaultImg];
+        } else {
+            thumbImage = thumbImage.map(function(u) { return toAbsoluteImgUrl(u); });
+        }
+        return {
+            id: id,
+            name: p.name || 'Product',
+            slug: p.slug || '#',
+            price: p.price != null ? String(Number(p.price).toFixed(2)) : '0.00',
+            originPrice: p.originPrice != null ? String(Number(p.originPrice).toFixed(2)) : null,
+            sale: !!p.sale,
+            new: !!p.new,
+            thumbImage: thumbImage,
+            sold: parseInt(p.sold, 10) || 0,
+            quantity: parseInt(p.quantity, 10) || 100,
+            sizes: Array.isArray(p.sizes) ? p.sizes : [],
+            variation: Array.isArray(p.variation) ? p.variation : [],
+            action: p.action || 'quick shop'
+        };
+    }
+
+    function addRemoveHandler(el) {
+        var removeBtn = el.querySelector('.remove-from-wishlist');
+        if (!removeBtn) return;
+        removeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = el.getAttribute('data-item');
+            var raw = localStorage.getItem('wishlistStore');
+            var arr = raw ? JSON.parse(raw) : [];
+            arr = arr.filter(function(item) { return String(item.id) !== String(id); });
+            localStorage.setItem('wishlistStore', JSON.stringify(arr));
+            renderWishlist();
+            if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
+            if (typeof window.updateWishlistIcons === 'function') window.updateWishlistIcons();
+        });
+    }
+
+    function appendProduct(product) {
+        var id = product && (product.id != null) ? String(product.id) : null;
+        if (!id) return false;
+        if (listEl.querySelector('[data-item="' + id.replace(/"/g, '\\"') + '"]')) return false;
+        var el = null;
+        if (typeof window.createProductItem === 'function') {
+            try {
+                el = window.createProductItem(product);
+            } catch (err) { el = null; }
+        }
+        if (!el) {
+            var imgSrc = (Array.isArray(product.thumbImage) && product.thumbImage[0]) ? toAbsoluteImgUrl(product.thumbImage[0]) : defaultImg;
+            var productUrl = (product.slug && product.slug !== '#') ? (baseUrl + '/product/' + product.slug) : '#';
+            var priceHtml = product.originPrice ? '<span class="text-title">₹' + product.price + '</span> <del class="text-secondary2">₹' + product.originPrice + '</del>' : '<span class="text-title">₹' + product.price + '</span>';
+            el = document.createElement('div');
+            el.className = 'product-item grid-type';
+            el.setAttribute('data-item', product.id);
+            el.setAttribute('data-slug', product.slug || '');
+            el.setAttribute('data-wishlist-page', '1');
+            el.innerHTML = '<div class="product-main cursor-pointer block"><div class="product-thumb bg-white relative rounded-2xl overflow-hidden">' +
+                '<button type="button" class="remove-from-wishlist absolute top-3 left-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2">×</button>' +
+                '<a href="' + productUrl + '" class="product-img w-full block aspect-[3/4]"><img src="' + imgSrc + '" alt="' + (product.name || '').replace(/"/g, '&quot;') + '" class="w-full h-full object-cover" onerror="this.src=\'' + defaultImg + '\'" /></a></div>' +
+                '<div class="product-infor mt-4"><div class="product-name text-title duration-300">' + (product.name || 'Product') + '</div>' +
+                '<div class="flex items-center gap-2 mt-2">' + priceHtml + '</div></div></div>';
+        } else {
+            el.setAttribute('data-wishlist-page', '1');
+            el.setAttribute('data-slug', product.slug || '');
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-from-wishlist absolute top-3 left-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = 'Remove from wishlist';
+            var thumb = el.querySelector('.product-thumb');
+            if (thumb) thumb.appendChild(removeBtn);
+        }
+        addRemoveHandler(el);
+        listEl.appendChild(el);
+        return true;
+    }
+
+        function finish() {
+            if (typeof window.addEventToProductItem === 'function') window.addEventToProductItem();
+            if (listEl.children.length === 0) {
+                listEl.classList.add('hidden');
+                if (emptyEl) emptyEl.classList.remove('hidden');
+            }
+        }
+
+    function renderWishlist() {
+        var raw = localStorage.getItem('wishlistStore');
+        var items = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(items)) items = [];
+
+        var seenIds = {};
+        var uniqueItems = [];
+        items.forEach(function(p) {
+            var id = p && (p.id != null) ? String(p.id) : null;
+            if (id && !seenIds[id]) {
+                seenIds[id] = true;
+                uniqueItems.push(p);
+            }
+        });
+        if (uniqueItems.length !== items.length) {
+            localStorage.setItem('wishlistStore', JSON.stringify(uniqueItems));
+            if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
+        }
+
+        listEl.innerHTML = '';
+        listEl.classList.remove('hidden');
+        if (emptyEl) emptyEl.classList.add('hidden');
+
+        if (uniqueItems.length === 0) {
+            listEl.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
+            return;
+        }
+
+        var pending = uniqueItems.length;
+        uniqueItems.forEach(function(p) {
+            var id = p && (p.id != null) ? String(p.id) : null;
+            if (!id) { pending--; if (pending === 0) finish(); return; }
+            fetch(apiBase + '/products/by-id/' + encodeURIComponent(id), { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (res.success && res.data) appendProduct(normalizeProduct(res.data));
+                    pending--;
+                    if (pending === 0) finish();
+                })
+                .catch(function() {
+                    var norm = normalizeProduct(p);
+                    if (norm) appendProduct(norm);
+                    pending--;
+                    if (pending === 0) finish();
+                });
+        });
+    }
+
+    function run() {
+        renderWishlist();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+})();
+</script>
 @endsection

@@ -1,4 +1,4 @@
-<div id="top-nav" class="top-nav style-two bg-purple md:h-[44px] h-[30px]">
+<div id="top-nav" class="top-nav style-two bg-purple md:h-[44px] h-[30px]" style="position: relative !important; top: auto !important; bottom: auto !important; display: block !important; visibility: visible !important;">
             <div class="container mx-auto h-full">
                 <div class="top-nav-main flex justify-between max-md:justify-center h-full">
                     <div class="left-content flex items-center gap-5 max-md:hidden">

@@ -32,6 +32,24 @@
             visibility: visible;
             transform: translateY(0);
         }
+        /* Proper header order on all pages (Contact/Checkout same): purple bar top, then white nav */
+        .site-header {
+            display: block !important;
+            position: relative !important;
+            width: 100%;
+            z-index: 100;
+        }
+        .site-header #top-nav {
+            position: relative !important;
+            top: auto !important;
+            bottom: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        .site-header #header {
+            display: block !important;
+            visibility: visible !important;
+        }
     </style>
     </head>
 
@@ -63,7 +81,25 @@
         }, true);
     })();
     </script>
-    @include('partials.header')
+    {{-- Ensure purple top bar is always first (fix for checkout/contact same header) --}}
+    <script>
+    (function(){
+        function moveTopNavFirst() {
+            var topNav = document.getElementById('top-nav');
+            if (topNav && topNav.parentNode && document.body.firstChild) {
+                document.body.insertBefore(topNav, document.body.firstChild);
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', moveTopNavFirst);
+        } else {
+            moveTopNavFirst();
+        }
+    })();
+    </script>
+    <div class="site-header">
+        @include('partials.header')
+    </div>
     
     {{-- Session Messages --}}
     @if(session('success'))
