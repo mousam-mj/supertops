@@ -6,6 +6,10 @@
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
 .about-truncated { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.product-description-html p { margin-bottom: 0.5rem; }
+.product-description-html h5, .product-description-html h6 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; }
+.product-description-html ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.product-description-html a { text-decoration: underline; }
 </style>
 <div class="product-page-content">
             <!-- Menu bar -->
@@ -334,16 +338,21 @@
                                     <div class="heading6">Detailed Description</div>
                                     @php
                                         $detailedText = $product->description ?: ($product->short_description ?: 'No detailed description has been added for this product.');
+                                        $isHtml = $product->description && (str_contains($product->description, '<') && str_contains($product->description, '>'));
                                     @endphp
                                     <div class="desc-detail-wrapper">
-                                        <div class="text-secondary mt-2 whitespace-pre-line desc-detail-content {{ strlen(strip_tags($detailedText)) > 300 ? 'desc-truncated' : '' }}">
+                                        <div class="text-secondary mt-2 desc-detail-content {{ !$isHtml && strlen(strip_tags($detailedText)) > 300 ? 'desc-truncated' : '' }} @if($isHtml) product-description-html @endif">
                                             @if($product->description)
-                                                {!! nl2br(e($product->description)) !!}
+                                                @if($isHtml)
+                                                    {!! $product->description !!}
+                                                @else
+                                                    {!! nl2br(e($product->description)) !!}
+                                                @endif
                                             @else
                                                 <span class="text-secondary2">{{ $product->short_description ?: 'No detailed description has been added for this product.' }}</span>
                                             @endif
                                         </div>
-                                        @if(strlen(strip_tags($detailedText)) > 300)
+                                        @if(!$isHtml && strlen(strip_tags($detailedText)) > 300)
                                             <button type="button" class="see-more-btn text-button text-black hover:underline mt-2 cursor-pointer font-semibold" data-target=".desc-detail-content">See more</button>
                                         @endif
                                     </div>
@@ -383,6 +392,18 @@
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
                                                 <p>Currently Out of Stock</p>
+                                            </div>
+                                        @endif
+                                        @if($product->sizes && is_array($product->sizes) && count($product->sizes) > 0)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>Size: {{ implode(', ', $product->sizes) }}</p>
+                                            </div>
+                                        @endif
+                                        @if($product->colors && is_array($product->colors) && count($product->colors) > 0)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p>Colors: {{ implode(', ', $product->colors) }}</p>
                                             </div>
                                         @endif
                                     </div>
@@ -444,14 +465,18 @@
                                     <div class="text-title sm:w-1/4 w-1/3">Lining</div>
                                     <p>100% polyurethane</p>
                                 </div>
+                                @if($product->sizes && is_array($product->sizes) && count($product->sizes) > 0)
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Size</div>
-                                    <p>S, M, L, XL</p>
+                                    <p>{{ implode(', ', $product->sizes) }}</p>
                                 </div>
+                                @endif
+                                @if($product->colors && is_array($product->colors) && count($product->colors) > 0)
                                 <div class="item bg-surface flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Colors</div>
-                                    <p>Grey, Red, Blue, Black</p>
+                                    <p>{{ implode(', ', $product->colors) }}</p>
                                 </div>
+                                @endif
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Care</div>
                                     <div class="flex items-center gap-5">

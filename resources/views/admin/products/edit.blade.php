@@ -4,6 +4,7 @@
 @section('page-title', 'Edit Product: ' . $product->name)
 
 @section('content')
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -11,7 +12,7 @@
                 <h5 class="mb-0">Product Information</h5>
             </div>
             <div class="card-body">
-                <form action="{{{ route('admin.products.update', $product) }}}" method="POST" enctype="multipart/form-data">
+                <form id="product-edit-form" action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -62,15 +63,44 @@
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Detailed Description</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" 
+                        <div id="editor-description" class="bg-white border rounded" style="min-height: 220px;"></div>
+                        <textarea class="form-control @error('description') is-invalid @enderror d-none" 
                                   id="description" 
                                   name="description" 
-                                  rows="8"
-                                  placeholder="Full product details (shown in Description tab)">{{ old('description', $product->description) }}</textarea>
-                        <small class="text-muted">Full product description. Shown in the Description tab on the product page. Line breaks are preserved.</small>
+                                  rows="8">{{ old('description', $product->description) }}</textarea>
+                        <small class="text-muted">Full product description. Shown in the Description tab on the product page. Use the toolbar to format.</small>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="sizes" class="form-label">Sizes</label>
+                            <input type="text" 
+                                   class="form-control @error('sizes') is-invalid @enderror" 
+                                   id="sizes" 
+                                   name="sizes" 
+                                   value="{{ old('sizes', is_array($product->sizes) ? implode(', ', $product->sizes) : '') }}" 
+                                   placeholder="e.g. S, M, L, XL">
+                            <small class="text-muted">Comma-separated. Shown as options on the product page.</small>
+                            @error('sizes')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="colors" class="form-label">Colors</label>
+                            <input type="text" 
+                                   class="form-control @error('colors') is-invalid @enderror" 
+                                   id="colors" 
+                                   name="colors" 
+                                   value="{{ old('colors', is_array($product->colors) ? implode(', ', $product->colors) : '') }}" 
+                                   placeholder="e.g. Red, Blue, Black">
+                            <small class="text-muted">Comma-separated. Shown as options on the product page.</small>
+                            @error('colors')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="row">
@@ -303,7 +333,31 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var descTa = document.getElementById('description');
+        if (descTa && document.getElementById('editor-description')) {
+            var quill = new Quill('#editor-description', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [5, 6, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+            if (descTa.value) quill.clipboard.dangerouslyPasteHTML(descTa.value);
+            document.getElementById('product-edit-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                descTa.value = quill.root.innerHTML;
+                this.submit();
+            });
+        }
+    });
     function previewImage(input) {
         const preview = document.getElementById('imagePreview');
         const previewImg = document.getElementById('previewImg');

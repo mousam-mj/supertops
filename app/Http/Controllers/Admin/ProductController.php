@@ -77,7 +77,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|exists:categories,id',
             'price' => 'required|numeric|min:0',
@@ -93,9 +93,13 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'sizes' => 'nullable|string|max:500',
+            'colors' => 'nullable|string|max:500',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
+        $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
         
         // Ensure slug is unique
         $originalSlug = $validated['slug'];
@@ -159,7 +163,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|exists:categories,id',
             'price' => 'required|numeric|min:0',
@@ -175,7 +179,12 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'sizes' => 'nullable|string|max:500',
+            'colors' => 'nullable|string|max:500',
         ]);
+
+        $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
+        $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
 
         // Update slug if name changed
         if ($validated['name'] != $product->name) {

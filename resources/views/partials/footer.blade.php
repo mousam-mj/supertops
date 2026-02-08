@@ -10,6 +10,7 @@
                     @php
                         $footerEmail = \App\Models\Setting::get('contact_email', 'ecom@perchbottle.in');
                         $footerPhone = \App\Models\Setting::get('contact_phone', '');
+                        $footerHelpline = \App\Models\Setting::get('helpline_number', '');
                         $addr = \App\Models\Setting::get('contact_address', '');
                         $city = \App\Models\Setting::get('contact_city', '');
                         $state = \App\Models\Setting::get('contact_state', '');
@@ -20,11 +21,13 @@
                         <div class="flex flex-col">
                             <span class="text-button">Mail:</span>
                             <span class="text-button mt-3">Phone:</span>
+                            @if($footerHelpline)<span class="text-button mt-3">Helpline:</span>@endif
                             <span class="text-button mt-3">Address:</span>
                         </div>
                         <div class="flex flex-col">
                             <span>{{ $footerEmail }}</span>
                             <span class="mt-[14px]">{{ $footerPhone }}</span>
+                            @if($footerHelpline)<span class="mt-[14px]">{{ $footerHelpline }}</span>@endif
                             <span class="mt-3 pt-1">{{ $footerAddress }}</span>
                         </div>
                     </div>
@@ -33,7 +36,8 @@
                     <div class="list-nav flex justify-between basis-2/3 max-md:basis-full gap-4">
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Infomation</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('contact') }}}">Contact us </a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('about') }}">About Us</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('contact') }}">Contact us</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!"> Career </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('my-account') }}}"> My Account</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}"> Order & Returns</a>
@@ -49,10 +53,12 @@
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Customer Services</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('faqs') }}}">FAQs </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Shipping </a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('faqs') }}}">FAQs</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">Shipping</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('terms-and-conditions') }}}">Terms & Conditions</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('privacy-policy') }}}">Privacy Policy</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}">Return & Refund</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('return-and-refund') }}}">Return & Refund</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('cancellation-policy') }}}">Cancellation Policy</a>
                         </div>
                     </div>
                     <div class="newsletter basis-1/3 pl-7 max-md:basis-full max-md:pl-0">

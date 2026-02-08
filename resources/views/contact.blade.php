@@ -613,27 +613,37 @@
                                 $state = \App\Models\Setting::get('contact_state', '');
                                 $pincode = \App\Models\Setting::get('contact_pincode', '');
                                 $storeAddress = trim(implode(', ', array_filter([$addr, $city, $state, $pincode]))) ?: '2163 Phillips Gap Rd, West Jefferson, North Carolina, United States';
-                                $storePhone = \App\Models\Setting::get('contact_phone', '+1 666 8888');
+                                $storePhone = \App\Models\Setting::get('contact_phone', '');
                                 $storeEmail = \App\Models\Setting::get('contact_email', 'ecom@perchbottle.in');
+                                $helplineNumber = \App\Models\Setting::get('helpline_number', '');
+                                $workingHours = \App\Models\Setting::get('working_hours', '');
                             @endphp
                             <p class="mt-3">{{ $storeAddress }}</p>
-                            <p class="mt-3">Phone: <span class="whitespace-nowrap">{{ $storePhone }}</span></p>
+                            @if($storePhone)
+                                <p class="mt-3">Phone: <a href="tel:{{ preg_replace('/\s+/', '', $storePhone) }}" class="whitespace-nowrap">{{ $storePhone }}</a></p>
+                            @endif
+                            @if($helplineNumber)
+                                <p class="mt-1">Helpline: <a href="tel:{{ preg_replace('/\s+/', '', $helplineNumber) }}" class="whitespace-nowrap font-semibold">{{ $helplineNumber }}</a></p>
+                            @endif
                             <p class="mt-1">Email: <a href="mailto:{{ $storeEmail }}" class="whitespace-nowrap">{{ $storeEmail }}</a></p>
                         </div>
+                        @if($workingHours)
                         <div class="item mt-10">
-                            <div class="heading4">Open Hours</div>
-                            <p class="mt-3">Mon - Fri: <span class="whitespace-nowrap">7:30am - 8:00pm PST</span></p>
-                            <p class="mt-3">Saturday: <span class="whitespace-nowrap">8:00am - 6:00pm PST</span></p>
-                            <p class="mt-3">Sunday: <span class="whitespace-nowrap">9:00am - 5:00pm PST</span></p>
+                            <div class="heading4">Working Hours</div>
+                            <div class="mt-3 text-secondary whitespace-pre-line">{{ $workingHours }}</div>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
 
+            @php $mapEmbed = trim(\App\Models\Setting::get('map_embed', '')); @endphp
+            @if($mapEmbed)
             <div class="map xl:h-[600px] sm:h-[500px] h-[450px] overflow-hidden">
-                <iframe class="w-full h-full" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1087.1466107534056!2d-81.49247136581288!3d36.40281150719292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8851ac9789084bdd%3A0x854168300ff0fb4b!2sDr%20Pepper.Grapette%20Bottling%20Co.!5e1!3m2!1svi!2s!4v1721783628866!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                {!! $mapEmbed !!}
             </div>
+            @endif
         </div>
 </div>
 @endsection

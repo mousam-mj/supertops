@@ -3,6 +3,7 @@
 @section('title', 'Settings')
 
 @section('content')
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -10,7 +11,7 @@
                 <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Site Settings</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
@@ -18,7 +19,7 @@
                             <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button">General</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button">About & Policy</button>
+                            <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button">Content</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button">Social Media</button>
@@ -73,22 +74,32 @@
                                     <label class="form-label">Pincode</label>
                                     <input type="text" name="contact_pincode" class="form-control" value="{{ old('contact_pincode', $settings['contact_pincode'] ?? '') }}">
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Helpline Number</label>
+                                    <input type="text" name="helpline_number" class="form-control" value="{{ old('helpline_number', $settings['helpline_number'] ?? '') }}" placeholder="e.g. 1800-123-4567 or +91 9876543210">
+                                    <small class="text-muted">Shown on contact page and in footer.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Working Hours</label>
+                                    <textarea name="working_hours" class="form-control" rows="4" placeholder="Mon - Fri: 9:00am - 6:00pm&#10;Saturday: 10:00am - 4:00pm&#10;Sunday: Closed">{{ old('working_hours', $settings['working_hours'] ?? '') }}</textarea>
+                                    <small class="text-muted">One line per slot. Shown on contact page.</small>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Map Embed</label>
+                                    <textarea name="map_embed" class="form-control font-monospace" rows="5" placeholder="Paste Google Maps embed iframe code here (from Google Maps → Share → Embed a map)">{{ old('map_embed', $settings['map_embed'] ?? '') }}</textarea>
+                                    <small class="text-muted">Paste the full &lt;iframe&gt;...&lt;/iframe&gt; code from Google Maps. Leave empty to hide map on contact page.</small>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Content Tab (About Us, Privacy Policy) --}}
+                        {{-- Content Tab (Contact page text only; About Us & Policy pages are in Policy Pages) --}}
                         <div class="tab-pane fade" id="content" role="tabpanel">
-                            <div class="mb-4">
-                                <label class="form-label">About Us</label>
-                                <textarea name="about_us" class="form-control" rows="8" placeholder="About us page content...">{{ old('about_us', $settings['about_us'] ?? '') }}</textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label">Privacy Policy</label>
-                                <textarea name="privacy_policy" class="form-control" rows="12" placeholder="Privacy policy content...">{{ old('privacy_policy', $settings['privacy_policy'] ?? '') }}</textarea>
-                            </div>
+                            <p class="text-muted small mb-3">Edit About Us, Privacy Policy, Terms, Return & Refund, and Cancellation Policy from <a href="{{ route('admin.policy-pages.index') }}">Policy Pages</a>.</p>
                             <div class="mb-3">
                                 <label class="form-label">Contact Page Text</label>
-                                <textarea name="contact_page_text" class="form-control" rows="3" placeholder="We're Here To Help text...">{{ old('contact_page_text', $settings['contact_page_text'] ?? '') }}</textarea>
+                                <div id="editor-contact-page-text" class="bg-white border rounded" style="min-height: 120px;"></div>
+                                <textarea name="contact_page_text" id="settings-contact-page-text" class="d-none" rows="3">{{ old('contact_page_text', $settings['contact_page_text'] ?? '') }}</textarea>
+                                <small class="text-muted">Short text for the contact page (e.g. "We're Here To Help").</small>
                             </div>
                         </div>
 
@@ -187,3 +198,26 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var toolbar = [
+        [{ 'header': [5, 6, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link'],
+        ['clean']
+    ];
+    var contactText = new Quill('#editor-contact-page-text', { theme: 'snow', modules: { toolbar: toolbar } });
+    var taContact = document.getElementById('settings-contact-page-text');
+    if (taContact && taContact.value) contactText.clipboard.dangerouslyPasteHTML(taContact.value);
+    document.getElementById('settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        taContact.value = contactText.root.innerHTML;
+        this.submit();
+    });
+});
+</script>
+@endpush

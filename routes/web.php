@@ -8,7 +8,9 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\PolicyPageController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AddressController;
 
@@ -196,11 +198,6 @@ Route::get('/search/ajax', function () {
     return response()->view('partials.search-results', ['products' => $products, 'query' => $query]);
 })->name('search.ajax');
 
-// About Us Route
-Route::get('/about', function () {
-    return view('about');
-})->name('about');
-
 // Contact Route
 Route::get('/contact', function () {
     return view('contact');
@@ -226,10 +223,13 @@ Route::get('/faqs', function () {
     return view('faqs');
 })->name('faqs');
 
-// Privacy Policy Route
-Route::get('/privacy-policy', function () {
-    return view('privacy-policy');
-})->name('privacy-policy');
+// Policy & content pages (About Us, Terms, Privacy, Return & Refund, Cancellation) - dynamic from admin
+Route::get('/about', [PolicyPageController::class, 'show'])->defaults('slug', 'about-us')->name('about');
+Route::get('/about-us', [PolicyPageController::class, 'show'])->defaults('slug', 'about-us')->name('about-us');
+Route::get('/terms-and-conditions', [PolicyPageController::class, 'show'])->defaults('slug', 'terms-and-conditions')->name('terms-and-conditions');
+Route::get('/privacy-policy', [PolicyPageController::class, 'show'])->defaults('slug', 'privacy-policy')->name('privacy-policy');
+Route::get('/return-and-refund', [PolicyPageController::class, 'show'])->defaults('slug', 'return-and-refund')->name('return-and-refund');
+Route::get('/cancellation-policy', [PolicyPageController::class, 'show'])->defaults('slug', 'cancellation-policy')->name('cancellation-policy');
 
 // Newsletter Subscription Route
 Route::post('/newsletter/subscribe', function (\Illuminate\Http\Request $request) {
@@ -397,6 +397,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Settings
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+        // Policy Pages (Terms, Privacy, Return & Refund, Cancellation)
+        Route::get('/policy-pages', [AdminPolicyPageController::class, 'index'])->name('policy-pages.index');
+        Route::get('/policy-pages/{policy_page}/edit', [AdminPolicyPageController::class, 'edit'])->name('policy-pages.edit');
+        Route::put('/policy-pages/{policy_page}', [AdminPolicyPageController::class, 'update'])->name('policy-pages.update');
         
         // Additional Admin Routes
         Route::get('/alerts', function() {
