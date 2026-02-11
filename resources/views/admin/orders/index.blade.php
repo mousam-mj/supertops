@@ -88,7 +88,7 @@
                                     <td><strong>{{ $order->order_number }}</strong></td>
                                     <td>{{ $order->user ? $order->user->name : ($order->customer_name ?? 'Guest') }}</td>
                                     <td>{{ $order->user ? $order->user->email : ($order->customer_email ?? 'N/A') }}</td>
-                                    <td><strong>${{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</strong></td>
+                                    <td><strong>{{ currency($order->total_amount ?? $order->total ?? 0) }}</strong></td>
                                     <td>
                                         <span class="badge bg-{{ $order->status_badge_class }}">
                                             {{ ucfirst($order->status) }}

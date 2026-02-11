@@ -102,11 +102,49 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Specifications</label>
+                        <div id="specifications-container">
+                            @php
+                                $specs = old('specifications', [['key' => '', 'value' => '']]);
+                            @endphp
+                            @foreach($specs as $idx => $spec)
+                                <div class="spec-row mb-2 d-flex gap-2 align-items-start" data-index="{{ $idx }}">
+                                    <div class="flex-grow-1">
+                                        <input type="text" 
+                                               name="specifications[{{ $idx }}][key]" 
+                                               class="form-control form-control-sm" 
+                                               placeholder="Key (e.g. Brand, Capacity, Material)" 
+                                               value="{{ $spec['key'] ?? '' }}">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <input type="text" 
+                                               name="specifications[{{ $idx }}][value]" 
+                                               class="form-control form-control-sm" 
+                                               placeholder="Value (e.g. Perch, 1000ml, Stainless Steel)" 
+                                               value="{{ $spec['value'] ?? '' }}">
+                                    </div>
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-success add-spec-btn" title="Add">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                        @if($idx > 0)
+                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <small class="text-muted">Add product specifications like Brand, Capacity, Material, etc. Click + to add more.</small>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text">{{ currency_symbol() }}</span>
                                 <input type="number" 
                                        class="form-control @error('price') is-invalid @enderror" 
                                        id="price" 
@@ -124,7 +162,7 @@
                         <div class="col-md-4 mb-3">
                             <label for="sale_price" class="form-label">Sale Price</label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text">{{ currency_symbol() }}</span>
                                 <input type="number" 
                                        class="form-control @error('sale_price') is-invalid @enderror" 
                                        id="sale_price" 
@@ -197,13 +235,18 @@
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label for="gallery_images" class="form-label">Gallery Images</label>
-                            <input type="file"
-                                   class="form-control @error('gallery_images') is-invalid @enderror @error('gallery_images.*') is-invalid @enderror"
-                                   id="gallery_images"
-                                   name="gallery_images[]"
-                                   accept="image/*"
-                                   multiple>
+                            <label class="form-label">Gallery Images</label>
+                            <div id="new-gallery-images" class="mb-2 d-flex flex-wrap gap-2"></div>
+                            <div class="d-flex gap-2">
+                                <input type="file"
+                                       class="form-control @error('gallery_images') is-invalid @enderror @error('gallery_images.*') is-invalid @enderror"
+                                       id="gallery_image_single"
+                                       accept="image/*">
+                                <button type="button" class="btn btn-sm btn-success" id="add-gallery-image-btn">
+                                    <i class="bi bi-plus me-1"></i>Add Image
+                                </button>
+                            </div>
+                            <input type="file" name="gallery_images[]" id="gallery_images_hidden" multiple accept="image/*" style="display: none;">
                             @error('gallery_images')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -321,6 +364,63 @@
                 e.preventDefault();
                 descTa.value = quill.root.innerHTML;
                 this.submit();
+            });
+        }
+
+        var specIndex = {{ count(old('specifications', [['key' => '', 'value' => '']])) }};
+        var specContainer = document.getElementById('specifications-container');
+        if (specContainer) {
+            specContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.add-spec-btn')) {
+                    var row = e.target.closest('.spec-row').cloneNode(true);
+                    var idx = specIndex++;
+                    row.setAttribute('data-index', idx);
+                    row.querySelector('input[name*="[key]"]').setAttribute('name', 'specifications[' + idx + '][key]');
+                    row.querySelector('input[name*="[value]"]').setAttribute('name', 'specifications[' + idx + '][value]');
+                    row.querySelector('input[name*="[key]"]').value = '';
+                    row.querySelector('input[name*="[value]"]').value = '';
+                    var removeBtn = row.querySelector('.remove-spec-btn');
+                    if (removeBtn) removeBtn.style.display = 'inline-block';
+                    specContainer.appendChild(row);
+                } else if (e.target.closest('.remove-spec-btn')) {
+                    e.target.closest('.spec-row').remove();
+                }
+            });
+        }
+
+        var gallerySingleInput = document.getElementById('gallery_image_single');
+        var galleryHiddenInput = document.getElementById('gallery_images_hidden');
+        var newGalleryContainer = document.getElementById('new-gallery-images');
+        var addGalleryBtn = document.getElementById('add-gallery-image-btn');
+        var fileList = [];
+        if (gallerySingleInput && addGalleryBtn) {
+            addGalleryBtn.addEventListener('click', function() {
+                gallerySingleInput.click();
+            });
+            gallerySingleInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    var file = e.target.files[0];
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        var div = document.createElement('div');
+                        div.className = 'position-relative d-inline-block gallery-thumb-wrap';
+                        div.innerHTML = '<img src="' + event.target.result + '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 2px solid #e2e8f0;"><button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle remove-new-gallery-btn" style="width: 24px; height: 24px; padding: 0; font-size: 12px;"><i class="bi bi-x"></i></button>';
+                        div.querySelector('.remove-new-gallery-btn').addEventListener('click', function() {
+                            var dataTransfer = new DataTransfer();
+                            fileList = fileList.filter(function(f) { return f !== file; });
+                            fileList.forEach(function(f) { dataTransfer.items.add(f); });
+                            galleryHiddenInput.files = dataTransfer.files;
+                            div.remove();
+                        });
+                        newGalleryContainer.appendChild(div);
+                        fileList.push(file);
+                        var dataTransfer = new DataTransfer();
+                        fileList.forEach(function(f) { dataTransfer.items.add(f); });
+                        galleryHiddenInput.files = dataTransfer.files;
+                        gallerySingleInput.value = '';
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
     });

@@ -66,7 +66,7 @@
                                                 <span class="badge bg-success">{{ $stock }}</span>
                                             @endif
                                         </td>
-                                        <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
+                                        <td>{{ currency($product->sale_price ?? $product->price ?? 0) }}</td>
                                         <td>
                                             @if($product->is_active)
                                                 <span class="badge bg-success">Active</span>

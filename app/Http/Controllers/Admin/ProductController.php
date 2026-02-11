@@ -95,11 +95,25 @@ class ProductController extends Controller
             'sort_order' => 'nullable|integer|min:0',
             'sizes' => 'nullable|string|max:500',
             'colors' => 'nullable|string|max:500',
+            'specifications' => 'nullable|array',
+            'specifications.*.key' => 'nullable|string|max:255',
+            'specifications.*.value' => 'nullable|string|max:500',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
         $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
+        
+        // Process specifications
+        $specifications = [];
+        if ($request->has('specifications') && is_array($request->specifications)) {
+            foreach ($request->specifications as $spec) {
+                if (!empty($spec['key']) && !empty($spec['value'])) {
+                    $specifications[trim($spec['key'])] = trim($spec['value']);
+                }
+            }
+        }
+        $validated['specifications'] = !empty($specifications) ? $specifications : null;
         
         // Ensure slug is unique
         $originalSlug = $validated['slug'];
@@ -181,10 +195,24 @@ class ProductController extends Controller
             'sort_order' => 'nullable|integer|min:0',
             'sizes' => 'nullable|string|max:500',
             'colors' => 'nullable|string|max:500',
+            'specifications' => 'nullable|array',
+            'specifications.*.key' => 'nullable|string|max:255',
+            'specifications.*.value' => 'nullable|string|max:500',
         ]);
 
         $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
         $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
+        
+        // Process specifications
+        $specifications = [];
+        if ($request->has('specifications') && is_array($request->specifications)) {
+            foreach ($request->specifications as $spec) {
+                if (!empty($spec['key']) && !empty($spec['value'])) {
+                    $specifications[trim($spec['key'])] = trim($spec['value']);
+                }
+            }
+        }
+        $validated['specifications'] = !empty($specifications) ? $specifications : null;
 
         // Update slug if name changed
         if ($validated['name'] != $product->name) {

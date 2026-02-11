@@ -30,6 +30,7 @@ class Product extends Model
         'video',
         'sizes',
         'colors',
+        'specifications',
         'product_type',
         'sort_order',
     ];
@@ -46,6 +47,7 @@ class Product extends Model
         'images' => 'array',
         'sizes' => 'array',
         'colors' => 'array',
+        'specifications' => 'array',
         'sort_order' => 'integer',
     ];
 

@@ -50,11 +50,11 @@
                         <th>Price</th>
                         <td>
                             @if($product->sale_price)
-                                <span class="text-decoration-line-through text-muted">${{ number_format($product->price, 2) }}</span>
-                                <strong class="text-danger ms-2">${{ number_format($product->sale_price, 2) }}</strong>
+                                <span class="text-decoration-line-through text-muted">{{ currency($product->price) }}</span>
+                                <strong class="text-danger ms-2">{{ currency($product->sale_price) }}</strong>
                                 <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
                             @else
-                                <strong>${{ number_format($product->price, 2) }}</strong>
+                                <strong>{{ currency($product->price) }}</strong>
                             @endif
                         </td>
                     </tr>

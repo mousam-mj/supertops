@@ -23,6 +23,8 @@ class SettingsController extends Controller
             'helpline_number',
             'working_hours',
             'map_embed',
+            'currency',
+            'currency_symbol',
         ],
         'content' => [
             'contact_page_text',
@@ -74,6 +76,8 @@ class SettingsController extends Controller
             'helpline_number' => 'nullable|string|max:50',
             'working_hours' => 'nullable|string|max:1000',
             'map_embed' => 'nullable|string|max:3000',
+            'currency' => 'nullable|string|max:10',
+            'currency_symbol' => 'nullable|string|max:10',
             'contact_page_text' => 'nullable|string|max:2000',
             'facebook_url' => 'nullable|string|max:500',
             'instagram_url' => 'nullable|string|max:500',

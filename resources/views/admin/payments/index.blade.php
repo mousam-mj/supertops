@@ -23,7 +23,7 @@
         <div class="card border-success">
             <div class="card-body text-center">
                 <h5 class="text-success">Total Revenue</h5>
-                <h3 class="mb-0">₹{{ number_format($payments->sum('total_amount') ?? $payments->sum('total') ?? 0, 2) }}</h3>
+                <h3 class="mb-0">{{ currency($payments->sum('total_amount') ?? $payments->sum('total') ?? 0) }}</h3>
             </div>
         </div>
     </div>
@@ -39,7 +39,7 @@
         <div class="card border-primary">
             <div class="card-body text-center">
                 <h5 class="text-primary">This Month</h5>
-                <h3 class="mb-0">₹{{ number_format(\App\Models\Order::where('payment_status', 'paid')->whereMonth('created_at', now()->month)->sum(\Illuminate\Support\Facades\DB::raw('COALESCE(total_amount, total, 0)')) ?? 0, 2) }}</h3>
+                <h3 class="mb-0">{{ currency(\App\Models\Order::where('payment_status', 'paid')->whereMonth('created_at', now()->month)->sum(\Illuminate\Support\Facades\DB::raw('COALESCE(total_amount, total, 0)')) ?? 0) }}</h3>
             </div>
         </div>
     </div>
@@ -47,7 +47,7 @@
         <div class="card border-warning">
             <div class="card-body text-center">
                 <h5 class="text-warning">Today</h5>
-                <h3 class="mb-0">₹{{ number_format(\App\Models\Order::where('payment_status', 'paid')->whereDate('created_at', today())->sum(\Illuminate\Support\Facades\DB::raw('COALESCE(total_amount, total, 0)')) ?? 0, 2) }}</h3>
+                <h3 class="mb-0">{{ currency(\App\Models\Order::where('payment_status', 'paid')->whereDate('created_at', today())->sum(\Illuminate\Support\Facades\DB::raw('COALESCE(total_amount, total, 0)')) ?? 0) }}</h3>
             </div>
         </div>
     </div>
@@ -88,7 +88,7 @@
                                                 <span class="badge bg-secondary">{{ ucfirst($payment->payment_method ?? 'N/A') }}</span>
                                             @endif
                                         </td>
-                                        <td class="fw-semibold">₹{{ number_format($payment->total_amount ?? $payment->total ?? 0, 2) }}</td>
+                                        <td class="fw-semibold">{{ currency($payment->total_amount ?? $payment->total ?? 0) }}</td>
                                         <td>
                                             @if($payment->razorpay_payment_id)
                                                 <code class="small">{{ substr($payment->razorpay_payment_id, 0, 20) }}...</code>

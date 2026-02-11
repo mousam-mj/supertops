@@ -52,7 +52,7 @@
                                         <td>
                                             <span class="badge bg-danger">{{ $product->stock_quantity ?? 0 }}</span>
                                         </td>
-                                        <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
+                                        <td>{{ currency($product->sale_price ?? $product->price ?? 0) }}</td>
                                         <td>{{ $product->category->name ?? 'N/A' }}</td>
                                         <td>
                                             <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">
@@ -110,7 +110,7 @@
                                             <a href="{{{ route('admin.orders.show', $order) }}}">{{ $order->order_number ?? 'N/A' }}</a>
                                         </td>
                                         <td>{{ $order->customer_name ?? 'Guest' }}</td>
-                                        <td>₹{{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</td>
+                                        <td>{{ currency($order->total_amount ?? $order->total ?? 0) }}</td>
                                         <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
                                         <td>
                                             <a href="{{{ route('admin.orders.show', $order) }}}" class="btn btn-sm btn-outline-primary">
@@ -171,7 +171,7 @@
                                         <td>
                                             <span class="badge bg-danger">Out of Stock</span>
                                         </td>
-                                        <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
+                                        <td>{{ currency($product->sale_price ?? $product->price ?? 0) }}</td>
                                         <td>{{ $product->category->name ?? 'N/A' }}</td>
                                         <td>
                                             <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">

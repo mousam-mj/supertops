@@ -267,6 +267,19 @@
                                             </div>
                         </div>
                     @endif
+                                    @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
+                                        <div class="product-specifications mt-4 pt-4 border-t border-line">
+                                            <div class="text-title mb-3">Specifications:</div>
+                                            <div class="space-y-2">
+                                                @foreach($product->specifications as $key => $value)
+                                                <div class="flex items-start gap-2">
+                                                    <div class="text-title flex-shrink-0 min-w-[120px]">{{ $key }}:</div>
+                                                    <div class="text-secondary">{{ $value }}</div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
                 </div>
                                 <div class="list-payment mt-7">
                                     <div class="main-content lg:pt-8 pt-6 lg:pb-6 pb-4 sm:px-4 px-3 border border-line rounded-xl relative max-md:w-2/3 max-sm:w-full">
@@ -406,6 +419,14 @@
                                                 <p>Colors: {{ implode(', ', $product->colors) }}</p>
                                             </div>
                                         @endif
+                                        @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
+                                            @foreach($product->specifications as $key => $value)
+                                            <div class="item flex gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl"></i>
+                                                <p><strong>{{ $key }}:</strong> {{ $value }}</p>
+                                            </div>
+                                            @endforeach
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -476,6 +497,16 @@
                                     <div class="text-title sm:w-1/4 w-1/3">Colors</div>
                                     <p>{{ implode(', ', $product->colors) }}</p>
                                 </div>
+                                @endif
+                                @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
+                                    @php $specIndex = 0; @endphp
+                                    @foreach($product->specifications as $key => $value)
+                                    <div class="item {{ $specIndex % 2 == 0 ? '' : 'bg-surface' }} flex items-center gap-8 py-3 px-10">
+                                        <div class="text-title sm:w-1/4 w-1/3">{{ $key }}</div>
+                                        <p>{{ $value }}</p>
+                                    </div>
+                                    @php $specIndex++; @endphp
+                                    @endforeach
                                 @endif
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Care</div>

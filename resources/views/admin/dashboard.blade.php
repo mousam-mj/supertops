@@ -50,7 +50,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-white-50 small mb-1">Total sales</div>
-                        <h3 class="mb-0 fw-bold">₹{{ number_format($stats['total_revenue'], 0) }}</h3>
+                        <h3 class="mb-0 fw-bold">{{ currency($stats['total_revenue'], 0) }}</h3>
                     </div>
                     <div style="font-size: 2.5rem; opacity: 0.3;">
                         <i class="bi bi-currency-dollar"></i>
@@ -231,7 +231,7 @@
                                 <tr>
                                     <td><a href="{{{ route('admin.orders.show', $order) }}}">{{ $order->order_number ?? 'N/A' }}</a></td>
                                     <td>{{ $order->customer_name ?? 'Guest' }}</td>
-                                    <td>₹{{ number_format($order->total_amount ?? $order->total ?? 0, 2) }}</td>
+                                    <td>{{ currency($order->total_amount ?? $order->total ?? 0) }}</td>
                                     <td><span class="badge bg-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'pending' ? 'warning' : 'info') }}">{{ ucfirst($order->status ?? 'Pending') }}</span></td>
                                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                                 </tr>
@@ -268,7 +268,7 @@
                                 @foreach($top_products as $product)
                                 <tr>
                                     <td><a href="{{{ route('admin.products.show', $product) }}}">{{ $product->name }}</a></td>
-                                    <td>₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</td>
+                                    <td>{{ currency($product->sale_price ?? $product->price ?? 0) }}</td>
                                     <td>{{ $product->stock_quantity ?? 0 }}</td>
                                     <td>
                                         @if($product->is_active)

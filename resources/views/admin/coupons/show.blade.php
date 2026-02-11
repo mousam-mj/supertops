@@ -59,7 +59,7 @@
                             @if($coupon->discount_type == 'percentage')
                                 {{ $coupon->discount_value }}%
                             @else
-                                ₹{{ number_format($coupon->discount_value, 2) }}
+                                {{ currency($coupon->discount_value) }}
                             @endif
                         </td>
                     </tr>
@@ -67,7 +67,7 @@
                         <th>Minimum Order:</th>
                         <td>
                             @if($coupon->minimum_order_amount)
-                                ₹{{ number_format($coupon->minimum_order_amount, 2) }}
+                                {{ currency($coupon->minimum_order_amount) }}
                             @else
                                 <span class="text-muted">No minimum</span>
                             @endif

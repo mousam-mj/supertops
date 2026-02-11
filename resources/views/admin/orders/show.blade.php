@@ -118,8 +118,8 @@
                                     <td>{{ $item->product_name }}</td>
                                     <td>{{ $item->product_sku ?? '—' }}</td>
                                     <td>{{ $item->quantity }}</td>
-                                    <td>${{ number_format($item->price, 2) }}</td>
-                                    <td><strong>${{ number_format($item->total, 2) }}</strong></td>
+                                    <td>{{ currency($item->price) }}</td>
+                                    <td><strong>{{ currency($item->total) }}</strong></td>
                                 </tr>
                             @endforeach
                         </tbody>

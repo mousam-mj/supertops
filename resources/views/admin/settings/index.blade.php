@@ -89,6 +89,16 @@
                                     <textarea name="map_embed" class="form-control font-monospace" rows="5" placeholder="Paste Google Maps embed iframe code here (from Google Maps → Share → Embed a map)">{{ old('map_embed', $settings['map_embed'] ?? '') }}</textarea>
                                     <small class="text-muted">Paste the full &lt;iframe&gt;...&lt;/iframe&gt; code from Google Maps. Leave empty to hide map on contact page.</small>
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Currency Code</label>
+                                    <input type="text" name="currency" class="form-control" value="{{ old('currency', $settings['currency'] ?? 'INR') }}" placeholder="INR">
+                                    <small class="text-muted">Currency code (e.g., INR, USD, EUR)</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Currency Symbol</label>
+                                    <input type="text" name="currency_symbol" class="form-control" value="{{ old('currency_symbol', $settings['currency_symbol'] ?? '₹') }}" placeholder="₹">
+                                    <small class="text-muted">Currency symbol (e.g., ₹, $, €)</small>
+                                </div>
                             </div>
                         </div>
 

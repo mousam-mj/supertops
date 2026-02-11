@@ -15,11 +15,12 @@
                         </div>
                         <div class="choose-type choose-currency flex items-center gap-1.5">
                             <div class="select relative">
-                                <p class="selected caption2 text-white">USD</p>
+                                <p class="selected caption2 text-white">{{ \App\Models\Setting::get('currency', 'INR') }}</p>
                                 <ul class="list-option bg-white">
-                                    <li data-item="USD" class="caption2 active">USD</li>
-                                    <li data-item="EUR" class="caption2">EUR</li>
-                                    <li data-item="GBP" class="caption2">GBP</li>
+                                    <li data-item="INR" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'INR' ? 'active' : '' }}">INR</li>
+                                    <li data-item="USD" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'USD' ? 'active' : '' }}">USD</li>
+                                    <li data-item="EUR" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'EUR' ? 'active' : '' }}">EUR</li>
+                                    <li data-item="GBP" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'GBP' ? 'active' : '' }}">GBP</li>
                                 </ul>
                             </div>
                             <i class="ph ph-caret-down text-xs text-white"></i>
