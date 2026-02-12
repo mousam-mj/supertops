@@ -128,11 +128,9 @@
                                         <button type="button" class="btn btn-sm btn-success add-spec-btn" title="Add">
                                             <i class="bi bi-plus"></i>
                                         </button>
-                                        @if($idx > 0)
-                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove">
+                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove" {{ count($specs) <= 1 ? 'style="display:none;"' : '' }}>
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -369,6 +367,17 @@
 
         var specIndex = {{ count(old('specifications', [['key' => '', 'value' => '']])) }};
         var specContainer = document.getElementById('specifications-container');
+        
+        function updateRemoveButtons() {
+            var rows = specContainer.querySelectorAll('.spec-row');
+            rows.forEach(function(btn) {
+                var removeBtn = btn.querySelector('.remove-spec-btn');
+                if (removeBtn) {
+                    removeBtn.style.display = rows.length > 1 ? 'inline-block' : 'none';
+                }
+            });
+        }
+        
         if (specContainer) {
             specContainer.addEventListener('click', function(e) {
                 if (e.target.closest('.add-spec-btn')) {
@@ -379,13 +388,14 @@
                     row.querySelector('input[name*="[value]"]').setAttribute('name', 'specifications[' + idx + '][value]');
                     row.querySelector('input[name*="[key]"]').value = '';
                     row.querySelector('input[name*="[value]"]').value = '';
-                    var removeBtn = row.querySelector('.remove-spec-btn');
-                    if (removeBtn) removeBtn.style.display = 'inline-block';
                     specContainer.appendChild(row);
+                    updateRemoveButtons();
                 } else if (e.target.closest('.remove-spec-btn')) {
                     e.target.closest('.spec-row').remove();
+                    updateRemoveButtons();
                 }
             });
+            updateRemoveButtons();
         }
 
         var gallerySingleInput = document.getElementById('gallery_image_single');
