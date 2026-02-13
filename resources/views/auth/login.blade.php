@@ -623,7 +623,7 @@
                                 <a href="{{ route('forgot-password') }}" class="font-semibold hover:underline">Forgot Your Password? </a>
                             </div>
                             <div class="block-button md:mt-7 mt-4">
-                                <button type="submit" class="button-main bg-white text-black border border-black w-full text-center block">Login</button>
+                                <button type="submit" class="button-main text-white border-0 w-full text-center block" style="background-color: #B09FE6; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#9B8AD0'" onmouseout="this.style.backgroundColor='#B09FE6'">Login</button>
                             </div>
                             <div class="block-button mt-3">
                                 <a href="{{ route('admin.login') }}" class="button-main bg-white text-black border border-black w-full text-center block">Admin Login</a>
@@ -635,7 +635,7 @@
                             <div class="heading4">New Customer</div>
                             <div class="mt-2 text-secondary">Be part of our growing family of new customers! Join us today and unlock a world of exclusive benefits, offers, and personalized experiences.</div>
                             <div class="block-button md:mt-7 mt-4">
-                                <a href="{{ route('register') }}" class="button-main">Register</a>
+                                <a href="{{ route('register') }}" class="button-main" style="background-color: #B09FE6; border: none; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#9B8AD0'" onmouseout="this.style.backgroundColor='#B09FE6'">Register</a>
                             </div>
                         </div>
                 </div>

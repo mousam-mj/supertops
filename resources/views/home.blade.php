@@ -50,27 +50,49 @@
                 <div class="banner-block md:pt-20 pt-10">
             <div class="container">
                 <div class="list-banner grid md:grid-cols-3 gap-[20px]">
-                        <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                    @php
+                        $defaultImages = [
+                            asset('assets/images/product/Bottle-1.webp'),
+                            asset('assets/images/product/Bottle-4.webp'),
+                            asset('assets/images/product/Bottle-8.webp')
+                        ];
+                    @endphp
+                    @forelse($homeCategories as $index => $category)
+                        <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                            <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
+                                @if($category->image)
+                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                                @else
+                                    <img src="{{ $defaultImages[$index] ?? $defaultImages[0] }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                                @endif
+                            </div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
+                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+                        </a>
+                    @empty
+                        {{-- Fallback if no categories --}}
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <div class="banner-img w-full">
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
                             <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                         </a>
-                        <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                            <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
                             <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                         </a>
-                        <a href="{{{ route('shop') }}}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                            <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
+                                <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
-                        <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kichenware</div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kichenware</div>
                             <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                         </a>
+                    @endforelse
                 </div>
             </div>
         </div>

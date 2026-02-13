@@ -21,6 +21,13 @@ Route::get('/', function () {
         ->orderBy('sort_order')
         ->get();
     
+    // Get top 3 categories for home page banners
+    $homeCategories = \App\Models\Category::whereNull('parent_id')
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->limit(3)
+        ->get();
+    
     // Get hero banners
     $heroBanners = \App\Models\HeroBanner::where('is_active', true)
         ->orderBy('priority', 'asc')
@@ -60,7 +67,7 @@ Route::get('/', function () {
         ->limit(8)
         ->get();
     
-    return view('home', compact('categories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts'));
+    return view('home', compact('categories', 'homeCategories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts'));
 })->name('home');
 
 // Regular Login Routes (for /login.html compatibility)
