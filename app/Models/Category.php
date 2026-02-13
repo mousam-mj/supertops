@@ -15,6 +15,16 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'hero_image',
+        'hero_text',
+        'hero_button_text',
+        'banner_images',
+        'banner_texts',
+        'bottom_banner_image',
+        'bottom_banner_text',
+        'testimonial_text',
+        'additional_banner_image',
+        'additional_banner_text',
         'parent_id',
         'main_category_id',
         'sort_order',
@@ -23,6 +33,8 @@ class Category extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'banner_images' => 'array',
+        'banner_texts' => 'array',
     ];
 
     /**

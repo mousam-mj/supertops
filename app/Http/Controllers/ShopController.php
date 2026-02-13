@@ -93,9 +93,12 @@ class ShopController extends Controller
     public function category(Request $request, $slug)
     {
         $category = Category::where('slug', $slug)
-            ->with(['children.children', 'parent'])
+            ->with(['children.children', 'parent', 'mainCategory'])
             ->where('is_active', true)
             ->firstOrFail();
+
+        // Get MainCategory for fallback content
+        $mainCategory = $category->mainCategory;
 
         $categories = Category::whereNull('parent_id')
             ->with(['children.children'])
@@ -168,7 +171,7 @@ class ShopController extends Controller
             ->limit(8)
             ->get();
 
-        return view('category', compact('categories', 'category', 'products', 'subCategories', 'featuredProducts'));
+        return view('shop.category', compact('categories', 'category', 'mainCategory', 'products', 'subCategories', 'featuredProducts'));
     }
 
     /**

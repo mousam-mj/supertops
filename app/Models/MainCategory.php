@@ -14,6 +14,16 @@ class MainCategory extends Model
         'name',
         'slug',
         'image',
+        'hero_image',
+        'hero_text',
+        'hero_button_text',
+        'banner_images',
+        'banner_texts',
+        'bottom_banner_image',
+        'bottom_banner_text',
+        'testimonial_text',
+        'additional_banner_image',
+        'additional_banner_text',
         'is_active',
         'sort_order',
     ];
@@ -21,6 +31,8 @@ class MainCategory extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'banner_images' => 'array',
+        'banner_texts' => 'array',
     ];
 
     /**

@@ -433,7 +433,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'slug' => 'nullable|string|unique:main_categories,slug',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'hero_image' => 'nullable|image|max:5120',
+                'hero_text' => 'nullable|string|max:255',
+                'hero_button_text' => 'nullable|string|max:100',
+                'banner_images' => 'nullable|array|max:3',
+                'banner_images.*' => 'nullable|image|max:2048',
+                'banner_texts' => 'nullable|array|max:3',
+                'banner_texts.*' => 'nullable|string|max:255',
+                'bottom_banner_image' => 'nullable|image|max:5120',
+                'bottom_banner_text' => 'nullable|string|max:255',
+                'testimonial_text' => 'nullable|string|max:1000',
+                'additional_banner_image' => 'nullable|image|max:5120',
+                'additional_banner_text' => 'nullable|string|max:255',
             ]);
             
             if (empty($validated['slug'])) {
@@ -442,6 +454,38 @@ Route::prefix('admin')->name('admin.')->group(function () {
             
             if ($request->hasFile('image')) {
                 $validated['image'] = $request->file('image')->store('main-categories', 'public');
+            }
+            
+            // Handle hero image
+            if ($request->hasFile('hero_image')) {
+                $validated['hero_image'] = $request->file('hero_image')->store('main-categories/hero', 'public');
+            }
+            
+            // Handle banner images
+            $bannerImages = [];
+            if ($request->has('banner_images')) {
+                foreach ($request->file('banner_images') as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        $bannerImages[$index] = $file->store('main-categories/banners', 'public');
+                    }
+                }
+            }
+            $validated['banner_images'] = !empty($bannerImages) ? array_values($bannerImages) : null;
+            
+            // Handle banner texts
+            if ($request->has('banner_texts')) {
+                $validated['banner_texts'] = array_filter($request->banner_texts ?? []);
+                $validated['banner_texts'] = !empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
+            }
+            
+            // Handle bottom banner image
+            if ($request->hasFile('bottom_banner_image')) {
+                $validated['bottom_banner_image'] = $request->file('bottom_banner_image')->store('main-categories/bottom-banner', 'public');
+            }
+            
+            // Handle additional banner image
+            if ($request->hasFile('additional_banner_image')) {
+                $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('main-categories/additional-banner', 'public');
             }
             
             \App\Models\MainCategory::create($validated);
@@ -465,16 +509,112 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'slug' => 'nullable|string|unique:main_categories,slug,' . $id,
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'remove_image' => 'nullable|boolean',
+                'hero_image' => 'nullable|image|max:5120',
+                'remove_hero_image' => 'nullable|boolean',
+                'hero_text' => 'nullable|string|max:255',
+                'hero_button_text' => 'nullable|string|max:100',
+                'banner_images' => 'nullable|array|max:3',
+                'banner_images.*' => 'nullable|image|max:2048',
+                'remove_banner_image' => 'nullable|array',
+                'banner_texts' => 'nullable|array|max:3',
+                'banner_texts.*' => 'nullable|string|max:255',
+                'bottom_banner_image' => 'nullable|image|max:5120',
+                'remove_bottom_banner_image' => 'nullable|boolean',
+                'bottom_banner_text' => 'nullable|string|max:255',
+                'testimonial_text' => 'nullable|string|max:1000',
+                'additional_banner_image' => 'nullable|image|max:5120',
+                'remove_additional_banner_image' => 'nullable|boolean',
+                'additional_banner_text' => 'nullable|string|max:255',
             ]);
             
-            if ($request->hasFile('image')) {
-                // Delete old image if exists
+            // Handle image removal
+            if ($request->filled('remove_image') && $request->remove_image == '1') {
+                if ($category->image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->image);
+                }
+                $validated['image'] = null;
+            } elseif ($request->hasFile('image')) {
                 if ($category->image) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($category->image);
                 }
                 $validated['image'] = $request->file('image')->store('main-categories', 'public');
             }
+            
+            // Handle hero image
+            if ($request->filled('remove_hero_image') && $request->remove_hero_image == '1') {
+                if ($category->hero_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->hero_image);
+                }
+                $validated['hero_image'] = null;
+            } elseif ($request->hasFile('hero_image')) {
+                if ($category->hero_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->hero_image);
+                }
+                $validated['hero_image'] = $request->file('hero_image')->store('main-categories/hero', 'public');
+            }
+            
+            // Handle banner images
+            $bannerImages = is_array($category->banner_images) ? $category->banner_images : [];
+            $removeBannerImages = $request->input('remove_banner_image', []);
+            
+            if ($request->has('banner_images')) {
+                foreach ($request->file('banner_images') as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        // Remove old image if exists
+                        if (isset($bannerImages[$index])) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($bannerImages[$index]);
+                        }
+                        $bannerImages[$index] = $file->store('main-categories/banners', 'public');
+                    }
+                }
+            }
+            
+            // Remove banners marked for deletion
+            foreach ($removeBannerImages as $index => $remove) {
+                if ($remove == '1' && isset($bannerImages[$index])) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($bannerImages[$index]);
+                    unset($bannerImages[$index]);
+                }
+            }
+            
+            $validated['banner_images'] = !empty($bannerImages) ? array_values($bannerImages) : null;
+            
+            // Handle banner texts
+            if ($request->has('banner_texts')) {
+                $validated['banner_texts'] = array_filter($request->banner_texts ?? []);
+                $validated['banner_texts'] = !empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
+            }
+            
+            // Handle bottom banner image
+            if ($request->filled('remove_bottom_banner_image') && $request->remove_bottom_banner_image == '1') {
+                if ($category->bottom_banner_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->bottom_banner_image);
+                }
+                $validated['bottom_banner_image'] = null;
+            } elseif ($request->hasFile('bottom_banner_image')) {
+                if ($category->bottom_banner_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->bottom_banner_image);
+                }
+                $validated['bottom_banner_image'] = $request->file('bottom_banner_image')->store('main-categories/bottom-banner', 'public');
+            }
+            
+            // Handle additional banner image
+            if ($request->filled('remove_additional_banner_image') && $request->remove_additional_banner_image == '1') {
+                if ($category->additional_banner_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->additional_banner_image);
+                }
+                $validated['additional_banner_image'] = null;
+            } elseif ($request->hasFile('additional_banner_image')) {
+                if ($category->additional_banner_image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->additional_banner_image);
+                }
+                $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('main-categories/additional-banner', 'public');
+            }
+            
+            // Remove remove flags from validated
+            unset($validated['remove_image'], $validated['remove_hero_image'], $validated['remove_bottom_banner_image'], $validated['remove_additional_banner_image'], $validated['remove_banner_image']);
             
             $category->update($validated);
             return redirect()->route('admin.main-categories.index')->with('success', 'Main category updated successfully!');
