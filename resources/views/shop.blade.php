@@ -584,160 +584,160 @@
             <div class="container">
                 <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                        <div class="filter-type-block pb-8 border-b border-line">
-                            <div class="heading6">Products Type</div>
+                        <div class="filter-type-block pb-8 border-b" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 15px; padding: 20px; border-color: rgba(255, 255, 255, 0.1) !important;">
+                            <div class="heading6" style="color: white !important;">Products Type</div>
                             <div class="list-type filter-type menu-tab mt-4">
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="t-shirt">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">t-shirt</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="t-shirt">
+                                    <div class="type-name capitalize" style="color: inherit;">t-shirt</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="dress">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">dress</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="dress">
+                                    <div class="type-name capitalize" style="color: inherit;">dress</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="top">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">top</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="top">
+                                    <div class="type-name capitalize" style="color: inherit;">top</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="swimwear">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">swimwear</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="swimwear">
+                                    <div class="type-name capitalize" style="color: inherit;">swimwear</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="shirt">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">shirt</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="shirt">
+                                    <div class="type-name capitalize" style="color: inherit;">shirt</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="underwear">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">underwear</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="underwear">
+                                    <div class="type-name capitalize" style="color: inherit;">underwear</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="sets">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">sets</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="sets">
+                                    <div class="type-name capitalize" style="color: inherit;">sets</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
-                                <div class="item tab-item flex items-center justify-between cursor-pointer" data-item="accessories">
-                                    <div class="type-name text-secondary has-line-before hover:text-black capitalize">accessories</div>
-                                    <div class="text-secondary2 number">6</div>
+                                <div class="item tab-item flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#00ffee'" onmouseout="this.style.background='transparent'; this.style.color='white'" data-item="accessories">
+                                    <div class="type-name capitalize" style="color: inherit;">accessories</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">6</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="filter-size pb-8 border-b border-line mt-8">
-                            <div class="heading6">Size</div>
+                        <div class="filter-size pb-8 border-b mt-8" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 15px; padding: 20px; border-color: rgba(255, 255, 255, 0.1) !important;">
+                            <div class="heading6" style="color: white !important;">Size</div>
                             <div class="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="XS">XS</div>
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="S">S</div>
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="M">M</div>
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="L">L</div>
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="XL">XL</div>
-                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-line" data-item="2XL">2XL</div>
-                                <div class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line" data-item="freesize">Freesize</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="XS">XS</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="S">S</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="M">M</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="L">L</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="XL">XL</div>
+                                <div class="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="2XL">2XL</div>
+                                <div class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border cursor-pointer transition-all" style="color: white !important; border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.2)'; this.style.color='#00ffee'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'; this.style.color='white'" data-item="freesize">Freesize</div>
                             </div>
                         </div>
-                        <div class="filter-price pb-8 border-b border-line mt-8">
-                            <div class="heading6">Price Range</div>
+                        <div class="filter-price pb-8 border-b mt-8" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 15px; padding: 20px; border-color: rgba(255, 255, 255, 0.1) !important;">
+                            <div class="heading6" style="color: white !important;">Price Range</div>
                             <div class="tow-bar-block mt-5">
                                 <div class="progress"></div>
                             </div>
                             <div class="range-input">
-                                <input class="range-min" type="range" min="0" max="300" value="0" />
-                                <input class="range-max" type="range" min="0" max="300" value="300" />
+                                <input class="range-min" type="range" min="0" max="300" value="0" style="accent-color: #00ffee;" />
+                                <input class="range-max" type="range" min="0" max="300" value="300" style="accent-color: #00ffee;" />
                             </div>
-                            <div class="price-block flex items-center justify-between flex-wrap mt-4">
+                            <div class="price-block flex items-center justify-between flex-wrap mt-4" style="color: white !important;">
                                 <div class="min flex items-center gap-1">
-                                    <div>Min price:</div>
-                                    <div class="min-price">$0</div>
+                                    <div style="color: rgba(255, 255, 255, 0.8) !important;">Min price:</div>
+                                    <div class="min-price" style="color: #00ffee !important;">₹0</div>
                                 </div>
                                 <div class="min flex items-center gap-1">
-                                    <div>Max price:</div>
-                                    <div class="max-price">$300</div>
+                                    <div style="color: rgba(255, 255, 255, 0.8) !important;">Max price:</div>
+                                    <div class="max-price" style="color: #00ffee !important;">₹300</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="filter-color pb-8 border-b border-line mt-8">
-                            <div class="heading6">colors</div>
+                        <div class="filter-color pb-8 border-b mt-8" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 15px; padding: 20px; border-color: rgba(255, 255, 255, 0.1) !important;">
+                            <div class="heading6" style="color: white !important;">colors</div>
                             <div class="list-color flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="pink">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="pink">
                                     <div class="color bg-[#F4C5BF] w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">pink</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">pink</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="red">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="red">
                                     <div class="color bg-red w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">red</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">red</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="green">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="green">
                                     <div class="color bg-green w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">green</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">green</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="yellow">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="yellow">
                                     <div class="color bg-yellow w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">yellow</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">yellow</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="purple">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="purple">
                                     <div class="color bg-purple w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">purple</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">purple</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="black">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="black">
                                     <div class="color bg-black w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">black</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">black</div>
                                 </div>
-                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line" data-item="white">
+                                <div class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border cursor-pointer transition-all" style="border-color: rgba(255, 255, 255, 0.2) !important; background: transparent;" onmouseover="this.style.borderColor='#00ffee'; this.style.background='rgba(0, 255, 238, 0.1)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.background='transparent'" data-item="white">
                                     <div class="color bg-[#F6EFDD] w-5 h-5 rounded-full"></div>
-                                    <div class="caption1 capitalize">white</div>
+                                    <div class="caption1 capitalize" style="color: white !important;">white</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="filter-brand pb-8 mt-8">
-                            <div class="heading6">Brands</div>
+                        <div class="filter-brand pb-8 mt-8" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 15px; padding: 20px;">
+                            <div class="heading6" style="color: white !important;">Brands</div>
                             <div class="list-brand mt-4">
-                                <div class="brand-item flex items-center justify-between" data-item="adidas">
+                                <div class="brand-item flex items-center justify-between py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'" data-item="adidas">
                                     <div class="left flex items-center cursor-pointer">
                                         <div class="block-input">
-                                            <input type="checkbox" name="adidas" id="adidas" />
-                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                            <input type="checkbox" name="adidas" id="adidas" style="accent-color: #00ffee;" />
+                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
                                         </div>
-                                        <label for="adidas" class="brand-name capitalize pl-2 cursor-pointer">adidas</label>
+                                        <label for="adidas" class="brand-name capitalize pl-2 cursor-pointer" style="color: white !important;">adidas</label>
                                     </div>
-                                    <div class="text-secondary2 number">12</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">12</div>
                                 </div>
-                                <div class="brand-item flex items-center justify-between" data-item="hermes">
+                                <div class="brand-item flex items-center justify-between py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'" data-item="hermes">
                                     <div class="left flex items-center cursor-pointer">
                                         <div class="block-input">
-                                            <input type="checkbox" name="hermes" id="hermes" />
-                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                            <input type="checkbox" name="hermes" id="hermes" style="accent-color: #00ffee;" />
+                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
                                         </div>
-                                        <label for="hermes" class="brand-name capitalize pl-2 cursor-pointer">hermes</label>
+                                        <label for="hermes" class="brand-name capitalize pl-2 cursor-pointer" style="color: white !important;">hermes</label>
                                     </div>
-                                    <div class="text-secondary2 number">12</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">12</div>
                                 </div>
-                                <div class="brand-item flex items-center justify-between" data-item="zara">
+                                <div class="brand-item flex items-center justify-between py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'" data-item="zara">
                                     <div class="left flex items-center cursor-pointer">
                                         <div class="block-input">
-                                            <input type="checkbox" name="zara" id="zara" />
-                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                            <input type="checkbox" name="zara" id="zara" style="accent-color: #00ffee;" />
+                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
                                         </div>
-                                        <label for="zara" class="brand-name capitalize pl-2 cursor-pointer">zara</label>
+                                        <label for="zara" class="brand-name capitalize pl-2 cursor-pointer" style="color: white !important;">zara</label>
                                     </div>
-                                    <div class="text-secondary2 number">12</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">12</div>
                                 </div>
-                                <div class="brand-item flex items-center justify-between" data-item="nike">
+                                <div class="brand-item flex items-center justify-between py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'" data-item="nike">
                                     <div class="left flex items-center cursor-pointer">
                                         <div class="block-input">
-                                            <input type="checkbox" name="nike" id="nike" />
-                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                            <input type="checkbox" name="nike" id="nike" style="accent-color: #00ffee;" />
+                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
                                         </div>
-                                        <label for="nike" class="brand-name capitalize pl-2 cursor-pointer">nike</label>
+                                        <label for="nike" class="brand-name capitalize pl-2 cursor-pointer" style="color: white !important;">nike</label>
                                     </div>
-                                    <div class="text-secondary2 number">12</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">12</div>
                                 </div>
-                                <div class="brand-item flex items-center justify-between" data-item="gucci">
+                                <div class="brand-item flex items-center justify-between py-2 px-3 rounded-lg transition-all" style="color: white !important;" onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.background='transparent'" data-item="gucci">
                                     <div class="left flex items-center cursor-pointer">
                                         <div class="block-input">
-                                            <input type="checkbox" name="gucci" id="gucci" />
-                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
+                                            <input type="checkbox" name="gucci" id="gucci" style="accent-color: #00ffee;" />
+                                            <i class="ph-fill ph-check-square icon-checkbox text-2xl" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
                                         </div>
-                                        <label for="gucci" class="brand-name capitalize pl-2 cursor-pointer">gucci</label>
+                                        <label for="gucci" class="brand-name capitalize pl-2 cursor-pointer" style="color: white !important;">gucci</label>
                                     </div>
-                                    <div class="text-secondary2 number">12</div>
+                                    <div class="number" style="color: rgba(255, 255, 255, 0.6) !important;">12</div>
                                 </div>
                             </div>
                         </div>

@@ -22,8 +22,8 @@
                                 
                                 <ul>
                                     <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between"
-                                            >Drinkware
+                                        <a href="{{{ route('shop') }}}" class="text-xl font-semibold flex items-center justify-between"
+                                            >📱 Phone Cases
                                             <span class="text-right">
                                                 <i class="ph ph-caret-right text-xl"></i>
                                             </span>
@@ -36,83 +36,44 @@
                                             <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
                                                 <ul>
                                                     <li>
-                                                        <a href="{{ route('home') }}" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 1 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Premium Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="fashion2.php" class="nav-item-mobile link text-secondary duration-300 active"> Home Fashion 2 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Clear Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="fashion3.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 3 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Wallet Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="fashion4.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 4 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Rugged Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="fashion5.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 5 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Leather Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="fashion6.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 6 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion7.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 7 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion8.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 8 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion9.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 9 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion10.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 10 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="fashion11.php" class="nav-item-mobile link text-secondary duration-300"> Home Fashion 11 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Silicone Cases </a>
                                                     </li>
                                                 </ul>
                                                 <ul>
                                                     <li>
-                                                        <a href="underwear.php" class="nav-item-mobile link text-secondary duration-300"> Home Underwear </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Bumper Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="cosmetic1.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 1 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Flip Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="cosmetic2.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 2 </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> Battery Cases </a>
                                                     </li>
                                                     <li>
-                                                        <a href="cosmetic3.php" class="nav-item-mobile link text-secondary duration-300"> Home Cosmetic 3 </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="pet.php" class="nav-item-mobile link text-secondary duration-300"> Home Pet Store </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="jewelry.php" class="nav-item-mobile link text-secondary duration-300"> Home Jewelry </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="furniture.php" class="nav-item-mobile link text-secondary duration-300"> Home Furniture </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="watch.php" class="nav-item-mobile link text-secondary duration-300"> Home Watch </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="toys.php" class="nav-item-mobile link text-secondary duration-300"> Home Toys Kid </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="yoga.php" class="nav-item-mobile link text-secondary duration-300"> Home Yoga </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="organic.php" class="nav-item-mobile link text-secondary duration-300"> Home Organic </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="marketplace.php" class="nav-item-mobile link text-secondary duration-300"> Home Marketplace </a>
+                                                        <a href="{{{ route('shop') }}}" class="nav-item-mobile link text-secondary duration-300"> View All Cases </a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Barware
+                                        <a href="{{{ route('shop') }}}" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >🔌 Chargers
                                             <span class="text-right">
                                                 <i class="ph ph-caret-right text-xl"></i>
                                             </span>
@@ -125,122 +86,42 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <div class="nav-link grid grid-cols-2 gap-5 gap-y-6">
                                                     <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Men</div>
+                                                        <div class="text-button-uppercase pb-1">Fast Chargers</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> USB-C Fast Chargers </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Wireless Chargers </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Car Chargers </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Multi-Port Chargers </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Skincare</div>
+                                                        <div class="text-button-uppercase pb-1">Cables & Adapters</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> USB-C Cables </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Lightning Cables </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Micro USB Cables </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Adapters & Converters </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Health</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Women</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Kid</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">For Home</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 view-all-btn"> View All </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -249,8 +130,8 @@
                                         </div>
                                     </li>
                                     <li>
-                                        <a href="#!" class="text-xl font-semibold flex items-center justify-between mt-5"
-                                            >Kitchenware
+                                        <a href="{{{ route('shop') }}}" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >🎧 Headphones & Audio
                                             <span class="text-right">
                                                 <i class="ph ph-caret-right text-xl"></i>
                                             </span>
@@ -263,86 +144,106 @@
                                             <div class="list-nav-item w-full pt-2 pb-6">
                                                 <div class="nav-link grid grid-cols-2 gap-5 gap-y-6 justify-between">
                                                     <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
+                                                        <div class="text-button-uppercase pb-1">Wireless Audio</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb IMG </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Wireless Earbuds </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb 1 </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Over-Ear Headphones </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Breadcrumb 2 </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Gaming Headsets </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Collection </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Sports Earbuds </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Features</div>
+                                                        <div class="text-button-uppercase pb-1">Wired Audio</div>
                                                         <ul>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Canvas </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Wired Earbuds </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Options </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> In-Ear Headphones </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Filter Dropdown </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Audio Adapters </a>
                                                             </li>
                                                             <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Sidebar List </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Shop Layout</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default Grid </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Default List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300 cursor-pointer"> Shop Full Width </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('shop') }}" class="link text-secondary duration-300"> Shop Square </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-1">Products Pages</div>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="{{ route('wishlist') }}" class="link text-secondary duration-300"> Wish List </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('search') }}" class="link text-secondary duration-300"> Search Result </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('cart.index') }}" class="link text-secondary duration-300"> Shopping Cart </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('login') }}" class="link text-secondary duration-300"> Login/Register </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('forgot-password') }}" class="link text-secondary duration-300"> Forgot Password </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('order-tracking') }}" class="link text-secondary duration-300"> Order Tracking </a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="{{ route('my-account') }}" class="link text-secondary duration-300"> My Account </a>
+                                                                <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> View All Audio </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="{{{ route('shop') }}}" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >🔋 Power Banks
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul class="w-full">
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Portable Power Banks </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Wireless Power Banks </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Solar Power Banks </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> High Capacity Banks </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="{{{ route('shop') }}}" class="text-xl font-semibold flex items-center justify-between mt-5"
+                                            >🛡️ Protection & Accessories
+                                            <span class="text-right">
+                                                <i class="ph ph-caret-right text-xl"></i>
+                                            </span>
+                                        </a>
+                                        <div class="sub-nav-mobile">
+                                            <div class="back-btn flex items-center gap-3">
+                                                <i class="ph ph-caret-left text-xl"></i>
+                                                Back
+                                            </div>
+                                            <div class="list-nav-item w-full pt-2 pb-6">
+                                                <ul class="w-full">
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Screen Protectors </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Tempered Glass </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Phone Stands </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Car Mounts </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> Pop Sockets </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300"> View All </a>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </li>

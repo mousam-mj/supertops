@@ -7,10 +7,154 @@
     /* Checkout - compact breadcrumb, reduce gap */
     .checkout-page-content .checkout-breadcrumb { min-height: unset !important; }
     .checkout-page-content .checkout-breadcrumb .breadcrumb-main { min-height: unset !important; }
+    
+    /* Checkout Page Dark Theme - Ensure All Text is Visible */
+    .checkout-page-content *,
+    .checkout-block *,
+    .checkout-page-content .heading2,
+    .checkout-page-content .heading5,
+    .checkout-page-content .text-title,
+    .checkout-page-content .text-button,
+    .checkout-page-content .text-on-surface,
+    .checkout-page-content .text-on-surface-variant1,
+    .checkout-page-content label,
+    .checkout-page-content .caption1,
+    .checkout-page-content .login *,
+    .checkout-page-content .information *,
+    .checkout-page-content .form-checkout *,
+    .checkout-page-content .payment-block *,
+    .checkout-page-content .list-payment *,
+    .checkout-page-content .type *,
+    .checkout-page-content .infor *,
+    .checkout-page-content .checkout-block *,
+    .checkout-page-content .list-product-checkout *,
+    .checkout-page-content .discount-block *,
+    .checkout-page-content .ship-block *,
+    .checkout-page-content .total-cart-block * {
+        color: white !important;
+    }
+    
+    /* Remove white backgrounds - Use dark theme */
+    .checkout-page-content .bg-white,
+    .checkout-page-content .bg-surface,
+    .checkout-page-content .login,
+    .checkout-page-content .form-login-block,
+    .checkout-page-content .form-checkout form,
+    .checkout-page-content .bg-linear,
+    .checkout-page-content .breadcrumb-main,
+    .checkout-page-content .breadcrumb-block,
+    .checkout-page-content .text-content {
+        background: transparent !important;
+    }
+    
+    /* Order summary card - Dark glass effect */
+    .checkout-page-content .right .checkout-block {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+    }
+    
+    /* Product items in order summary */
+    .checkout-page-content .list-product-checkout .item,
+    .checkout-page-content .list-product-checkout .product-item {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Payment options background */
+    .checkout-page-content .type {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Login box */
+    .checkout-page-content .login {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+    
+    /* Form inputs - Dark theme */
+    .checkout-page-content input,
+    .checkout-page-content select,
+    .checkout-page-content textarea {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .checkout-page-content input:focus,
+    .checkout-page-content select:focus,
+    .checkout-page-content textarea:focus {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(0, 255, 238, 0.5) !important;
+        outline: none !important;
+    }
+    
+    .checkout-page-content input::placeholder,
+    .checkout-page-content textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Select dropdown options */
+    .checkout-page-content select option {
+        background: rgba(15, 15, 15, 0.98) !important;
+        color: white !important;
+    }
+    
+    /* Radio buttons and checkboxes */
+    .checkout-page-content input[type="radio"],
+    .checkout-page-content input[type="checkbox"] {
+        accent-color: #00ffee !important;
+    }
+    
+    /* Order summary section */
+    .checkout-page-content .checkout-block {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    
+    /* Place Order button */
+    .checkout-page-content .button-main {
+        background: linear-gradient(45deg, #ff00cc, #3333ff) !important;
+        color: white !important;
+        border: none !important;
+    }
+    
+    /* Mobile menu bar */
+    .checkout-page-content .menu_bar {
+        background: rgba(15, 15, 15, 0.95) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .checkout-page-content .menu_bar * {
+        color: white !important;
+    }
+    
+    /* Remove any white backgrounds */
+    .checkout-page-content .bg-white {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    /* Form borders */
+    .checkout-page-content .border,
+    .checkout-page-content .border-line {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
 </style>
 <div class="page-content checkout-page-content">
     <!-- Menu bar (mobile) -->
-    <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
+    <div class="menu_bar fixed bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]" style="background: rgba(15, 15, 15, 0.95) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
         <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
             <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
                 <span class="ph-bold ph-house text-2xl block"></span>
@@ -35,16 +179,16 @@
     </div>
 
     <!-- Compact breadcrumb - minimal gap -->
-    <div class="breadcrumb-block checkout-breadcrumb">
-        <div class="breadcrumb-main bg-linear overflow-hidden">
+    <div class="breadcrumb-block checkout-breadcrumb" style="background: transparent !important;">
+        <div class="breadcrumb-main bg-linear overflow-hidden" style="background: transparent !important;">
             <div class="container py-4 relative">
                 <div class="main-content w-full flex flex-col items-center justify-center relative z-[1]">
-                    <div class="text-content">
-                        <div class="heading2 text-center">Checkout</div>
+                    <div class="text-content" style="background: transparent !important;">
+                        <div class="heading2 text-center" style="color: white !important;">Checkout</div>
                         <div class="link flex items-center justify-center gap-1 caption1 mt-1">
-                            <a href="{{ route('home') }}">Homepage</a>
-                            <i class="ph ph-caret-right text-sm text-secondary2"></i>
-                            <span class="text-secondary2 capitalize">Checkout</span>
+                            <a href="{{ route('home') }}" style="color: white !important;">Homepage</a>
+                            <i class="ph ph-caret-right text-sm" style="color: rgba(255, 255, 255, 0.6) !important;"></i>
+                            <span class="capitalize" style="color: rgba(255, 255, 255, 0.6) !important;">Checkout</span>
                         </div>
                     </div>
                 </div>
@@ -56,12 +200,12 @@
             <div class="container">
                 <div class="content-main flex max-lg:flex-col-reverse gap-y-10 justify-between">
                     <div class="left lg:w-1/2">
-                        <div class="login bg-surface py-3 px-4 flex justify-between rounded-lg">
+                        <div class="login py-3 px-4 flex justify-between rounded-lg" style="background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
                             <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
                             <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
                         </div>
                         <div class="form-login-block mt-3">
-                            <form class="p-5 border border-line rounded-lg">
+                            <form class="p-5 border rounded-lg" style="background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: rgba(255, 255, 255, 0.1) !important;">
                                 <div class="grid sm:grid-cols-2 gap-5">
                                     <div class="email">
                                         <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="email" placeholder="Username or email" required />
@@ -142,113 +286,13 @@
                                         </div>
                                     </div>
                                     <div class="payment-block md:mt-10 mt-6">
-                                        <div class="heading5">Choose payment Option:</div>
+                                        <div class="heading5" style="color: white !important;">Payment Method</div>
                                         <div class="list-payment mt-5">
-                                            <div class="type bg-surface p-5 border border-line rounded-lg">
-                                                <input class="cursor-pointer" type="radio" id="test" name="payment" value="test" checked />
-                                                <label class="text-button pl-2 cursor-pointer" for="test">Test Payment (For Testing)</label>
+                                            <div class="type p-5 border rounded-lg" style="background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: rgba(255, 255, 255, 0.1) !important;">
+                                                <input class="cursor-pointer" type="radio" id="delivery" name="payment" value="cod" checked />
+                                                <label class="text-button pl-2 cursor-pointer" for="delivery" style="color: white !important;">💵 Cash On Delivery</label>
                                                 <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">This is a test payment method. No actual payment will be processed. Order will be placed successfully.</div>
-                                                </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="credit" name="payment" value="razorpay" />
-                                                <label class="text-button pl-2 cursor-pointer" for="credit">Credit Card</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberCredit">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberCredit" placeholder="ex.1234567290" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateCredit">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateCredit" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvCredit">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvCredit" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveCredit" name="save" />
-                                                        <label class="text-button" for="saveCredit">Save Card Details</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="delivery" name="payment" value="cod" />
-                                                <label class="text-button pl-2 cursor-pointer" for="delivery">Cash on delivery</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberDelivery">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberDelivery" placeholder="ex.1234567290" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateDelivery">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateDelivery" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvDelivery">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvDelivery" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveDelivery" name="save" />
-                                                        <label class="text-button" for="saveDelivery">Save Card Details</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="apple" name="payment" />
-                                                <label class="text-button pl-2 cursor-pointer" for="apple">Apple Pay</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberApple">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberApple" placeholder="ex.1234567290" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateApple">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateApple" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvApple">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvApple" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveApple" name="save" />
-                                                        <label class="text-button" for="saveApple">Save Card Details</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="paypal" name="payment" />
-                                                <label class="text-button pl-2 cursor-pointer" for="paypal">PayPal</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberPaypal">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberPaypal" placeholder="ex.1234567290" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="datePaypal">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="datePaypal" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvPaypal">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvPaypal" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="savePaypal" name="save" />
-                                                        <label class="text-button" for="savePaypal">Save Card Details</label>
-                                                    </div>
+                                                    <div class="text-on-surface-variant1 pt-4" style="color: rgba(255, 255, 255, 0.8) !important;">Pay cash when your order is delivered. No online payment required. Our delivery partner will collect the payment at your doorstep.</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -261,20 +305,20 @@
                         </div>
                     </div>
                     <div class="right lg:w-5/12">
-                        <div class="checkout-block">
-                            <div class="heading5 pb-3">Your Order</div>
+                        <div class="checkout-block" style="background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 15px; padding: 20px;">
+                            <div class="heading5 pb-3" style="color: white !important;">Your Order</div>
                             <div class="list-product-checkout"></div>
-                            <div class="discount-block py-5 flex justify-between border-b border-line">
-                                <div class="text-title">Discounts</div>
-                                <div class="text-title">-₹<span class="discount">0</span><span>.00</span></div>
+                            <div class="discount-block py-5 flex justify-between border-b" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                                <div class="text-title" style="color: white !important;">Discounts</div>
+                                <div class="text-title" style="color: white !important;">-₹<span class="discount">0</span><span>.00</span></div>
                             </div>
-                            <div class="ship-block py-5 flex justify-between border-b border-line">
-                                <div class="text-title">Shipping</div>
-                                <div class="text-title">Free</div>
+                            <div class="ship-block py-5 flex justify-between border-b" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                                <div class="text-title" style="color: white !important;">Shipping</div>
+                                <div class="text-title" style="color: white !important;">Free</div>
                             </div>
                             <div class="total-cart-block pt-5 flex justify-between">
-                                <div class="heading5">Total</div>
-                                <div class="heading5 total-cart">₹0.00</div>
+                                <div class="heading5" style="color: white !important;">Total</div>
+                                <div class="heading5 total-cart" style="color: white !important;">₹0.00</div>
                             </div>
                         </div>
                     </div>
@@ -361,7 +405,7 @@ function validateForm() {
         state: document.getElementById('country').value,
         pincode: document.getElementById('postal').value.trim(),
         notes: document.getElementById('note')?.value.trim() || '',
-        payment_method: document.querySelector('input[name="payment"]:checked')?.value || 'test'
+        payment_method: document.querySelector('input[name="payment"]:checked')?.value || 'cod'
     };
     
     // Get shipping cost
@@ -428,7 +472,7 @@ function validateForm() {
                 state: formData.state || '',
                 pincode: formData.pincode || ''
             },
-            payment_method: formData.payment_method || 'test',
+            payment_method: formData.payment_method || 'cod',
             notes: formData.notes || '',
             shipping_charge: shipping || 0
         };

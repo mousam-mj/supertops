@@ -1,14 +1,14 @@
-<div id="footer" class="footer mt-8" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both;">
-    <div class="footer-main bg-surface">
+<div id="footer" class="footer mt-8" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both; background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <div class="footer-main" style="background: transparent;">
         <div class="container">
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
                 <div class="company-infor basis-1/4 max-lg:basis-full pr-7">
                     <a href="{{{ route('home') }}}" class="logo inline-block">
                         @php $footerLogo = \App\Models\Setting::get('site_logo'); @endphp
-                        <img src="{{ $footerLogo ? asset('storage/' . $footerLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" />
+                        <span class="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Ricimart</span>
                     </a>
                     @php
-                        $footerEmail = \App\Models\Setting::get('contact_email', 'ecom@perchbottle.in');
+                        $footerEmail = \App\Models\Setting::get('contact_email', 'info@ricimart.in');
                         $footerPhone = \App\Models\Setting::get('contact_phone', '');
                         $footerHelpline = \App\Models\Setting::get('helpline_number', '');
                         $addr = \App\Models\Setting::get('contact_address', '');
@@ -45,11 +45,11 @@
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Quick Shop</div>
-                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('shop') }}}">Women</a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Men </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Clothes </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}"> Accessories </a>
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!">Blog </a>
+                            <a class="caption1 has-line-before duration-300 w-fit" href="{{{ route('shop') }}}">Phone Cases</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Chargers </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Headphones </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Screen Protectors </a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('shop') }}}">Power Banks </a>
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             <div class="text-button-uppercase pb-3">Customer Services</div>
@@ -90,7 +90,7 @@
             </div>
             <div class="footer-bottom py-3 flex items-center justify-between gap-5 max-lg:justify-center max-lg:flex-col border-t border-line">
                 <div class="left flex items-center gap-8">
-                    <div class="copyright caption1 text-secondary">{{ \App\Models\Setting::get('copyright_text', '©2025 Perch. All Rights Reserved.') ?: '©2025 Perch. All Rights Reserved.' }}</div>
+                    <div class="copyright caption1 text-secondary">{{ \App\Models\Setting::get('copyright_text', '©2025 Ricimart. All Rights Reserved.') ?: '©2025 Ricimart. All Rights Reserved.' }}</div>
                     <div class="select-block flex items-center gap-5 max-md:hidden">
                         <div class="choose-language flex items-center gap-1.5">
                             <select name="language" id="chooseLanguageFooter" class="caption2 bg-transparent">
