@@ -8,8 +8,9 @@
         <link rel="shortcut icon" href="{{ asset('assets/images/perch-logo.png') }}" type="image/x-icon" />
     <link rel="stylesheet" href="{{ asset('assets/css/swiper-bundle.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
-    <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" />
-    <link rel="stylesheet" href="{{ asset('dist/output-tailwind.css') }}" />
+    {{-- Temporarily commented out - files giving 404 errors --}}
+    {{-- <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" /> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('dist/output-tailwind.css') }}" /> --}}
     <style>
         /* Dark Theme Base Styles */
         * {
