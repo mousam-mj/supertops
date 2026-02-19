@@ -613,7 +613,8 @@
                 });
             }
         })();
-        
+    </script>
+    <style>
         /* Mega Menu Dark Theme */
         .mega-menu {
             background: rgba(15, 15, 15, 0.98) !important;
