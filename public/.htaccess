@@ -8,6 +8,11 @@ AddHandler application/x-httpd-php82 .php
 
     RewriteEngine On
 
+    # Allow direct access to storage files (BEFORE sending to index.php)
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
