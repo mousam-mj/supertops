@@ -9,12 +9,13 @@ AddHandler application/x-httpd-php82 .php
     RewriteEngine On
 
     # Allow direct access to storage files (BEFORE sending to index.php)
-    # For LiteSpeed: Check if storage file exists (including through symlinks)
+    # For LiteSpeed: Serve files directly from symlink target
     RewriteCond %{REQUEST_URI} ^/storage/
-    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f
-    RewriteRule ^ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{DOCUMENT_ROOT}/../storage/app/public%{REQUEST_URI} -f
+    RewriteRule ^storage/(.*)$ ../storage/app/public/$1 [L]
     
-    # Alternative check for symlinked files
+    # If file exists via symlink, serve it directly
     RewriteCond %{REQUEST_URI} ^/storage/
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
