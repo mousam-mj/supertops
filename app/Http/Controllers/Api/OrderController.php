@@ -400,16 +400,17 @@ class OrderController extends Controller
                         throw new \Exception("Insufficient stock for {$product->name}. Available: {$stock}, Requested: {$cartItem->quantity}");
                     }
                     
-                    // Update inventory
+                    // Update inventory (deduct stock for this variant)
                     $inventory = Inventory::where('product_id', $product->id)
-                        ->where('color', $cartItem->color)
-                        ->where('size', $cartItem->size)
+                        ->where('color', $cartItem->color ?? '')
+                        ->where('size', $cartItem->size ?? '')
                         ->first();
 
                     if ($inventory) {
                         $inventory->quantity -= $cartItem->quantity;
-                        $inventory->sold_quantity += $cartItem->quantity;
+                        $inventory->sold_quantity = ($inventory->sold_quantity ?? 0) + $cartItem->quantity;
                         $inventory->save();
+                        $product->syncStockFromInventories();
                     } else {
                         // If no inventory record exists, create one with negative quantity (for tracking)
                         // Or throw error if inventory is required
@@ -431,11 +432,11 @@ class OrderController extends Controller
                     $product->save();
                 }
 
-                // Create order item
+                // Create order item (use cart's unit price so variant price is saved)
                 $order->items()->create([
                     'product_id' => $product->id,
                     'quantity' => $cartItem->quantity,
-                    'price' => $product->current_price,
+                    'price' => $cartItem->unit_price,
                     'size' => $cartItem->size,
                     'color' => $cartItem->color,
                     // Legacy fields

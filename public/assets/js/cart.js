@@ -282,7 +282,7 @@
                             items.forEach(item => {
                                 const cartItem = createCartItemElement(item);
                                 cartList.appendChild(cartItem);
-                                const price = parseFloat(item.product?.sale_price || item.product?.price || item.unit_price || 0);
+                                const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
                                 total += price * item.quantity;
                             });
                             
@@ -336,7 +336,7 @@
         
         const imageUrl = getImageUrl(item.product?.image);
         
-        const price = parseFloat(item.product?.sale_price || item.product?.price || 0);
+        const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
         
         div.innerHTML = `
@@ -361,18 +361,10 @@
                     </div>
                 </div>
             </div>
-            <button class="remove-cart-item button-main sm:py-3 py-2 sm:px-5 px-4 bg-red hover:bg-red-700 text-white rounded-full cursor-pointer flex-shrink-0" data-cart-id="${item.id}">Remove</button>
+            <button type="button" class="remove-cart-item button-main sm:py-3 py-2 sm:px-5 px-4 bg-red hover:bg-red-700 text-white rounded-full cursor-pointer flex-shrink-0" data-cart-id="${item.id}" onclick="var id=this.getAttribute('data-cart-id');if(id&&window.removeCartItem){window.removeCartItem(id);}return false;">Remove</button>
         `;
         
-        // Add remove functionality
-        const removeBtn = div.querySelector('.remove-cart-item');
-        if (removeBtn) {
-            removeBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                removeCartItem(item.id);
-            });
-        }
+        // Remove: inline onclick above + delegated listener (backup)
 
         // Add quantity increase/decrease functionality
         const decreaseBtn = div.querySelector('.quantity-decrease');
@@ -442,7 +434,12 @@
     }
     
     // Remove cart item
+    let isRemovingCartItem = false;
     function removeCartItem(cartId) {
+        if (isRemovingCartItem) return;
+        cartId = String(cartId || '').trim();
+        if (!cartId) return;
+        isRemovingCartItem = true;
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         
         fetch(`/api/cart/remove/${cartId}`, {
@@ -471,8 +468,21 @@
         .catch(error => {
             console.error('Error removing cart item:', error);
             showNotification('An error occurred', 'error');
+        })
+        .finally(() => {
+            isRemovingCartItem = false;
         });
     }
+
+    // Delegated click for Remove button (works even after cart list is re-rendered)
+    document.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-cart-item');
+        if (!removeBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const cartId = removeBtn.getAttribute('data-cart-id');
+        if (cartId) removeCartItem(cartId);
+    }, true);
 
     // Show notification
     function showNotification(message, type = 'success') {
@@ -630,7 +640,7 @@
                             items.forEach(item => {
                                 const checkoutItem = createCheckoutItemElement(item);
                                 checkoutList.appendChild(checkoutItem);
-                                const price = parseFloat(item.product?.sale_price || item.product?.price || item.unit_price || 0);
+                                const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
                                 total += price * item.quantity;
                             });
                             
@@ -674,7 +684,7 @@
                             items.forEach(item => {
                                 const cartItem = createCartPageItemElement(item);
                                 cartList.appendChild(cartItem);
-                                const price = parseFloat(item.product?.sale_price || item.product?.price || item.unit_price || 0);
+                                const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
                                 subtotal += price * item.quantity;
                             });
                             
@@ -720,7 +730,7 @@
         }
         
         const imageUrl = getImageUrl(item.product?.image);
-        const price = parseFloat(item.product?.sale_price || item.product?.price || item.unit_price || 0);
+        const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
         
         row.innerHTML = `
@@ -893,7 +903,7 @@
                         const items = data.data?.items || data.data || [];
                         let subtotal = 0;
                         items.forEach(item => {
-                            const price = parseFloat(item.product?.sale_price || item.product?.price || item.unit_price || 0);
+                            const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
                             subtotal += price * item.quantity;
                         });
                         updateCartPageTotal(subtotal);
@@ -922,7 +932,7 @@
         }
         const imageUrl = getImageUrl(item.product?.image);
         
-        const price = parseFloat(item.product?.sale_price || item.product?.price || 0);
+        const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
         
         div.innerHTML = `

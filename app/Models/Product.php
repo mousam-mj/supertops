@@ -27,6 +27,7 @@ class Product extends Model
         'is_new_arrival',
         'image',
         'images',
+        'color_images',
         'video',
         'sizes',
         'colors',
@@ -45,6 +46,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_new_arrival' => 'boolean',
         'images' => 'array',
+        'color_images' => 'array',
         'sizes' => 'array',
         'colors' => 'array',
         'specifications' => 'array',
@@ -130,6 +132,18 @@ class Product extends Model
     }
 
     /**
+     * Sync product stock_quantity and in_stock from inventory totals (e.g. after order deducts inventory)
+     */
+    public function syncStockFromInventories(): void
+    {
+        $total = (int) $this->inventories()->sum('quantity');
+        $this->update([
+            'stock_quantity' => $total,
+            'in_stock' => $total > 0,
+        ]);
+    }
+
+    /**
      * Get stock for specific color and size
      */
     public function getStockForColorSize($color = null, $size = null)
@@ -145,6 +159,22 @@ class Product extends Model
         }
         
         return $query->sum('quantity');
+    }
+
+    /**
+     * Get image URL for a color variant (from color_images), or fallback to main image
+     */
+    public function getImageForColor($color)
+    {
+        if (!$color) {
+            return $this->image;
+        }
+        $colorImages = $this->color_images ?? [];
+        $key = trim($color);
+        if (isset($colorImages[$key]) && $colorImages[$key]) {
+            return $colorImages[$key];
+        }
+        return $this->image;
     }
 }
 

@@ -80,10 +80,7 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0|lt:price',
             'sku' => 'nullable|string|unique:products,sku',
-            'stock_quantity' => 'required|integer|min:0',
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -93,16 +90,18 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
-            'sizes' => 'nullable|string|max:500',
-            'colors' => 'nullable|string|max:500',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
             'specifications.*.value' => 'nullable|string|max:500',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
-        $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
+        $validated['sizes'] = [];
+        $validated['colors'] = [];
+        $validated['stock_quantity'] = 0;
+        $validated['in_stock'] = false;
+        $validated['price'] = 0;
+        $validated['sale_price'] = null;
         
         // Process specifications
         $specifications = [];
@@ -180,10 +179,7 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0|lt:price',
             'sku' => ['nullable', 'string', \Illuminate\Validation\Rule::unique('products', 'sku')->ignore($product->id)],
-            'stock_quantity' => 'required|integer|min:0',
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -193,15 +189,10 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
-            'sizes' => 'nullable|string|max:500',
-            'colors' => 'nullable|string|max:500',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
             'specifications.*.value' => 'nullable|string|max:500',
         ]);
-
-        $validated['sizes'] = array_values(array_filter(array_map('trim', explode(',', $request->input('sizes', '') ?? ''))));
-        $validated['colors'] = array_values(array_filter(array_map('trim', explode(',', $request->input('colors', '') ?? ''))));
         
         // Process specifications
         $specifications = [];

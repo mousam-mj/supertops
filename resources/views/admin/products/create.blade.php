@@ -73,33 +73,8 @@
                         @enderror
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="sizes" class="form-label">Sizes</label>
-                            <input type="text" 
-                                   class="form-control @error('sizes') is-invalid @enderror" 
-                                   id="sizes" 
-                                   name="sizes" 
-                                   value="{{ old('sizes') }}" 
-                                   placeholder="e.g. S, M, L, XL">
-                            <small class="text-muted">Comma-separated.</small>
-                            @error('sizes')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6">
-                            <label for="colors" class="form-label">Colors</label>
-                            <input type="text" 
-                                   class="form-control @error('colors') is-invalid @enderror" 
-                                   id="colors" 
-                                   name="colors" 
-                                   value="{{ old('colors') }}" 
-                                   placeholder="e.g. Red, Blue, Black">
-                            <small class="text-muted">Comma-separated.</small>
-                            @error('colors')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-box-seam me-2"></i><strong>Inventory:</strong> After creating the product, manage <strong>price</strong>, quantity, color &amp; size from the <a href="{{ route('admin.inventory.index') }}">Inventory</a> module.
                     </div>
 
                     <div class="mb-3">
@@ -139,42 +114,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">{{ currency_symbol() }}</span>
-                                <input type="number" 
-                                       class="form-control @error('price') is-invalid @enderror" 
-                                       id="price" 
-                                       name="price" 
-                                       value="{{ old('price') }}" 
-                                       step="0.01" 
-                                       min="0" 
-                                       required>
-                            </div>
-                            @error('price')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label for="sale_price" class="form-label">Sale Price</label>
-                            <div class="input-group">
-                                <span class="input-group-text">{{ currency_symbol() }}</span>
-                                <input type="number" 
-                                       class="form-control @error('sale_price') is-invalid @enderror" 
-                                       id="sale_price" 
-                                       name="sale_price" 
-                                       value="{{ old('sale_price') }}" 
-                                       step="0.01" 
-                                       min="0">
-                            </div>
-                            @error('sale_price')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-12 mb-3">
                             <label for="sku" class="form-label">SKU</label>
                             <input type="text" 
                                    class="form-control @error('sku') is-invalid @enderror" 
@@ -189,21 +129,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="stock_quantity" class="form-label">Stock Quantity <span class="text-danger">*</span></label>
-                            <input type="number" 
-                                   class="form-control @error('stock_quantity') is-invalid @enderror" 
-                                   id="stock_quantity" 
-                                   name="stock_quantity" 
-                                   value="{{ old('stock_quantity', 0) }}" 
-                                   min="0" 
-                                   required>
-                            @error('stock_quantity')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="sort_order" class="form-label">Sort Order</label>
                             <input type="number" 
                                    class="form-control @error('sort_order') is-invalid @enderror" 
@@ -216,7 +142,7 @@
                             @enderror
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="image" class="form-label">Product Image</label>
                             <input type="file" 
                                    class="form-control @error('image') is-invalid @enderror" 

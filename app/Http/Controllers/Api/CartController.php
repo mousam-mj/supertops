@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -140,9 +141,20 @@ class CartController extends Controller
                 $item->load('product');
             }
             
-            // Calculate subtotal properly
             $product = $item->product;
-            $unitPrice = $product ? ($product->sale_price ?? $product->price ?? 0) : 0;
+            $unitPrice = $product ? (float) ($product->sale_price ?? $product->price ?? 0) : 0;
+
+            // Use inventory (variant) price when cart item has color/size
+            if ($product && (($item->color !== null && $item->color !== '') || ($item->size !== null && $item->size !== ''))) {
+                $inventory = Inventory::where('product_id', $item->product_id)
+                    ->where('color', $item->color ?? '')
+                    ->where('size', $item->size ?? '')
+                    ->first();
+                if ($inventory) {
+                    $unitPrice = (float) ($inventory->sale_price ?? $inventory->price ?? $product->price ?? 0);
+                }
+            }
+
             $subtotal = $item->quantity * $unitPrice;
             $total += $subtotal;
             

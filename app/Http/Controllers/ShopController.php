@@ -181,7 +181,7 @@ class ShopController extends Controller
     {
         try {
             $product = Product::where('slug', $slug)
-                ->with(['category', 'category.parent'])
+                ->with(['category', 'category.parent', 'inventories'])
                 ->first();
             
             if (!$product) {

@@ -39,11 +39,35 @@ class Cart extends Model
     }
 
     /**
-     * Get subtotal (quantity * product price)
+     * Get unit price (variant price when color/size set, else product price)
+     */
+    public function getUnitPriceAttribute()
+    {
+        $product = $this->product;
+        if (!$product) {
+            return 0;
+        }
+        if (($this->color !== null && $this->color !== '') || ($this->size !== null && $this->size !== '')) {
+            $inventory = \App\Models\Inventory::where('product_id', $product->id)
+                ->where('color', $this->color ?? '')
+                ->where('size', $this->size ?? '')
+                ->first();
+            if ($inventory) {
+                $price = $inventory->sale_price ?? $inventory->price ?? null;
+                if ($price !== null && (float) $price > 0) {
+                    return (float) $price;
+                }
+            }
+        }
+        return (float) ($product->sale_price ?? $product->price ?? 0);
+    }
+
+    /**
+     * Get subtotal (quantity * unit price) – uses variant price when color/size set
      */
     public function getSubtotalAttribute()
     {
-        return $this->quantity * ($this->product->current_price ?? 0);
+        return $this->quantity * $this->unit_price;
     }
 }
 

@@ -9,12 +9,28 @@
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">Product Inventory</h4>
-                <p class="text-muted mb-0">Manage stock levels for all products</p>
+                <p class="text-muted mb-0">Manage stock levels for all products (latest first)</p>
             </div>
             <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-download me-1"></i> Download Reports
             </a>
         </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <form action="{{ route('admin.inventory.index') }}" method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+            <div class="input-group" style="max-width: 320px;">
+                <input type="text" name="q" class="form-control" placeholder="Search by product name or SKU..." value="{{ request('q') }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+            @if(request('q'))
+                <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            @endif
+        </form>
     </div>
 </div>
 
@@ -75,8 +91,8 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{{ route('admin.products.edit', $product) }}}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil"></i> Update Stock
+                                            <a href="{{ route('admin.inventory.product', $product->id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-box-seam"></i> Manage Inventory
                                             </a>
                                         </td>
                                     </tr>

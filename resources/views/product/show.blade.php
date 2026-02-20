@@ -3,6 +3,60 @@
 @section('title', 'Product Discount - Perch Bottle')
 
 @section('content')
+@php
+    $product->loadMissing('inventories');
+    $availableColors = $product->inventories->pluck('color')->unique()->filter()->values()->toArray();
+    $allSizes = $product->inventories->pluck('size')->unique()->filter()->values()->toArray();
+    if (empty($availableColors) && is_array($product->colors ?? null)) { $availableColors = $product->colors ?? []; }
+    if (empty($allSizes) && is_array($product->sizes ?? null)) { $allSizes = $product->sizes ?? []; }
+    $sizesByColor = [];
+    foreach ($product->inventories as $inv) {
+        $c = $inv->color ?? '';
+        $s = $inv->size ?? '';
+        if ($s === '' && $c === '') continue;
+        if (!isset($sizesByColor[$c])) $sizesByColor[$c] = [];
+        if ($s !== '' && !in_array($s, $sizesByColor[$c], true)) $sizesByColor[$c][] = $s;
+    }
+    foreach ($sizesByColor as $c => $list) {
+        if (empty($list) && $c !== '') $sizesByColor[$c] = array_values(array_unique($allSizes));
+        else $sizesByColor[$c] = array_values($list);
+    }
+    $firstColor = $availableColors[0] ?? null;
+    $sizesForFirstColor = isset($sizesByColor[$firstColor]) && !empty($sizesByColor[$firstColor]) ? $sizesByColor[$firstColor] : $allSizes;
+    $firstSize = $sizesForFirstColor[0] ?? $allSizes[0] ?? null;
+    $availableSizes = $allSizes;
+    $colorImageUrls = [];
+    foreach ($product->inventories as $inv) {
+        if ($inv->color && $inv->image) {
+            $colorImageUrls[$inv->color] = asset('storage/' . $inv->image);
+        }
+    }
+    if (empty($colorImageUrls) && isset($product->color_images) && is_array($product->color_images)) {
+        foreach ($product->color_images as $cName => $path) {
+            if ($path) $colorImageUrls[$cName] = str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
+        }
+    }
+    $variantPrices = [];
+    $productPrice = (float) ($product->price ?? 0);
+    $productSalePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
+    foreach ($product->inventories as $inv) {
+        $c = $inv->color ?? '';
+        $s = $inv->size ?? '';
+        $p = $inv->price !== null && $inv->price > 0 ? (float) $inv->price : $productPrice;
+        $sp = $inv->sale_price !== null && $inv->sale_price > 0 ? (float) $inv->sale_price : $productSalePrice;
+        $variantPrices[] = ['color' => $c, 'size' => $s, 'price' => $p, 'sale_price' => $sp];
+    }
+    $initialPrice = $productPrice;
+    $initialSalePrice = $productSalePrice;
+    foreach ($variantPrices as $v) {
+        if (($v['color'] === $firstColor || ($v['color'] === '' && !$firstColor)) && ($v['size'] === $firstSize || ($v['size'] === '' && !$firstSize))) {
+            $initialPrice = $v['price'];
+            $initialSalePrice = $v['sale_price'];
+            break;
+        }
+    }
+    $initialDisplayPrice = ($initialSalePrice !== null && $initialSalePrice > 0 && $initialSalePrice < $initialPrice) ? $initialSalePrice : $initialPrice;
+@endphp
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
 .about-truncated { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
@@ -75,21 +129,23 @@
                                     @php
                     $getImageUrl = function($path) {
                         if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                                            if (str_starts_with($path, 'http')) return $path;
+                        if (str_starts_with($path, 'http')) return $path;
                         if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
                             return asset($path);
                         }
                         return asset('storage/' . $path);
                     };
-                    
                     $mainImage = $getImageUrl($product->image ?? null);
-                                        $allImages = [$mainImage];
-                                        if (isset($product->images) && is_array($product->images)) {
-                                            foreach ($product->images as $img) {
-                                                $allImages[] = $getImageUrl($img);
-                                            }
-                                        }
-                                        $allImages = array_unique($allImages);
+                    if ($firstColor && isset($colorImageUrls[$firstColor])) {
+                        $mainImage = $colorImageUrls[$firstColor];
+                    }
+                    $allImages = [$mainImage];
+                    if (isset($product->images) && is_array($product->images)) {
+                        foreach ($product->images as $img) {
+                            $allImages[] = $getImageUrl($img);
+                        }
+                    }
+                    $allImages = array_unique($allImages);
                 @endphp
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
@@ -143,21 +199,23 @@
                                 </div>
                                 <span class="caption1 text-secondary">({{ rand(10, 999) }} reviews)</span>
                             </div>
-                            <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
-                                <div class="product-price heading5">₹{{ number_format($product->sale_price ?? $product->price ?? 0, 2) }}</div>
-                    @if($product->sale_price && $product->price > $product->sale_price)
+                            <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line product-price-block" data-variant-prices="{{ json_encode($variantPrices) }}" data-product-price="{{ $productPrice }}" data-product-sale-price="{{ $productSalePrice !== null ? $productSalePrice : '' }}">
+                                <div class="product-price heading5">₹{{ number_format($initialDisplayPrice, 2) }}</div>
+                                @if($initialSalePrice !== null && $initialSalePrice > 0 && $initialPrice > $initialSalePrice)
                                     <div class="w-px h-4 bg-line"></div>
                                     <div class="product-origin-price font-normal text-secondary2">
-                            <del>₹{{ number_format($product->price, 2) }}</del>
-                        </div>
-                        @php
-                            $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
-                        @endphp
-                        @if($discount > 0)
+                                        <del>₹{{ number_format($initialPrice, 2) }}</del>
+                                    </div>
+                                    @php $discount = round((($initialPrice - $initialSalePrice) / $initialPrice) * 100); @endphp
+                                    @if($discount > 0)
                                         <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">-{{ $discount }}%</div>
-                        @endif
-                    @endif
-                                <div class="product-description text-secondary mt-3">{{ $product->short_description ?? ($product->description ? \Illuminate\Support\Str::limit($product->description, 150) : 'No description available.') }}</div>
+                                    @endif
+                                @else
+                                    <div class="w-px h-4 bg-line d-none"></div>
+                                    <div class="product-origin-price font-normal text-secondary2 d-none"><del></del></div>
+                                    <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full d-none"></div>
+                                @endif
+                                <div class="product-description text-secondary mt-3 w-full">{{ $product->short_description ?? ($product->description ? \Illuminate\Support\Str::limit($product->description, 150) : 'No description available.') }}</div>
                 </div>
                             <div class="list-action mt-6">
                                 <div class="discount-code">
@@ -187,11 +245,11 @@
                     </div>
                 @endif
                                 </div>
-                                @if(isset($product->colors) && is_array($product->colors) && count($product->colors) > 0)
-                                    <div class="choose-color mt-5">
-                                        <div class="text-title">Colors: <span class="text-title color selected-color"></span></div>
+                                @if(count($availableColors) > 0)
+                                    <div class="choose-color mt-5" data-color-images="{{ json_encode($colorImageUrls) }}">
+                                        <div class="text-title">Colors: <span class="text-title color selected-color">{{ $availableColors[0] ?? '' }}</span></div>
                                         <div class="list-color flex items-center gap-2 flex-wrap mt-3">
-                                            @foreach($product->colors as $color)
+                                            @foreach($availableColors as $color)
                                                 <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $loop->first ? 'active border-black' : '' }}" 
                                                      style="background-color: {{ $color }};"
                                                      data-color="{{ $color }}"
@@ -201,16 +259,17 @@
                                         </div>
                     </div>
                 @endif
-                                @if(isset($product->sizes) && is_array($product->sizes) && count($product->sizes) > 0)
-                                    <div class="choose-size mt-5">
+                                @if(count($availableSizes) > 0)
+                                    <div class="choose-size mt-5" data-sizes-by-color="{{ json_encode($sizesByColor) }}" data-all-sizes="{{ json_encode($availableSizes) }}">
                                         <div class="heading flex items-center justify-between">
-                                            <div class="text-title">Size: <span class="text-title size selected-size"></span></div>
+                                            <div class="text-title">Size: <span class="text-title size selected-size">{{ $firstSize ?? $availableSizes[0] ?? '' }}</span></div>
                                             <div class="caption1 size-guide text-red underline cursor-pointer">Size Guide</div>
                         </div>
                                         <div class="list-size flex items-center gap-2 flex-wrap mt-3">
-                                            @foreach($product->sizes as $size)
-                                                <div class="size-item w-12 h-12 rounded-lg border-2 border-line hover:border-black cursor-pointer duration-300 flex items-center justify-center text-sm font-semibold {{ $loop->first ? 'active border-black bg-black text-white' : '' }}" 
-                                                     data-size="{{ $size }}">
+                                            @foreach($availableSizes as $size)
+                                                @php $isAvailableForFirst = in_array($size, $sizesForFirstColor ?? $availableSizes, true); @endphp
+                                                <div class="size-item w-12 h-12 rounded-lg border-2 border-line hover:border-black cursor-pointer duration-300 flex items-center justify-center text-sm font-semibold {{ ($firstSize === $size) ? 'active border-black bg-black text-white' : '' }} {{ !$isAvailableForFirst ? 'size-unavailable opacity-60' : '' }}" 
+                                                     data-size="{{ $size }}" title="{{ !$isAvailableForFirst ? 'This size is not available for this color' : '' }}">
                                                     {{ $size }}
                     </div>
                                             @endforeach
@@ -227,7 +286,7 @@
                                     <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
                                 </div>
                                 <div class="button-block mt-5">
-                                    <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center">Buy It Now</a>
+                                    <button type="button" class="buy-it-now-btn button-main w-full text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
                                 </div>
                                 <div class="more-infor mt-6">
                                     <div class="flex items-center gap-4 flex-wrap">
@@ -407,16 +466,16 @@
                                                 <p>Currently Out of Stock</p>
                                             </div>
                                         @endif
-                                        @if($product->sizes && is_array($product->sizes) && count($product->sizes) > 0)
+                                        @if(isset($availableSizes) && count($availableSizes) > 0)
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
-                                                <p>Size: {{ implode(', ', $product->sizes) }}</p>
+                                                <p>Size: {{ implode(', ', $availableSizes) }}</p>
                                             </div>
                                         @endif
-                                        @if($product->colors && is_array($product->colors) && count($product->colors) > 0)
+                                        @if(isset($availableColors) && count($availableColors) > 0)
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
-                                                <p>Colors: {{ implode(', ', $product->colors) }}</p>
+                                                <p>Colors: {{ implode(', ', $availableColors) }}</p>
                                             </div>
                                         @endif
                                         @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
@@ -486,16 +545,16 @@
                                     <div class="text-title sm:w-1/4 w-1/3">Lining</div>
                                     <p>100% polyurethane</p>
                                 </div>
-                                @if($product->sizes && is_array($product->sizes) && count($product->sizes) > 0)
+                                @if(isset($availableSizes) && count($availableSizes) > 0)
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Size</div>
-                                    <p>{{ implode(', ', $product->sizes) }}</p>
+                                    <p>{{ implode(', ', $availableSizes) }}</p>
                                 </div>
                                 @endif
-                                @if($product->colors && is_array($product->colors) && count($product->colors) > 0)
+                                @if(isset($availableColors) && count($availableColors) > 0)
                                 <div class="item bg-surface flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Colors</div>
-                                    <p>{{ implode(', ', $product->colors) }}</p>
+                                    <p>{{ implode(', ', $availableColors) }}</p>
                                 </div>
                                 @endif
                                 @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
@@ -896,7 +955,59 @@
     (function() {
         'use strict';
         
-        // Color selection
+        function updateProductVariantPrice() {
+            const block = document.querySelector('.product-price-block');
+            if (!block) return;
+            const variantPricesJson = block.getAttribute('data-variant-prices');
+            const productPrice = parseFloat(block.getAttribute('data-product-price') || '0') || 0;
+            const productSalePriceRaw = block.getAttribute('data-product-sale-price');
+            const productSalePrice = productSalePriceRaw !== '' && productSalePriceRaw !== null ? (parseFloat(productSalePriceRaw) || null) : null;
+            let variantPrices = [];
+            try {
+                if (variantPricesJson) variantPrices = JSON.parse(variantPricesJson);
+            } catch (e) { return; }
+            const colorEl = document.querySelector('.color-item.active');
+            const sizeEl = document.querySelector('.size-item.active');
+            const color = colorEl ? (colorEl.getAttribute('data-color') || '') : '';
+            const size = sizeEl ? (sizeEl.getAttribute('data-size') || '') : '';
+            let price = productPrice;
+            let salePrice = productSalePrice;
+            for (let i = 0; i < variantPrices.length; i++) {
+                const v = variantPrices[i];
+                const vColor = v.color || '';
+                const vSize = v.size || '';
+                if (vColor === color && vSize === size) {
+                    price = parseFloat(v.price) || price;
+                    salePrice = (v.sale_price !== null && v.sale_price !== undefined && v.sale_price !== '') ? (parseFloat(v.sale_price) || null) : null;
+                    break;
+                }
+            }
+            const displayPrice = (salePrice !== null && salePrice > 0 && salePrice < price) ? salePrice : price;
+            const priceEl = block.querySelector('.product-price');
+            const originEl = block.querySelector('.product-origin-price');
+            const saleBadge = block.querySelector('.product-sale');
+            const separator = block.querySelector('.w-px.h-4');
+            if (priceEl) priceEl.textContent = '₹' + displayPrice.toFixed(2);
+            const hasSale = salePrice !== null && salePrice > 0 && price > salePrice;
+            if (originEl) {
+                const del = originEl.querySelector('del');
+                if (del) del.textContent = '₹' + price.toFixed(2);
+                originEl.classList.toggle('d-none', !hasSale);
+            }
+            if (separator) separator.classList.toggle('d-none', !hasSale);
+            if (saleBadge) {
+                if (hasSale) {
+                    const pct = Math.round(((price - salePrice) / price) * 100);
+                    saleBadge.textContent = '-' + pct + '%';
+                    saleBadge.classList.remove('d-none');
+                } else {
+                    saleBadge.classList.add('d-none');
+                }
+            }
+        }
+        window.updateProductVariantPrice = updateProductVariantPrice;
+        
+        // Color selection + switch main image when color has a dedicated image
         document.addEventListener('click', function(e) {
             const colorItem = e.target.closest('.color-item');
             if (!colorItem || !colorItem.closest('.choose-color')) return;
@@ -904,18 +1015,85 @@
             e.preventDefault();
             e.stopPropagation();
             
-            // Remove active class from siblings
             const siblings = colorItem.parentElement.querySelectorAll('.color-item');
             siblings.forEach(sib => sib.classList.remove('active', 'border-black'));
-            
-            // Add active class to clicked item
             colorItem.classList.add('active', 'border-black');
             
-            // Update selected color text
             const selectedColor = colorItem.getAttribute('data-color');
             const colorText = document.querySelector('.selected-color');
-            if (colorText) {
-                colorText.textContent = selectedColor;
+            if (colorText) colorText.textContent = selectedColor;
+            
+            if (typeof window.updateProductVariantPrice === 'function') {
+                window.updateProductVariantPrice();
+            }
+            var chooseSizeBlock = document.querySelector('.choose-size');
+            if (chooseSizeBlock) {
+                var sizesByColorJson = chooseSizeBlock.getAttribute('data-sizes-by-color');
+                var allSizesJson = chooseSizeBlock.getAttribute('data-all-sizes');
+                try {
+                    var sizesByColor = sizesByColorJson ? JSON.parse(sizesByColorJson) : {};
+                    var allSizes = allSizesJson ? JSON.parse(allSizesJson) : [];
+                    var sizesForColor = sizesByColor[selectedColor] || sizesByColor[''] || allSizes;
+                    var listSize = chooseSizeBlock.querySelector('.list-size');
+                    if (listSize) {
+                        var sizeItems = listSize.querySelectorAll('.size-item');
+                        var firstAvailable = null;
+                        sizeItems.forEach(function(si) {
+                            var s = si.getAttribute('data-size');
+                            var available = sizesForColor.indexOf(s) !== -1;
+                            if (available) {
+                                si.classList.remove('size-unavailable', 'opacity-60');
+                                si.setAttribute('title', '');
+                                if (!firstAvailable) firstAvailable = si;
+                            } else {
+                                si.classList.add('size-unavailable', 'opacity-60');
+                                si.setAttribute('title', 'This size is not available for this color');
+                                si.classList.remove('active', 'border-black', 'bg-black', 'text-white');
+                                si.classList.add('border-line');
+                            }
+                        });
+                        var activeSize = listSize.querySelector('.size-item.active:not(.size-unavailable)');
+                        if (!activeSize && firstAvailable) {
+                            sizeItems.forEach(function(sib) {
+                                sib.classList.remove('active', 'border-black', 'bg-black', 'text-white');
+                                sib.classList.add('border-line');
+                            });
+                            firstAvailable.classList.add('active', 'border-black', 'bg-black', 'text-white');
+                            firstAvailable.classList.remove('border-line');
+                            var sizeTextEl = document.querySelector('.selected-size');
+                            if (sizeTextEl) sizeTextEl.textContent = firstAvailable.getAttribute('data-size');
+                            if (typeof window.updateProductVariantPrice === 'function') window.updateProductVariantPrice();
+                        }
+                    }
+                } catch (err) { /* ignore */ }
+            }
+            
+            // Switch product image to color-based image if available
+            const chooseColor = colorItem.closest('.choose-color');
+            const colorImagesJson = chooseColor?.getAttribute('data-color-images');
+            if (colorImagesJson) {
+                try {
+                    const colorImages = JSON.parse(colorImagesJson);
+                    const colorImageUrl = selectedColor ? (colorImages[selectedColor] || colorImages[selectedColor.trim()]) : '';
+                    const mainSwiper = document.querySelector('.product-detail .mySwiper2');
+                    const thumbSwiper = document.querySelector('.product-detail .mySwiper');
+                    if (colorImageUrl && mainSwiper) {
+                        const wrapper = mainSwiper.querySelector('.swiper-wrapper');
+                        const firstSlide = wrapper?.querySelector('.swiper-slide');
+                        const firstImg = firstSlide?.querySelector('img');
+                        if (firstImg) {
+                            firstImg.src = colorImageUrl;
+                            firstImg.alt = selectedColor + ' - ' + (firstImg.alt || '');
+                        }
+                        if (thumbSwiper) {
+                            const thumbWrapper = thumbSwiper.querySelector('.swiper-wrapper');
+                            const thumbFirst = thumbWrapper?.querySelector('.swiper-slide img');
+                            if (thumbFirst) thumbFirst.src = colorImageUrl;
+                        }
+                        const popupImg = document.querySelector('.product-detail .popup-img .swiper-wrapper .swiper-slide img');
+                        if (popupImg) popupImg.src = colorImageUrl;
+                    }
+                } catch (err) { /* ignore */ }
             }
         });
         
@@ -923,6 +1101,40 @@
         document.addEventListener('click', function(e) {
             const sizeItem = e.target.closest('.size-item');
             if (!sizeItem || !sizeItem.closest('.choose-size')) return;
+            
+            var chooseSizeBlock = sizeItem.closest('.choose-size');
+            var sizesByColorJson = chooseSizeBlock.getAttribute('data-sizes-by-color');
+            var allSizesJson = chooseSizeBlock.getAttribute('data-all-sizes');
+            var clickedSize = sizeItem.getAttribute('data-size');
+            var colorEl = document.querySelector('.color-item.active');
+            var selectedColor = colorEl ? (colorEl.getAttribute('data-color') || '') : '';
+            var isAvailable = true;
+            try {
+                if (sizesByColorJson && allSizesJson) {
+                    var sizesByColor = JSON.parse(sizesByColorJson);
+                    var allSizes = JSON.parse(allSizesJson);
+                    var sizesForColor = sizesByColor[selectedColor] || sizesByColor[''] || allSizes;
+                    isAvailable = sizesForColor.indexOf(clickedSize) !== -1;
+                }
+            } catch (err) { }
+            
+            if (!isAvailable || sizeItem.classList.contains('size-unavailable')) {
+                e.preventDefault();
+                e.stopPropagation();
+                var existingToast = document.querySelector('.product-size-toast');
+                if (existingToast) existingToast.remove();
+                var msg = document.createElement('div');
+                msg.className = 'product-size-toast fixed top-4 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-lg bg-gray-900 text-white text-sm font-medium shadow-xl whitespace-nowrap';
+                msg.textContent = 'Is color ke liye ye size available nahi hai';
+                msg.style.opacity = '1';
+                msg.style.transition = 'opacity 0.2s';
+                document.body.appendChild(msg);
+                setTimeout(function() {
+                    msg.style.opacity = '0';
+                    setTimeout(function() { if (msg.parentNode) msg.remove(); }, 300);
+                }, 2800);
+                return;
+            }
             
             e.preventDefault();
             e.stopPropagation();
@@ -943,6 +1155,9 @@
             const sizeText = document.querySelector('.selected-size');
             if (sizeText) {
                 sizeText.textContent = selectedSize;
+            }
+            if (typeof window.updateProductVariantPrice === 'function') {
+                window.updateProductVariantPrice();
             }
         });
         
@@ -997,13 +1212,16 @@
             const productId = addCartBtn.getAttribute('data-product-id');
             if (!productId) return;
             
+            const productInfor = addCartBtn.closest('.product-infor');
+            if (!productInfor) return;
+            
             // Set flag to prevent double clicks
             isAddingToCart = true;
             
-            // Get selected size and color
-            const selectedSizeItem = document.querySelector('.size-item.active');
-            const selectedColorItem = document.querySelector('.color-item.active');
-            const quantityElement = document.querySelector('.product-infor .quantity-block .quantity');
+            // Get selected size and color from this product
+            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
+            const selectedColorItem = productInfor.querySelector('.color-item.active');
+            const quantityElement = productInfor.querySelector('.quantity-block .quantity');
             
             const size = selectedSizeItem?.getAttribute('data-size') || null;
             const color = selectedColorItem?.getAttribute('data-color') || null;
@@ -1087,6 +1305,80 @@
                 addCartBtn.disabled = originalDisabled;
                 addCartBtn.style.pointerEvents = '';
                 isAddingToCart = false;
+            });
+        });
+        
+        // Buy It Now: add product to cart then redirect to checkout
+        let isBuyItNow = false;
+        document.addEventListener('click', function(e) {
+            const buyBtn = e.target.closest('.buy-it-now-btn');
+            if (!buyBtn || !buyBtn.closest('.product-infor')) return;
+            if (isBuyItNow || buyBtn.disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            const productId = buyBtn.getAttribute('data-product-id');
+            const checkoutUrl = buyBtn.getAttribute('data-checkout-url') || '/checkout';
+            if (!productId) return;
+            const productInfor = buyBtn.closest('.product-infor');
+            if (!productInfor) return;
+            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
+            const selectedColorItem = productInfor.querySelector('.color-item.active');
+            const size = selectedSizeItem?.getAttribute('data-size') || null;
+            const color = selectedColorItem?.getAttribute('data-color') || null;
+            isBuyItNow = true;
+            const originalText = buyBtn.innerHTML;
+            buyBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
+            buyBtn.disabled = true;
+            buyBtn.style.pointerEvents = 'none';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    product_id: parseInt(productId),
+                    quantity: 1,
+                    size: size,
+                    color: color
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (typeof window.updateCartCount === 'function') window.updateCartCount();
+                    window.location.href = checkoutUrl;
+                } else {
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification(data.message || 'Failed to add product', 'error');
+                    } else {
+                        alert(data.message || 'Failed to add product');
+                    }
+                    buyBtn.innerHTML = originalText;
+                    buyBtn.disabled = false;
+                    buyBtn.style.pointerEvents = '';
+                    isBuyItNow = false;
+                }
+            })
+            .catch(function(err) {
+                console.error('Buy It Now error:', err);
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('An error occurred. Please try again.', 'error');
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+                buyBtn.innerHTML = originalText;
+                buyBtn.disabled = false;
+                buyBtn.style.pointerEvents = '';
+                isBuyItNow = false;
             });
         });
         

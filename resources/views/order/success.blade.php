@@ -18,8 +18,14 @@
                     Thank you for your order. We've received your order and will begin processing it right away.
                 </p>
                 
+                @php
+                    $totalAmount = $order->total_amount ?? $order->total ?? 0;
+                    $subtotal = $order->subtotal ?? ($order->items->sum('total') ?: $totalAmount);
+                    $shippingCharge = $order->shipping_charge ?? $order->shipping ?? 0;
+                    $couponDiscount = $order->coupon_discount ?? 0;
+                @endphp
                 <div class="order-details bg-gray-50 rounded-xl p-6 mb-8 text-left">
-                    <div class="grid md:grid-cols-2 gap-4">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <div class="caption1 text-secondary mb-1">Order Number</div>
                             <div class="body1 font-semibold">{{ $order->order_number }}</div>
@@ -34,7 +40,20 @@
                         </div>
                         <div>
                             <div class="caption1 text-secondary mb-1">Total Amount</div>
-                            <div class="body1 font-semibold">${{ number_format($order->total_amount, 2) }}</div>
+                            <div class="body1 font-semibold">₹{{ number_format((float) $totalAmount, 2) }}</div>
+                        </div>
+                    </div>
+                    <div class="border-t border-line pt-4 mt-4">
+                        <div class="caption1 text-secondary mb-2">Amount breakdown</div>
+                        <div class="space-y-1 body2">
+                            <div class="flex justify-between"><span>Subtotal</span><span>₹{{ number_format((float) $subtotal, 2) }}</span></div>
+                            @if($couponDiscount > 0)
+                                <div class="flex justify-between text-green-600"><span>Discount</span><span>-₹{{ number_format((float) $couponDiscount, 2) }}</span></div>
+                            @endif
+                            @if($shippingCharge > 0)
+                                <div class="flex justify-between"><span>Shipping</span><span>₹{{ number_format((float) $shippingCharge, 2) }}</span></div>
+                            @endif
+                            <div class="flex justify-between font-semibold pt-2"><span>Total</span><span>₹{{ number_format((float) $totalAmount, 2) }}</span></div>
                         </div>
                     </div>
                 </div>

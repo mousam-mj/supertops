@@ -559,7 +559,11 @@ if (cartIcon) {
   cartIcon.addEventListener("click", openModalCart);
 }
 if (modalCart) {
-  modalCart.addEventListener("click", closeModalCart);
+  modalCart.addEventListener("click", function(e) {
+    // Only close when clicking the backdrop (outside .modal-cart-main), not when clicking Remove or content inside
+    if (e.target.closest(".modal-cart-main")) return;
+    closeModalCart();
+  });
 }
 if (closeCartIcon) {
   closeCartIcon.addEventListener("click", closeModalCart);

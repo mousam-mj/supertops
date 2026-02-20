@@ -37,7 +37,7 @@
                 <tr>
                     <td style="padding: 10px; border-bottom: 1px solid #ddd;">{{ $item->product->name ?? $item->product_name }}</td>
                     <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">{{ $item->quantity }}</td>
-                    <td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                    <td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">₹{{ number_format($item->price * $item->quantity, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -46,21 +46,21 @@
         <div style="background-color: #f9f9f9; padding: 15px; margin: 20px 0;">
             <div style="display: flex; justify-content: space-between; margin: 5px 0;">
                 <span>Subtotal:</span>
-                <span>${{ number_format($order->total_amount - $order->shipping_charge - ($order->coupon_discount ?? 0), 2) }}</span>
+                <span>₹{{ number_format($order->total_amount - $order->shipping_charge - ($order->coupon_discount ?? 0), 2) }}</span>
             </div>
             @if($order->coupon_discount > 0)
             <div style="display: flex; justify-content: space-between; margin: 5px 0; color: #28a745;">
                 <span>Discount:</span>
-                <span>-${{ number_format($order->coupon_discount, 2) }}</span>
+                <span>-₹{{ number_format($order->coupon_discount, 2) }}</span>
             </div>
             @endif
             <div style="display: flex; justify-content: space-between; margin: 5px 0;">
                 <span>Shipping:</span>
-                <span>${{ number_format($order->shipping_charge, 2) }}</span>
+                <span>₹{{ number_format($order->shipping_charge, 2) }}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin: 15px 0; padding-top: 15px; border-top: 2px solid #333; font-weight: bold; font-size: 1.1em;">
                 <span>Total:</span>
-                <span>${{ number_format($order->total_amount, 2) }}</span>
+                <span>₹{{ number_format($order->total_amount, 2) }}</span>
             </div>
         </div>
         

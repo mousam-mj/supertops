@@ -136,7 +136,7 @@ Route::get('/test/hello', function() {
 
 // Order Success Route
 Route::get('/order-success/{id}', function($id) {
-    $order = \App\Models\Order::findOrFail($id);
+    $order = \App\Models\Order::with('items')->findOrFail($id);
     return view('order.success', compact('order'));
 })->name('order.success');
 
@@ -626,11 +626,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
             return redirect()->route('admin.main-categories.index')->with('success', 'Main category deleted successfully!');
         })->name('main-categories.destroy');
         
-        // Inventory Route
-        Route::get('/inventory', function() {
-            $products = \App\Models\Product::with('category')->orderBy('name')->get();
-            return view('admin.inventory.index', compact('products'));
-        })->name('inventory.index');
+        // Inventory Routes
+        Route::get('/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('/inventory/product/{id}', function($id) {
+            $product = \App\Models\Product::with(['category', 'inventories'])->findOrFail($id);
+            return view('admin.inventory.product', compact('product'));
+        })->name('inventory.product');
+        Route::post('/inventory/product/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'store'])->name('inventory.store');
+        Route::post('/inventory/product/{id}/bulk', [\App\Http\Controllers\Admin\InventoryController::class, 'bulkStore'])->name('inventory.bulk.store');
+        Route::put('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'update'])->name('inventory.update');
+        Route::delete('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'destroy'])->name('inventory.destroy');
         
         // Payments Route
         Route::get('/payments', function() {
