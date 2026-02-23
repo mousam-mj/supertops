@@ -8,12 +8,8 @@
         <link rel="shortcut icon" href="{{ asset('assets/images/perch-logo.png') }}" type="image/x-icon" />
     <link rel="stylesheet" href="{{ asset('assets/css/swiper-bundle.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
-    @if(file_exists(public_path('dist/output-scss.css')))
     <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" />
-    @endif
-    @if(file_exists(public_path('dist/output-tailwind.css')))
     <link rel="stylesheet" href="{{ asset('dist/output-tailwind.css') }}" />
-    @endif
     <style>
         /* Dark Theme Base Styles */
         * {
