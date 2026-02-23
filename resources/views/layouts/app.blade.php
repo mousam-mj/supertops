@@ -334,6 +334,7 @@
     
     @include('partials.scripts')
     @yield('scripts')
+    @stack('scripts')
     
     <script>
         // Header interactions

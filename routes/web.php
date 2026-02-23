@@ -34,12 +34,17 @@ Route::get('/', function () {
         ->orderBy('created_at', 'desc')
         ->get();
     
-    // Get featured products for "What's New" section
+    // Get featured products for "What's New" section (with main category for filtering)
     $featuredProducts = \App\Models\Product::where('is_active', true)
         ->where('is_featured', true)
-        ->with('category')
+        ->with('category.mainCategory')
         ->orderBy('sort_order')
-        ->limit(8)
+        ->limit(12)
+        ->get();
+
+    // Main categories for What's New tabs and header
+    $mainCategories = \App\Models\MainCategory::where('is_active', true)
+        ->orderBy('sort_order')
         ->get();
     
     // Get new arrivals
@@ -67,7 +72,7 @@ Route::get('/', function () {
         ->limit(8)
         ->get();
     
-    return view('home', compact('categories', 'homeCategories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts'));
+    return view('home', compact('categories', 'homeCategories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts', 'mainCategories'));
 })->name('home');
 
 // Regular Login Routes (for /login.html compatibility)

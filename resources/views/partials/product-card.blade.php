@@ -42,21 +42,6 @@
                 <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" />
             </a>
             
-            @if(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
-                <div class="countdown-time-block py-1.5 flex items-center justify-center">
-                    <div class="text-xs font-semibold uppercase text-red">
-                        <span class="countdown-day">24</span>
-                        <span>D : </span>
-                        <span class="countdown-hour">14</span>
-                        <span>H : </span>
-                        <span class="countdown-minute">36</span>
-                        <span>M : </span>
-                        <span class="countdown-second">51</span>
-                        <span>S</span>
-                    </div>
-                </div>
-            @endif
-            
             <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 opacity-0 group-hover:opacity-100 max-md:opacity-100 max-md:group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-auto">
                 <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer select-none" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}">
                     <span class="max-lg:hidden">Quick View</span>

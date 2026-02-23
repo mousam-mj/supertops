@@ -56,198 +56,23 @@
                         </div>
                         
                         <div class="menu-main h-full max-lg:hidden">
+                            @php
+                                $headerMainCategories = \App\Models\MainCategory::where('is_active', true)
+                                    ->orderBy('sort_order')
+                                    ->with(['activeCategories' => function ($q) {
+                                        $q->whereNull('parent_id');
+                                    }])
+                                    ->get();
+                            @endphp
                             <ul class="flex items-center gap-8 h-full">
-                                <li class="h-full">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Features </a>
-                                    <div class="mega-menu absolute top-[74px] left-0 bg-white w-screen">
-                                        <div class="container">
-                                            <div class="flex justify-between py-8">
-                                                <div class="nav-link basis-2/3 grid grid-cols-4 gap-y-8">
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">For Men</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Starting From 50% Off </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Outerwear | Coats </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Sweaters | Cardigans </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Sweatshirts </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Massimo Dutti</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Shirt | Clothes </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Top | Overshirts </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Clothes </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Swimwear | Underwear </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Skincare</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Faces Skin </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Eyes Makeup </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Lip Polish </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Hair Care </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">Health</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Cented Candle </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Health Drinks </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Yoga Clothes </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Yoga Equipment </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">For Women</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Starting From 60% Off </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Dresses | Jumpsuits </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> T-shirts | Sweatshirts </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Accessories | Jewelry </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">For Kid</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Kids Bed </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Boy's Toy </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Baby Blanket </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Newborn Clothing </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="nav-item">
-                                                        <div class="text-button-uppercase pb-2">For Home</div>
-                                                        <ul>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Furniture | Decor </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Table | Living Room </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Chair | Work Room </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 cursor-pointer"> Lighting | Bed Room </a>
-                                                            </li>
-                                                            <li>
-                                                        <a href="{{{ route('shop') }}}" class="link text-secondary duration-300 view-all-btn"> View All </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="banner-ads-block pl-2.5 basis-1/3">
-                                            <a href="{{{ route('shop') }}}" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer">
-                                                        <div class="text-content py-14 pl-8 relative z-[1]">
-                                                            <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm">Save $10</div>
-                                                            <div class="heading6 mt-2">Dive into Savings <br />on Swimwear</div>
-                                                            <div class="body1 mt-3 text-secondary">Starting at <span class="text-red">$59.99</span></div>
-                                                        </div>
-                                                <img src="{{ asset('assets/images/slider/bg2-2.png') }}" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
-                                                    </a>
-                                            <a href="{{{ route('shop') }}}" class="banner-ads-item bg-linear rounded-2xl relative block overflow-hidden cursor-pointer mt-8">
-                                                        <div class="text-content py-14 pl-8 relative z-[1]">
-                                                            <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm">Save $10</div>
-                                                            <div class="heading6 mt-2">20% off <br />accessories</div>
-                                                            <div class="body1 mt-3 text-secondary">Starting at <span class="text-red">$59.99</span></div>
-                                                        </div>
-                                                <img src="{{ asset('assets/images/other/bg-feature.png') }}" alt="bg-img" class="h-full w-auto absolute right-0 top-0 duration-700" />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="h-full relative">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Blog </a>
-                                    <div class="sub-menu py-3 px-5 -left-10 absolute bg-white rounded-b-xl">
-                                        <ul class="w-full">
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Blog Default </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Blog List </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Blog Grid </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Blog Detail 1 </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Blog Detail 2 </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
+                                @foreach($headerMainCategories as $mainCat)
+                                    @php $primaryCat = $mainCat->activeCategories->first(); @endphp
+                                    @if($primaryCat)
+                                        <li class="h-full">
+                                            <a href="{{ route('category', $primaryCat->slug) }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">{{ $mainCat->name }}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
                                 <li class="h-full relative">
                                     <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Pages </a>
                                     <div class="sub-menu py-3 px-5 -left-10 absolute bg-white rounded-b-xl">
@@ -259,19 +84,7 @@
                                         <a href="{{{ route('contact') }}}" class="link text-secondary duration-300"> Contact Us </a>
                                             </li>
                                             <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Store List </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> 404 </a>
-                                            </li>
-                                            <li>
                                         <a href="{{{ route('faqs') }}}" class="link text-secondary duration-300"> FAQs </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Coming Soon </a>
-                                            </li>
-                                            <li>
-                                        <a href="#!" class="link text-secondary duration-300"> Customer Feedbacks </a>
                                             </li>
                                         </ul>
                                     </div>
@@ -351,47 +164,57 @@
                     
                             <div class="list-nav mt-6">
                         @php
-                            $categories = \App\Models\Category::whereNull('parent_id')
-                                ->with(['children.children'])
-                                ->where('is_active', true)
+                            $mobileMainCategories = \App\Models\MainCategory::where('is_active', true)
                                 ->orderBy('sort_order')
+                                ->with(['activeCategories' => function ($q) {
+                                    $q->whereNull('parent_id')->with(['children' => function ($q2) {
+                                        $q2->where('is_active', true)->orderBy('sort_order')->with(['children' => function ($q3) {
+                                            $q3->where('is_active', true)->orderBy('sort_order');
+                                        }]);
+                                    }]);
+                                }])
                                 ->get();
                         @endphp
                         
                         <ul>
-                            @foreach($categories as $category)
-                                <li>
-                                    <a href="#!" class="text-xl font-semibold flex items-center justify-between">
-                                        {{ $category->name }}
+                            @foreach($mobileMainCategories as $mainCat)
+                                @php $primaryCat = $mainCat->activeCategories->first(); @endphp
+                                @if($primaryCat)
+                                    <li>
+                                        <a href="{{ $primaryCat->children->count() > 0 ? '#!' : route('category', $primaryCat->slug) }}" class="text-xl font-semibold flex items-center justify-between">
+                                            {{ $mainCat->name }}
+                                            @if($primaryCat->children->count() > 0)
                                             <span class="text-right">
                                                 <i class="ph ph-caret-right text-xl"></i>
                                             </span>
+                                            @endif
                                         </a>
-                                    @if($category->children->count() > 0)
-                                        <div class="sub-nav-mobile">
-                                            <div class="back-btn flex items-center gap-3">
-                                                <i class="ph ph-caret-left text-xl"></i>
-                                                Back
+                                        @if($primaryCat->children->count() > 0)
+                                            <div class="sub-nav-mobile">
+                                                <div class="back-btn flex items-center gap-3">
+                                                    <i class="ph ph-caret-left text-xl"></i>
+                                                    Back
+                                                </div>
+                                                <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
+                                                    @foreach($primaryCat->children as $subCategory)
+                                                        <div class="nav-item">
+                                                            <a href="{{ route('category', $subCategory->slug) }}" class="text-title duration-300">{{ $subCategory->name }}</a>
+                                                            @if($subCategory->children->count() > 0)
+                                                                <ul class="mt-2">
+                                                                    @foreach($subCategory->children as $childCategory)
+                                                                        <li>
+                                                                            <a href="{{ route('category', $childCategory->slug) }}" class="link text-secondary duration-300">{{ $childCategory->name }}</a>
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                            <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
-                                                @foreach($category->children as $subCategory)
-                                                    <div class="nav-item">
-                                                        <a href="{{{ route('shop', ['category' => $subCategory->slug]) }}}" class="text-title duration-300">{{ $subCategory->name }}</a>
-                                                        @if($subCategory->children->count() > 0)
-                                                            <ul class="mt-2">
-                                                                @foreach($subCategory->children as $childCategory)
-                                                                    <li>
-                                                                        <a href="{{{ route('shop', ['category' => $childCategory->slug]) }}}" class="link text-secondary duration-300">{{ $childCategory->name }}</a>
-                                                            </li>
-                                                                @endforeach
-                                                        </ul>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                                    </div>
-                                                    </div>
-                                    @endif
-                                                            </li>
+                                        @endif
+                                    </li>
+                                @endif
                             @endforeach
                                                             <li>
                                 <a href="{{{ route('shop') }}}" class="text-xl font-semibold">Shop</a>

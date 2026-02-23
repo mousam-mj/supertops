@@ -89,7 +89,7 @@
                             <div class="banner-img w-full">
                                 <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
-                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kichenware</div>
+                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kitchenware</div>
                             <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
                         </a>
                     @endforelse
@@ -100,32 +100,58 @@
             </div>
         </div>
 
-        <div class="what-new-block filter-product-block md:pt-20 pt-10">
+        <div class="what-new-block filter-product-block md:pt-20 pt-10" data-filter-type="main-category">
             <div class="container">
                 <div class="heading flex flex-col items-center text-center">
                     <div class="heading3">What's new</div>
                     <div class="menu-tab bg-surface rounded-2xl mt-6">
-                        <div class="menu flex items-center gap-2 p-1">
+                        <div class="menu flex items-center gap-2 p-1 relative">
                             <div class="indicator absolute top-1 bottom-1 bg-white rounded-full shadow-md duration-300"></div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="top">top</div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black active" data-item="t-shirt">t-shirt</div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="dress">dress</div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="sets">sets</div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="shirt">shirt</div>
+                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black active" data-item="all">All</div>
+                            @foreach($mainCategories ?? [] as $mainCat)
+                                <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="{{ $mainCat->slug }}">{{ $mainCat->name }}</div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
                 <div class="list-product four-product hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 md:mt-10 mt-6">
-                    @forelse($featuredProducts->take(4) as $product)
+                    @forelse($featuredProducts as $product)
+                        <div class="what-new-product-wrap" data-main-category="{{ $product->category->mainCategory->slug ?? 'all' }}">
                             @include('partials.product-card', ['product' => $product])
+                        </div>
                     @empty
                         <div class="col-span-full text-center py-10">
                             <p class="text-secondary">No products available</p>
-                            </div>
-                    @endforelse
                         </div>
+                    @endforelse
+                </div>
             </div>
         </div>
+        @push('scripts')
+        <script>
+        (function() {
+            var block = document.querySelector('.what-new-block[data-filter-type="main-category"]');
+            if (!block) return;
+            var tabs = block.querySelectorAll('.menu-tab .tab-item[data-item]');
+            var wraps = block.querySelectorAll('.what-new-product-wrap');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    var slug = this.getAttribute('data-item');
+                    block.querySelectorAll('.menu-tab .tab-item').forEach(function(t){ t.classList.remove('active'); });
+                    this.classList.add('active');
+                    wraps.forEach(function(w) {
+                        var cat = w.getAttribute('data-main-category');
+                        if (slug === 'all' || cat === slug) {
+                            w.style.display = '';
+                        } else {
+                            w.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        })();
+        </script>
+        @endpush
 
         <div class="look-book-block md:mt-20 mt-10 lg:py-20 md:py-14 py-10 bg-linear">
             <div class="container">
