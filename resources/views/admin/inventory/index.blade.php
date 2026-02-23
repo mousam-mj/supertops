@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">Product Inventory</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">Product Inventory</h4>
                 <p class="text-muted mb-0">Manage stock levels for all products</p>
             </div>
             <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm">

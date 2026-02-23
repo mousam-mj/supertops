@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">Dashboard Overview</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">Dashboard Overview</h4>
                 <p class="text-muted mb-0">Welcome back! Here's what's happening with your store today.</p>
             </div>
             <div class="dropdown">

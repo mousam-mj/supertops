@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">{{ $coupon->name }}</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">{{ $coupon->name }}</h4>
                 <p class="text-muted mb-0">Coupon details and usage statistics</p>
             </div>
             <div>

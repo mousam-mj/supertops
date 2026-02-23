@@ -7,7 +7,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <div>
-            <h4 class="mb-1 fw-bold" style="color: #2d3748;">System Alerts</h4>
+            <h4 class="mb-1 fw-bold admin-page-title">System Alerts</h4>
             <p class="text-muted mb-0">Monitor important alerts and notifications</p>
         </div>
     </div>

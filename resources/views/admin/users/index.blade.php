@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Users</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">All Users</h4>
                 <p class="text-muted mb-0">Manage user accounts and permissions</p>
             </div>
             <div class="d-flex gap-2">

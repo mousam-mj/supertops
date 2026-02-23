@@ -4,359 +4,106 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\MainCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 
 class ProductSeeder extends Seeder
 {
     /**
-     * Available product images
-     */
-    private $productImages = [
-        'perch-bottal.webp',
-        'Bottle-1.webp',
-        'Bottle-4.webp',
-        'Bottle-8.webp',
-        '20250521_1801_Stylish-Thermos-Bottle_remix_01jvsd3j07f6a9rm70wqvvb657-1-1.webp',
-        '20250521_1821_Funky-Purple-Bottle_remix_01jvse8qtcf3rb4t4cy114y0x1-1.webp',
-        '20250614_1217_Color-Coordinated-Background_remix_01jxpjzpcdf599yv9ssqfqndfm.webp',
-        '20250614_1238_Floral-Bottle-Harmony_remix_01jxpm7f78f0dtz5hba3sy1fp2.webp',
-    ];
-
-    /**
      * Run the database seeds.
+     * 30 mobile accessory products with original (Unsplash) image URLs.
      */
     public function run(): void
     {
-        // Get categories
-        $categories = Category::all();
-        
-        if ($categories->isEmpty()) {
-            $this->command->warn('No categories found. Please run CategorySeeder first.');
+        $main = MainCategory::where('slug', 'mobile-accessories')->first();
+        if (!$main) {
+            $this->command->warn('Mobile Accessories main category not found. Run CategorySeeder first.');
             return;
         }
 
-        // Clear existing products if needed (optional - comment out if you want to keep existing products)
-        // Product::truncate();
+        $categories = Category::where('main_category_id', $main->id)->get();
+        if ($categories->isEmpty()) {
+            $this->command->warn('No mobile accessory categories found. Run CategorySeeder first.');
+            return;
+        }
 
-        // Product data matching the screenshot
         $products = [
-            // Featured Products (from screenshot)
-            [
-                'name' => 'Hydro Double Wall Bottle 1L',
-                'price' => 44.99,
-                'sale_price' => 39.99,
-                'stock' => 22,
-                'category' => 'Double wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'perch-bottal.webp',
-                'sort_order' => 1,
-            ],
-            [
-                'name' => 'Elegant Single Wall Bottle 1L',
-                'price' => 29.99,
-                'sale_price' => null,
-                'stock' => 38,
-                'category' => 'Single Wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => true,
-                'image' => 'Bottle-1.webp',
-                'sort_order' => 2,
-            ],
-            [
-                'name' => 'Oasis Pro Double Wall Bottle 1L',
-                'price' => 39.99,
-                'sale_price' => 34.99,
-                'stock' => 25,
-                'category' => 'Double wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-4.webp',
-                'sort_order' => 3,
-            ],
-            [
-                'name' => 'Zenith Double Wall Bottle 500ml',
-                'price' => 29.99,
-                'sale_price' => 24.99,
-                'stock' => 50,
-                'category' => 'Double wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-8.webp',
-                'sort_order' => 4,
-            ],
-            
-            // More Double Wall Bottles
-            [
-                'name' => 'Oasis Double Wall Bottle 750ml',
-                'price' => 34.99,
-                'sale_price' => null,
-                'stock' => 30,
-                'category' => 'Double wall Bottles',
-                'is_featured' => false,
-                'is_new_arrival' => true,
-                'image' => '20250521_1801_Stylish-Thermos-Bottle_remix_01jvsd3j07f6a9rm70wqvvb657-1-1.webp',
-                'sort_order' => 5,
-            ],
-            [
-                'name' => 'Zion Double Wall Bottle 500ml',
-                'price' => 27.99,
-                'sale_price' => null,
-                'stock' => 40,
-                'category' => 'Double wall Bottles',
-                'is_featured' => false,
-                'is_new_arrival' => false,
-                'image' => '20250521_1821_Funky-Purple-Bottle_remix_01jvse8qtcf3rb4t4cy114y0x1-1.webp',
-                'sort_order' => 6,
-            ],
-            [
-                'name' => 'California Double Wall Bottle 750ml',
-                'price' => 32.99,
-                'sale_price' => 28.99,
-                'stock' => 35,
-                'category' => 'Double wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => '20250614_1217_Color-Coordinated-Background_remix_01jxpjzpcdf599yv9ssqfqndfm.webp',
-                'sort_order' => 7,
-            ],
-            [
-                'name' => 'Apex Double Wall Bottle 1L',
-                'price' => 42.99,
-                'sale_price' => null,
-                'stock' => 20,
-                'category' => 'Double wall Bottles',
-                'is_featured' => false,
-                'is_new_arrival' => true,
-                'image' => '20250614_1238_Floral-Bottle-Harmony_remix_01jxpm7f78f0dtz5hba3sy1fp2.webp',
-                'sort_order' => 8,
-            ],
-            [
-                'name' => 'Retro Double Wall Bottle 500ml',
-                'price' => 31.99,
-                'sale_price' => 27.99,
-                'stock' => 15,
-                'category' => 'Double wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'perch-bottal.webp',
-                'sort_order' => 9,
-            ],
-            [
-                'name' => 'Froste Double Wall Bottle 750ml',
-                'price' => 36.99,
-                'sale_price' => null,
-                'stock' => 28,
-                'category' => 'Double wall Bottles',
-                'is_featured' => false,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-1.webp',
-                'sort_order' => 10,
-            ],
-            
-            // Single Wall Bottles
-            [
-                'name' => 'Magic Single Wall Bottle 500ml',
-                'price' => 19.99,
-                'sale_price' => null,
-                'stock' => 60,
-                'category' => 'Single Wall Bottles',
-                'is_featured' => false,
-                'is_new_arrival' => true,
-                'image' => 'Bottle-4.webp',
-                'sort_order' => 11,
-            ],
-            [
-                'name' => 'Classic Single Wall Bottle 750ml',
-                'price' => 24.99,
-                'sale_price' => 21.99,
-                'stock' => 45,
-                'category' => 'Single Wall Bottles',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-8.webp',
-                'sort_order' => 12,
-            ],
-            
-            // Barware Essentials
-            [
-                'name' => 'Elite Kit Barware Set',
-                'price' => 89.99,
-                'sale_price' => 79.99,
-                'stock' => 12,
-                'category' => 'Barware Essentials',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'perch-bottal.webp',
-                'sort_order' => 13,
-            ],
-            [
-                'name' => 'Perch O Holic Cocktail Shaker',
-                'price' => 45.99,
-                'sale_price' => null,
-                'stock' => 25,
-                'category' => 'Barware Essentials',
-                'is_featured' => false,
-                'is_new_arrival' => true,
-                'image' => 'Bottle-1.webp',
-                'sort_order' => 14,
-            ],
-            [
-                'name' => 'Premium Bar Tools Set',
-                'price' => 65.99,
-                'sale_price' => 55.99,
-                'stock' => 18,
-                'category' => 'Barware Essentials',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-4.webp',
-                'sort_order' => 15,
-            ],
-            [
-                'name' => 'Professional Mixing Set',
-                'price' => 52.99,
-                'sale_price' => null,
-                'stock' => 20,
-                'category' => 'Barware Essentials',
-                'is_featured' => false,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-8.webp',
-                'sort_order' => 16,
-            ],
-            
-            // Home & Kitchen
-            [
-                'name' => 'Speckle Storage Container Set',
-                'price' => 39.99,
-                'sale_price' => 34.99,
-                'stock' => 30,
-                'category' => 'Home & Kitchen',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'perch-bottal.webp',
-                'sort_order' => 17,
-            ],
-            [
-                'name' => 'Modern Kitchen Utensil Set',
-                'price' => 49.99,
-                'sale_price' => null,
-                'stock' => 25,
-                'category' => 'Home & Kitchen',
-                'is_featured' => false,
-                'is_new_arrival' => true,
-                'image' => 'Bottle-1.webp',
-                'sort_order' => 18,
-            ],
-            [
-                'name' => 'Premium Cookware Set',
-                'price' => 129.99,
-                'sale_price' => 109.99,
-                'stock' => 8,
-                'category' => 'Home & Kitchen',
-                'is_featured' => true,
-                'is_new_arrival' => false,
-                'image' => 'Bottle-4.webp',
-                'sort_order' => 19,
-            ],
+            ['name' => 'Silicone iPhone Case - Clear Protective', 'price' => 599, 'sale_price' => 449, 'category_name' => 'Phone Cases', 'image' => 'https://images.unsplash.com/photo-1601593346742-d1c539289bfe?w=600', 'description' => 'Premium clear silicone case with shock absorption. Fits iPhone 14/15 series.'],
+            ['name' => 'Leather Wallet Phone Case', 'price' => 1299, 'sale_price' => null, 'category_name' => 'Phone Cases', 'image' => 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600', 'description' => 'Genuine leather wallet case with card slots and magnetic closure.'],
+            ['name' => 'Rugged Armor Shockproof Case', 'price' => 899, 'sale_price' => 699, 'category_name' => 'Phone Cases', 'image' => 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600', 'description' => 'Military-grade drop protection. Dual-layer design.'],
+            ['name' => 'USB-C Fast Charger 25W', 'price' => 799, 'sale_price' => 599, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600', 'description' => 'PD 3.0 compatible. Fast charge compatible with Samsung/iPhone.'],
+            ['name' => 'Wireless Charging Pad 15W', 'price' => 1499, 'sale_price' => 1199, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1625723044792-44de16ccb4e9?w=600', 'description' => 'Qi-certified. LED indicator. Non-slip surface.'],
+            ['name' => 'Car Charger Dual Port 36W', 'price' => 649, 'sale_price' => null, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600', 'description' => 'Dual USB-A + USB-C. Quick Charge 3.0 support.'],
+            ['name' => 'Braided USB-C to Lightning Cable 1m', 'price' => 499, 'sale_price' => 399, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1583394293214-28f3f2b2a2a2?w=600', 'description' => 'Nylon braided. MFi certified. Durable design.'],
+            ['name' => 'Wireless Bluetooth Earbuds TWS', 'price' => 2499, 'sale_price' => 1999, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1598331668826-20cecc596b86?w=600', 'description' => 'Active noise cancellation. 30hr total battery. IPX5 water resistant.'],
+            ['name' => 'Over-Ear Wireless Headphones', 'price' => 3999, 'sale_price' => 3299, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600', 'description' => '40mm drivers. 35hr playback. Foldable with carry case.'],
+            ['name' => 'Gaming Headset with Mic', 'price' => 2799, 'sale_price' => null, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600', 'description' => '7.1 surround. Detachable mic. RGB lighting.'],
+            ['name' => 'Sports Running Wireless Earbuds', 'price' => 1799, 'sale_price' => 1499, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1577174881658-45f9d3f2c932?w=600', 'description' => 'Ear hooks. IPX7. 8hr battery. Secure fit.'],
+            ['name' => 'Tempered Glass Screen Protector 9H', 'price' => 299, 'sale_price' => 199, 'category_name' => 'Protection', 'image' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600', 'description' => '9H hardness. Oleophobic coating. Bubble-free installation.'],
+            ['name' => 'Camera Lens Protector Kit', 'price' => 449, 'sale_price' => null, 'category_name' => 'Protection', 'image' => 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600', 'description' => 'Sapphire glass. Anti-glare. Easy alignment.'],
+            ['name' => 'Privacy Screen Protector', 'price' => 599, 'sale_price' => 499, 'category_name' => 'Protection', 'image' => 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600', 'description' => '45° viewing angle. Blue light filter. HD clear.'],
+            ['name' => '10000mAh Power Bank 22.5W', 'price' => 1499, 'sale_price' => 1199, 'category_name' => 'Power Banks', 'image' => 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600', 'description' => 'Dual USB output. Fast charge. Compact design.'],
+            ['name' => '20000mAh Power Bank 65W PD', 'price' => 2999, 'sale_price' => null, 'category_name' => 'Power Banks', 'image' => 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600', 'description' => 'Laptop charging. 3 ports. LED display.'],
+            ['name' => 'Wireless Power Bank 10000mAh', 'price' => 2299, 'sale_price' => 1999, 'category_name' => 'Power Banks', 'image' => 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600', 'description' => 'Qi wireless + USB. Stand design. Fast charge.'],
+            ['name' => 'Aluminum Phone Stand Desktop', 'price' => 499, 'sale_price' => 399, 'category_name' => 'Stands & Mounts', 'image' => 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600', 'description' => 'Adjustable angle. Non-slip base. Portable.'],
+            ['name' => 'Car Vent Magnetic Phone Mount', 'price' => 649, 'sale_price' => null, 'category_name' => 'Stands & Mounts', 'image' => 'https://images.unsplash.com/photo-1601593346742-d1c539289bfe?w=600', 'description' => 'Strong magnet. 360° rotation. One-hand operation.'],
+            ['name' => 'Gaming Phone Cooler Mount', 'price' => 1799, 'sale_price' => 1499, 'category_name' => 'Stands & Mounts', 'image' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600', 'description' => 'Active cooling. Adjustable. Compatible with controllers.'],
+            ['name' => 'Portable Bluetooth Speaker', 'price' => 1999, 'sale_price' => 1699, 'category_name' => 'Audio Accessories', 'image' => 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600', 'description' => 'IPX7 waterproof. 12hr play. Bass boost.'],
+            ['name' => 'USB-C to 3.5mm Audio Adapter', 'price' => 349, 'sale_price' => 249, 'category_name' => 'Audio Accessories', 'image' => 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600', 'description' => 'DAC included. No loss in quality. Compact.'],
+            ['name' => 'Magnetic Cable Organizer', 'price' => 199, 'sale_price' => null, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600', 'description' => 'Cable management. Reusable. Multiple colors.'],
+            ['name' => 'Premium Silicone Watch Band', 'price' => 899, 'sale_price' => 699, 'category_name' => 'Phone Cases', 'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600', 'description' => 'Comfortable. Sweat resistant. Quick release pins.'],
+            ['name' => 'Multi-Port USB Hub 4-in-1', 'price' => 999, 'sale_price' => 799, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600', 'description' => 'USB 3.0. HDMI. SD card reader. Compact.'],
+            ['name' => 'Noise Cancelling Ear Tips Set', 'price' => 299, 'sale_price' => 199, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1577174881658-45f9d3f2c932?w=600', 'description' => '3 sizes. Memory foam. Better seal and bass.'],
+            ['name' => 'Phone Grip Ring Holder', 'price' => 249, 'sale_price' => null, 'category_name' => 'Phone Cases', 'image' => 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600', 'description' => 'Sticky base. Stand function. Multiple colors.'],
+            ['name' => 'Laptop Sleeve with Phone Pocket', 'price' => 1299, 'sale_price' => 999, 'category_name' => 'Protection', 'image' => 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600', 'description' => 'Neoprene. Padded. Fits 13-15 inch laptops.'],
+            ['name' => 'Smartwatch Charging Cable', 'price' => 449, 'sale_price' => 349, 'category_name' => 'Chargers', 'image' => 'https://images.unsplash.com/photo-1583394293214-28f3f2b2a2a2?w=600', 'description' => 'Magnetic. Fast charge. Universal compatibility.'],
+            ['name' => 'Earbuds Case with Keychain', 'price' => 399, 'sale_price' => null, 'category_name' => 'Headphones', 'image' => 'https://images.unsplash.com/photo-1598331668826-20cecc596b86?w=600', 'description' => 'Silicone. Dust proof. Carabiner clip.'],
+            ['name' => 'Tablet Stand with Cooling Fan', 'price' => 1599, 'sale_price' => 1299, 'category_name' => 'Stands & Mounts', 'image' => 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600', 'description' => 'Adjustable. USB fan. Fits 7-12 inch tablets.'],
         ];
 
-        foreach ($products as $index => $productData) {
-            // Find category by name
-            $category = $categories->firstWhere('name', $productData['category']);
-            
-            if (!$category) {
-                // Try to find a subcategory
-                $category = $categories->first(function ($cat) use ($productData) {
-                    return $cat->parent && $cat->parent->name === $productData['category'];
-                });
-                
-                if (!$category) {
-                    // Use first available category as fallback
-                    $category = $categories->first();
-                }
-            }
+        foreach ($products as $index => $data) {
+            $category = $categories->firstWhere('name', $data['category_name']) ?? $categories->first();
+            $slug = Str::slug($data['name']);
+            $existing = Product::where('slug', $slug)->first();
 
-            // Handle image - use asset path directly (images are in public folder)
-            $imagePath = null;
-            if (isset($productData['image'])) {
-                $sourcePath = public_path('assets/images/product/' . $productData['image']);
-                if (File::exists($sourcePath)) {
-                    // For now, store the relative path - images are already in public/assets/images/product
-                    // In production, you might want to copy to storage, but for development this works
-                    $imagePath = 'assets/images/product/' . $productData['image'];
-                } else {
-                    // Fallback to default image
-                    $imagePath = 'assets/images/product/perch-bottal.webp';
-                }
-            } else {
-                // Default image if none specified
-                $imagePath = 'assets/images/product/perch-bottal.webp';
-            }
+            $payload = [
+                'name' => $data['name'],
+                'description' => $data['description'] ?? $this->description($data['name']),
+                'short_description' => $this->shortDescription($data['name']),
+                'category_id' => $category?->id,
+                'price' => $data['price'],
+                'sale_price' => $data['sale_price'] ?? null,
+                'stock_quantity' => rand(15, 80),
+                'in_stock' => true,
+                'is_active' => true,
+                'is_featured' => $index < 10,
+                'is_new_arrival' => $index % 3 === 0,
+                'image' => $data['image'],
+                'images' => [$data['image']],
+                'sort_order' => $index + 1,
+            ];
 
-            // Check if product already exists
-            $slug = Str::slug($productData['name']);
-            $existingProduct = Product::where('slug', $slug)->first();
-            
-            if ($existingProduct) {
-                // Update existing product
-                $existingProduct->update([
-                    'name' => $productData['name'],
-                    'description' => $this->generateDescription($productData['name']),
-                    'short_description' => $this->generateShortDescription($productData['name']),
-                    'category_id' => $category ? $category->id : null,
-                    'price' => $productData['price'],
-                    'sale_price' => $productData['sale_price'],
-                    'stock_quantity' => $productData['stock'],
-                    'in_stock' => $productData['stock'] > 0,
-                    'is_active' => true,
-                    'is_featured' => $productData['is_featured'] ?? false,
-                    'is_new_arrival' => $productData['is_new_arrival'] ?? false,
-                    'image' => $imagePath,
-                    'images' => $imagePath ? [$imagePath] : null,
-                    'sort_order' => $productData['sort_order'] ?? $index + 1,
-                ]);
+            if ($existing) {
+                $existing->update($payload);
             } else {
-                // Create new product
-                Product::create([
-                    'name' => $productData['name'],
+                Product::create(array_merge($payload, [
                     'slug' => $slug,
-                    'description' => $this->generateDescription($productData['name']),
-                    'short_description' => $this->generateShortDescription($productData['name']),
-                    'category_id' => $category ? $category->id : null,
-                    'price' => $productData['price'],
-                    'sale_price' => $productData['sale_price'],
-                    'sku' => 'PROD-' . strtoupper(Str::random(8)),
-                    'stock_quantity' => $productData['stock'],
-                    'in_stock' => $productData['stock'] > 0,
-                    'is_active' => true,
-                    'is_featured' => $productData['is_featured'] ?? false,
-                    'is_new_arrival' => $productData['is_new_arrival'] ?? false,
-                    'image' => $imagePath,
-                    'images' => $imagePath ? [$imagePath] : null,
-                    'sort_order' => $productData['sort_order'] ?? $index + 1,
-                ]);
+                    'sku' => 'MAC-' . strtoupper(Str::random(6)),
+                ]));
             }
         }
 
-        $this->command->info('Products seeded successfully with images!');
+        $this->command->info('30 mobile accessories products seeded.');
     }
 
-    private function generateDescription($name): string
+    private function description(string $name): string
     {
-        $descriptions = [
-            "Premium quality {$name}. Made with high-grade materials for durability and style. Perfect for everyday use. Features excellent craftsmanship and modern design.",
-            "Experience the perfect blend of style and functionality with our {$name}. Designed with attention to detail, this product offers superior quality and performance.",
-            "The {$name} combines innovative design with practical functionality. Built to last with premium materials, it's the perfect addition to your collection.",
-            "Discover the elegance of our {$name}. Crafted with precision and care, this product delivers exceptional quality and timeless design.",
-        ];
-        
-        return $descriptions[array_rand($descriptions)];
+        return "Premium {$name}. High quality materials, durable design. Perfect for daily use.";
     }
 
-    private function generateShortDescription($name): string
+    private function shortDescription(string $name): string
     {
-        return "High-quality {$name} with modern design and premium materials. Perfect for daily use.";
+        return "Premium {$name} with great build quality and design.";
     }
 }

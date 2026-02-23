@@ -18,6 +18,10 @@
             --sidebar-gradient: linear-gradient(180deg, rgba(15, 15, 15, 0.98), rgba(15, 15, 15, 0.95));
             --card-shadow: 0 4px 15px rgba(0,0,0,0.3);
             --card-hover-shadow: 0 8px 25px rgba(0, 255, 238, 0.2);
+            /* Override Bootstrap so cards/tables stay dark */
+            --bs-body-bg: #0f0f0f;
+            --bs-card-bg: rgba(18, 18, 22, 0.95);
+            --bs-tertiary-bg: rgba(255, 255, 255, 0.05);
         }
         
         body {
@@ -165,13 +169,16 @@
             background: transparent;
         }
         
-        .card {
+        /* Force dark theme - override Bootstrap card/table white */
+        .card,
+        .main-content .card,
+        body .card {
             border: none;
             box-shadow: var(--card-shadow);
             border-radius: 16px;
             transition: all 0.3s ease;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: rgba(18, 18, 22, 0.95) !important;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -193,16 +200,23 @@
             font-weight: 600;
         }
         
-        .card-body {
+        .card-body,
+        .main-content .card-body,
+        body .card-body {
             padding: 25px;
-            background: transparent;
-            color: white !important;
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.95) !important;
         }
         
         .card-footer {
             background: rgba(255, 255, 255, 0.03) !important;
             border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: white !important;
+        }
+        
+        .table-responsive,
+        .main-content .table-responsive {
+            background: transparent !important;
         }
         
         .btn {
@@ -275,6 +289,8 @@
             border-radius: 12px;
             overflow: hidden;
             background: transparent;
+            border-collapse: collapse;
+            width: 100%;
         }
         
         .table thead {
@@ -285,12 +301,16 @@
         
         .table thead th {
             border: none;
-            padding: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
+            padding: 12px 15px;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
             color: white !important;
+            white-space: nowrap;
+            vertical-align: middle;
+            text-align: left;
         }
         
         .table tbody {
@@ -298,20 +318,68 @@
         }
         
         .table tbody tr {
-            transition: all 0.2s ease;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+        
+        .table tbody tr:last-child {
+            border-bottom: none;
         }
         
         .table tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            transform: scale(1.01);
+            background-color: rgba(255, 255, 255, 0.08) !important;
         }
         
         .table tbody td {
-            padding: 15px;
-            vertical-align: middle;
+            padding: 12px 15px;
+            vertical-align: middle !important;
             color: white !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        
+        /* Admin data table - column alignment and widths */
+        .admin-data-table thead th.admin-th-id { width: 1%; white-space: nowrap; }
+        .admin-data-table thead th.admin-th-image { width: 70px; text-align: center; }
+        .admin-data-table .admin-th-image + td { text-align: center; }
+        .admin-data-table thead th.admin-th-name { min-width: 160px; }
+        .admin-data-table thead th.admin-th-category { min-width: 100px; }
+        .admin-data-table thead th.admin-th-price { width: 1%; white-space: nowrap; }
+        .admin-data-table thead th.admin-th-stock { width: 1%; white-space: nowrap; text-align: center; }
+        .admin-data-table td:nth-child(6) { text-align: center; }
+        .admin-data-table thead th.admin-th-status { min-width: 100px; }
+        .admin-data-table thead th.admin-th-actions { width: 1%; white-space: nowrap; text-align: right; }
+        .admin-data-table td:last-child { text-align: right; }
+        
+        .admin-table-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .admin-table-thumb-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 1.25rem;
+        }
+        
+        .admin-table-name .text-truncate {
+            max-width: 220px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        
+        .admin-data-table .btn-group {
+            flex-wrap: nowrap;
+            gap: 2px;
+        }
+        
+        .admin-data-table .btn-group .btn,
+        .admin-data-table .btn-group form {
+            flex-shrink: 0;
         }
         
         .badge {
@@ -330,6 +398,78 @@
         
         .badge.bg-primary {
             background: var(--primary-gradient) !important;
+        }
+        .badge.bg-secondary {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .badge.bg-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: #111 !important;
+        }
+        .badge.bg-info {
+            background: linear-gradient(135deg, #00ccff, #0099cc) !important;
+            color: white !important;
+        }
+        /* Page headings - visible on dark */
+        .admin-page-title {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .card-title {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .btn-outline-info {
+            border-color: rgba(0, 204, 255, 0.6) !important;
+            color: #00ccff !important;
+        }
+        .btn-outline-info:hover {
+            background: linear-gradient(135deg, #00ccff, #0099cc) !important;
+            border-color: transparent !important;
+            color: white !important;
+        }
+        .btn-outline-primary {
+            border-color: rgba(255, 0, 204, 0.5) !important;
+            color: #ff66b2 !important;
+        }
+        .btn-outline-primary:hover {
+            background: var(--primary-gradient) !important;
+            border-color: transparent !important;
+            color: white !important;
+        }
+        .btn-outline-secondary {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            color: white !important;
+        }
+        /* Table card - consistent border */
+        .card .table-responsive {
+            border-radius: 12px;
+        }
+        .card .table {
+            margin-bottom: 0;
+        }
+        /* Dropdown in dark theme */
+        .dropdown-menu {
+            background: rgba(20, 20, 20, 0.98) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px;
+        }
+        .dropdown-item {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: #00ffee !important;
+        }
+        .dropdown-header {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
         
         .form-control, .form-select {
@@ -460,6 +600,51 @@
             color: white !important;
         }
         
+        /* Stats cards (payments, etc.) - dark theme borders & text */
+        .card.border-success { border-color: rgba(34, 197, 94, 0.5) !important; }
+        .card.border-success .card-body { color: rgba(255,255,255,0.95) !important; }
+        .card.border-success .text-success, .card.border-success h5 { color: #4ade80 !important; }
+        .card.border-info { border-color: rgba(59, 130, 246, 0.5) !important; }
+        .card.border-info .card-body { color: rgba(255,255,255,0.95) !important; }
+        .card.border-info .text-info, .card.border-info h5 { color: #60a5fa !important; }
+        .card.border-primary { border-color: rgba(255, 0, 204, 0.5) !important; }
+        .card.border-primary .card-body { color: rgba(255,255,255,0.95) !important; }
+        .card.border-primary .text-primary, .card.border-primary h5 { color: #ff66b2 !important; }
+        .card.border-warning { border-color: rgba(245, 158, 11, 0.5) !important; }
+        .card.border-warning .card-body { color: rgba(255,255,255,0.95) !important; }
+        .card.border-warning .text-warning, .card.border-warning h5 { color: #fbbf24 !important; }
+        /* Alert section cards (low stock, out of stock) */
+        .card.border-warning .card-header.bg-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: #111 !important;
+            border: none;
+        }
+        .card.border-danger .card-header.bg-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            border: none;
+        }
+        .card.border-info .card-header.bg-info {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+            color: white !important;
+            border: none;
+        }
+        .card-header.bg-white {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .card-header.bg-light {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .card-footer.bg-light {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-content {

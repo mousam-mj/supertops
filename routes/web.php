@@ -20,53 +20,45 @@ Route::get('/', function () {
         ->where('is_active', true)
         ->orderBy('sort_order')
         ->get();
-    
+
+    // Landing: only mobile accessories products
+    $mobileMain = \App\Models\MainCategory::where('slug', 'mobile-accessories')->where('is_active', true)->first();
+    $mobileCategoryIds = $mobileMain
+        ? \App\Models\Category::where('main_category_id', $mobileMain->id)->pluck('id')->toArray()
+        : [];
+
     // Get top 3 categories for home page banners
     $homeCategories = \App\Models\Category::whereNull('parent_id')
         ->where('is_active', true)
         ->orderBy('sort_order')
         ->limit(3)
         ->get();
-    
+
     // Get hero banners
     $heroBanners = \App\Models\HeroBanner::where('is_active', true)
         ->orderBy('priority', 'asc')
         ->orderBy('created_at', 'desc')
         ->get();
-    
-    // Get featured products for "What's New" section
-    $featuredProducts = \App\Models\Product::where('is_active', true)
-        ->where('is_featured', true)
-        ->with('category')
-        ->orderBy('sort_order')
-        ->limit(8)
-        ->get();
-    
-    // Get new arrivals
-    $newArrivals = \App\Models\Product::where('is_active', true)
-        ->where('is_new_arrival', true)
-        ->with('category')
-        ->orderBy('created_at', 'desc')
-        ->limit(8)
-        ->get();
-    
-    // Get best sellers (top selling products - using featured for now, can be updated with actual sales data later)
-    $bestSellers = \App\Models\Product::where('is_active', true)
-        ->where('is_featured', true)
-        ->with('category')
-        ->orderBy('sort_order')
-        ->limit(8)
-        ->get();
-    
-    // Get products on sale (products with sale_price)
-    $onSaleProducts = \App\Models\Product::where('is_active', true)
+
+    $productQuery = function () use ($mobileCategoryIds) {
+        $q = \App\Models\Product::where('is_active', true)->with('category');
+        if (!empty($mobileCategoryIds)) {
+            $q->whereIn('category_id', $mobileCategoryIds);
+        }
+        return $q;
+    };
+
+    // Featured, new arrivals, best sellers, on sale – mobile accessories only
+    $featuredProducts = $productQuery()->where('is_featured', true)->orderBy('sort_order')->limit(8)->get();
+    $newArrivals = $productQuery()->where('is_new_arrival', true)->orderBy('created_at', 'desc')->limit(8)->get();
+    $bestSellers = $productQuery()->where('is_featured', true)->orderBy('sort_order')->limit(8)->get();
+    $onSaleProducts = $productQuery()
         ->whereNotNull('sale_price')
         ->whereColumn('sale_price', '<', 'price')
-        ->with('category')
         ->orderBy('sort_order')
         ->limit(8)
         ->get();
-    
+
     return view('home', compact('categories', 'homeCategories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts'));
 })->name('home');
 

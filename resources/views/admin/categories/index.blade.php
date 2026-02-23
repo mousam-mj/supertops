@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Categories</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">All Categories</h4>
                 <p class="text-muted mb-0">Manage your product categories</p>
             </div>
             <a href="{{{ route('admin.categories.create') }}}" class="btn btn-primary">
@@ -47,8 +47,8 @@
                                                  alt="{{ $category->name }}" 
                                                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                         @else
-                                            <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                 style="width: 60px; height: 60px; border-radius: 8px;">
+                                            <div class="d-flex align-items-center justify-content-center rounded" 
+                                                 style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255,255,255,0.08);">
                                                 <i class="bi bi-image text-muted"></i>
                                             </div>
                                         @endif

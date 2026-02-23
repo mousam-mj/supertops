@@ -6,7 +6,7 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <h4 class="mb-1 fw-bold" style="color: #2d3748;">Download Reports</h4>
+        <h4 class="mb-1 fw-bold admin-page-title">Download Reports</h4>
         <p class="text-muted mb-0">Export inventory, orders, customers, revenue, and SKUs as CSV.</p>
     </div>
 </div>

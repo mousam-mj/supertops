@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             UserSeeder::class,
             ProductSeeder::class,
-            MobileAccessoriesProductSeeder::class,
             OrderSeeder::class,
             PolicyPageSeeder::class,
         ]);

@@ -7,7 +7,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <div>
-            <h4 class="mb-1 fw-bold" style="color: #2d3748;">Policy & Legal Pages</h4>
+            <h4 class="mb-1 fw-bold admin-page-title">Policy & Legal Pages</h4>
             <p class="text-muted mb-0">Edit About Us, Terms & Conditions, Privacy Policy, Return & Refund, and Cancellation Policy. Content is shown on the frontend.</p>
         </div>
     </div>

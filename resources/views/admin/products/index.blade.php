@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Products</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">All Products</h4>
                 <p class="text-muted mb-0">Manage your product inventory</p>
             </div>
             <a href="{{{ route('admin.products.create') }}}" class="btn btn-primary">
@@ -83,17 +83,17 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover admin-data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th class="admin-th-id">ID</th>
+                                <th class="admin-th-image">Image</th>
+                                <th class="admin-th-name">Name</th>
+                                <th class="admin-th-category">Category</th>
+                                <th class="admin-th-price">Price</th>
+                                <th class="admin-th-stock">Stock</th>
+                                <th class="admin-th-status">Status</th>
+                                <th class="admin-th-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,6 +104,9 @@
                                         @php
                                             $getImageUrl = function($path) {
                                                 if (!$path) return null;
+                                                if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                                                    return $path;
+                                                }
                                                 if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
                                                     return asset($path);
                                                 }
@@ -114,16 +117,16 @@
                                         @if($imageUrl)
                                             <img src="{{ $imageUrl }}" 
                                                  alt="{{ $product->name }}" 
-                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                                 class="admin-table-thumb"
+                                                 loading="lazy">
                                         @else
-                                            <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                 style="width: 50px; height: 50px; border-radius: 4px;">
+                                            <div class="admin-table-thumb admin-table-thumb-placeholder d-flex align-items-center justify-content-center">
                                                 <i class="bi bi-image text-muted"></i>
                                             </div>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="fw-semibold">{{ $product->name }}</div>
+                                    <td class="admin-table-name">
+                                        <div class="fw-semibold text-truncate" title="{{ $product->name }}">{{ $product->name }}</div>
                                         @if($product->sku)
                                             <small class="text-muted">SKU: {{ $product->sku }}</small>
                                         @endif
@@ -145,10 +148,13 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($product->stock_quantity < 10)
-                                            <span class="badge bg-warning">{{ $product->stock_quantity }}</span>
+                                        @php $qty = (int) ($product->stock_quantity ?? 0); @endphp
+                                        @if($qty <= 0)
+                                            <span class="badge bg-danger">0</span>
+                                        @elseif($qty < 10)
+                                            <span class="badge bg-warning">{{ $qty }}</span>
                                         @else
-                                            <span class="badge bg-success">{{ $product->stock_quantity }}</span>
+                                            <span class="badge bg-success">{{ $qty }}</span>
                                         @endif
                                     </td>
                                     <td>

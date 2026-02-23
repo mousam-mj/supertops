@@ -8,7 +8,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Coupons</h4>
+                <h4 class="mb-1 fw-bold admin-page-title">All Coupons</h4>
                 <p class="text-muted mb-0">Manage discount coupons and promotional codes</p>
             </div>
             <a href="{{{ route('admin.coupons.create') }}}" class="btn btn-primary">

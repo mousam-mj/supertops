@@ -1078,7 +1078,10 @@
                 <div class="heading6" id="searchResultsTitle" style="color: white !important;">Latest products</div>
                 <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4" id="searchModalProductList">
                     @php
+                        $mobileMain = \App\Models\MainCategory::where('slug', 'mobile-accessories')->where('is_active', true)->first();
+                        $mobileCatIds = $mobileMain ? \App\Models\Category::where('main_category_id', $mobileMain->id)->pluck('id')->toArray() : [];
                         $recentProducts = \App\Models\Product::where('is_active', true)
+                            ->when(!empty($mobileCatIds), fn($q) => $q->whereIn('category_id', $mobileCatIds))
                             ->orderBy('created_at', 'desc')
                             ->limit(4)
                             ->get();
