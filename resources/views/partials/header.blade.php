@@ -1,31 +1,7 @@
 <div id="top-nav" class="top-nav style-two bg-purple md:h-[44px] h-[30px]" style="position: relative !important; top: auto !important; bottom: auto !important; display: block !important; visibility: visible !important;">
             <div class="container mx-auto h-full">
                 <div class="top-nav-main flex justify-between max-md:justify-center h-full">
-                    <div class="left-content flex items-center gap-5 max-md:hidden">
-                        <div class="choose-type choose-language flex items-center gap-1.5">
-                            <div class="select relative">
-                                <p class="selected caption2 text-white">English</p>
-                                <ul class="list-option bg-white">
-                                    <li data-item="English" class="caption2 active">English</li>
-                                    <li data-item="Espana" class="caption2">Espana</li>
-                                    <li data-item="France" class="caption2">France</li>
-                                </ul>
-                            </div>
-                            <i class="ph ph-caret-down text-xs text-white"></i>
-                        </div>
-                        <div class="choose-type choose-currency flex items-center gap-1.5">
-                            <div class="select relative">
-                                <p class="selected caption2 text-white">{{ \App\Models\Setting::get('currency', 'INR') }}</p>
-                                <ul class="list-option bg-white">
-                                    <li data-item="INR" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'INR' ? 'active' : '' }}">INR</li>
-                                    <li data-item="USD" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'USD' ? 'active' : '' }}">USD</li>
-                                    <li data-item="EUR" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'EUR' ? 'active' : '' }}">EUR</li>
-                                    <li data-item="GBP" class="caption2 {{ \App\Models\Setting::get('currency', 'INR') === 'GBP' ? 'active' : '' }}">GBP</li>
-                                </ul>
-                            </div>
-                            <i class="ph ph-caret-down text-xs text-white"></i>
-                        </div>
-                    </div>
+                    <div class="left-content flex items-center gap-5 max-md:hidden"></div>
                     <div class="text-center text-button-uppercase text-white flex items-center">{{ \App\Models\Setting::get('free_shipping_text', 'FREE SHIPPING ON ALL ORDERS OVER ₹75') }}</div>
                     <div class="right-content flex items-center gap-5 max-md:hidden">
                         @php $fb = \App\Models\Setting::get('facebook_url'); @endphp

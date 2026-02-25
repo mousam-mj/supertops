@@ -76,17 +76,14 @@ class InventoryController extends Controller
             $inventory->sale_price = $request->sale_price;
         }
 
-        $oldImage = $inventory->exists ? $inventory->image : null;
-        if ($request->hasFile('image')) {
-            $inventory->image = $request->file('image')->store('products/inventory', 'public');
-        } elseif ($request->hasFile('images') && count($request->file('images')) > 0) {
-            $inventory->image = $request->file('images')[0]->store('products/inventory', 'public');
+        $uploadedPaths = $this->storeInventoryImages($request, null);
+        if (!empty($uploadedPaths)) {
+            $existing = is_array($inventory->images) ? $inventory->images : ($inventory->image ? [$inventory->image] : []);
+            $inventory->images = array_values(array_merge($existing, $uploadedPaths));
+            $inventory->image = $inventory->images[0] ?? null;
         }
 
         $inventory->save();
-        if ($oldImage && $inventory->image && $oldImage !== $inventory->image) {
-            Storage::disk('public')->delete($oldImage);
-        }
         $this->syncProductStock($product);
 
         $message = $wasExisting
@@ -112,6 +109,8 @@ class InventoryController extends Controller
             'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:2048',
             'remove_image' => 'nullable|boolean',
         ]);
 
@@ -122,15 +121,16 @@ class InventoryController extends Controller
         $inventory->sale_price = $request->filled('sale_price') ? $request->sale_price : null;
 
         if ($request->filled('remove_image') && $request->remove_image == '1') {
-            if ($inventory->image) {
-                Storage::disk('public')->delete($inventory->image);
-            }
+            $this->deleteInventoryImages($inventory);
             $inventory->image = null;
-        } elseif ($request->hasFile('image')) {
-            if ($inventory->image) {
-                Storage::disk('public')->delete($inventory->image);
+            $inventory->images = null;
+        } else {
+            $uploadedPaths = $this->storeInventoryImages($request, null);
+            if (!empty($uploadedPaths)) {
+                $existing = is_array($inventory->images) ? $inventory->images : ($inventory->image ? [$inventory->image] : []);
+                $inventory->images = array_values(array_merge($existing, $uploadedPaths));
+                $inventory->image = $inventory->images[0] ?? null;
             }
-            $inventory->image = $request->file('image')->store('products/inventory', 'public');
         }
 
         $inventory->save();
@@ -147,9 +147,7 @@ class InventoryController extends Controller
     {
         $inventory = Inventory::findOrFail($id);
         $productId = $inventory->product_id;
-        if ($inventory->image) {
-            Storage::disk('public')->delete($inventory->image);
-        }
+        $this->deleteInventoryImages($inventory);
         $inventory->delete();
 
         $product = Product::find($productId);
@@ -173,15 +171,22 @@ class InventoryController extends Controller
             'items.*.quantity' => 'nullable|integer|min:0',
             'items.*.price' => 'nullable|numeric|min:0',
             'items.*.sale_price' => 'nullable|numeric|min:0',
+            'items.*.image' => 'nullable|image|max:2048',
+            'items.*.images' => 'nullable|array',
+            'items.*.images.*' => 'nullable|image|max:2048',
         ]);
 
         $product = Product::findOrFail($productId);
         $successCount = 0;
+        $rawItems = $request->input('items', []);
 
-        $items = array_values(array_filter($request->input('items'), function ($item) {
+        $items = [];
+        foreach ($rawItems as $index => $item) {
             $q = (int) ($item['quantity'] ?? 0);
-            return $q > 0;
-        }));
+            if ($q > 0) {
+                $items[] = ['index' => $index, 'data' => $item];
+            }
+        }
         if (empty($items)) {
             return redirect()->route('admin.inventory.product', $productId)
                 ->with('error', 'Add at least one row with quantity greater than 0.');
@@ -189,7 +194,9 @@ class InventoryController extends Controller
 
         DB::beginTransaction();
         try {
-            foreach ($items as $item) {
+            foreach ($items as $entry) {
+                $index = $entry['index'];
+                $item = $entry['data'];
                 $color = !empty($item['color']) && trim($item['color']) !== '' ? trim($item['color']) : null;
                 $size = !empty($item['size']) && trim($item['size']) !== '' ? trim($item['size']) : null;
                 $quantity = (int) ($item['quantity'] ?? 0);
@@ -215,6 +222,14 @@ class InventoryController extends Controller
                 if (isset($item['sale_price']) && is_numeric($item['sale_price'])) {
                     $inventory->sale_price = $item['sale_price'];
                 }
+
+                $uploadedPaths = $this->storeInventoryImages($request, $index);
+                if (!empty($uploadedPaths)) {
+                    $existing = is_array($inventory->images) ? $inventory->images : [];
+                    $inventory->images = array_values(array_merge($existing, $uploadedPaths));
+                    $inventory->image = $inventory->images[0] ?? null;
+                }
+
                 $inventory->save();
                 $successCount++;
             }
@@ -228,6 +243,58 @@ class InventoryController extends Controller
             DB::rollBack();
             return redirect()->route('admin.inventory.product', $product->id)
                 ->with('error', 'Bulk add failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store uploaded images from request. Returns array of stored paths.
+     * @param Request $request
+     * @param int|null $bulkIndex If set, read from items.$bulkIndex.image and items.$bulkIndex.images
+     */
+    private function storeInventoryImages(Request $request, ?int $bulkIndex = null): array
+    {
+        $paths = [];
+        if ($bulkIndex !== null) {
+            $single = $request->file("items.{$bulkIndex}.image");
+            if ($single && $single->isValid()) {
+                $paths[] = $single->store('products/inventory', 'public');
+            }
+            $files = $request->file("items.{$bulkIndex}.images");
+            if (is_array($files)) {
+                foreach ($files as $file) {
+                    if ($file && $file->isValid()) {
+                        $paths[] = $file->store('products/inventory', 'public');
+                    }
+                }
+            }
+        } else {
+            $single = $request->file('image');
+            if ($single && $single->isValid()) {
+                $paths[] = $single->store('products/inventory', 'public');
+            }
+            $files = $request->file('images');
+            if (is_array($files)) {
+                foreach ($files as $file) {
+                    if ($file && $file->isValid()) {
+                        $paths[] = $file->store('products/inventory', 'public');
+                    }
+                }
+            }
+        }
+        return $paths;
+    }
+
+    private function deleteInventoryImages(Inventory $inventory): void
+    {
+        if ($inventory->image) {
+            Storage::disk('public')->delete($inventory->image);
+        }
+        if (is_array($inventory->images)) {
+            foreach ($inventory->images as $path) {
+                if ($path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
         }
     }
 

@@ -48,12 +48,6 @@
                 <span>Subtotal:</span>
                 <span>₹{{ number_format($order->total_amount - $order->shipping_charge - ($order->coupon_discount ?? 0), 2) }}</span>
             </div>
-            @if($order->coupon_discount > 0)
-            <div style="display: flex; justify-content: space-between; margin: 5px 0; color: #28a745;">
-                <span>Discount:</span>
-                <span>-₹{{ number_format($order->coupon_discount, 2) }}</span>
-            </div>
-            @endif
             <div style="display: flex; justify-content: space-between; margin: 5px 0;">
                 <span>Shipping:</span>
                 <span>₹{{ number_format($order->shipping_charge, 2) }}</span>

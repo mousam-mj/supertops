@@ -264,10 +264,6 @@
                         <div class="checkout-block">
                             <div class="heading5 pb-3">Your Order</div>
                             <div class="list-product-checkout"></div>
-                            <div class="discount-block py-5 flex justify-between border-b border-line">
-                                <div class="text-title">Discounts</div>
-                                <div class="text-title">-₹<span class="discount">0</span><span>.00</span></div>
-                            </div>
                             <div class="ship-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Shipping</div>
                                 <div class="text-title">Free</div>
@@ -377,9 +373,8 @@ function validateForm() {
         }
     }
     
-    // Get discount
-    const discountElement = document.querySelector('.discount');
-    const discount = discountElement ? parseFloat(discountElement.textContent) || 0 : 0;
+    // Discount removed from UI - use 0
+    const discount = 0;
     
     // Check if user is logged in
     const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};

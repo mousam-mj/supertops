@@ -875,11 +875,11 @@
                                         </div>
                                         <div class="item flex items-center gap-8 py-3 px-10">
                                             <div class="text-title sm:w-1/4 w-1/3">Size</div>
-                                            <p>S, M, L, XL</p>
+                                            <p>{{ isset($availableSizes) && count($availableSizes) > 0 ? implode(', ', $availableSizes) : '—' }}</p>
                                         </div>
                                         <div class="item bg-surface flex items-center gap-8 py-3 px-10">
                                             <div class="text-title sm:w-1/4 w-1/3">Colors</div>
-                                            <p>Grey, Red, Blue, Black</p>
+                                            <p>{{ isset($availableColors) && count($availableColors) > 0 ? implode(', ', $availableColors) : '—' }}</p>
                                         </div>
                                         <div class="item flex items-center gap-8 py-3 px-10">
                                             <div class="text-title sm:w-1/4 w-1/3">Care</div>

@@ -76,6 +76,8 @@
                                 <th>Customer</th>
                                 <th>Email</th>
                                 <th>Total</th>
+                                <th>Color</th>
+                                <th>Size</th>
                                 <th>Status</th>
                                 <th>Payment</th>
                                 <th>Date</th>
@@ -84,11 +86,17 @@
                         </thead>
                         <tbody>
                             @forelse($orders as $order)
+                                @php
+                                    $colors = $order->items->pluck('color')->filter()->unique()->values();
+                                    $sizes = $order->items->pluck('size')->filter()->unique()->values();
+                                @endphp
                                 <tr>
                                     <td><strong>{{ $order->order_number }}</strong></td>
                                     <td>{{ $order->user ? $order->user->name : ($order->customer_name ?? 'Guest') }}</td>
                                     <td>{{ $order->user ? $order->user->email : ($order->customer_email ?? 'N/A') }}</td>
                                     <td><strong>{{ currency($order->total_amount ?? $order->total ?? 0) }}</strong></td>
+                                    <td>{{ $colors->isNotEmpty() ? $colors->implode(', ') : '—' }}</td>
+                                    <td>{{ $sizes->isNotEmpty() ? $sizes->implode(', ') : '—' }}</td>
                                     <td>
                                         <span class="badge bg-{{ $order->status_badge_class }}">
                                             {{ ucfirst($order->status) }}
@@ -129,7 +137,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="10" class="text-center py-4">
                                         <p class="text-muted mb-0">No orders found.</p>
                                     </td>
                                 </tr>

@@ -471,6 +471,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.color-size-master.*') ? 'active' : '' }}" href="{{ route('admin.color-size-master.index') }}">
+                                <i class="bi bi-palette2 me-2"></i> Color & Size
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                                 <i class="bi bi-cart-check me-2"></i> Orders
                             </a>

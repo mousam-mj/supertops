@@ -19,6 +19,56 @@
     </div>
 </div>
 
+{{-- Product Details Card --}}
+@php
+    $productImage = $product->image
+        ? (str_starts_with($product->image, 'assets/') || str_starts_with($product->image, '/assets/') ? asset($product->image) : asset('storage/' . $product->image))
+        : asset('assets/images/product/perch-bottal.webp');
+@endphp
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header py-2 px-3" style="background: #f8fafc; color: #2d3748;">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Product Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <img src="{{ $productImage }}" alt="{{ $product->name }}" class="rounded border" style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
+                    <div class="col">
+                        <h6 class="fw-bold mb-1" style="color: #2d3748;">{{ $product->name }}</h6>
+                        <div class="small text-muted mb-1">SKU: <span class="text-dark">{{ $product->sku ?? '—' }}</span></div>
+                        @if($product->category)
+                            <div class="small mb-1"><span class="badge bg-light text-dark">{{ $product->category->name }}</span></div>
+                        @endif
+                        @if($product->short_description || $product->description)
+                            <p class="small text-muted mb-0 mb-md-0" style="max-width: 500px;">{{ Str::limit(strip_tags($product->short_description ?: $product->description), 120) }}</p>
+                        @endif
+                    </div>
+                    <div class="col-md-auto mt-3 mt-md-0 text-md-end">
+                        <div class="small mb-1">
+                            @if($product->sale_price && (float)$product->sale_price > 0)
+                                <span class="text-decoration-line-through text-muted">₹{{ number_format($product->price ?? 0, 2) }}</span>
+                                <span class="text-danger fw-semibold ms-1">₹{{ number_format($product->sale_price, 2) }}</span>
+                            @else
+                                <span class="fw-semibold">₹{{ number_format($product->price ?? 0, 2) }}</span>
+                            @endif
+                        </div>
+                        <span class="badge {{ $product->is_active ? 'bg-success' : 'bg-secondary' }}">{{ $product->is_active ? 'Active' : 'Inactive' }}</span>
+                        @if($product->is_featured)
+                            <span class="badge bg-warning text-dark">Featured</span>
+                        @endif
+                        <div class="mt-2">
+                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-primary">Edit Product</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @php
     $totalStock = $product->inventories->sum('quantity');
     $inventories = $product->inventories()->orderBy('color')->orderBy('size')->get();
@@ -69,15 +119,11 @@
 @endif
 
 @php
-    $colorOptions = array_unique(array_merge(
-        $inventories->pluck('color')->filter()->map(fn($c) => trim($c))->values()->toArray(),
-        ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Gray', 'Grey', 'Brown', 'Pink', 'Orange', 'Purple', 'Navy', 'Maroon', 'Dark Blue', 'Dark Green', 'Charcoal', 'Light Blue', 'Light Green', 'Beige', 'Cream', 'Ivory', 'Coral', 'Turquoise', 'Magenta', 'Teal', 'Indigo', 'Violet', 'Lavender', 'Khaki', 'Tan', 'Olive', 'Burgundy', 'Camel', 'Taupe', 'Silver', 'Gold', 'Bronze', 'Champagne', 'Nude', 'Royal Blue', 'Forest Green', 'Amber', 'Crimson', 'Mustard', 'Ash', 'Azure', 'Bei', 'Cerulean', 'Chartreuse', 'Copper', 'Mocha', 'Peach', 'Sky Blue', 'Slate']
-    ));
+    $inventoryColors = $inventories->pluck('color')->filter()->map(fn($c) => trim($c))->unique()->values()->toArray();
+    $inventorySizes = $inventories->pluck('size')->filter()->map(fn($s) => trim($s))->unique()->values()->toArray();
+    $colorOptions = array_values(array_unique(array_merge($inventoryColors, $masterColors ?? [])));
+    $sizeOptions = array_values(array_unique(array_merge($inventorySizes, $masterSizes ?? [])));
     sort($colorOptions);
-    $sizeOptions = array_unique(array_merge(
-        $inventories->pluck('size')->filter()->map(fn($s) => trim($s))->values()->toArray(),
-        ['Free Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '28', '30', '32', '34', '36', '38', '40', '42', '32GB', '64GB', '128GB', '256GB', '512GB', '1TB', '4GB RAM', '6GB RAM', '8GB RAM', '12GB RAM', '16GB RAM', '128GB+8GB', '256GB+8GB', '512GB+12GB', 'Standard', 'Premium', 'Pro', 'Max']
-    ));
     sort($sizeOptions);
 @endphp
 
@@ -139,9 +185,9 @@
                                     <input type="number" name="sale_price" class="form-control" step="0.01" min="0" value="{{ old('sale_price') }}" placeholder="₹">
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Image for this color (Optional)</label>
-                                    <input type="file" name="image" class="form-control" accept="image/*">
-                                    <small class="text-muted">Upload images specific to this color (optional).</small>
+                                    <label class="form-label">Images for this variant (Optional)</label>
+                                    <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                                    <small class="text-muted">You can select multiple images. All will be saved for this color/size.</small>
                                 </div>
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #dc2626 0%, #8b5cf6 100%); border: none;">
@@ -152,9 +198,9 @@
                         </form>
                     </div>
                     <div class="tab-pane fade" id="bulk-pane" role="tabpanel">
-                        <form action="{{ route('admin.inventory.bulk.store', $product->id) }}" method="POST" id="bulk-inventory-form">
+                        <form action="{{ route('admin.inventory.bulk.store', $product->id) }}" method="POST" id="bulk-inventory-form" enctype="multipart/form-data">
                             @csrf
-                            <p class="text-muted small mb-3">Add multiple inventory entries at once. Same color+size will add to existing stock.</p>
+                            <p class="text-muted small mb-3">Add multiple inventory entries at once. Same color+size will add to existing stock. Use "Add row" to add more; optional image per row.</p>
                             <div class="table-responsive mb-3">
                                 <table class="table table-bordered table-sm" id="bulk-inventory-table">
                                     <thead>
@@ -164,18 +210,20 @@
                                             <th>Quantity *</th>
                                             <th>Price (₹)</th>
                                             <th>Sale Price (₹)</th>
+                                            <th>Images (Optional)</th>
+                                            <th style="width: 50px;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @for($i = 0; $i < 5; $i++)
-                                        <tr>
-                                            <td><input type="text" name="items[{{ $i }}][color]" class="form-control form-control-sm" list="colorOptionsBulk" placeholder="Red, Blue..."></td>
-                                            <td><input type="text" name="items[{{ $i }}][size]" class="form-control form-control-sm" list="sizeOptionsBulk" placeholder="L, XL, 64GB..."></td>
-                                            <td><input type="number" name="items[{{ $i }}][quantity]" class="form-control form-control-sm" min="0" placeholder="0"></td>
-                                            <td><input type="number" name="items[{{ $i }}][price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>
-                                            <td><input type="number" name="items[{{ $i }}][sale_price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>
+                                        <tr class="bulk-row">
+                                            <td><input type="text" name="items[0][color]" class="form-control form-control-sm" list="colorOptionsBulk" placeholder="Red, Blue..."></td>
+                                            <td><input type="text" name="items[0][size]" class="form-control form-control-sm" list="sizeOptionsBulk" placeholder="L, XL, 64GB..."></td>
+                                            <td><input type="number" name="items[0][quantity]" class="form-control form-control-sm" min="0" placeholder="0"></td>
+                                            <td><input type="number" name="items[0][price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>
+                                            <td><input type="number" name="items[0][sale_price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>
+                                            <td><input type="file" name="items[0][images][]" class="form-control form-control-sm" accept="image/*" multiple title="Optional images for this variant"></td>
+                                            <td><button type="button" class="btn btn-sm btn-outline-danger bulk-row-delete" title="Remove row"><i class="bi bi-trash"></i></button></td>
                                         </tr>
-                                        @endfor
                                     </tbody>
                                 </table>
                             </div>
@@ -215,9 +263,14 @@
                                 <span class="badge bg-secondary">{{ $inv->color ?: '—' }}</span>
                                 <span class="badge bg-secondary">{{ $inv->size ?: '—' }}</span>
                             </div>
-                            @if($inv->image)
-                                <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $inv->image) }}" alt="" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                            @php
+                                $invImages = !empty($inv->images) ? $inv->images : ($inv->image ? [$inv->image] : []);
+                            @endphp
+                            @if(count($invImages) > 0)
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @foreach($invImages as $imgPath)
+                                        <img src="{{ asset('storage/' . $imgPath) }}" alt="" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                    @endforeach
                                 </div>
                             @endif
                             <div class="small mb-1"><strong>Initial Stock:</strong> {{ $inv->initial_quantity }}</div>
@@ -275,12 +328,20 @@
                                         <input type="number" name="sale_price" class="form-control" step="0.01" min="0" value="{{ old('sale_price', $inv->sale_price) }}">
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label">Image (color)</label>
-                                        @if($inv->image)
-                                            <div class="mb-1"><img src="{{ asset('storage/' . $inv->image) }}" style="max-height: 80px;" class="rounded"></div>
-                                            <label class="small"><input type="checkbox" name="remove_image" value="1"> Remove image</label>
+                                        <label class="form-label">Images (color/variant)</label>
+                                        @php
+                                            $editImages = !empty($inv->images) ? $inv->images : ($inv->image ? [$inv->image] : []);
+                                        @endphp
+                                        @if(count($editImages) > 0)
+                                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                                @foreach($editImages as $imgPath)
+                                                    <img src="{{ asset('storage/' . $imgPath) }}" alt="" style="max-height: 60px; width: auto;" class="rounded border">
+                                                @endforeach
+                                            </div>
+                                            <label class="small d-block mb-1"><input type="checkbox" name="remove_image" value="1"> Remove all images</label>
                                         @endif
-                                        <input type="file" name="image" class="form-control" accept="image/*">
+                                        <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                                        <small class="text-muted">Select multiple to add more images.</small>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -311,17 +372,45 @@
     var colorList = 'colorOptionsBulk';
     var sizeList = 'sizeOptionsBulk';
     if (!tbody || !addBtn) return;
+
+    function reindexRows() {
+        var rows = tbody.querySelectorAll('tr.bulk-row');
+        rows.forEach(function(tr, idx) {
+            var inputs = tr.querySelectorAll('input');
+            inputs.forEach(function(inp) {
+                var n = inp.getAttribute('name');
+                if (n && n.indexOf('items[') === 0) {
+                    inp.setAttribute('name', n.replace(/items\[\d+\]/, 'items[' + idx + ']'));
+                }
+            });
+        });
+    }
+
+    tbody.addEventListener('click', function(e) {
+        var btn = e.target.closest('button.bulk-row-delete');
+        if (!btn) return;
+        var tr = btn.closest('tr');
+        if (tr && tr.classList.contains('bulk-row')) {
+            var rows = tbody.querySelectorAll('tr.bulk-row');
+            if (rows.length <= 1) return;
+            tr.remove();
+            reindexRows();
+        }
+    });
+
     addBtn.addEventListener('click', function() {
-        var rows = tbody.querySelectorAll('tr');
-        var last = rows[rows.length - 1];
+        var rows = tbody.querySelectorAll('tr.bulk-row');
         var idx = rows.length;
         var tr = document.createElement('tr');
+        tr.className = 'bulk-row';
         tr.innerHTML =
             '<td><input type="text" name="items[' + idx + '][color]" class="form-control form-control-sm" list="' + colorList + '" placeholder="Red, Blue..."></td>' +
             '<td><input type="text" name="items[' + idx + '][size]" class="form-control form-control-sm" list="' + sizeList + '" placeholder="L, XL, 64GB..."></td>' +
             '<td><input type="number" name="items[' + idx + '][quantity]" class="form-control form-control-sm" min="0" placeholder="0"></td>' +
             '<td><input type="number" name="items[' + idx + '][price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>' +
-            '<td><input type="number" name="items[' + idx + '][sale_price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>';
+            '<td><input type="number" name="items[' + idx + '][sale_price]" class="form-control form-control-sm" step="0.01" min="0" placeholder="₹"></td>' +
+            '<td><input type="file" name="items[' + idx + '][images][]" class="form-control form-control-sm" accept="image/*" multiple title="Optional images for this variant"></td>' +
+            '<td><button type="button" class="btn btn-sm btn-outline-danger bulk-row-delete" title="Remove row"><i class="bi bi-trash"></i></button></td>';
         tbody.appendChild(tr);
     });
 })();

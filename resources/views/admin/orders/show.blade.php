@@ -54,19 +54,19 @@
                     @endif
                     <tr>
                         <th>Subtotal</th>
-                        <td>${{ number_format($order->subtotal, 2) }}</td>
+                        <td>₹{{ number_format($order->subtotal, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Tax</th>
-                        <td>${{ number_format($order->tax, 2) }}</td>
+                        <td>₹{{ number_format($order->tax, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Shipping</th>
-                        <td>${{ number_format($order->shipping, 2) }}</td>
+                        <td>₹{{ number_format($order->shipping, 2) }}</td>
                     </tr>
                     <tr>
                         <th>Total</th>
-                        <td><strong>${{ number_format($order->total, 2) }}</strong></td>
+                        <td><strong>₹{{ number_format($order->total, 2) }}</strong></td>
                     </tr>
                     <tr>
                         <th>Created At</th>
@@ -81,7 +81,21 @@
                 <h5 class="mb-0">Billing Address</h5>
             </div>
             <div class="card-body">
-                <pre style="white-space: pre-wrap; font-family: inherit;">{{ $order->billing_address }}</pre>
+                @php
+                    $billing = is_array($order->billing_address) ? $order->billing_address : (is_string($order->billing_address) ? json_decode($order->billing_address, true) : []);
+                @endphp
+                @if(!empty($billing))
+                    <p class="mb-0">
+                        {{ ($billing['first_name'] ?? '') . ' ' . ($billing['last_name'] ?? '') }}<br>
+                        {{ $billing['address_line_1'] ?? '' }}<br>
+                        @if(!empty($billing['address_line_2'])){{ $billing['address_line_2'] }}<br>@endif
+                        {{ $billing['city'] ?? '' }}, {{ $billing['state'] ?? '' }} {{ $billing['pincode'] ?? '' }}<br>
+                        @if(!empty($billing['email']))Email: {{ $billing['email'] }}<br>@endif
+                        @if(!empty($billing['phone']))Phone: {{ $billing['phone'] }}@endif
+                    </p>
+                @else
+                    <p class="text-muted mb-0">—</p>
+                @endif
             </div>
         </div>
 
@@ -91,7 +105,21 @@
                 <h5 class="mb-0">Shipping Address</h5>
             </div>
             <div class="card-body">
-                <pre style="white-space: pre-wrap; font-family: inherit;">{{ $order->shipping_address }}</pre>
+                @php
+                    $shipping = is_array($order->shipping_address) ? $order->shipping_address : (is_string($order->shipping_address) ? json_decode($order->shipping_address, true) : []);
+                @endphp
+                @if(!empty($shipping))
+                    <p class="mb-0">
+                        {{ ($shipping['first_name'] ?? '') . ' ' . ($shipping['last_name'] ?? '') }}<br>
+                        {{ $shipping['address_line_1'] ?? '' }}<br>
+                        @if(!empty($shipping['address_line_2'])){{ $shipping['address_line_2'] }}<br>@endif
+                        {{ $shipping['city'] ?? '' }}, {{ $shipping['state'] ?? '' }} {{ $shipping['pincode'] ?? '' }}<br>
+                        @if(!empty($shipping['email']))Email: {{ $shipping['email'] }}<br>@endif
+                        @if(!empty($shipping['phone']))Phone: {{ $shipping['phone'] }}@endif
+                    </p>
+                @else
+                    <p class="text-muted mb-0">—</p>
+                @endif
             </div>
         </div>
         @endif
@@ -107,6 +135,8 @@
                             <tr>
                                 <th>Product</th>
                                 <th>SKU</th>
+                                <th>Color</th>
+                                <th>Size</th>
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total</th>
@@ -117,6 +147,8 @@
                                 <tr>
                                     <td>{{ $item->product_name }}</td>
                                     <td>{{ $item->product_sku ?? '—' }}</td>
+                                    <td>{{ $item->color ?: '—' }}</td>
+                                    <td>{{ $item->size ?: '—' }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ currency($item->price) }}</td>
                                     <td><strong>{{ currency($item->total) }}</strong></td>

@@ -3,8 +3,7 @@
 @section('title', 'Category - Perch Bottle')
 
 @section('content')
-<div id="menu-mobile" class="">
-                <div class="menu-container bg-white h-full">
+            <!-- Menu bar -->
                     <div class="container h-full">
                         <div class="menu-main h-full overflow-x-hidden scroll2">
                             <div class="heading py-2 relative flex items-center justify-center">
@@ -528,13 +527,6 @@
                                     </li>
                                     
                                 </ul>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Menu bar -->
             <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
                 <div class="menu_bar-inner grid grid-cols-4 items-center h-full">

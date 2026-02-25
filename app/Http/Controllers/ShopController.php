@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\MasterColor;
+use App\Models\MasterSize;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -18,6 +20,8 @@ class ShopController extends Controller
         $sort = $request->get('sort', 'default');
         $minPrice = $request->get('min_price');
         $maxPrice = $request->get('max_price');
+        $filterSize = $request->get('size');
+        $filterColor = $request->get('color');
         $category = null;
         $products = Product::where('is_active', true)->with('category');
 
@@ -44,14 +48,24 @@ class ShopController extends Controller
         }
 
         // Price filter
-        if ($minPrice) {
-            $products = $products->where(function($query) use ($minPrice) {
-                $query->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
+        if ($minPrice !== null && $minPrice !== '') {
+            $products = $products->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
+        }
+        if ($maxPrice !== null && $maxPrice !== '') {
+            $products = $products->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
+        }
+
+        // Size filter (products that have inventory with this size)
+        if ($filterSize) {
+            $products = $products->whereHas('inventories', function ($q) use ($filterSize) {
+                $q->where('size', $filterSize);
             });
         }
-        if ($maxPrice) {
-            $products = $products->where(function($query) use ($maxPrice) {
-                $query->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
+
+        // Color filter (products that have inventory with this color)
+        if ($filterColor) {
+            $products = $products->whereHas('inventories', function ($q) use ($filterColor) {
+                $q->whereRaw('LOWER(TRIM(color)) = ?', [strtolower(trim($filterColor))]);
             });
         }
 
@@ -84,7 +98,22 @@ class ShopController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('shop', compact('categories', 'category', 'products'));
+        $categoryProductCounts = [];
+        foreach ($categories as $c) {
+            $ids = $this->getCategoryIds($c);
+            $categoryProductCounts[$c->id] = Product::whereIn('category_id', $ids)->where('is_active', true)->count();
+        }
+
+        $filterSizes = MasterSize::orderBy('sort_order')->orderBy('name')->get();
+        $filterColors = MasterColor::orderBy('sort_order')->orderBy('name')->get();
+
+        $priceRange = Product::where('is_active', true)
+            ->selectRaw('MIN(COALESCE(sale_price, price)) as min_price, MAX(COALESCE(sale_price, price)) as max_price')
+            ->first();
+        $priceMin = $priceRange && $priceRange->min_price !== null ? (float) $priceRange->min_price : 0;
+        $priceMax = $priceRange && $priceRange->max_price !== null ? (float) $priceRange->max_price : 300;
+
+        return view('shop', compact('categories', 'category', 'products', 'categoryProductCounts', 'filterSizes', 'filterColors', 'priceMin', 'priceMax', 'filterSize', 'filterColor'));
     }
 
     /**

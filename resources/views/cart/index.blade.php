@@ -99,59 +99,6 @@
                                 <div class="list-product-main w-full mt-3"></div>
                             </div>
                         </div>
-                        <div class="input-block discount-code w-full h-12 sm:mt-7 mt-5">
-                            <form class="w-full h-full relative" onsubmit="event.preventDefault(); return false;">
-                                <input type="text" placeholder="Add voucher discount" class="w-full h-full bg-surface pl-4 pr-14 rounded-lg border border-line" required />
-                                <button type="button" class="button-main absolute top-1 bottom-1 right-1 px-5 rounded-lg flex items-center justify-center">Apply Code</button>
-                            </form>
-                        </div>
-                        <div class="list-voucher flex items-center gap-5 flex-wrap sm:mt-7 mt-5">
-                            <div class="item border border-line rounded-lg py-2">
-                                <div class="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
-                                    <div class="left">
-                                        <div class="caption1">Discount</div>
-                                        <div class="caption1 font-bold">10% OFF</div>
-                                    </div>
-                                    <div class="right">
-                                        <div class="caption1">For all orders <br />from ₹200</div>
-                                    </div>
-                                </div>
-                                <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                    <div class="text-button-uppercase">Code: AN6810</div>
-                                    <div class="button-main py-1 px-2.5 capitalize text-xs">Apply Code</div>
-                                </div>
-                            </div>
-                            <div class="item border border-line rounded-lg py-2">
-                                <div class="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
-                                    <div class="left">
-                                        <div class="caption1">Discount</div>
-                                        <div class="caption1 font-bold">15% OFF</div>
-                                    </div>
-                                    <div class="right">
-                                        <div class="caption1">For all orders <br />from ₹300</div>
-                                    </div>
-                                </div>
-                                <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                    <div class="text-button-uppercase">Code: AN6810</div>
-                                    <div class="button-main py-1 px-2.5 capitalize text-xs">Apply Code</div>
-                                </div>
-                            </div>
-                            <div class="item border border-line rounded-lg py-2">
-                                <div class="top flex gap-10 justify-between px-3 pb-2 border-b border-dashed border-line">
-                                    <div class="left">
-                                        <div class="caption1">Discount</div>
-                                        <div class="caption1 font-bold">20% OFF</div>
-                                    </div>
-                                    <div class="right">
-                                        <div class="caption1">For all orders <br />from ₹400</div>
-                                    </div>
-                                </div>
-                                <div class="bottom gap-6 items-center flex justify-between px-3 pt-2">
-                                    <div class="text-button-uppercase">Code: AN6810</div>
-                                    <div class="button-main py-1 px-2.5 capitalize text-xs">Apply Code</div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="xl:w-1/3 xl:pl-12 w-full">
                         <div class="checkout-block bg-surface p-6 rounded-2xl">
@@ -159,10 +106,6 @@
                             <div class="total-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Subtotal</div>
                                 <div class="text-title">₹<span class="total-product">136</span><span>.00</span></div>
-                            </div>
-                            <div class="discount-block py-5 flex justify-between border-b border-line">
-                                <div class="text-title">Discounts</div>
-                                <div class="text-title"><span>-₹</span><span class="discount">0</span><span>.00</span></div>
                             </div>
                             <div class="ship-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Shipping</div>

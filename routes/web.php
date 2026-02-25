@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\ColorSizeMasterController;
 use App\Http\Controllers\PolicyPageController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AddressController;
@@ -282,6 +283,23 @@ Route::get('/my-account', function () {
     return view('my-account', compact('user', 'orders', 'addresses', 'awaitingPickup', 'cancelledOrders', 'totalOrders'));
 })->middleware('auth')->name('my-account');
 
+// Account: view single order details (must be own order)
+Route::get('/account/orders/{id}', function ($id) {
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Please login to view your orders.');
+    }
+    $user = auth()->user();
+    $order = \App\Models\Order::with(['items.product'])
+        ->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
+        })
+        ->find($id);
+    if (!$order) {
+        abort(404);
+    }
+    return view('order.show', compact('order'));
+})->middleware('auth')->name('account.orders.show');
+
 // POST /my-account – save address (same URL as page, so cookies always match)
 Route::post('/my-account', function (\Illuminate\Http\Request $request) {
     if (!auth()->check()) {
@@ -355,6 +373,102 @@ Route::post('/my-account', function (\Illuminate\Http\Request $request) {
     }
     return redirect()->to('/my-account?tab=address')->with('success', $msg);
 })->middleware('auth')->name('my-account.address.save');
+
+// Update My Account Settings
+Route::put('/my-account/settings', function (\Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Please login to access your account.');
+    }
+    
+    $user = auth()->user();
+    
+    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        'gender' => 'required|in:Male,Female,Other',
+        'date_of_birth' => 'required|date',
+        'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+    
+    if ($validator->fails()) {
+        return redirect()->to('/my-account?tab=setting')
+            ->withErrors($validator)
+            ->withInput();
+    }
+    
+    $validated = $validator->validated();
+    
+    try {
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar && !str_starts_with($user->avatar, 'assets/')) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $avatarPath;
+        }
+        
+        // Update user
+        $user->update([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+            'phone' => $validated['phone'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'date_of_birth' => $validated['date_of_birth'],
+            'avatar' => $validated['avatar'] ?? $user->avatar,
+        ]);
+        
+        return redirect()->to('/my-account?tab=setting')->with('settings_success', 'Settings updated successfully!');
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error('Settings update error: ' . $e->getMessage());
+        return redirect()->to('/my-account?tab=setting')
+            ->withErrors(['error' => 'Failed to update settings. Please try again.'])
+            ->withInput();
+    }
+})->middleware('auth')->name('my-account.settings.update');
+
+// Change Password
+Route::put('/my-account/password', function (\Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'Please login to access your account.');
+    }
+    
+    $user = auth()->user();
+    
+    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
+            if (!\Illuminate\Support\Facades\Hash::check($value, $user->password)) {
+                $fail('The current password is incorrect.');
+            }
+        }],
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+    
+    if ($validator->fails()) {
+        return redirect()->to('/my-account?tab=change-password')
+            ->withErrors($validator)
+            ->withInput();
+    }
+    
+    try {
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
+        ]);
+        
+        return redirect()->to('/my-account?tab=change-password')->with('password_success', 'Password changed successfully!');
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error('Password change error: ' . $e->getMessage());
+        return redirect()->to('/my-account?tab=change-password')
+            ->withErrors(['error' => 'Failed to change password. Please try again.'])
+            ->withInput();
+    }
+})->middleware('auth')->name('my-account.password.update');
 
 // Address Management Routes - Using Controller
 // Test route to check if middleware is working
@@ -635,12 +749,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
         Route::get('/inventory/product/{id}', function($id) {
             $product = \App\Models\Product::with(['category', 'inventories'])->findOrFail($id);
-            return view('admin.inventory.product', compact('product'));
+            $masterColors = \App\Models\MasterColor::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
+            $masterSizes = \App\Models\MasterSize::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
+            return view('admin.inventory.product', compact('product', 'masterColors', 'masterSizes'));
         })->name('inventory.product');
         Route::post('/inventory/product/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'store'])->name('inventory.store');
         Route::post('/inventory/product/{id}/bulk', [\App\Http\Controllers\Admin\InventoryController::class, 'bulkStore'])->name('inventory.bulk.store');
         Route::put('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'update'])->name('inventory.update');
         Route::delete('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'destroy'])->name('inventory.destroy');
+        
+        // Color & Size Master
+        Route::get('/color-size-master', [ColorSizeMasterController::class, 'index'])->name('color-size-master.index');
+        Route::post('/color-size-master/colors', [ColorSizeMasterController::class, 'storeColor'])->name('color-size-master.store-color');
+        Route::put('/color-size-master/colors/{color}', [ColorSizeMasterController::class, 'updateColor'])->name('color-size-master.update-color');
+        Route::delete('/color-size-master/colors/{color}', [ColorSizeMasterController::class, 'destroyColor'])->name('color-size-master.destroy-color');
+        Route::post('/color-size-master/sizes', [ColorSizeMasterController::class, 'storeSize'])->name('color-size-master.store-size');
+        Route::put('/color-size-master/sizes/{size}', [ColorSizeMasterController::class, 'updateSize'])->name('color-size-master.update-size');
+        Route::delete('/color-size-master/sizes/{size}', [ColorSizeMasterController::class, 'destroySize'])->name('color-size-master.destroy-size');
         
         // Payments Route
         Route::get('/payments', function() {

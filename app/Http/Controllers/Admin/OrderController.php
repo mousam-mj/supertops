@@ -13,7 +13,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Order::with('user')->orderBy('created_at', 'desc');
+        $query = Order::with(['user', 'items'])->orderBy('created_at', 'desc');
 
         // Status filter (includes fulfilled = delivered, returned = payment refunded)
         $status = $request->get('status');

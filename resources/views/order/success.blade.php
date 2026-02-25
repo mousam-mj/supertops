@@ -47,9 +47,6 @@
                         <div class="caption1 text-secondary mb-2">Amount breakdown</div>
                         <div class="space-y-1 body2">
                             <div class="flex justify-between"><span>Subtotal</span><span>₹{{ number_format((float) $subtotal, 2) }}</span></div>
-                            @if($couponDiscount > 0)
-                                <div class="flex justify-between text-green-600"><span>Discount</span><span>-₹{{ number_format((float) $couponDiscount, 2) }}</span></div>
-                            @endif
                             @if($shippingCharge > 0)
                                 <div class="flex justify-between"><span>Shipping</span><span>₹{{ number_format((float) $shippingCharge, 2) }}</span></div>
                             @endif
@@ -63,7 +60,7 @@
                         Continue Shopping
                     </a>
                     @if(auth()->check())
-                        <a href="/account/orders/{{ $order->id }}" class="button-secondary">
+                        <a href="{{ route('account.orders.show', $order->id) }}" class="button-secondary">
                             View Order Details
                         </a>
                     @else

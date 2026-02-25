@@ -19,6 +19,7 @@ class Inventory extends Model
         'price',
         'sale_price',
         'image',
+        'images',
     ];
 
     protected $casts = [
@@ -27,6 +28,7 @@ class Inventory extends Model
         'sold_quantity' => 'integer',
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'images' => 'array',
     ];
 
     /**

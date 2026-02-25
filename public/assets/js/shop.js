@@ -85,15 +85,15 @@ rangeInput.forEach(input => {
             progress.style.right = 100 - (maxValue / rangeInput[1].max) * 100 + "%";
         }
 
-        minPrice.innerHTML = '$' + minValue
-        maxPrice.innerHTML = '$' + maxValue
+        minPrice.innerHTML = '₹' + minValue
+        maxPrice.innerHTML = '₹' + maxValue
 
         if (minValue >= 290) {
-            minPrice.innerHTML = '$' + 290
+            minPrice.innerHTML = '₹' + 290
         }
 
         if (maxValue <= 10) {
-            maxPrice.innerHTML = '$' + 10
+            maxPrice.innerHTML = '₹' + 10
         }
     })
 })

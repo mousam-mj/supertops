@@ -28,6 +28,9 @@ class User extends Authenticatable
         'role',
         'email_verification_token',
         'email_verified_at',
+        'gender',
+        'date_of_birth',
+        'avatar',
     ];
 
     /**

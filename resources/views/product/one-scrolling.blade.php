@@ -728,31 +728,6 @@
                                         <div class="list-tag text-secondary">top</div>
                                     </div>
                                 </div>
-                                <div class="list-payment mt-7">
-                                    <div class="main-content lg:pt-8 pt-6 lg:pb-6 pb-4 sm:px-4 px-3 border border-line rounded-xl relative max-md:w-2/3 max-sm:w-full">
-                                        <div class="heading6 px-5 bg-white absolute -top-[14px] left-1/2 -translate-x-1/2 whitespace-nowrap">Guranteed safe checkout</div>
-                                        <div class="list grid grid-cols-6">
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-0.png" alt="payment" class="w-full') " />
-                                            </div>
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-1.png" alt="payment" class="w-full') " />
-                                            </div>
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-2.png" alt="payment" class="w-full') " />
-                                            </div>
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-3.png" alt="payment" class="w-full') " />
-                                            </div>
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-4.png" alt="payment" class="w-full') " />
-                                            </div>
-                                            <div class="item flex items-center justify-center lg:px-3 px-1">
-                                                <img src="{{ asset('assets/images/payment/Frame-5.png" alt="payment" class="w-full') " />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                             <div class="get-it mt-6">
                                 <div class="heading5">Get it today</div>
@@ -875,11 +850,11 @@
                                 </div>
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Size</div>
-                                    <p>S, M, L, XL</p>
+                                    <p>{{ isset($availableSizes) && count($availableSizes) > 0 ? implode(', ', $availableSizes) : '—' }}</p>
                                 </div>
                                 <div class="item bg-surface flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Colors</div>
-                                    <p>Grey, Red, Blue, Black</p>
+                                    <p>{{ isset($availableColors) && count($availableColors) > 0 ? implode(', ', $availableColors) : '—' }}</p>
                                 </div>
                                 <div class="item flex items-center gap-8 py-3 px-10">
                                     <div class="text-title sm:w-1/4 w-1/3">Care</div>

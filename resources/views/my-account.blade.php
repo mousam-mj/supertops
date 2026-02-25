@@ -608,6 +608,10 @@
                                     <span class="ph ph-gear-six text-xl"></span>
                                     <strong class="heading6">Setting</strong>
                                 </a>
+                                <a href="#!" class="category-item flex items-center gap-3 w-full px-5 py-4 rounded-lg cursor-pointer duration-300 hover:bg-white mt-1.5" data-item="change-password">
+                                    <span class="ph ph-lock text-xl"></span>
+                                    <strong class="heading6">Change Password</strong>
+                                </a>
                                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                                     @csrf
                                     <button type="submit" class="category-item flex items-center gap-3 w-full px-5 py-4 rounded-lg cursor-pointer duration-300 hover:bg-white mt-1.5">
@@ -804,7 +808,7 @@
                                                 @endforeach
                                             </div>
                                             <div class="flex flex-wrap gap-4 p-5">
-                                                <a href="{{ route('order.success', $order->id) }}" class="button-main btn_order_detail">Order Details</a>
+                                                <a href="{{ route('account.orders.show', $order->id) }}" class="button-main btn_order_detail">Order Details</a>
                                                 @if($order->status !== 'cancelled' && $order->status !== 'canceled' && $order->status !== 'completed' && $order->status !== 'delivered')
                                                     <button class="button-main bg-surface border border-line hover:bg-black text-black hover:text-white" onclick="cancelOrder({{ $order->id }})">Cancel Order</button>
                                                 @endif
@@ -953,10 +957,28 @@
                             </div>
                         </div>
                         <div class="filter-item text-content w-full p-7 border border-line rounded-xl" data-item="setting">
-                            <form>
+                            @if(session('settings_success'))
+                                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                                    {{ session('settings_success') }}
+                                </div>
+                            @endif
+                            
+                            @if($errors->any() && request('tab') === 'setting')
+                                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                                    <ul class="list-disc list-inside">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            
+                            <form method="POST" action="{{ route('my-account.settings.update') }}" enctype="multipart/form-data">
+                                @csrf
+                                @method('PUT')
                                 <div class="heading5 pb-4">Information</div>
                                 <div class="upload_image col-span-full">
-                                    <label for="uploadImage">Upload Avatar: <span class="text-red">*</span></label>
+                                    <label for="uploadImage">Upload Avatar:</label>
                                     <div class="flex flex-wrap items-center gap-5 mt-3">
                                         <div class="bg_img flex-shrink-0 relative w-[7.5rem] h-[7.5rem] rounded-lg overflow-hidden bg-surface">
                                             @php
@@ -966,14 +988,14 @@
                                                     : asset('storage/' . $avatarPath);
                                             @endphp
                                             <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
-                                            <img src="{{ $avatarUrl }}" alt="avatar" class="upload_img relative z-[1] w-full h-full object-cover" />
+                                            <img src="{{ $avatarUrl }}" alt="avatar" class="upload_img relative z-[1] w-full h-full object-cover" id="avatarPreview" />
                                         </div>
                                         <div>
                                             <strong class="text-button">Upload File:</strong>
                                             <p class="caption1 text-secondary mt-1">JPG 120x120px</p>
                                             <div class="upload_file flex items-center gap-3 w-[220px] mt-3 px-3 py-2 border border-line rounded">
                                                 <label for="uploadImage" class="caption2 py-1 px-3 rounded bg-line whitespace-nowrap cursor-pointer">Choose File</label>
-                                                <input type="file" name="uploadImage" id="uploadImage" accept="image/*" class="caption2 cursor-pointer" required />
+                                                <input type="file" name="avatar" id="uploadImage" accept="image/*" class="caption2 cursor-pointer" />
                                             </div>
                                         </div>
                                     </div>
@@ -981,52 +1003,92 @@
                                 <div class="grid sm:grid-cols-2 gap-4 gap-y-5 mt-5">
                                     <div class="first-name">
                                         <label for="firstName" class="caption1 capitalize">First Name <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="firstName" type="text" value="{{ $user->first_name ?? explode(' ', $user->name ?? '')[0] ?? '' }}" placeholder="First name" required />
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="firstName" name="first_name" type="text" value="{{ old('first_name', $user->first_name ?? explode(' ', $user->name ?? '')[0] ?? '') }}" placeholder="First name" required />
                                     </div>
                                     <div class="last-name">
                                         <label for="lastName" class="caption1 capitalize">Last Name <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="lastName" type="text" value="{{ $user->last_name ?? (count(explode(' ', $user->name ?? '')) > 1 ? explode(' ', $user->name)[1] : '') }}" placeholder="Last name" required />
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="lastName" name="last_name" type="text" value="{{ old('last_name', $user->last_name ?? (count(explode(' ', $user->name ?? '')) > 1 ? explode(' ', $user->name)[1] : '')) }}" placeholder="Last name" required />
                                     </div>
                                     <div class="phone-number">
                                         <label for="phoneNumber" class="caption1 capitalize">Phone Number <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="phoneNumber" type="text" value="{{ $user->phone ?? '' }}" placeholder="Phone number" required />
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="phoneNumber" name="phone" type="text" value="{{ old('phone', $user->phone ?? '') }}" placeholder="Phone number" required />
                                     </div>
                                     <div class="email">
                                         <label for="email" class="caption1 capitalize">Email Address <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="email" type="email" value="{{ $user->email }}" placeholder="Email address" required />
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="email" name="email" type="email" value="{{ old('email', $user->email) }}" placeholder="Email address" required />
                                     </div>
                                     <div class="gender">
                                         <label for="gender" class="caption1 capitalize">Gender <span class="text-red">*</span></label>
                                         <div class="select-block mt-2">
-                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="gender" name="gender" value="default">
-                                                <option value="default" disabled>Choose Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Other">Other</option>
+                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="gender" name="gender" required>
+                                                <option value="" disabled>Choose Gender</option>
+                                                <option value="Male" {{ old('gender', $user->gender ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
+                                                <option value="Female" {{ old('gender', $user->gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
+                                                <option value="Other" {{ old('gender', $user->gender ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
                                             </select>
                                             <span class="ph ph-caret-down arrow-down text-lg"></span>
                                         </div>
                                     </div>
                                     <div class="birth">
                                         <label for="birth" class="caption1">Day of Birth <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="birth" type="date" placeholder="Day of Birth" required />
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth ?? '') }}" placeholder="Day of Birth" required />
                                     </div>
                                 </div>
-                                <div class="heading5 pb-4 lg:mt-10 mt-6">Change Password</div>
+                                <div class="block-button lg:mt-10 mt-6" style="display: block !important;">
+                                    <button type="submit" class="button-main w-full sm:w-auto" style="display: inline-block !important; visibility: visible !important; background-color: #1a1a1a !important; color: #fff !important;">Save Change</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="filter-item text-content w-full p-7 border border-line rounded-xl" data-item="change-password">
+                            @if(session('password_success'))
+                                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                                    {{ session('password_success') }}
+                                </div>
+                            @endif
+                            
+                            @if($errors->any() && request('tab') === 'change-password')
+                                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                                    <ul class="list-disc list-inside">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            
+                            <form method="POST" action="{{ route('my-account.password.update') }}">
+                                @csrf
+                                @method('PUT')
+                                <div class="heading5 pb-4">Change Password</div>
                                 <div class="pass">
-                                    <label for="password" class="caption1">Current password <span class="text-red">*</span></label>
-                                    <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="password" type="password" placeholder="Password *" required />
+                                    <label for="current_password" class="caption1">Current password <span class="text-red">*</span></label>
+                                    <div class="relative mt-2">
+                                        <input class="border-line px-4 py-3 w-full rounded-lg pr-12" id="current_password" name="current_password" type="password" placeholder="Current Password *" value="{{ old('current_password') }}" required />
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-black focus:outline-none" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('current_password', this)">
+                                            <i class="ph ph-eye text-xl password-eye-icon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="new-pass mt-5">
-                                    <label for="newPassword" class="caption1">New password <span class="text-red">*</span></label>
-                                    <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="newPassword" type="password" placeholder="New Password *" required />
+                                    <label for="new_password" class="caption1">New password <span class="text-red">*</span></label>
+                                    <div class="relative mt-2">
+                                        <input class="border-line px-4 py-3 w-full rounded-lg pr-12" id="new_password" name="new_password" type="password" placeholder="New Password *" value="{{ old('new_password') }}" required />
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-black focus:outline-none" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('new_password', this)">
+                                            <i class="ph ph-eye text-xl password-eye-icon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="confirm-pass mt-5">
-                                    <label for="confirmPassword" class="caption1">Confirm new password <span class="text-red">*</span></label>
-                                    <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="confirmPassword" type="password" placeholder="Confirm Password *" required />
+                                    <label for="confirm_password" class="caption1">Confirm new password <span class="text-red">*</span></label>
+                                    <div class="relative mt-2">
+                                        <input class="border-line px-4 py-3 w-full rounded-lg pr-12" id="confirm_password" name="new_password_confirmation" type="password" placeholder="Confirm Password *" value="{{ old('new_password_confirmation') }}" required />
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-black focus:outline-none" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('confirm_password', this)">
+                                            <i class="ph ph-eye text-xl password-eye-icon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="block-button lg:mt-10 mt-6">
-                                    <button class="button-main">Save Change</button>
+                                    <button type="submit" class="button-main" style="background-color: #1a1a1a !important; color: #fff !important;">Change Password</button>
                                 </div>
                             </form>
                         </div>
@@ -1036,6 +1098,43 @@
         </div>
 
 <script>
+// Toggle password visibility (eye icon)
+function togglePasswordVisibility(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('ph-eye');
+        icon.classList.add('ph-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('ph-eye-slash');
+        icon.classList.add('ph-eye');
+    }
+}
+
+// Avatar Preview
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarInput = document.getElementById('uploadImage');
+    const avatarPreview = document.getElementById('avatarPreview');
+    
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.src = e.target.result;
+                    avatarPreview.style.display = 'block';
+                    avatarPreview.nextElementSibling.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
 // Address Management Functions
 function showAddAddressForm() {
     const form = document.getElementById('addressForm');
@@ -1115,11 +1214,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Switch to address tab if ?tab=address (e.g. after save redirect)
+    // Switch to tab based on URL parameter (e.g. after save redirect)
     const params = new URLSearchParams(window.location.search);
-    if (params.get('tab') === 'address') {
-        const cat = document.querySelector('.category-item[data-item="address"]');
-        const filter = document.querySelector('.filter-item[data-item="address"]');
+    const tab = params.get('tab');
+    if (tab && ['address', 'setting', 'change-password'].includes(tab)) {
+        const cat = document.querySelector(`.category-item[data-item="${tab}"]`);
+        const filter = document.querySelector(`.filter-item[data-item="${tab}"]`);
         if (cat && filter) {
             document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.filter-item').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
