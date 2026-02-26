@@ -52,15 +52,34 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
+                                    $getProductImageUrl = function($product) {
+                                        if ($product->image) {
+                                            $path = $product->image;
+                                            if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
+                                            if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
+                                            return asset('storage/' . $path);
+                                        }
+                                        if (is_array($product->images) && count($product->images) > 0) {
+                                            $first = $product->images[0];
+                                            if (is_string($first)) {
+                                                if (str_starts_with($first, 'assets/') || str_starts_with($first, '/assets/')) return asset($first);
+                                                return asset('storage/' . $first);
+                                            }
+                                        }
+                                        return null;
+                                    };
+                                @endphp
                                 @foreach($products as $product)
+                                    @php $imgUrl = $getProductImageUrl($product) ?? $placeholderImg; @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if($product->image)
-                                                    <img src="{{ asset('storage/' . $product->image) }}" 
-                                                         alt="{{ $product->name }}" 
-                                                         style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                @endif
+                                                <img src="{{ $imgUrl }}" 
+                                                     alt="{{ $product->name }}" 
+                                                     style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; background: #f0f0f0;"
+                                                     onerror="this.onerror=null; this.src='{{ $placeholderImg }}';">
                                                 <div>
                                                     <a href="{{{ route('admin.products.show', $product) }}}" class="fw-semibold">{{ $product->name }}</a>
                                                     @if($product->sku)

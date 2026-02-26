@@ -114,7 +114,8 @@
                                         @if($imageUrl)
                                             <img src="{{ $imageUrl }}" 
                                                  alt="{{ $product->name }}" 
-                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: #f0f0f0;"
+                                                 onerror="this.onerror=null; this.src='{{ asset('assets/images/product/perch-bottal.webp') }}';">
                                         @else
                                             <div class="bg-light d-flex align-items-center justify-content-center" 
                                                  style="width: 50px; height: 50px; border-radius: 4px;">
