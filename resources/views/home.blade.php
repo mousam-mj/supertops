@@ -235,7 +235,7 @@
             
         </div>
 
-        <div class="tab-features-block filter-prodduct-block md:pt-20 pt-10">
+        <div class="tab-features-block filter-prodduct-block md:pt-20 pt-10" id="home-best-sellers-section">
             <div class="container">
                 <div class="heading flex flex-col items-center text-center">
                     <div class="menu-tab bg-surface rounded-2xl">
@@ -247,7 +247,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="list-product eight-product hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6" data-tab="best sellers">
+                {{-- Dynamic from DB: use home-tab-products so main.js does not replace with Product.json --}}
+                <div class="list-product home-tab-products hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6" data-tab="best sellers">
                     @forelse($bestSellers->take(8) as $product)
                         @include('partials.product-card', ['product' => $product])
                     @empty
@@ -256,8 +257,49 @@
                         </div>
                     @endforelse
                 </div>
+                <div class="list-product home-tab-products hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6 hidden" data-tab="on sale">
+                    @forelse($onSaleProducts->take(8) as $product)
+                        @include('partials.product-card', ['product' => $product])
+                    @empty
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-secondary">No products on sale</p>
+                        </div>
+                    @endforelse
+                </div>
+                <div class="list-product home-tab-products hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6 hidden" data-tab="new arrivals">
+                    @forelse($newArrivals->take(8) as $product)
+                        @include('partials.product-card', ['product' => $product])
+                    @empty
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-secondary">No new arrivals</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
+        @push('scripts')
+        <script>
+        (function() {
+            var section = document.getElementById('home-best-sellers-section');
+            if (!section) return;
+            var tabItems = section.querySelectorAll('.tab-item');
+            var grids = section.querySelectorAll('.list-product.home-tab-products[data-tab]');
+            function showTab(dataItem) {
+                grids.forEach(function(g) {
+                    g.classList.toggle('hidden', g.getAttribute('data-tab') !== dataItem);
+                });
+                tabItems.forEach(function(t) {
+                    t.classList.toggle('active', t.getAttribute('data-item') === dataItem);
+                });
+            }
+            tabItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    showTab(this.getAttribute('data-item'));
+                });
+            });
+        })();
+        </script>
+        @endpush
                         </div>
                     </div>
                 </div>

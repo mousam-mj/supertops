@@ -97,31 +97,32 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $productPlaceholder = asset('assets/images/product/perch-bottal.webp');
+                                $getImageUrlFromPath = function($path) {
+                                    if (!$path || !is_string($path)) return null;
+                                    if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
+                                    if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
+                                    return asset('storage/' . $path);
+                                };
+                                $getProductImageUrl = function($product) use ($getImageUrlFromPath) {
+                                    if ($product->image) return $getImageUrlFromPath($product->image);
+                                    if (is_array($product->images) && count($product->images) > 0) {
+                                        $first = $product->images[0];
+                                        return is_string($first) ? $getImageUrlFromPath($first) : null;
+                                    }
+                                    return null;
+                                };
+                            @endphp
                             @forelse($products as $product)
+                                @php $imageUrl = $getProductImageUrl($product) ?? $productPlaceholder; @endphp
                                 <tr>
                                     <td>{{ $product->id }}</td>
                                     <td>
-                                        @php
-                                            $getImageUrl = function($path) {
-                                                if (!$path) return null;
-                                                if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                                                    return asset($path);
-                                                }
-                                                return asset('storage/' . $path);
-                                            };
-                                            $imageUrl = $getImageUrl($product->image ?? null);
-                                        @endphp
-                                        @if($imageUrl)
-                                            <img src="{{ $imageUrl }}" 
-                                                 alt="{{ $product->name }}" 
-                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: #f0f0f0;"
-                                                 onerror="this.onerror=null; this.src='{{ asset('assets/images/product/perch-bottal.webp') }}';">
-                                        @else
-                                            <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                 style="width: 50px; height: 50px; border-radius: 4px;">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        @endif
+                                        <img src="{{ $imageUrl }}" 
+                                             alt="{{ $product->name }}" 
+                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: #f0f0f0;"
+                                             onerror="this.onerror=null; this.src='{{ $productPlaceholder }}';">
                                     </td>
                                     <td>
                                         <div class="fw-semibold">{{ $product->name }}</div>

@@ -22,24 +22,20 @@
             <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
                 @php
                     $getImageUrl = function($path) {
-                        if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                            return asset($path);
-                        }
+                        if (!$path || !is_string($path)) return asset('assets/images/product/perch-bottal.webp');
+                        if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
+                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
                         return asset('storage/' . $path);
                     };
-                    
+                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
                     $mainImage = $getImageUrl($product->image ?? null);
-                    $hoverImage = null;
-                    if (isset($product->images) && is_array($product->images) && count($product->images) > 0) {
-                        $hoverImage = $getImageUrl($product->images[0]);
-                    } else {
-                        $hoverImage = $mainImage;
+                    if ($mainImage === $placeholderImg && isset($product->images) && is_array($product->images) && count($product->images) > 0 && is_string($product->images[0])) {
+                        $mainImage = $getImageUrl($product->images[0]);
                     }
+                    $hoverImage = (isset($product->images) && is_array($product->images) && count($product->images) > 0) ? $getImageUrl($product->images[0]) : $mainImage;
                 @endphp
-                
-                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" />
-                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
             
             <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 opacity-0 group-hover:opacity-100 max-md:opacity-100 max-md:group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-auto">
