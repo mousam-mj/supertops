@@ -485,30 +485,31 @@ const handleItemModalWishlist = () => {
 };
 
 const updateWishlistIcons = () => {
+  const wishlistStore = localStorage.getItem("wishlistStore")
+    ? JSON.parse(localStorage.getItem("wishlistStore"))
+    : [];
   const wishlistIcons = document.querySelectorAll(".add-wishlist-btn");
   wishlistIcons.forEach((wishlistIcon) => {
-    const productId = wishlistIcon
-      .closest(".product-item")
-      ?.getAttribute("data-item");
-    const wishlistStore = localStorage.getItem("wishlistStore")
-      ? JSON.parse(localStorage.getItem("wishlistStore"))
-      : [];
+    const productId = wishlistIcon.closest(".product-item")?.getAttribute("data-item")
+      || wishlistIcon.getAttribute("data-product-id");
+    if (!productId) return;
     const isProductInWishlist = wishlistStore.some(
-      (item) => item.id === productId
+      (item) => String(item.id) === String(productId)
     );
+    const icon = wishlistIcon.querySelector("i");
     if (isProductInWishlist) {
       wishlistIcon.classList.add("active");
-      wishlistIcon.querySelector("i").classList.remove("ph");
-      wishlistIcon.querySelector("i").classList.add("ph-fill");
+      if (icon) { icon.classList.remove("ph"); icon.classList.add("ph-fill"); }
     } else {
       wishlistIcon.classList.remove("active");
-      wishlistIcon.querySelector("i").classList.add("ph");
-      wishlistIcon.querySelector("i").classList.remove("ph-fill");
+      if (icon) { icon.classList.add("ph"); icon.classList.remove("ph-fill"); }
     }
   });
 };
+window.updateWishlistIcons = updateWishlistIcons;
 
 handleItemModalWishlist();
+updateWishlistIcons();
 
 // Modal Cart - use last modal (layout's) when duplicates exist (e.g. home page)
 const cartIcon = document.querySelector(".cart-icon");
