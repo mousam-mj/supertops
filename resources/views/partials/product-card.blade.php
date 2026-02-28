@@ -1,4 +1,4 @@
-<div class="product-item grid-type group relative" data-item="{{ $product->id ?? '1' }}">
+<div class="product-item grid-type group relative" data-item="{{ $product->id ?? '' }}">
     <div class="product-main cursor-pointer block relative">
         <div class="product-thumb bg-white relative rounded-2xl overflow-hidden">
             @if(isset($product->is_new_arrival) && $product->is_new_arrival)

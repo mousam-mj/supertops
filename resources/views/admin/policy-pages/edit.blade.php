@@ -33,13 +33,21 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="content" class="form-label">Content</label>
-                        <div id="editor" class="bg-white border rounded" style="min-height: 400px;"></div>
-                        <textarea class="form-control @error('content') is-invalid @enderror d-none"
-                                  id="content"
-                                  name="content"
-                                  rows="18">{{ old('content', $policy_page->content) }}</textarea>
-                        <small class="text-muted">Use the toolbar to format text, add headings, lists and links. No signup or API key required.</small>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                            <label for="content" class="form-label mb-0">Content</label>
+                            <button type="button" id="toggle-html-mode" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-code-slash me-1"></i> <span id="toggle-html-label">Edit as HTML</span>
+                            </button>
+                        </div>
+                        <div id="editor-wrap" class="border rounded overflow-hidden">
+                            <div id="editor" class="bg-white" style="min-height: 400px;"></div>
+                            <textarea class="form-control font-monospace small @error('content') is-invalid @enderror d-none"
+                                      id="content"
+                                      name="content"
+                                      rows="18"
+                                      placeholder="Paste or type HTML here (e.g. <p>, <strong>, <a>, <ul>)">{{ old('content', $policy_page->content) }}</textarea>
+                        </div>
+                        <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML code.</small>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -71,6 +79,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     var form = document.getElementById('policy-page-form');
     var textarea = document.getElementById('content');
+    var editorWrap = document.getElementById('editor-wrap');
+    var toggleBtn = document.getElementById('toggle-html-mode');
+    var toggleLabel = document.getElementById('toggle-html-label');
     var quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
@@ -83,10 +94,30 @@ document.addEventListener('DOMContentLoaded', function() {
             ]
         }
     });
-    if (textarea && textarea.value) quill.clipboard.dangerouslyPasteHTML(textarea.value);
+    if (textarea && textarea.value.trim()) quill.clipboard.dangerouslyPasteHTML(textarea.value);
+    var isHtmlMode = false;
+    var editorEl = document.getElementById('editor');
+    toggleBtn.addEventListener('click', function() {
+        isHtmlMode = !isHtmlMode;
+        if (isHtmlMode) {
+            textarea.value = quill.root.innerHTML;
+            editorEl.classList.add('d-none');
+            textarea.classList.remove('d-none');
+            toggleLabel.textContent = 'Visual editor';
+        } else {
+            quill.clipboard.dangerouslyPasteHTML(textarea.value || '');
+            editorEl.classList.remove('d-none');
+            textarea.classList.add('d-none');
+            toggleLabel.textContent = 'Edit as HTML';
+        }
+    });
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        textarea.value = quill.root.innerHTML;
+        if (isHtmlMode) {
+            textarea.classList.remove('d-none');
+        } else {
+            textarea.value = quill.root.innerHTML;
+        }
         form.submit();
     });
 });

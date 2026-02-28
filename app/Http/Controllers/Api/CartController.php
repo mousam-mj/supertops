@@ -362,7 +362,7 @@ class CartController extends Controller
             if ($cart->user_id !== $request->user()->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized',
+                    'message' => 'This cart item does not belong to you. Please refresh the page.',
                 ], 403);
             }
         } else {
@@ -370,7 +370,7 @@ class CartController extends Controller
             if ($cart->session_id !== $sessionId || $cart->user_id !== null) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized',
+                    'message' => 'Your cart session changed. Please refresh the page and try again.',
                 ], 403);
             }
         }
@@ -421,7 +421,7 @@ class CartController extends Controller
             if ($cart->user_id !== $request->user()->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized',
+                    'message' => 'This cart item does not belong to you. Please refresh the page.',
                 ], 403);
             }
         } else {
@@ -429,7 +429,7 @@ class CartController extends Controller
             if ($cart->session_id !== $sessionId || $cart->user_id !== null) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized',
+                    'message' => 'Your cart session changed. Please refresh the page and try again.',
                 ], 403);
             }
         }

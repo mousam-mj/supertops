@@ -9,7 +9,7 @@ class MasterColor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'sort_order'];
+    protected $fillable = ['name', 'color_code', 'sort_order'];
 
     protected $casts = [
         'sort_order' => 'integer',

@@ -6,12 +6,13 @@
     let isAddingToCart = false; // Prevent double clicks
     
     function initAddToCart() {
+        // Use capture phase so we run before main.js Quick View modal's stopPropagation (which blocks bubble)
         document.addEventListener('click', function(e) {
             const addCartBtn = e.target.closest('.add-cart-btn');
             if (!addCartBtn) return;
 
-            // Skip if already processing or if it's from product detail page (handled separately)
-            if (addCartBtn.closest('.product-infor')) {
+            // Skip only on product detail page (full page), not inside Quick View modal
+            if (addCartBtn.closest('.product-infor') && !addCartBtn.closest('.modal-quickview-block')) {
                 return; // Let product detail page handler take care of it
             }
 
@@ -25,11 +26,16 @@
             e.preventDefault();
             e.stopPropagation();
 
-            const productId = addCartBtn.getAttribute('data-product-id');
-            if (!productId) {
-                console.error('Product ID not found');
+            let productId = addCartBtn.getAttribute('data-product-id');
+            if (!productId || String(productId).trim() === '') {
+                const productItem = addCartBtn.closest('.product-item');
+                productId = productItem ? productItem.getAttribute('data-item') : null;
+            }
+            if (!productId || String(productId).trim() === '') {
+                showNotification('Could not add this product. Please try again or open the product page.', 'error');
                 return;
             }
+            productId = String(productId).trim();
 
             // Set flag to prevent double clicks
             isAddingToCart = true;
@@ -40,6 +46,15 @@
             
             const size = sizeItem?.getAttribute('data-size') || null;
             const color = colorItem?.getAttribute('data-color') || null;
+
+            // Quantity: from Quick View modal if this button is inside it, else 1
+            var quantity = 1;
+            var qvModal = addCartBtn.closest('.modal-quickview-main');
+            if (qvModal) {
+                var qtyEl = qvModal.querySelector('.choose-quantity .quantity');
+                if (qtyEl) quantity = parseInt(qtyEl.textContent, 10) || 1;
+                quantity = Math.max(1, Math.min(quantity, 999));
+            }
 
             // Show loading state
             const originalText = addCartBtn.innerHTML;
@@ -62,33 +77,44 @@
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
-                    product_id: parseInt(productId),
-                    quantity: 1,
+                    product_id: parseInt(productId, 10),
+                    quantity: quantity,
                     size: size,
                     color: color
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update cart count
-                    updateCartCount();
-                    
-                    // Show success message
+            .then(function(response) {
+                var contentType = response.headers.get('content-type');
+                if (contentType && contentType.indexOf('application/json') !== -1) {
+                    return response.json().then(function(data) {
+                        return { ok: response.ok, status: response.status, data: data };
+                    });
+                }
+                var msg = response.status === 419 ? 'Page session expired. Please refresh and try again.' : 'Please refresh the page and try again.';
+                return Promise.resolve({ ok: false, status: response.status, data: { success: false, message: msg } });
+            })
+            .then(function(result) {
+                var data = result.data;
+                if (result.status === 401 || result.status === 403 || (data && (data.message === 'Unauthorized' || data.message === 'Unauthenticated.'))) {
+                    showNotification('Session expired or cart changed. Please refresh the page and try again.', 'error');
+                    if (typeof updateCartCount === 'function') updateCartCount();
+                    if (typeof loadCartItems === 'function') loadCartItems();
+                    return;
+                }
+                if (data && data.success) {
+                    if (typeof updateCartCount === 'function') updateCartCount();
                     showNotification('Product added to cart!', 'success');
-                    
-                    // Open cart modal - use layout's modal (last in DOM when home has duplicates)
                     const allCart = document.querySelectorAll('.modal-cart-block .modal-cart-main');
                     const cartModalMain = allCart.length ? allCart[allCart.length - 1] : null;
                     if (cartModalMain) {
                         cartModalMain.classList.add('open');
-                        loadCartItems();
+                        if (typeof loadCartItems === 'function') loadCartItems();
                     }
                 } else {
-                    showNotification(data.message || 'Failed to add product to cart', 'error');
+                    showNotification(data && data.message ? data.message : 'Failed to add product to cart', 'error');
                 }
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error:', error);
                 showNotification('An error occurred. Please try again.', 'error');
             })
@@ -99,6 +125,41 @@
                 addCartBtn.style.pointerEvents = '';
                 isAddingToCart = false;
             });
+        }, true); // capture phase: run before modal's stopPropagation so Quick View Add to Cart works
+    }
+
+    // Quick View modal: quantity +/- buttons
+    function initQuickViewQuantity() {
+        document.addEventListener('click', function(e) {
+            var target = e.target.closest('.quantity-decrease-qv, .quantity-increase-qv');
+            if (!target) return;
+            var block = target.closest('.modal-quickview-main .quantity-block');
+            if (!block) return;
+            var qtyEl = block.querySelector('.quantity');
+            if (!qtyEl) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var n = parseInt(qtyEl.textContent, 10) || 1;
+            if (target.classList.contains('quantity-decrease-qv')) {
+                n = Math.max(1, n - 1);
+            } else {
+                n = Math.min(999, n + 1);
+            }
+            qtyEl.textContent = n;
+        });
+    }
+
+    // Quick View modal: size and color selection (toggle .active)
+    function initQuickViewSizeColor() {
+        document.addEventListener('click', function(e) {
+            var target = e.target.closest('.modal-quickview-main .size-item, .modal-quickview-main .color-item');
+            if (!target) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var parent = target.parentElement;
+            if (!parent) return;
+            parent.querySelectorAll('.size-item.active, .color-item.active').forEach(function(el) { el.classList.remove('active'); });
+            target.classList.add('active');
         });
     }
 
@@ -197,6 +258,10 @@
         const main = getQuickViewModal();
         if (!main) return;
 
+        // Reset quantity to 1 when switching to another product
+        const qtyEl = main.querySelector('.choose-quantity .quantity');
+        if (qtyEl) qtyEl.textContent = '1';
+
         const img = product.image || (product.images && product.images[0]);
         const imgUrl = getImageUrl(img);
         const listImg = main.querySelector('.list-img');
@@ -225,6 +290,46 @@
             const pct = Math.round(((origPrice - salePrice) / origPrice) * 100);
             saleEl.textContent = '-' + pct + '%';
             saleEl.style.display = 'inline-block';
+        }
+
+        // Size options – show on Quick View card
+        var sizeBlock = main.querySelector('.qv-size-block');
+        var listSize = main.querySelector('.list-size');
+        if (sizeBlock && listSize) {
+            var sizes = product.sizes && (Array.isArray(product.sizes) ? product.sizes : []);
+            if (sizes.length > 0) {
+                sizeBlock.style.display = 'block';
+                listSize.style.display = 'flex';
+                listSize.innerHTML = sizes.map(function(s, idx) {
+                    var active = idx === 0 ? ' active' : '';
+                    return '<div class="size-item w-9 h-9 rounded-full flex flex-shrink-0 items-center justify-center text-button bg-white border border-line hover:border-black cursor-pointer duration-300' + active + '" data-size="' + String(s).replace(/"/g, '&quot;') + '">' + String(s) + '</div>';
+                }).join('');
+            } else {
+                sizeBlock.style.display = 'none';
+                listSize.innerHTML = '';
+            }
+        }
+        // Color options – show on Quick View card
+        var colorBlock = main.querySelector('.qv-color-block');
+        var listColor = main.querySelector('.list-color');
+        if (colorBlock && listColor) {
+            var colors = product.colors && (Array.isArray(product.colors) ? product.colors : []);
+            var images = product.images && (Array.isArray(product.images) ? product.images : []);
+            if (colors.length > 0) {
+                colorBlock.style.display = 'block';
+                listColor.style.display = 'flex';
+                listColor.innerHTML = colors.map(function(c, i) {
+                    var img = images[i];
+                    var style = !img ? ' style="background-color:' + String(c) + '"' : '';
+                    var active = i === 0 ? ' active' : '';
+                    var cls = 'color-item duration-300 relative cursor-pointer border border-line hover:border-black' + (img ? ' w-12 h-12 rounded-xl' : ' w-8 h-8 rounded-full') + active;
+                    var inner = img ? '<img src="' + getImageUrl(img) + '" alt="" class="rounded-xl w-full h-full object-cover" />' : '';
+                    return '<div class="' + cls + '"' + style + ' data-color="' + String(c).replace(/"/g, '&quot;') + '">' + inner + '</div>';
+                }).join('');
+            } else {
+                colorBlock.style.display = 'none';
+                listColor.innerHTML = '';
+            }
         }
 
         const addCart = main.querySelector('.add-cart-btn');
@@ -307,6 +412,45 @@
                 }
             })
             .catch(error => console.error('Error loading cart:', error));
+        loadYouMayAlsoLike();
+    }
+
+    // "You May Also Like" in cart modal – load recommended products
+    function loadYouMayAlsoLike() {
+        var cartBlock = document.querySelectorAll('.modal-cart-block').length
+            ? document.querySelectorAll('.modal-cart-block')[document.querySelectorAll('.modal-cart-block').length - 1]
+            : document.querySelector('.modal-cart-block');
+        if (!cartBlock) return;
+        var leftCol = cartBlock.querySelector('.left');
+        var listEl = cartBlock.querySelector('.left .list');
+        if (!leftCol || !listEl) return;
+
+        fetch('/api/products?per_page=4&sort_by=created_at&sort_order=desc', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                var products = res.success && res.data && res.data.data ? res.data.data : [];
+                if (!products.length) {
+                    leftCol.style.display = 'none';
+                    return;
+                }
+                leftCol.style.display = '';
+                listEl.innerHTML = products.map(function(p) {
+                    var img = p.image || (p.images && p.images[0]);
+                    var url = getImageUrl(img);
+                    var price = parseFloat(p.sale_price || p.price || 0);
+                    var slug = p.slug || ('product-' + p.id);
+                    return '<a href="/product/' + slug + '" class="product-item grid-type block mb-4 rounded-xl overflow-hidden border border-line hover:border-black duration-300">' +
+                        '<div class="aspect-square bg-surface"><img src="' + url + '" alt="" class="w-full h-full object-cover" /></div>' +
+                        '<div class="p-3"><div class="name text-button truncate">' + (p.name || '') + '</div>' +
+                        '<div class="product-price text-title mt-1">₹' + price.toFixed(2) + '</div></div></a>';
+                }).join('');
+            })
+            .catch(function() {
+                leftCol.style.display = 'none';
+            });
     }
 
     // Create cart item element
@@ -1027,6 +1171,8 @@
     function init() {
         initAddToCart();
         initQuickView();
+        initQuickViewQuantity();
+        initQuickViewSizeColor();
         initWishlistBtn();
         initQuickShop();
         updateCartCount();

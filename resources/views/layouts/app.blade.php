@@ -264,8 +264,14 @@
                             <div class="desc text-secondary mt-3" style="display:none"></div>
                         </div>
                         <div class="list-action mt-6">
-                            <div class="list-color flex items-center gap-2 flex-wrap mt-3" style="display:none"></div>
-                            <div class="list-size flex items-center gap-2 flex-wrap mt-3" style="display:none"></div>
+                            <div class="qv-size-block mt-3" style="display:none">
+                                <div class="text-button-uppercase text-secondary2 mb-1.5">Size</div>
+                                <div class="list-size flex items-center gap-2 flex-wrap"></div>
+                            </div>
+                            <div class="qv-color-block mt-3" style="display:none">
+                                <div class="text-button-uppercase text-secondary2 mb-1.5">Color</div>
+                                <div class="list-color flex items-center gap-2 flex-wrap"></div>
+                            </div>
                             <div class="choose-quantity flex items-center gap-5 mt-3">
                                 <div class="quantity-block md:p-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
                                     <i class="ph-bold ph-minus cursor-pointer body1 quantity-decrease-qv"></i>
@@ -326,7 +332,7 @@
                         <div class="text-title">₹<span class="total-price">0.00</span></div>
                     </div>
                     <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center uppercase">Checkout</a>
-                    <a href="{{{ route('cart.index') }}}" class="text-button-uppercase continue mt-4 text-center has-line-before cursor-pointer inline-block">View Cart</a>
+                    <a href="{{{ route('cart.index') }}}" class="button-main w-full text-center uppercase mt-3 bg-white border border-black text-black hover:bg-black hover:text-white">View Cart</a>
                 </div>
             </div>
         </div>

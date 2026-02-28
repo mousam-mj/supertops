@@ -548,13 +548,8 @@ const closeModalCart = () => {
   }
 };
 
-if (addCartBtns && addCartBtns.length > 0) {
-  addCartBtns.forEach((item) => {
-    item.addEventListener("click", () => {
-      openModalCart();
-    });
-  });
-}
+// Add-to-cart is handled by cart.js (API add + then open modal on success).
+// Do not open modal on add-cart-btn click here, so category/shop cards add via API first.
 
 if (cartIcon) {
   cartIcon.addEventListener("click", openModalCart);
@@ -1388,15 +1383,15 @@ const closeCompareIcon = document.querySelector(
 const clearCompareIcon = document.querySelector(".modal-compare-main .clear");
 
 const openModalCompare = () => {
-  modalCompareMain.classList.add("open");
+  if (modalCompareMain) modalCompareMain.classList.add("open");
 };
 
 const closeModalCompare = () => {
-  modalCompareMain.classList.remove("open");
+  if (modalCompareMain) modalCompareMain.classList.remove("open");
 };
 
-closeCompareIcon.addEventListener("click", closeModalCompare);
-clearCompareIcon.addEventListener("click", closeModalCompare);
+if (closeCompareIcon) closeCompareIcon.addEventListener("click", closeModalCompare);
+if (clearCompareIcon) clearCompareIcon.addEventListener("click", closeModalCompare);
 
 // Set compare length
 const handleItemModalCompare = () => {
@@ -1407,6 +1402,7 @@ const handleItemModalCompare = () => {
   const listItemCompare = document.querySelector(
     ".modal-compare-block .list-product"
   );
+  if (!listItemCompare) return;
 
   listItemCompare.innerHTML = "";
 
@@ -1463,7 +1459,7 @@ const handleItemModalCompare = () => {
   const clearCompareBtn = document.querySelector(
     ".modal-compare-block .block-button .clear"
   );
-  clearCompareBtn.addEventListener("click", () => {
+  if (clearCompareBtn) clearCompareBtn.addEventListener("click", () => {
     localStorage.setItem("compareStore", []);
     updateCompareIcons();
   });
@@ -1489,7 +1485,7 @@ const updateCompareIcons = () => {
   });
 };
 
-handleItemModalCompare();
+if (document.querySelector(".modal-compare-block")) handleItemModalCompare();
 
 // Modal Quickview
 const modalQuickview = document.querySelector(".modal-quickview-block");
