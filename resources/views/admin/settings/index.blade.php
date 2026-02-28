@@ -106,7 +106,7 @@
                         <div class="tab-pane fade" id="content" role="tabpanel">
                             <p class="text-muted small mb-3">Edit About Us, Privacy Policy, Terms, Return & Refund, and Cancellation Policy from <a href="{{ route('admin.policy-pages.index') }}">Policy Pages</a>.</p>
                             <div class="mb-3">
-                                <label class="form-label">Contact Page Text</label>
+                                <label class="form-label">Footer About Us Text</label>
                                 <div id="editor-contact-page-text" class="bg-white border rounded" style="min-height: 120px;"></div>
                                 <textarea name="contact_page_text" id="settings-contact-page-text" class="d-none" rows="3">{{ old('contact_page_text', $settings['contact_page_text'] ?? '') }}</textarea>
                                 <small class="text-muted">Short text for the contact page (e.g. "We're Here To Help").</small>

@@ -56,15 +56,15 @@
             <div class="container">
                 <div class="content-main flex justify-between max-xl:flex-col gap-y-8">
                     <div class="xl:w-2/3 xl:pr-3 w-full">
-                        <div class="time countdown-cart bg-green py-3 px-5 flex items-center rounded-lg">
+                        <!-- <div class="time countdown-cart bg-green py-3 px-5 flex items-center rounded-lg">
                             <div class="heding5">🔥</div>
                             <div class="caption1 pl-2">
                                 Your cart will expire in
                                 <span class="min text-red text-button fw-700"><span class="minute">10</span> : <span class="second">00</span></span>
                                 <span> minutes! Please checkout now before your items sell out!</span>
                             </div>
-                        </div>
-                        <div class="heading banner mt-5">
+                        </div> -->
+                        <!-- <div class="heading banner mt-5">
                             <div class="text">
                                 Buy
                                 <span class="text-button"> ₹<span class="more-price">250</span>.00 </span>
@@ -74,7 +74,7 @@
                             <div class="tow-bar-block mt-4">
                                 <div class="progress-line" style="width: 50%"></div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="list-product w-full sm:mt-7 mt-5">
                             <div class="w-full">
                                 <div class="heading bg-surface bora-4 pt-4 pb-4">
@@ -148,3 +148,4 @@
         </div>
 </div>
 
+@endsection

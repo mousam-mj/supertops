@@ -298,7 +298,7 @@
                         <i class="ph ph-x text-sm"></i>
                     </div>
                 </div>
-                <div class="time countdown-cart px-6">
+                <!-- <div class="time countdown-cart px-6">
                     <div class="flex items-center gap-3 px-5 py-3 bg-green rounded-lg">
                         <p class="text-3xl">🔥</p>
                         <div class="caption1">
@@ -306,8 +306,8 @@
                             Please checkout now before your items sell out!
                         </div>
                     </div>
-                </div>
-                <div class="heading banner mt-3 px-6">
+                </div> -->
+                <!-- <div class="heading banner mt-3 px-6">
                     <div class="text">
                         Buy <span class="text-button"> ₹<span class="more-price">150</span>.00 </span>
                         <span>more to get </span>
@@ -316,7 +316,7 @@
                     <div class="tow-bar-block mt-3">
                         <div class="progress-line"></div>
                     </div>
-                </div>
+                </div> -->
                 <div class="list-cart px-6 overflow-y-auto max-h-[400px]">
                     <!-- Cart items will be loaded dynamically -->
                 </div>

@@ -278,7 +278,7 @@
         </div>
     </div>
 </div>
-
+@endsection
 @section('scripts')
 <script>
 // Define functions IMMEDIATELY - NO IIFE, execute directly
@@ -723,4 +723,3 @@ if (testBtn) {
     });
 })();
 </script>
-@endsection

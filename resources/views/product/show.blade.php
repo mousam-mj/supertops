@@ -904,7 +904,7 @@
                 </div>
     </div>
 </div>
-
+@endsection
 @section('scripts')
 <script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
@@ -1522,4 +1522,3 @@
         }
     })();
 </script>
-@endsection

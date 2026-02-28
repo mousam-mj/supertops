@@ -55,7 +55,7 @@
             </div>
 
         {{-- Category products (main listing) --}}
-        <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
+        <!-- <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
             <div class="container">
                 <div class="mb-8">
                     <h2 class="heading3">{{ $category->name }}</h2>
@@ -77,7 +77,7 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </div> -->
 
         @php
             $additionalBannerImage = $category->additional_banner_image ?? ($mainCategory->additional_banner_image ?? null);

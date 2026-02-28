@@ -157,7 +157,7 @@
                                 @php $primaryCat = $mainCat->activeCategories->first(); @endphp
                                 @if($primaryCat)
                                     <li>
-                                        <a href="{{ $primaryCat->children->count() > 0 ? '#!' : route('category', $primaryCat->slug) }}" class="text-xl font-semibold flex items-center justify-between">
+                                        <a href="{{ $primaryCat->children->count() > 0 ? '#!' : route('category', $primaryCat->slug) }}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all justify-between">
                                             {{ $mainCat->name }}
                                             @if($primaryCat->children->count() > 0)
                                             <span class="text-right">
@@ -193,16 +193,16 @@
                                 @endif
                             @endforeach
                                                             <li>
-                                <a href="{{{ route('shop') }}}" class="text-xl font-semibold">Shop</a>
+                                <a href="{{{ route('shop') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Shop</a>
                                                             </li>
                                                             <li>
-                                <a href="{{{ route('about') }}}" class="text-xl font-semibold">About Us</a>
+                                <a href="{{{ route('about') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">About Us</a>
                                                             </li>
                                                             <li>
-                                <a href="{{{ route('contact') }}}" class="text-xl font-semibold">Contact Us</a>
+                                <a href="{{{ route('contact') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Contact Us</a>
                                                             </li>
                                                             <li>
-                                <a href="{{{ route('faqs') }}}" class="text-xl font-semibold">FAQs</a>
+                                <a href="{{{ route('faqs') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">FAQs</a>
                                                             </li>
                                                         </ul>
                                                     </div>

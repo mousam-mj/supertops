@@ -632,7 +632,7 @@
                             <i class="ph ph-x text-sm"></i>
                         </div>
                     </div>
-                    <div class="time countdown-cart px-6">
+                    <!-- <div class="time countdown-cart px-6">
                         <div class="flex items-center gap-3 px-5 py-3 bg-green rounded-lg">
                             <p class="text-3xl">🔥</p>
                             <div class="caption1">
@@ -640,8 +640,8 @@
                                 Please checkout now before your items sell out!
                             </div>
                         </div>
-                    </div>
-                    <div class="heading banner mt-3 px-6">
+                    </div> -->
+                    <!-- <div class="heading banner mt-3 px-6">
                         <div class="text">
                             Buy <span class="text-button"> $<span class="more-price">150</span>.00 </span>
                             <span>more to get </span>
@@ -650,7 +650,7 @@
                         <div class="tow-bar-block mt-3">
                             <div class="progress-line"></div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="list-product px-6"></div>
                     <div class="footer-modal bg-white absolute bottom-0 left-0 w-full">
                         <div class="flex items-center justify-center lg:gap-14 gap-8 px-6 py-4 border-b border-line">
