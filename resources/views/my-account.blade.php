@@ -582,11 +582,12 @@
                                 <div class="avatar">
                                     @php
                                         $avatarPath = $user->avatar ?? 'assets/images/avatar/1.png';
-                                        $avatarUrl = str_starts_with($avatarPath, 'assets/') || str_starts_with($avatarPath, '/assets/') 
-                                            ? asset($avatarPath) 
-                                            : asset('storage/' . $avatarPath);
+                                        $avatarUrl = str_starts_with($avatarPath, 'assets/') || str_starts_with($avatarPath, '/assets/')
+                                            ? asset(ltrim($avatarPath, '/'))
+                                            : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($avatarPath, '/'));
+                                        $avatarFallback = asset('assets/images/avatar/1.png');
                                     @endphp
-                                    <img src="{{ $avatarUrl }}" alt="avatar" class="md:w-[140px] w-[120px] md:h-[140px] h-[120px] rounded-full" />
+                                    <img src="{{ $avatarUrl }}" alt="avatar" class="md:w-[140px] w-[120px] md:h-[140px] h-[120px] rounded-full object-cover" onerror="this.onerror=null; this.src='{{ $avatarFallback }}';" />
                                 </div>
                                 <div class="name heading6 mt-4 text-center">{{ $user->name ?? ($user->first_name . ' ' . $user->last_name) ?? 'User' }}</div>
                                 <div class="mail heading6 font-normal normal-case text-secondary text-center mt-1">{{ $user->email }}</div>
@@ -983,12 +984,13 @@
                                         <div class="bg_img flex-shrink-0 relative w-[7.5rem] h-[7.5rem] rounded-lg overflow-hidden bg-surface">
                                             @php
                                                 $avatarPath = $user->avatar ?? 'assets/images/avatar/1.png';
-                                                $avatarUrl = str_starts_with($avatarPath, 'assets/') || str_starts_with($avatarPath, '/assets/') 
-                                                    ? asset($avatarPath) 
-                                                    : asset('storage/' . $avatarPath);
+                                                $avatarUrl = str_starts_with($avatarPath, 'assets/') || str_starts_with($avatarPath, '/assets/')
+                                                    ? asset(ltrim($avatarPath, '/'))
+                                                    : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($avatarPath, '/'));
+                                                $avatarFallback = asset('assets/images/avatar/1.png');
                                             @endphp
-                                            <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary"></span>
-                                            <img src="{{ $avatarUrl }}" alt="avatar" class="upload_img relative z-[1] w-full h-full object-cover" id="avatarPreview" />
+                                            <span class="ph ph-image text-5xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-secondary avatar-placeholder-icon"></span>
+                                            <img src="{{ $avatarUrl }}" alt="avatar" class="upload_img relative z-[1] w-full h-full object-cover" id="avatarPreview" onerror="this.onerror=null; this.src='{{ $avatarFallback }}';" />
                                         </div>
                                         <div>
                                             <strong class="text-button">Upload File:</strong>
