@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ColorSizeMasterController;
 use App\Http\Controllers\PolicyPageController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ProductReviewController;
 
 Route::get('/', function () {
     $categories = \App\Models\Category::whereNull('parent_id')
@@ -129,6 +130,7 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/collection', [ShopController::class, 'index'])->name('shop.collection');
 Route::get('/category/{slug}', [ShopController::class, 'category'])->name('category');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
+Route::post('/product/{product}/review', [ProductReviewController::class, 'store'])->name('product.review.store');
 
 // Cart & Checkout Routes
 Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
@@ -528,6 +530,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/policy-pages', [AdminPolicyPageController::class, 'index'])->name('policy-pages.index');
         Route::get('/policy-pages/{policy_page}/edit', [AdminPolicyPageController::class, 'edit'])->name('policy-pages.edit');
         Route::put('/policy-pages/{policy_page}', [AdminPolicyPageController::class, 'update'])->name('policy-pages.update');
+
+        // Product reviews (list & delete)
+        Route::get('/reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
+        Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])->name('reviews.destroy');
         
         // Additional Admin Routes
         Route::get('/alerts', function() {

@@ -191,13 +191,13 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1 mt-3">
+                                @php $avg = $reviewStats['avg'] ?? 0; $rc = $reviewStats['count'] ?? 0; @endphp
                                 <div class="rate flex">
-                                    <i class="ph-fill ph-star text-sm text-yellow"></i>
-                                    <i class="ph-fill ph-star text-sm text-yellow"></i>
-                                    <i class="ph-fill ph-star text-sm text-yellow"></i>
-                                    <i class="ph-fill ph-star text-sm text-yellow"></i><i class="ph-fill ph-star text-sm text-yellow"></i>
+                                    @for ($s = 1; $s <= 5; $s++)
+                                        <i class="ph {{ $s <= round($avg) ? 'ph-fill' : 'ph' }} ph-star text-sm {{ $s <= round($avg) ? 'text-yellow' : 'text-line' }}"></i>
+                                    @endfor
                                 </div>
-                                <span class="caption1 text-secondary">({{ rand(10, 999) }} reviews)</span>
+                                <span class="caption1 text-secondary">({{ number_format($rc) }} {{ $rc === 1 ? 'review' : 'reviews' }})</span>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line product-price-block" data-variant-prices="{{ json_encode($variantPrices) }}" data-product-price="{{ $productPrice }}" data-product-sale-price="{{ $productSalePrice !== null ? $productSalePrice : '' }}">
                                 <div class="product-price heading5">₹{{ number_format($initialDisplayPrice, 2) }}</div>
@@ -373,9 +373,9 @@
                 <div class="container">
                     <div class="flex items-center justify-center w-full">
                         <div class="menu-tab flex items-center md:gap-[60px] gap-8">
-                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 active">Description</div>
-                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300">Specifications</div>
-                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300">Review</div>
+                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer select-none active" data-item="Description" role="button" tabindex="0">Description</div>
+                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer select-none" data-item="Specifications" role="button" tabindex="0">Specifications</div>
+                            <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer select-none" data-item="Review" role="button" tabindex="0">Review</div>
                         </div>
                     </div>
                     <div class="desc-block mt-8">
@@ -612,248 +612,7 @@
                 </div>
                         </div>
                         <div class="desc-item review" data-item="Review">
-                            <div class="top-overview flex max-sm:flex-col items-center justify-between gap-12 gap-y-4">
-                                <div class="left flex max-sm:flex-col gap-y-4 items-center justify-between lg:w-1/2 sm:w-2/3 w-full sm:pr-5">
-                                    <div class="rating flex flex-col items-center">
-                                        <div class="text-display">4.6</div>
-                                        <div class="flex flex-col items-center">
-                                            <div class="rate flex">
-                                                <i class="ph-fill ph-star text-lg text-black"></i>
-                                                <i class="ph-fill ph-star text-lg text-black"></i>
-                                                <i class="ph-fill ph-star text-lg text-black"></i>
-                                                <i class="ph-fill ph-star text-lg text-black"></i>
-                                                <i class="ph-fill ph-star text-lg text-black"></i>
-                                            </div>
-                                            <div class="text-secondary text-center mt-1">(1,968 Ratings)</div>
-                                        </div>
-                                    </div>
-                                    <div class="list-rating w-2/3">
-                                        <div class="item flex items-center justify-between gap-1.5">
-                                            <div class="flex items-center gap-1">
-                                                <div class="caption1">5</div>
-                                                <i class="ph-fill ph-star text-sm"></i>
-                                            </div>
-                                            <div class="progress bg-line relative w-3/4 h-2">
-                                                <div class="progress-percent absolute bg-yellow w-[50%] h-full left-0 top-0"></div>
-                                            </div>
-                                            <div class="caption1">50%</div>
-                                        </div>
-                                        <div class="item flex items-center justify-between gap-1.5 mt-1">
-                                            <div class="flex items-center gap-1">
-                                                <div class="caption1">4</div>
-                                                <i class="ph-fill ph-star text-sm"></i>
-                                            </div>
-                                            <div class="progress bg-line relative w-3/4 h-2">
-                                                <div class="progress-percent absolute bg-yellow w-[20%] h-full left-0 top-0"></div>
-                                            </div>
-                                            <div class="caption1">20%</div>
-                                        </div>
-                                        <div class="item flex items-center justify-between gap-1.5 mt-1">
-                                            <div class="flex items-center gap-1">
-                                                <div class="caption1">3</div>
-                                                <i class="ph-fill ph-star text-sm"></i>
-                                            </div>
-                                            <div class="progress bg-line relative w-3/4 h-2">
-                                                <div class="progress-percent absolute bg-yellow w-[10%] h-full left-0 top-0"></div>
-                                            </div>
-                                            <div class="caption1">10%</div>
-                                        </div>
-                                        <div class="item flex items-center justify-between gap-1.5 mt-1">
-                                            <div class="flex items-center gap-1">
-                                                <div class="caption1">2</div>
-                                                <i class="ph-fill ph-star text-sm"></i>
-                                            </div>
-                                            <div class="progress bg-line relative w-3/4 h-2">
-                                                <div class="progress-percent absolute bg-yellow w-[10%] h-full left-0 top-0"></div>
-                                            </div>
-                                            <div class="caption1">10%</div>
-                                        </div>
-                                        <div class="item flex items-center justify-between gap-1.5 mt-1">
-                                            <div class="flex items-center gap-2">
-                                                <div class="caption1">1</div>
-                                                <i class="ph-fill ph-star text-sm"></i>
-                                            </div>
-                                            <div class="progress bg-line relative w-3/4 h-2">
-                                                <div class="progress-percent absolute bg-yellow w-[10%] h-full left-0 top-0"></div>
-                                            </div>
-                                            <div class="caption1">10%</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="right">
-                                    <a href="#form-review" class="button-main bg-white text-black border border-black whitespace-nowrap">Write Reviews</a>
-                                </div>
-                            </div>
-                            <div class="list-review mt-8">
-                                <div class="heading flex items-center justify-between flex-wrap gap-4">
-                                    <div class="heading4">03 Comments</div>
-                                    <div class="right flex items-center gap-3">
-                                        <label for="select-filter" class="uppercase">Sort by:</label>
-                                        <div class="select-block relative">
-                                            <select id="select-filter" name="select-filter" class="text-button py-2 pl-3 md:pr-14 pr-10 rounded-lg bg-white border border-line">
-                                                <option value="Sorting">Sorting</option>
-                                                <option value="newest">Newest</option>
-                                                <option value="5star">5 Star</option>
-                                                <option value="4star">4 Star</option>
-                                                <option value="3star">3 Star</option>
-                                                <option value="2star">2 Star</option>
-                                                <option value="1star">1 Star</option>
-                                            </select>
-                                            <i class="ph ph-caret-down text-xs absolute top-1/2 -translate-y-1/2 md:right-4 right-2"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item mt-6 pb-6 border-b border-line">
-                                    <div class="heading flex items-center justify-between">
-                                        <div class="user-infor flex gap-4">
-                                            <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/1.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
-                                            </div>
-                                            <div class="user">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="text-title">Jessica Pavard</div>
-                                                    <div class="span text-line">-</div>
-                                                    <div class="rate flex">
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex items-center gap-2">
-                                                    <div class="text-secondary2">1 days ago</div>
-                                                    <div class="text-secondary2">-</div>
-                                                    <div class="text-secondary2">
-                                                        <span>Yellow</span> /
-                                                        <span>XL</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="more-action cursor-pointer">
-                                            <i class="ph-bold ph-dots-three text-2xl"></i>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">I can't get enough of the fashion pieces from this brand. They have a great selection for every occasion and the prices are reasonable. The shipping is fast and the items always arrive in perfect condition.</div>
-                                    <div class="action mt-3">
-                                        <div class="flex items-center gap-4">
-                                            <div class="like-btn flex items-center gap-1 cursor-pointer">
-                                                <i class="ph ph-hands-clapping text-lg"></i>
-                                                <div class="text-button">20</div>
-                                            </div>
-                                            <a href="#form-review" class="reply-btn text-button text-secondary cursor-pointer hover:text-black"> Reply</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item mt-6 pb-6 border-b border-line">
-                                    <div class="heading flex items-center justify-between">
-                                        <div class="user-infor flex gap-4">
-                                            <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/2.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
-                                            </div>
-                                            <div class="user">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="text-title">Tony Nguyen</div>
-                                                    <div class="span text-line">-</div>
-                                                    <div class="rate flex">
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex items-center gap-2">
-                                                    <div class="text-secondary2">2 days ago</div>
-                                                    <div class="text-secondary2">-</div>
-                                                    <div class="text-secondary2">
-                                                        <span>Yellow</span> /
-                                                        <span>XL</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="more-action cursor-pointer">
-                                            <i class="ph-bold ph-dots-three text-2xl"></i>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">The fashion brand's online shopping experience is seamless. The website is user-friendly, the product images are clear, and the checkout process is quick.</div>
-                                    <div class="action mt-3">
-                                        <div class="flex items-center gap-4">
-                                            <div class="like-btn flex items-center gap-1 cursor-pointer">
-                                                <i class="ph ph-hands-clapping text-lg"></i>
-                                                <div class="text-button">20</div>
-                                            </div>
-                                            <a href="#form-review" class="reply-btn text-button text-secondary cursor-pointer hover:text-black"> Reply</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item mt-6">
-                                    <div class="heading flex items-center justify-between">
-                                        <div class="user-infor flex gap-4">
-                                            <div class="avatar">
-                                                <img src="{{ asset('assets/images/avatar/3.png') }}" alt="img" class="w-[52px] aspect-square rounded-full" />
-                                            </div>
-                                            <div class="user">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="text-title">John Parker</div>
-                                                    <div class="span text-line">-</div>
-                                                    <div class="rate flex">
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                        <i class="ph-fill ph-star text-xs text-yellow"></i>
-                                                    </div>
-                                                </div>
-                        <div class="flex items-center gap-2">
-                                                    <div class="text-secondary2">1 days ago</div>
-                                                    <div class="text-secondary2">-</div>
-                                                    <div class="text-secondary2">
-                                                        <span>Yellow</span> /
-                                                        <span>XL</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="more-action cursor-pointer">
-                                            <i class="ph-bold ph-dots-three text-2xl"></i>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">I love how sustainable and ethically conscious this fashion brand is. They prioritize eco-friendly materials and fair trade practices, which makes me feel good about supporting them.</div>
-                                    <div class="action mt-3">
-                                        <div class="flex items-center gap-4">
-                                            <div class="like-btn flex items-center gap-1 cursor-pointer">
-                                                <i class="ph ph-hands-clapping text-lg"></i>
-                                                <div class="text-button">20</div>
-                                            </div>
-                                            <a href="#form-review" class="reply-btn text-button text-secondary cursor-pointer hover:text-black"> Reply</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="form-review" class="form-review pt-8">
-                                <div class="heading4">Leave A comment</div>
-                                <form class="grid sm:grid-cols-2 gap-4 gap-y-5 mt-6">
-                                    <div class="name">
-                                        <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="text" placeholder="Your Name *" required />
-                                    </div>
-                                    <div class="mail">
-                                        <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" type="email" placeholder="Your Email *" required />
-                                    </div>
-                                    <div class="col-span-full message">
-                                        <textarea class="border border-line px-4 py-3 w-full rounded-lg" id="message" name="message" rows="3" placeholder="Your message *" required></textarea>
-                                    </div>
-                                    <div class="col-span-full flex items-start -mt-2 gap-2">
-                                        <input type="checkbox" id="saveAccount" name="saveAccount" class="mt-1.5" />
-                                        <label class="" for="saveAccount">Save my name, email, and website in this browser for the next time I comment.</label>
-                                    </div>
-                                    <div class="col-span-full sm:pt-3">
-                                        <button class="button-main bg-white text-black border border-black">Submit Reviews</button>
-                                    </div>
-                                </form>
-                            </div>
+                            @include('partials.product-reviews', ['product' => $product, 'reviews' => $reviews, 'reviewStats' => $reviewStats])
                         </div>
                     </div>
                 </div>
@@ -908,6 +667,42 @@
 @section('scripts')
 <script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
+    // Description / Specifications / Review tabs — switch content on click
+    (function() {
+        var descTab = document.querySelector('.desc-tab');
+        if (!descTab) return;
+        var tabButtons = descTab.querySelectorAll('.menu-tab .tab-item');
+        var panels = descTab.querySelectorAll('.desc-block .desc-item');
+        if (!tabButtons.length || !panels.length) return;
+
+        function showPanel(dataItem) {
+            if (!dataItem) return;
+            panels.forEach(function(panel) {
+                if (panel.getAttribute('data-item') === dataItem) {
+                    panel.classList.add('open');
+                } else {
+                    panel.classList.remove('open');
+                }
+            });
+            tabButtons.forEach(function(btn) {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-item') === dataItem) btn.classList.add('active');
+            });
+        }
+
+        tabButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var dataItem = btn.getAttribute('data-item');
+                if (dataItem) showPanel(dataItem);
+            });
+        });
+
+        if (window.location.hash === '#form-review') showPanel('Review');
+        window.addEventListener('hashchange', function() {
+            if (window.location.hash === '#form-review') showPanel('Review');
+        });
+    })();
+
     // See more / See less for descriptions
     document.querySelectorAll('.see-more-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {

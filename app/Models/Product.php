@@ -97,6 +97,22 @@ class Product extends Model
     }
 
     /**
+     * Get approved reviews (top-level, no replies in main list)
+     */
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class)->whereNull('parent_id')->where('is_approved', true)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * All reviews for rating stats (approved only)
+     */
+    public function allApprovedReviews()
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
+    /**
      * Get current price (sale_price if available, otherwise price)
      */
     public function getCurrentPriceAttribute()

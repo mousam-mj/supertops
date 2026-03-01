@@ -29,15 +29,15 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             $user = Auth::user();
-            $redirect = $request->get('redirect', route('home'));
-            
+            $redirect = $request->get('redirect') ?? session('url.intended') ?? route('home');
+
             // Auto-verify email if not verified
             if (!$user->email_verified_at) {
                 $user->email_verified_at = now();
                 $user->save();
             }
-            
-            return redirect($redirect)->with('success', 'Login successful!');
+
+            return redirect()->to($redirect)->with('success', 'Login successful!');
         }
 
         return back()->withErrors([

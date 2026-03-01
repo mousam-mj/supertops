@@ -249,6 +249,21 @@ class ShopController extends Controller
                 ->limit(3)
                 ->get();
 
+            // Reviews: only approved, top-level (no replies in main list)
+            $reviews = $product->reviews()->with('user')->get();
+            $allApproved = $product->allApprovedReviews()->get();
+            $reviewCount = $allApproved->count();
+            $reviewStats = [
+                'avg' => $reviewCount > 0 ? round($allApproved->avg('rating'), 1) : 0,
+                'count' => $reviewCount,
+                'distribution' => [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0],
+            ];
+            foreach ($allApproved as $r) {
+                if (isset($reviewStats['distribution'][$r->rating])) {
+                    $reviewStats['distribution'][$r->rating]++;
+                }
+            }
+
             // Get previous and next products
             $prevProduct = Product::where('id', '<', $product->id)
                 ->where('is_active', true)
@@ -260,7 +275,7 @@ class ShopController extends Controller
                 ->orderBy('id', 'asc')
                 ->first();
 
-            return view('product.show', compact('product', 'relatedProducts', 'coupons', 'prevProduct', 'nextProduct'));
+            return view('product.show', compact('product', 'relatedProducts', 'coupons', 'prevProduct', 'nextProduct', 'reviews', 'reviewStats'));
         } catch (\Exception $e) {
             \Log::error('Product show error: ' . $e->getMessage());
             abort(404, 'Product not found');

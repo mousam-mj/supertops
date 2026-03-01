@@ -505,6 +505,11 @@
                                 <i class="bi bi-file-text me-2"></i> Policy Pages
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
+                                <i class="bi bi-chat-square-text me-2"></i> Review Manage
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="p-3 pt-2 border-top border-secondary border-opacity-25 flex-shrink-0">
