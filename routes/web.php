@@ -125,6 +125,21 @@ Route::get('/test-email', function() {
     }
 })->name('test.email');
 
+// Serve storage files via PHP when symlink returns 403 (e.g. shared hosting that blocks symlinks)
+Route::get('/storage/{path}', function (string $path) {
+    $path = preg_replace('#\.\./#', '', $path); // block directory traversal
+    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+    $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+    $realPath = realpath($fullPath);
+    $storageRoot = realpath(storage_path('app/public'));
+    if (!$realPath || !$storageRoot || strpos($realPath, $storageRoot) !== 0) {
+        abort(404);
+    }
+    return response()->file($realPath);
+})->where('path', '.*')->name('storage.serve');
+
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/collection', [ShopController::class, 'index'])->name('shop.collection');
