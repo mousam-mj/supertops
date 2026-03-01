@@ -35,7 +35,7 @@
                 @endphp
                 @if($heroImage)
                     <div class="banner-img w-full">
-                        <img src="{{ asset('storage/' . $heroImage) }}" alt="{{ $category->name }}" class="w-full duration-500">
+                        <img src="{{ storage_asset($heroImage) }}" alt="{{ $category->name }}" class="w-full duration-500">
                     </div>
                 @else
                     <div class="banner-img w-full">
@@ -88,7 +88,7 @@
                 <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block overflow-hidden duration-500">
                     <div class="banner-img w-full">
                         @if($additionalBannerImage)
-                            <img src="{{ asset('storage/' . $additionalBannerImage) }}" alt="{{ $additionalBannerText ?? $category->name }}" class="w-full duration-500">
+                            <img src="{{ storage_asset($additionalBannerImage) }}" alt="{{ $additionalBannerText ?? $category->name }}" class="w-full duration-500">
                         @else
                             <img src="{{ asset('assets/images/slider/09-1-scaled.webp') }}" alt="bg-img" class="w-full duration-500">
                         @endif
@@ -130,7 +130,7 @@
                         <div class="list-banner grid md:grid-cols-3 gap-[20px]">
                             @for($i = 0; $i < 3; $i++)
                                 @php
-                                    $collectionImage = !empty($bannerImages[$i]) ? asset('storage/' . $bannerImages[$i]) : asset($defaultCollectionImages[$i]);
+                                    $collectionImage = !empty($bannerImages[$i] ?? null) ? storage_asset($bannerImages[$i] ?? null) : asset($defaultCollectionImages[$i]);
                                     $collectionText = !empty($bannerTexts[$i]) ? $bannerTexts[$i] : $defaultCollectionTexts[$i];
                                     $slugForLookup = \Illuminate\Support\Str::slug($collectionText);
                                     $catForCard = \App\Models\Category::where('is_active', true)->where('name', $collectionText)->first()
@@ -223,7 +223,7 @@
                             $middleBannerImage = $category->additional_banner_image ?? ($mainCategory->additional_banner_image ?? null);
                         @endphp
                         @if($middleBannerImage)
-                            <img src="{{ asset('storage/' . $middleBannerImage) }}" alt="{{ $category->name }}" class="w-full duration-500">
+                            <img src="{{ storage_asset($middleBannerImage) }}" alt="{{ $category->name }}" class="w-full duration-500">
                         @else
                             <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="bg-img" class="w-full duration-500">
                         @endif
@@ -242,7 +242,7 @@
             <div class="container">
                 <div class="content md:rounded-[28px] rounded-2xl overflow-hidden relative">
                     @if($bottomBannerImage)
-                        <img src="{{ asset('storage/' . $bottomBannerImage) }}" alt="{{ $category->name }}" class="absolute top-0 left-0 w-full h-full object-cover z-[-1]">
+                        <img src="{{ storage_asset($bottomBannerImage) }}" alt="{{ $category->name }}" class="absolute top-0 left-0 w-full h-full object-cover z-[-1]">
                     @else
                         <img src="{{ asset('assets/images/banner/bg-banner-toys.png') }}" alt="bg" class="absolute top-0 left-0 w-full h-full object-cover z-[-1]">
                     @endif
@@ -283,7 +283,7 @@
                         <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 @if(!empty($bannerImages) && count($bannerImages) >= 2 && !empty($bannerImages[$i]))
-                                    <img src="{{ asset('storage/' . $bannerImages[$i]) }}" alt="{{ $twoBannerTexts[$i] }}" class="w-full duration-500">
+                                    <img src="{{ storage_asset($bannerImages[$i] ?? null) }}" alt="{{ $twoBannerTexts[$i] }}" class="w-full duration-500">
                                 @else
                                     <img src="{{ $twoBannerImages[$i] }}" alt="{{ $twoBannerTexts[$i] }}" class="w-full duration-500">
                                 @endif

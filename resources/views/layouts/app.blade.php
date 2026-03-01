@@ -59,6 +59,8 @@
 
     
 <body>
+    {{-- Storage path for JS (respects STORAGE_PUBLIC_PATH=media) --}}
+    <script>window.STORAGE_PATH = '{{ ltrim(parse_url(config("filesystems.disks.public.url"), PHP_URL_PATH) ?? "/storage", "/") }}';</script>
     {{-- Cart, Wishlist & Search - load first, before any other script --}}
     <script>
     (function(){

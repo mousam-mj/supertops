@@ -152,7 +152,7 @@
                             <label for="image" class="form-label">Product Image</label>
                             @if($product->image)
                                 <div class="mb-2 position-relative d-inline-block">
-                                    <img src="{{ asset('storage/' . $product->image) }}" 
+                                    <img src="{{ storage_asset($product->image) }}" 
                                          alt="{{ $product->name }}" 
                                          id="currentProductImage"
                                          style="max-width: 150px; max-height: 150px; border-radius: 4px;">
@@ -182,7 +182,7 @@
                                 @if(is_array($product->images) && count($product->images) > 0)
                                     @foreach($product->images as $idx => $img)
                                         <div class="position-relative d-inline-block gallery-thumb-wrap" data-path="{{ $img }}">
-                                            <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 2px solid #e2e8f0;">
+                                            <img src="{{ storage_asset($img) }}" alt="{{ $product->name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 2px solid #e2e8f0;">
                                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle gallery-remove-btn" style="width: 24px; height: 24px; padding: 0; font-size: 12px; line-height: 1;" data-path="{{ $img }}" title="Remove">
                                                 <i class="bi bi-x"></i>
                                             </button>
@@ -214,7 +214,7 @@
                             <label for="video" class="form-label">Product Video</label>
                             @if($product->video)
                                 <div class="mb-2">
-                                    <video src="{{ asset('storage/' . $product->video) }}" controls id="currentProductVideo" style="max-width: 200px; border-radius: 4px;"></video>
+                                    <video src="{{ storage_asset($product->video) }}" controls id="currentProductVideo" style="max-width: 200px; border-radius: 4px;"></video>
                                     <input type="hidden" name="remove_video" value="0" id="removeVideoInput">
                                     <button type="button" class="btn btn-sm btn-outline-danger mt-1" id="removeVideoBtn" onclick="toggleRemoveVideo()">
                                         <i class="bi bi-trash me-1"></i>Remove Video

@@ -69,7 +69,7 @@
                 <h5 class="mb-0">Category Image</h5>
             </div>
             <div class="card-body text-center">
-                <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="img-fluid" style="max-height: 300px; border-radius: 8px;">
+                <img src="{{ storage_asset($category->image) }}" alt="{{ $category->name }}" class="img-fluid" style="max-height: 300px; border-radius: 8px;">
             </div>
         </div>
     </div>

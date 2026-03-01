@@ -25,7 +25,7 @@
                         if (!$path || !is_string($path)) return asset('assets/images/product/perch-bottal.webp');
                         if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
                         if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
-                        return asset('storage/' . $path);
+                        return storage_asset($path);
                     };
                     $placeholderImg = asset('assets/images/product/perch-bottal.webp');
                     $mainImage = $getImageUrl($product->image ?? null);

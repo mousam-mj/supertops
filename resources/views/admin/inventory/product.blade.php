@@ -30,7 +30,7 @@
 {{-- Product Details Card --}}
 @php
     $productImage = $product->image
-        ? (str_starts_with($product->image, 'assets/') || str_starts_with($product->image, '/assets/') ? asset($product->image) : asset('storage/' . $product->image))
+        ? (str_starts_with($product->image, 'assets/') || str_starts_with($product->image, '/assets/') ? asset($product->image) : storage_asset($product->image))
         : asset('assets/images/product/perch-bottal.webp');
 @endphp
 <div class="row mb-4">
@@ -277,7 +277,7 @@
                             @if(count($invImages) > 0)
                                 <div class="d-flex flex-wrap gap-1 mb-2">
                                     @foreach($invImages as $imgPath)
-                                        <img src="{{ asset('storage/' . $imgPath) }}" alt="" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <img src="{{ storage_asset($imgPath) }}" alt="" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
                                     @endforeach
                                 </div>
                             @endif
@@ -343,7 +343,7 @@
                                         @if(count($editImages) > 0)
                                             <div class="d-flex flex-wrap gap-2 mb-2">
                                                 @foreach($editImages as $imgPath)
-                                                    <img src="{{ asset('storage/' . $imgPath) }}" alt="" style="max-height: 60px; width: auto;" class="rounded border">
+                                                    <img src="{{ storage_asset($imgPath) }}" alt="" style="max-height: 60px; width: auto;" class="rounded border">
                                                 @endforeach
                                             </div>
                                             <label class="small d-block mb-1"><input type="checkbox" name="remove_image" value="1"> Remove all images</label>

@@ -61,7 +61,7 @@
                         <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                                    <img src="{{ storage_asset($category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
                                 @else
                                     <img src="{{ $defaultImages[$index] ?? $defaultImages[0] }}" alt="{{ $category->name }}" class="w-full duration-500" />
                                 @endif

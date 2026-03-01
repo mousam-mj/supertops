@@ -672,7 +672,7 @@
                                                             if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
                                                                 return asset($path);
                                                             }
-                                                            return asset('storage/' . $path);
+                                                            return storage_asset($path);
                                                         };
                                                         
                                                         $productImage = $product ? $getImageUrl($product->image ?? null) : asset('assets/images/product/perch-bottal.webp');
@@ -743,7 +743,7 @@
                                                 if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
                                                     return asset($path);
                                                 }
-                                                return asset('storage/' . $path);
+                                                return storage_asset($path);
                                             };
                                             
                                             $statusColors = [

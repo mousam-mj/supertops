@@ -43,7 +43,7 @@
                                     <td>{{ $category->id }}</td>
                                     <td>
                                         @if($category->image)
-                                            <img src="{{ asset('storage/' . $category->image) }}" 
+                                            <img src="{{ storage_asset($category->image) }}" 
                                                  alt="{{ $category->name }}" 
                                                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                         @else
@@ -143,7 +143,7 @@
                         <div class="tree-item mb-3">
                             <div class="d-flex align-items-center mb-2">
                                 @if($mainCategory->image)
-                                    <img src="{{ asset('storage/' . $mainCategory->image) }}" 
+                                    <img src="{{ storage_asset($mainCategory->image) }}" 
                                          alt="{{ $mainCategory->name }}" 
                                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px;">
                                 @else
@@ -160,7 +160,7 @@
                                         <div class="tree-item mb-2">
                                             <div class="d-flex align-items-center mb-1">
                                                 @if($subCategory->image)
-                                                    <img src="{{ asset('storage/' . $subCategory->image) }}" 
+                                                    <img src="{{ storage_asset($subCategory->image) }}" 
                                                          alt="{{ $subCategory->name }}" 
                                                          style="width: 35px; height: 35px; object-fit: cover; border-radius: 5px; margin-right: 8px;">
                                                 @else
@@ -176,7 +176,7 @@
                                     @foreach($subCategory->children as $product)
                                         <div class="d-flex align-items-center mb-1">
                                             @if($product->image)
-                                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                                <img src="{{ storage_asset($product->image) }}" 
                                                      alt="{{ $product->name }}" 
                                                      style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
                                             @else

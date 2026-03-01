@@ -664,7 +664,8 @@
         if (url.indexOf('http') === 0) return url;
         if (url.indexOf('//') === 0) return (window.location.protocol || 'http:') + url;
         if (url.indexOf('/') === 0) return origin + url;
-        return origin + '/storage/' + url.replace(/^\/+/, '');
+        var storagePath = (typeof window !== 'undefined' && window.STORAGE_PATH) ? ('/' + window.STORAGE_PATH) : '/storage';
+        return origin + storagePath + '/' + url.replace(/^\/+/, '');
     }
 
     function normalizeProduct(p) {

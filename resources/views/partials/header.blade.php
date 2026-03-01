@@ -27,7 +27,7 @@
                             <i class="icon-category text-2xl"></i>
                             <a href="{{{ route('home') }}}" class="flex items-center px-10">
                                 @php $logo = \App\Models\Setting::get('site_logo'); @endphp
-                                <img src="{{ $logo ? asset('storage/' . $logo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-8 md:h-10 object-contain" />
+                                <img src="{{ $logo ? storage_asset($logo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-8 md:h-10 object-contain" />
                             </a>
                         </div>
                         

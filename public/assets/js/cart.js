@@ -247,11 +247,16 @@
         }
     }
 
+    function getStorageBase() {
+        return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
+    }
     function getImageUrl(path) {
         if (!path) return '/assets/images/product/perch-bottal.webp';
         if (path.startsWith('http')) return path;
         if (path.startsWith('assets/') || path.startsWith('/assets/')) return path.startsWith('/') ? path : '/' + path;
-        return path.startsWith('storage/') ? '/' + path : '/storage/' + path;
+        var base = getStorageBase();
+        if (path.startsWith('storage/') || path.startsWith('/storage/')) return base + '/' + path.replace(/^\/?storage\/?/, '');
+        return base + '/' + path.replace(/^\/+/, '');
     }
 
     function showQuickViewModal(product) {
@@ -472,14 +477,12 @@
                 return path.startsWith('/') ? path : '/' + path;
             }
             
-            // Storage path - Laravel asset('storage/' . $path)
-            // If path already has storage/, use it, otherwise add it
+            // Storage path - use configurable STORAGE_PATH (e.g. media)
+            var base = (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
             if (path.startsWith('storage/') || path.startsWith('/storage/')) {
-                return path.startsWith('/') ? path : '/' + path;
+                return base + '/' + path.replace(/^\/?storage\/?/, '');
             }
-            
-            // Default: assume it's a storage path
-            return '/storage/' + path;
+            return base + '/' + path.replace(/^\/+/, '');
         }
         
         const imageUrl = getImageUrl(item.product?.image);
@@ -865,16 +868,20 @@
         row.setAttribute('data-cart-id', item.id);
         
         // Get image URL
+        function getStorageBase() {
+            return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
+        }
         function getImageUrl(path) {
             if (!path) return '/assets/images/product/perch-bottal.webp';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;
             }
+            var base = getStorageBase();
             if (path.startsWith('storage/') || path.startsWith('/storage/')) {
-                return path.startsWith('/') ? path : '/' + path;
+                return base + '/' + path.replace(/^\/?storage\/?/, '');
             }
-            return '/storage/' + path;
+            return base + '/' + path.replace(/^\/+/, '');
         }
         
         const imageUrl = getImageUrl(item.product?.image);
@@ -1067,16 +1074,20 @@
         div.className = 'product-item-checkout flex items-center justify-between gap-3 py-4 border-b border-line';
         
         // Get image URL - use same function as cart items
+        function getStorageBase() {
+            return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
+        }
         function getImageUrl(path) {
             if (!path) return '/assets/images/product/perch-bottal.webp';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;
             }
+            var base = getStorageBase();
             if (path.startsWith('storage/') || path.startsWith('/storage/')) {
-                return path.startsWith('/') ? path : '/' + path;
+                return base + '/' + path.replace(/^\/?storage\/?/, '');
             }
-            return '/storage/' + path;
+            return base + '/' + path.replace(/^\/+/, '');
         }
         const imageUrl = getImageUrl(item.product?.image);
         

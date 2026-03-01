@@ -5,7 +5,7 @@
                 <div class="company-infor basis-1/4 max-lg:basis-full pr-7">
                     <a href="{{{ route('home') }}}" class="logo inline-block">
                         @php $footerLogo = \App\Models\Setting::get('site_logo'); @endphp
-                        <img src="{{ $footerLogo ? asset('storage/' . $footerLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" />
+                        <img src="{{ $footerLogo ? storage_asset($footerLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" />
                     </a>
                     @php
                         $footerAboutText = \App\Models\Setting::get('contact_page_text');

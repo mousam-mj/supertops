@@ -103,7 +103,7 @@
                                     if (!$path || !is_string($path)) return null;
                                     if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
                                     if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
-                                    return asset('storage/' . $path);
+                                    return storage_asset($path);
                                 };
                                 $getProductImageUrl = function($product) use ($getImageUrlFromPath) {
                                     if ($product->image) return $getImageUrlFromPath($product->image);

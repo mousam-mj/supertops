@@ -64,7 +64,7 @@
                         <label for="image" class="form-label">Category Thumbnail Image</label>
                         @if($category->image)
                             <div class="mb-2 position-relative d-inline-block">
-                                <img src="{{ asset('storage/' . $category->image) }}" 
+                                <img src="{{ storage_asset($category->image) }}" 
                                      alt="{{ $category->name }}" 
                                      id="currentCategoryImage"
                                      style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -96,7 +96,7 @@
                         <label for="hero_image" class="form-label">Hero/Banner Image</label>
                         @if($category->hero_image)
                             <div class="mb-2 position-relative d-inline-block">
-                                <img src="{{ asset('storage/' . $category->hero_image) }}" 
+                                <img src="{{ storage_asset($category->hero_image) }}" 
                                      alt="Hero" 
                                      id="currentHeroImage"
                                      style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
@@ -169,7 +169,7 @@
                                 <label class="form-label">Banner Image {{ $i + 1 }}</label>
                                 @if(!empty($bannerImages[$i]))
                                     <div class="mb-2 position-relative d-inline-block">
-                                        <img src="{{ asset('storage/' . $bannerImages[$i]) }}" 
+                                        <img src="{{ storage_asset($bannerImages[$i]) }}" 
                                              alt="Banner {{ $i + 1 }}" 
                                              style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
                                         <input type="hidden" name="remove_banner_image[{{ $i }}]" value="0" id="removeBannerImageInput{{ $i }}">
@@ -208,7 +208,7 @@
                         <label for="bottom_banner_image" class="form-label">Bottom Banner Image</label>
                         @if($category->bottom_banner_image)
                             <div class="mb-2 position-relative d-inline-block">
-                                <img src="{{ asset('storage/' . $category->bottom_banner_image) }}" 
+                                <img src="{{ storage_asset($category->bottom_banner_image) }}" 
                                      alt="Bottom Banner" 
                                      id="currentBottomBannerImage"
                                      style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
@@ -270,7 +270,7 @@
                         <label for="additional_banner_image" class="form-label">Additional Banner Image</label>
                         @if($category->additional_banner_image)
                             <div class="mb-2 position-relative d-inline-block">
-                                <img src="{{ asset('storage/' . $category->additional_banner_image) }}" 
+                                <img src="{{ storage_asset($category->additional_banner_image) }}" 
                                      alt="Additional Banner" 
                                      id="currentAdditionalBannerImage"
                                      style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">

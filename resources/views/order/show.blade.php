@@ -9,7 +9,7 @@
         if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
             return asset($path);
         }
-        return asset('storage/' . $path);
+        return storage_asset($path);
     };
     $totalAmount = $order->total_amount ?? $order->total ?? 0;
     $subtotal = $order->subtotal ?? ($order->items->sum('total') ?: $totalAmount);

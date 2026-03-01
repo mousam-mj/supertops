@@ -28,12 +28,12 @@
     $colorImageUrls = [];
     foreach ($product->inventories as $inv) {
         if ($inv->color && $inv->image) {
-            $colorImageUrls[$inv->color] = asset('storage/' . $inv->image);
+            $colorImageUrls[$inv->color] = storage_asset($inv->image);
         }
     }
     if (empty($colorImageUrls) && isset($product->color_images) && is_array($product->color_images)) {
         foreach ($product->color_images as $cName => $path) {
-            if ($path) $colorImageUrls[$cName] = str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
+            if ($path) $colorImageUrls[$cName] = str_starts_with($path, 'http') ? $path : storage_asset($path);
         }
     }
     $variantPrices = [];
@@ -133,7 +133,7 @@
                         if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
                             return asset($path);
                         }
-                        return asset('storage/' . $path);
+                        return storage_asset($path);
                     };
                     $mainImage = $getImageUrl($product->image ?? null);
                     if ($firstColor && isset($colorImageUrls[$firstColor])) {
@@ -628,9 +628,9 @@
                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
                         preload="metadata"
                     >
-                        <source src="{{ asset('storage/' . $product->video) }}#t=0.1" type="video/mp4">
-                        <source src="{{ asset('storage/' . $product->video) }}" type="video/mp4">
-                        <source src="{{ asset('storage/' . $product->video) }}" type="video/quicktime">
+                        <source src="{{ storage_asset($product->video) }}#t=0.1" type="video/mp4">
+                        <source src="{{ storage_asset($product->video) }}" type="video/mp4">
+                        <source src="{{ storage_asset($product->video) }}" type="video/quicktime">
                         Your browser does not support the video tag.
                     </video>
                 </div>

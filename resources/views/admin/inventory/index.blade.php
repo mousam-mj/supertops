@@ -59,13 +59,13 @@
                                             $path = $product->image;
                                             if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
                                             if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
-                                            return asset('storage/' . $path);
+                                            return storage_asset($path);
                                         }
                                         if (is_array($product->images) && count($product->images) > 0) {
                                             $first = $product->images[0];
                                             if (is_string($first)) {
                                                 if (str_starts_with($first, 'assets/') || str_starts_with($first, '/assets/')) return asset($first);
-                                                return asset('storage/' . $first);
+                                                return storage_asset($first);
                                             }
                                         }
                                         return null;

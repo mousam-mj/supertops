@@ -41,7 +41,7 @@
                                     <label class="form-label">Logo</label>
                                     @if(!empty($settings['site_logo']))
                                         <div class="mb-2">
-                                            <img src="{{ asset('storage/' . ($settings['site_logo'] ?? '')) }}" alt="Logo" style="max-height: 60px;">
+                                            <img src="{{ storage_asset($settings['site_logo'] ?? '') }}" alt="Logo" style="max-height: 60px;">
                                         </div>
                                     @endif
                                     <input type="file" name="site_logo" class="form-control" accept="image/*">

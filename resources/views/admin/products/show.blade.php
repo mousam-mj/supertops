@@ -13,7 +13,7 @@
             <div class="card-body">
                 @if($product->image)
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $product->image) }}" 
+                        <img src="{{ storage_asset($product->image) }}" 
                              alt="{{ $product->name }}" 
                              class="img-fluid" 
                              style="max-width: 300px; border-radius: 8px;">

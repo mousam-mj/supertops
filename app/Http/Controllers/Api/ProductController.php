@@ -120,7 +120,7 @@ class ProductController extends Controller
             if (! $path || ! is_string($path)) {
                 return $baseUrl . '/assets/images/product/perch-bottal.webp';
             }
-            return str_starts_with($path, 'http') ? $path : $baseUrl . '/storage/' . ltrim($path, '/');
+            return str_starts_with($path, 'http') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($path, '/'));
         };
         $primaryImage = $product->image ?? null;
         if (! $primaryImage && $product->images && is_array($product->images) && count($product->images) > 0) {

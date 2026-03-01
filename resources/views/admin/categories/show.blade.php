@@ -13,7 +13,7 @@
             <div class="card-body">
                 @if($category->image)
                     <div class="mb-4 text-center">
-                        <img src="{{ asset('storage/' . $category->image) }}" 
+                        <img src="{{ storage_asset($category->image) }}" 
                              alt="{{ $category->name }}" 
                              class="img-fluid" 
                              style="max-width: 300px; max-height: 300px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
