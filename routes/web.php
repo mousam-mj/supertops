@@ -125,9 +125,9 @@ Route::get('/test-email', function() {
     }
 })->name('test.email');
 
-// Serve storage files via PHP when symlink returns 403 (e.g. shared hosting that blocks symlinks)
-Route::get('/storage/{path}', function (string $path) {
-    $path = preg_replace('#\.\./#', '', $path); // block directory traversal
+// Serve storage files via PHP when symlink returns 403 (shared hosting often blocks /storage or symlinks)
+$serveStorage = function (string $path) {
+    $path = preg_replace('#\.\./#', '', $path);
     if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
         abort(404);
     }
@@ -138,7 +138,9 @@ Route::get('/storage/{path}', function (string $path) {
         abort(404);
     }
     return response()->file($realPath);
-})->where('path', '.*')->name('storage.serve');
+};
+Route::get('/storage/{path}', $serveStorage)->where('path', '.*')->name('storage.serve');
+Route::get('/media/{path}', $serveStorage)->where('path', '.*')->name('media.serve');
 
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
