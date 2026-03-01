@@ -56,8 +56,8 @@ Artisan::command('storage:fix', function () {
     $this->info('If images still do not show on server:');
     $this->line('1. Ensure APP_URL in .env is correct (e.g. https://perchlife.in)');
     $this->line('2. Run: php artisan storage:link (if link was not created)');
-    $this->line('3. Set ownership to web server user, e.g:');
-    $this->line('   sudo chown -R www-data:www-data storage bootstrap/cache');
-    $this->line('   sudo chmod -R 775 storage bootstrap/cache');
+    $this->line('3. Permissions:');
+    $this->line('   - Shared hosting (no sudo): chmod -R 775 storage bootstrap/cache');
+    $this->line('   - VPS with sudo: sudo chown -R www-data:www-data storage bootstrap/cache && sudo chmod -R 775 storage bootstrap/cache');
     $this->line('4. On SELinux: sudo chcon -R -t httpd_sys_rw_content_t storage');
 })->purpose('Create storage link and fix permissions for uploaded images on server');
