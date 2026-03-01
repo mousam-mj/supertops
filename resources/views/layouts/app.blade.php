@@ -50,6 +50,10 @@
             display: block !important;
             visibility: visible !important;
         }
+        /* Hide Compare Product button site-wide */
+        .compare-btn {
+            display: none !important;
+        }
     </style>
     </head>
 

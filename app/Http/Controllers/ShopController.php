@@ -48,11 +48,13 @@ class ShopController extends Controller
         }
 
         // Price filter
-        if ($minPrice !== null && $minPrice !== '') {
-            $products = $products->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
+        $minPriceVal = $minPrice !== null && $minPrice !== '' ? (float) $minPrice : null;
+        $maxPriceVal = $maxPrice !== null && $maxPrice !== '' ? (float) $maxPrice : null;
+        if ($minPriceVal !== null) {
+            $products = $products->whereRaw('COALESCE(sale_price, price) >= ?', [$minPriceVal]);
         }
-        if ($maxPrice !== null && $maxPrice !== '') {
-            $products = $products->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
+        if ($maxPriceVal !== null) {
+            $products = $products->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPriceVal]);
         }
 
         // Size filter (products that have inventory with this size)

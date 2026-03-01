@@ -3,6 +3,46 @@
 @section('title', 'Shop Default List - Perch Bottle')
 
 @section('content')
+<style>
+    /* Shop sidebar: proper theme colors (no default white) */
+    .shop-product .sidebar #shop-apply-price {
+        background-color: var(--black) !important;
+        color: var(--white) !important;
+    }
+    .shop-product .sidebar #shop-apply-price:hover {
+        background-color: var(--green) !important;
+        color: var(--black) !important;
+    }
+    .shop-product .sidebar .btn-clear-filters {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--black);
+        background-color: var(--white);
+        border: 2px solid var(--black);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all ease 0.3s;
+        text-decoration: none;
+    }
+    .shop-product .sidebar .btn-clear-filters:hover {
+        background-color: var(--black);
+        color: var(--white);
+    }
+    .shop-product .sidebar .list-size .size-item:not(.active) {
+        background-color: #f5f5f5;
+        border-color: #e0e0e0;
+        color: var(--black);
+    }
+    .shop-product .sidebar .list-color .color-item:not(.active) {
+        background-color: #f5f5f5;
+        border-color: #e0e0e0;
+    }
+</style>
 <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
                     <div class="container h-full">
@@ -586,7 +626,7 @@
                 <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
                         @if(request()->hasAny(['category', 'size', 'color', 'min_price', 'max_price', 'search']))
-                        <a href="{{ route('shop') }}" class="btn btn-outline-primary w-full mb-6">Clear all filters</a>
+                        <a href="{{ route('shop') }}" class="btn-clear-filters mb-6">Clear all filters</a>
                         @endif
                         <div class="filter-type-block pb-8 border-b border-line">
                             <div class="heading6">Category</div>
@@ -629,7 +669,7 @@
                                     <div class="max-price">₹{{ number_format((int)request()->get('max_price', $priceMax), 0) }}</div>
                                 </div>
                             </div>
-                            <button type="button" id="shop-apply-price" class="btn btn-sm btn-outline-primary mt-2">Apply price filter</button>
+                            <button type="button" id="shop-apply-price" class="button-main mt-3 w-full text-center">Apply price filter</button>
                         </div>
                         <div class="filter-color pb-8 border-b border-line mt-8">
                             <div class="heading6">Colors</div>
@@ -648,7 +688,7 @@
                         </div>
                     </div>
                     <div class="list-product-block style-list lg:w-3/4 md:w-2/3 w-full md:pl-3">
-                        <div class="filter-heading flex items-center justify-between gap-5 flex-wrap">
+                        <div class="filter-heading flex items-center justify-between gap-5 flex-wrap hidden">
                             <div class="left flex has-line items-center flex-wrap gap-5">
                                 <div class="choose-layout menu-tab flex items-center gap-2">
                                     <div class="item style-grid tab-item three-col p-2 border border-line rounded flex items-center justify-center cursor-pointer">
@@ -710,7 +750,7 @@
         </div>
 @push('scripts')
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     var filterPrice = document.querySelector('.filter-price');
     if (!filterPrice) return;
     var rangeMin = filterPrice.querySelector('.range-min');
@@ -732,14 +772,15 @@
             var minVal = parseInt(rangeMin.value, 10);
             var maxVal = parseInt(rangeMax.value, 10);
             if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
-            var url = new URL('{{ url()->current() }}', window.location.origin);
             var params = new URLSearchParams(window.location.search);
             params.set('min_price', String(minVal));
             params.set('max_price', String(maxVal));
-            window.location.href = url.pathname + '?' + params.toString();
+            var baseUrl = '{{ route("shop") }}';
+            var sep = baseUrl.indexOf('?') !== -1 ? '&' : '?';
+            window.location.href = baseUrl + sep + params.toString();
         });
     }
-})();
+});
 </script>
 @endpush
 @endsection

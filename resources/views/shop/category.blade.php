@@ -42,15 +42,15 @@
                         <img src="{{ asset('assets/images/slider/11b-scaled.webp') }}" alt="bg-img" class="w-full duration-500">
                     </div>
                 @endif
-                <div class="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-4 pb-8 pt-6 z-10 pointer-events-none">
-                    <div class="pointer-events-auto">
+                <div class="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end gap-5 pb-8 pt-8 z-10 pointer-events-none">
+                    <div class="pointer-events-auto order-1">
                 @if($heroText)
                     <div class="heading4 text-center whitespace-normal max-w-2xl px-4">{{ $heroText }}</div>
                 @else
                     <div class="heading4 text-center whitespace-nowrap">{{ $category->name }}</div>
                 @endif
                     </div>
-                    <a href="{{ route('category', $category->slug) }}" class="pointer-events-auto button-main">{{ $heroButtonText }}</a>
+                    <a href="{{ route('category', $category->slug) }}" class="pointer-events-auto button-main order-2">{{ $heroButtonText }}</a>
                 </div>
             </div>
 
@@ -93,12 +93,14 @@
                             <img src="{{ asset('assets/images/slider/09-1-scaled.webp') }}" alt="bg-img" class="w-full duration-500">
                         @endif
                     </div>
-                    @if($additionalBannerText)
-                        <div class="heading4 absolute bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $additionalBannerText }}</div>
-                    @else
-                        <div class="heading4 absolute bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
-                    @endif
-                    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 button-main">{{ $heroButtonText }}</div>
+                    <div class="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-4 pb-8 pt-6 z-10">
+                        @if($additionalBannerText)
+                            <div class="heading4 text-center whitespace-nowrap">{{ $additionalBannerText }}</div>
+                        @else
+                            <div class="heading4 text-center whitespace-nowrap">{{ $category->name }}</div>
+                        @endif
+                        <span class="button-main">{{ $heroButtonText }}</span>
+                    </div>
                 </a>
             </div>
         </div>

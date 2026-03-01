@@ -116,13 +116,18 @@ class ProductController extends Controller
             ->firstOrFail();
 
         $baseUrl = rtrim($request->getSchemeAndHttpHost() ?: config('app.url'), '/');
-        $thumbImage = $product->image
-            ? (str_starts_with($product->image, 'http') ? $product->image : $baseUrl . '/storage/' . ltrim($product->image, '/'))
-            : $baseUrl . '/assets/images/product/perch-bottal.webp';
+        $toFullUrl = function ($path) use ($baseUrl) {
+            if (! $path || ! is_string($path)) {
+                return $baseUrl . '/assets/images/product/perch-bottal.webp';
+            }
+            return str_starts_with($path, 'http') ? $path : $baseUrl . '/storage/' . ltrim($path, '/');
+        };
+        $primaryImage = $product->image ?? null;
+        if (! $primaryImage && $product->images && is_array($product->images) && count($product->images) > 0) {
+            $primaryImage = $product->images[0];
+        }
         $images = $product->images && is_array($product->images) ? $product->images : [];
-        $thumbImages = array_map(function ($img) use ($baseUrl) {
-            return str_starts_with($img, 'http') ? $img : $baseUrl . '/storage/' . ltrim($img, '/');
-        }, array_merge([$thumbImage], $images));
+        $thumbImages = array_map($toFullUrl, array_merge([$primaryImage], array_filter($images, fn ($i) => $i !== $primaryImage)));
 
         return response()->json([
             'success' => true,

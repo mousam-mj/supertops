@@ -4,6 +4,14 @@
 @section('page-title', 'Inventory: ' . $product->name)
 
 @section('content')
+<style>
+    /* Theme match: purple (sidebar & stock cards) */
+    .inventory-add-card .card-header .nav-pills .nav-link { background: rgba(255,255,255,0.25); color: #fff; }
+    .inventory-add-card .card-header .nav-pills .nav-link:hover { background: rgba(255,255,255,0.35); color: #fff; }
+    .inventory-add-card .card-header .nav-pills .nav-link.active { background: #7c3aed; color: #fff; border: none; }
+    .inventory-submit-btn { background: #7c3aed !important; border-color: #7c3aed !important; }
+    .inventory-submit-btn:hover { background: #6d28d9 !important; border-color: #6d28d9 !important; }
+</style>
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
@@ -77,7 +85,7 @@
 {{-- Total Stock --}}
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);">
+        <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
             <div class="card-body text-white py-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -130,18 +138,18 @@
 {{-- Add Inventory --}}
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header py-3 text-white border-0 d-flex flex-wrap align-items-center justify-content-between gap-2" style="background: linear-gradient(135deg, #dc2626 0%, #8b5cf6 100%);">
+        <div class="card border-0 shadow-sm inventory-add-card">
+            <div class="card-header py-3 text-white border-0 d-flex flex-wrap align-items-center justify-content-between gap-2" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
                 <div>
                     <h5 class="mb-0 fw-bold">Add Inventory</h5>
                     <small class="opacity-90">Select color, size, and enter the initial stock quantity. Upload image for this color (optional).</small>
                 </div>
                 <ul class="nav nav-pills nav-fill gap-1 mb-0" id="addInventoryTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-pane" type="button" role="tab">Single</button>
+                        <button class="nav-link active inventory-tab-btn" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-pane" type="button" role="tab">Single</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk-pane" type="button" role="tab">Bulk</button>
+                        <button class="nav-link inventory-tab-btn" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk-pane" type="button" role="tab">Bulk</button>
                     </li>
                 </ul>
             </div>
@@ -190,7 +198,7 @@
                                     <small class="text-muted">You can select multiple images. All will be saved for this color/size.</small>
                                 </div>
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #dc2626 0%, #8b5cf6 100%); border: none;">
+                                    <button type="submit" class="btn btn-primary inventory-submit-btn">
                                         <i class="bi bi-plus-lg me-1"></i>Add Inventory
                                     </button>
                                 </div>
@@ -238,7 +246,7 @@
                                 @endforeach
                             </datalist>
                             <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="add-bulk-row"><i class="bi bi-plus me-1"></i>Add row</button>
-                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #dc2626 0%, #8b5cf6 100%); border: none;">
+                            <button type="submit" class="btn btn-primary inventory-submit-btn">
                                 <i class="bi bi-plus-lg me-1"></i>Bulk Add Inventory
                             </button>
                         </form>

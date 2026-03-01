@@ -426,62 +426,91 @@ const handleItemModalWishlist = () => {
   if (items.length === 0) {
     listItemWishlist.innerHTML = `<p class='mt-1'>No product in wishlist</p>`;
   } else {
-    items.forEach((item) => {
-      const prdItem = document.createElement("div");
-      prdItem.setAttribute("data-item", item.id);
-      prdItem.classList.add(
-        "item",
-        "py-5",
-        "flex",
-        "items-center",
-        "justify-between",
-        "gap-3",
-        "border-b",
-        "border-line"
-      );
-      const modalImgSrc = (item.thumbImage && item.thumbImage[0]) ? item.thumbImage[0] : (typeof window.location !== 'undefined' ? window.location.origin : '') + '/assets/images/product/perch-bottal.webp';
-      const modalImgAlt = (item.name || 'product').replace(/'/g, '&#39;');
-      prdItem.innerHTML = `
-                <div class="infor flex items-center gap-5">
-                    <div class="bg-img">
-                        <img src="${modalImgSrc}" alt="${modalImgAlt}"
-                            class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=(window.location.origin||'')+'/assets/images/product/perch-bottal.webp'" />
-                    </div>
-                    <div class=''>
-                        <div class="name text-button">${item.name || 'Product'}</div>
-                        <div class="flex items-center gap-2 mt-2">
-                            <div class="product-price text-title">₹${(item.price != null ? Number(item.price).toFixed(2) : '0.00')}</div>
-                            ${item.originPrice != null ? `<div class="product-origin-price text-title text-secondary2"><del>₹${Number(item.originPrice).toFixed(2)}</del></div>` : ''}
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="remove-wishlist-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">
-                    Remove
-                </div>
-            `;
+    const defaultImg = (typeof window.location !== "undefined" ? window.location.origin : "") + "/assets/images/product/perch-bottal.webp";
+    const apiBase = typeof window.location !== "undefined" ? window.location.origin + "/api" : "";
 
-      listItemWishlist.appendChild(prdItem);
+    // Always use same source as product list: fetch each product from API, then render (no localStorage images)
+    function renderModalItems(products) {
+      listItemWishlist.innerHTML = "";
+      (products || []).forEach((item) => {
+        const prdItem = document.createElement("div");
+        prdItem.setAttribute("data-item", item.id);
+        prdItem.classList.add("item", "py-5", "flex", "items-center", "justify-between", "gap-3", "border-b", "border-line");
+        var imgSrc = defaultImg;
+        if (item.thumbImage && Array.isArray(item.thumbImage) && item.thumbImage.length > 0 && item.thumbImage[0]) {
+          imgSrc = item.thumbImage[0];
+        } else if (item.image && typeof item.image === "string") {
+          imgSrc = item.image;
+        }
+        var modalImgAlt = (item.name || "product").replace(/'/g, "&#39;");
+        prdItem.innerHTML =
+          '<div class="infor flex items-center gap-5">' +
+          '<div class="bg-img"><img src="' + imgSrc + '" alt="' + modalImgAlt + '" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=\'' + defaultImg + '\'" /></div>' +
+          "<div class=''><div class=\"name text-button\">" + (item.name || "Product") + "</div>" +
+          '<div class="flex items-center gap-2 mt-2"><div class="product-price text-title">₹' + (item.price != null ? Number(item.price).toFixed(2) : "0.00") + "</div>" +
+          (item.originPrice != null ? '<div class="product-origin-price text-title text-secondary2"><del>₹' + Number(item.originPrice).toFixed(2) + "</del></div>" : "") +
+          "</div></div></div>" +
+          '<div class="remove-wishlist-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">Remove</div>';
+        listItemWishlist.appendChild(prdItem);
+      });
+    }
+
+    if (apiBase) {
+      listItemWishlist.innerHTML = "<p class='mt-1 text-secondary2'>Loading…</p>";
+      var promises = items.map(function (item) {
+        var id = item.id;
+        if (!id) return Promise.resolve(null);
+        return fetch(apiBase + "/products/by-id/" + encodeURIComponent(id), {
+          headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin",
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (res) { return res.success && res.data ? res.data : null; })
+          .catch(function () { return null; });
+      });
+      Promise.all(promises).then(function (results) {
+        var products = results.filter(Boolean);
+        if (products.length === 0) {
+          listItemWishlist.innerHTML = "<p class='mt-1'>No product in wishlist</p>";
+        } else {
+          renderModalItems(products);
+          var stored = localStorage.getItem("wishlistStore");
+          var current = stored ? JSON.parse(stored) : [];
+          if (Array.isArray(current)) {
+            var updated = current.map(function (oldItem) {
+              var fresh = products.find(function (p) { return String(p.id) === String(oldItem.id); });
+              return fresh ? { ...oldItem, thumbImage: fresh.thumbImage, name: fresh.name, price: fresh.price, originPrice: fresh.originPrice } : oldItem;
+            });
+            localStorage.setItem("wishlistStore", JSON.stringify(updated));
+          }
+          attachWishlistRemoveHandlers();
+        }
+      });
+    } else {
+      renderModalItems(items);
+    }
+  }
+
+  function attachWishlistRemoveHandlers() {
+    var prdItems = listItemWishlist.querySelectorAll(".item");
+    prdItems.forEach(function (prd) {
+      var removeWishlistBtn = prd.querySelector(".remove-wishlist-btn");
+      if (!removeWishlistBtn) return;
+      removeWishlistBtn.onclick = function () {
+        var prdId = prd.getAttribute("data-item");
+        var stored = localStorage.getItem("wishlistStore");
+        var current = stored ? JSON.parse(stored) : [];
+        var newArray = (Array.isArray(current) ? current : []).filter(function (item) { return String(item.id) !== String(prdId); });
+        localStorage.setItem("wishlistStore", JSON.stringify(newArray));
+        handleItemModalWishlist();
+        if (typeof updateWishlistIcons === "function") updateWishlistIcons();
+      };
     });
   }
 
-  const prdItems = listItemWishlist.querySelectorAll(".item");
-  prdItems.forEach((prd) => {
-    const removeWishlistBtn = prd.querySelector(".remove-wishlist-btn");
-    removeWishlistBtn.addEventListener("click", () => {
-      const prdId = removeWishlistBtn
-        .closest(".item")
-        .getAttribute("data-item");
-      const stored = localStorage.getItem("wishlistStore");
-      const current = stored ? JSON.parse(stored) : [];
-      const newArray = (Array.isArray(current) ? current : []).filter(
-        (item) => item.id !== prdId
-      );
-      localStorage.setItem("wishlistStore", JSON.stringify(newArray));
-      handleItemModalWishlist();
-      updateWishlistIcons();
-    });
-  });
+  if (listItemWishlist.querySelectorAll(".item").length > 0) {
+    attachWishlistRemoveHandlers();
+  }
 };
 
 const updateWishlistIcons = () => {
@@ -1784,10 +1813,14 @@ const createProductItem = (product) => {
     productTags += `<div class="product-tag text-button-uppercase text-white bg-red px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">Sale</div>`;
   }
 
-  let productImages = "";
-  product.thumbImage.forEach((img, index) => {
-    productImages += `<img key="${index}" class="w-full h-full object-cover duration-700" src="${img}" alt="img">`;
-  });
+  // Use same primary image as product card: thumbImage[0] or default (never empty/broken)
+  const defaultProductImg = (typeof window !== "undefined" && window.location && window.location.origin)
+    ? window.location.origin + "/assets/images/product/perch-bottal.webp"
+    : "";
+  const mainImgSrc = (product.thumbImage && Array.isArray(product.thumbImage) && product.thumbImage[0])
+    ? product.thumbImage[0]
+    : defaultProductImg;
+  const productImages = `<img class="w-full h-full object-cover duration-700 absolute inset-0" src="${mainImgSrc}" alt="${(product.name || "Product").replace(/"/g, "&quot;")}" onerror="this.src='${defaultProductImg}'">`;
 
   productItem.innerHTML = `
         <div class="product-main cursor-pointer block" data-item="${product.id
@@ -1809,7 +1842,7 @@ const createProductItem = (product) => {
                         <i class="ph ph-check-circle text-lg checked-icon"></i>
                     </div>
                 </div>
-                <div class="product-img w-full h-full aspect-[3/4]">
+                <div class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
                     ${productImages}
                 </div>
                 ${product.sale ? (`

@@ -51,42 +51,29 @@
                         </div>
                         <div class="item flex flex-col basis-1/3">
                             @php
-                                $footerQuickShopCategories = \App\Models\Category::where('is_active', true)
-                                    ->whereNull('parent_id')
-                                    ->with(['children' => function ($q) {
-                                        $q->where('is_active', true)->orderBy('sort_order');
-                                    }])
+                                /* Quick Shop: dynamic from main categories only (same as header: Drinkware, Barware, Kitchenware) */
+                                $footerQuickShopMainCategories = \App\Models\MainCategory::where('is_active', true)
                                     ->orderBy('sort_order')
+                                    ->with(['activeCategories' => function ($q) {
+                                        $q->whereNull('parent_id')->orderBy('sort_order');
+                                    }])
                                     ->get();
                                 $quickShopLinks = [];
-                                foreach ($footerQuickShopCategories as $cat) {
-                                    $quickShopLinks[] = ['name' => $cat->name, 'url' => route('category', $cat->slug)];
-                                    foreach ($cat->children as $sub) {
-                                        $quickShopLinks[] = ['name' => $sub->name, 'url' => route('category', $sub->slug)];
+                                foreach ($footerQuickShopMainCategories as $mainCat) {
+                                    $firstCat = $mainCat->activeCategories->first();
+                                    if ($firstCat) {
+                                        $quickShopLinks[] = ['name' => $mainCat->name, 'url' => route('category', $firstCat->slug)];
                                     }
                                 }
                                 if (empty($quickShopLinks)) {
                                     $quickShopLinks[] = ['name' => 'Shop', 'url' => route('shop')];
                                 }
-                                if (Route::has('blog')) {
-                                    $quickShopLinks[] = ['name' => 'Blog', 'url' => route('blog')];
-                                }
-                                $half = (int) ceil(count($quickShopLinks) / 2);
-                                $quickShopLeft = array_slice($quickShopLinks, 0, $half);
-                                $quickShopRight = array_slice($quickShopLinks, $half);
                             @endphp
                             <div class="text-button-uppercase pb-3">Quick Shop</div>
-                            <div class="grid grid-cols-2 gap-x-8 gap-y-0">
-                                <div class="flex flex-col">
-                                    @foreach($quickShopLeft as $i => $link)
-                                        <a class="caption1 has-line-before duration-300 w-fit {{ $i > 0 ? 'pt-2' : '' }}" href="{{ $link['url'] }}">{{ $link['name'] }}</a>
-                                    @endforeach
-                                </div>
-                                <div class="flex flex-col">
-                                    @foreach($quickShopRight as $i => $link)
-                                        <a class="caption1 has-line-before duration-300 w-fit {{ $i > 0 ? 'pt-2' : '' }}" href="{{ $link['url'] }}">{{ $link['name'] }}</a>
-                                    @endforeach
-                                </div>
+                            <div class="flex flex-col">
+                                @foreach($quickShopLinks as $i => $link)
+                                    <a class="caption1 has-line-before duration-300 w-fit {{ $i > 0 ? 'pt-2' : '' }}" href="{{ $link['url'] }}">{{ $link['name'] }}</a>
+                                @endforeach
                             </div>
                         </div>
                         <div class="item flex flex-col basis-1/3">

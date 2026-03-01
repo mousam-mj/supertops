@@ -789,23 +789,27 @@
             return;
         }
 
-        var pending = uniqueItems.length;
-        uniqueItems.forEach(function(p) {
-            var id = p && (p.id != null) ? String(p.id) : null;
-            if (!id) { pending--; if (pending === 0) finish(); return; }
-            fetch(apiBase + '/products/by-id/' + encodeURIComponent(id), { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+        // Fetch all products from API (same source as product list), preserve order, then render each with its own image
+        var idsInOrder = uniqueItems.map(function(p) { return p && (p.id != null) ? String(p.id) : null; }).filter(Boolean);
+        var fetchPromises = idsInOrder.map(function(id) {
+            return fetch(apiBase + '/products/by-id/' + encodeURIComponent(id), { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(function(r) { return r.json(); })
-                .then(function(res) {
-                    if (res.success && res.data) appendProduct(normalizeProduct(res.data));
-                    pending--;
-                    if (pending === 0) finish();
-                })
-                .catch(function() {
-                    var norm = normalizeProduct(p);
-                    if (norm) appendProduct(norm);
-                    pending--;
-                    if (pending === 0) finish();
-                });
+                .then(function(res) { return { id: id, data: (res.success && res.data) ? res.data : null }; })
+                .catch(function() { return { id: id, data: null }; });
+        });
+        Promise.all(fetchPromises).then(function(results) {
+            var dataById = {};
+            results.forEach(function(r) { if (r && r.id) dataById[r.id] = r.data; });
+            idsInOrder.forEach(function(id) {
+                var productData = dataById[id];
+                if (productData) {
+                    appendProduct(normalizeProduct(productData));
+                } else {
+                    var fallback = uniqueItems.find(function(p) { return String(p.id) === String(id); });
+                    if (fallback) appendProduct(normalizeProduct(fallback));
+                }
+            });
+            finish();
         });
     }
 
