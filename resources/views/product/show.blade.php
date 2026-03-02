@@ -667,8 +667,8 @@
 @section('scripts')
 <script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
-    // Description / Specifications / Review tabs — switch content on click
-    (function() {
+    // Description / Specifications / Review tabs — work without full reload (reliable on server)
+    function initDescTabs() {
         var descTab = document.querySelector('.desc-tab');
         if (!descTab) return;
         var tabButtons = descTab.querySelectorAll('.menu-tab .tab-item');
@@ -690,18 +690,35 @@
             });
         }
 
-        tabButtons.forEach(function(btn) {
-            btn.addEventListener('click', function() {
+        // Event delegation: one listener on container so tabs work even if script runs early
+        descTab.addEventListener('click', function(e) {
+            var btn = e.target.closest('.menu-tab .tab-item');
+            if (btn) {
+                e.preventDefault();
                 var dataItem = btn.getAttribute('data-item');
                 if (dataItem) showPanel(dataItem);
-            });
+            }
+        });
+        descTab.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var btn = e.target.closest('.menu-tab .tab-item');
+            if (btn) {
+                e.preventDefault();
+                var dataItem = btn.getAttribute('data-item');
+                if (dataItem) showPanel(dataItem);
+            }
         });
 
         if (window.location.hash === '#form-review') showPanel('Review');
         window.addEventListener('hashchange', function() {
             if (window.location.hash === '#form-review') showPanel('Review');
         });
-    })();
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDescTabs);
+    } else {
+        initDescTabs();
+    }
 
     // See more / See less for descriptions
     document.querySelectorAll('.see-more-btn').forEach(function(btn) {
