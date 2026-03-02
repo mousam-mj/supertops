@@ -267,11 +267,38 @@
         const qtyEl = main.querySelector('.choose-quantity .quantity');
         if (qtyEl) qtyEl.textContent = '1';
 
-        const img = product.image || (product.images && product.images[0]);
-        const imgUrl = getImageUrl(img);
-        const listImg = main.querySelector('.list-img');
-        if (listImg) {
-            listImg.innerHTML = `<div class="bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6"><img src="${imgUrl}" alt="${(product.name || '').replace(/"/g, '&quot;')}" class="w-full h-full object-cover" /></div>`;
+        const allImages = [];
+        if (product.image) allImages.push(product.image);
+        if (product.images && Array.isArray(product.images)) product.images.forEach(function(p) { if (p && allImages.indexOf(p) === -1) allImages.push(p); });
+        const imgUrl = allImages.length ? getImageUrl(allImages[0]) : getImageUrl(null);
+        const mainImgWrap = main.querySelector('.qv-main-img');
+        const mainImg = mainImgWrap ? mainImgWrap.querySelector('img') : null;
+        if (mainImg) {
+            mainImg.src = imgUrl;
+            mainImg.alt = (product.name || '').replace(/"/g, '');
+        }
+        const thumbsWrap = main.querySelector('.qv-thumbs');
+        if (thumbsWrap) {
+            if (allImages.length > 1) {
+                thumbsWrap.style.display = 'flex';
+                thumbsWrap.innerHTML = allImages.slice(0, 5).map(function(p, i) {
+                    var u = getImageUrl(p);
+                    return '<button type="button" class="qv-thumb w-14 h-14 rounded-lg overflow-hidden border-2 border-line hover:border-black flex-shrink-0" data-index="' + i + '"><img src="' + u + '" alt="" class="w-full h-full object-cover" /></button>';
+                }).join('');
+                thumbsWrap.querySelectorAll('.qv-thumb').forEach(function(btn, i) {
+                    btn.addEventListener('click', function() {
+                        var u = getImageUrl(allImages[i]);
+                        if (mainImg) mainImg.src = u;
+                        thumbsWrap.querySelectorAll('.qv-thumb').forEach(function(b) { b.classList.remove('border-black'); b.classList.add('border-line'); });
+                        btn.classList.add('border-black');
+                        btn.classList.remove('border-line');
+                    });
+                    if (i === 0) { btn.classList.add('border-black'); btn.classList.remove('border-line'); }
+                });
+            } else {
+                thumbsWrap.style.display = 'none';
+                thumbsWrap.innerHTML = '';
+            }
         }
 
         const category = main.querySelector('.product-infor .category');
@@ -295,6 +322,66 @@
             const pct = Math.round(((origPrice - salePrice) / origPrice) * 100);
             saleEl.textContent = '-' + pct + '%';
             saleEl.style.display = 'inline-block';
+        } else if (saleEl) saleEl.style.display = 'none';
+
+        // Stock status
+        const stockEl = main.querySelector('.qv-stock');
+        if (stockEl) {
+            const qty = product.stock_quantity != null ? parseInt(product.stock_quantity, 10) : null;
+            if (qty !== null) {
+                stockEl.style.display = 'block';
+                if (qty <= 0) stockEl.textContent = 'Out of stock';
+                else if (qty < 10) stockEl.textContent = 'Only ' + qty + ' left in stock';
+                else stockEl.textContent = 'In stock';
+            } else stockEl.style.display = 'none';
+        }
+
+        // Description
+        const descBlock = main.querySelector('.qv-description-block');
+        const descEl = main.querySelector('.qv-description');
+        if (descBlock && descEl) {
+            const raw = product.short_description || product.description || '';
+            let text = '';
+            if (raw) {
+                if (typeof raw === 'string' && raw.trim()) {
+                    const div = document.createElement('div');
+                    div.innerHTML = raw;
+                    text = (div.textContent || div.innerText || '').trim();
+                    if (text.length > 280) text = text.substring(0, 277) + '...';
+                }
+            }
+            if (text) {
+                descBlock.style.display = 'block';
+                descEl.textContent = text;
+            } else {
+                descBlock.style.display = 'none';
+                descEl.textContent = '';
+            }
+        }
+
+        // Specifications
+        const specsBlock = main.querySelector('.qv-specs-block');
+        const specsEl = main.querySelector('.qv-specs');
+        if (specsBlock && specsEl) {
+            const spec = product.specifications;
+            let html = '';
+            if (spec && typeof spec === 'object') {
+                const entries = Array.isArray(spec) ? spec : Object.entries(spec);
+                if (Array.isArray(entries)) {
+                    entries.forEach(function(item) {
+                        const label = item.key || item.name || item[0];
+                        const value = item.value || item[1];
+                        if (label != null && value != null) html += '<div class="flex justify-between gap-2 py-0.5"><span class="text-secondary2">' + String(label).replace(/</g, '&lt;') + '</span><span>' + String(value).replace(/</g, '&lt;') + '</span></div>';
+                    });
+                }
+            }
+            if (html) {
+                specsBlock.style.display = 'block';
+                specsEl.innerHTML = html;
+            } else {
+                specsBlock.style.display = 'none';
+                specsEl.innerHTML = '';
+            }
         }
 
         // Size options – show on Quick View card

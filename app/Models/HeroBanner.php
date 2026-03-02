@@ -11,8 +11,10 @@ class HeroBanner extends Model
 
     protected $fillable = [
         'name',
+        'subtitle',
         'priority',
         'deeplink',
+        'button_text',
         'banner_image',
         'is_active',
     ];

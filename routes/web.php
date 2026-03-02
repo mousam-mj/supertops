@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\ColorSizeMasterController;
 use App\Http\Controllers\PolicyPageController;
 use App\Http\Controllers\ShopController;
@@ -544,6 +545,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);
+        Route::resource('hero-banners', HeroBannerController::class)->except(['show']);
 
         // Settings
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

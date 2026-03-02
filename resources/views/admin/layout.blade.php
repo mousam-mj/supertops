@@ -456,6 +456,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.hero-banners.*') ? 'active' : '' }}" href="{{ route('admin.hero-banners.index') }}">
+                                <i class="bi bi-image me-2"></i> Hero Banners
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index', ['sub_only' => 1]) }}">
                                 <i class="bi bi-folder2 me-2"></i> Sub Categories
                             </a>

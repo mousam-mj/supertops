@@ -31,8 +31,10 @@ class HeroBannerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
             'priority' => 'nullable|integer|min:0',
-            'deeplink' => 'nullable|string|max:255',
+            'deeplink' => 'nullable|string|max:500',
+            'button_text' => 'nullable|string|max:100',
             'banner_image' => 'required|image|max:5120', // 5MB max
             'is_active' => 'nullable|boolean',
         ]);
@@ -72,8 +74,10 @@ class HeroBannerController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
             'priority' => 'nullable|integer|min:0',
-            'deeplink' => 'nullable|string|max:255',
+            'deeplink' => 'nullable|string|max:500',
+            'button_text' => 'nullable|string|max:100',
             'banner_image' => 'sometimes|required|image|max:5120',
             'is_active' => 'nullable|boolean',
         ]);

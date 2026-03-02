@@ -240,10 +240,11 @@
         <div class="modal-quickview-main py-6">
             <div class="flex h-full max-md:flex-col-reverse gap-y-6">
                 <div class="left lg:w-[388px] md:w-[300px] flex-shrink-0 px-6">
-                    <div class="list-img max-md:flex items-center gap-4">
-                        <div class="bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6">
+                    <div class="list-img max-md:flex items-center gap-4 flex flex-col">
+                        <div class="qv-main-img bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6">
                             <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="item" class="w-full h-full object-cover" />
                         </div>
+                        <div class="qv-thumbs flex gap-2 mt-2 flex-wrap" style="display:none;"></div>
                     </div>
                 </div>
                 <div class="right w-full px-6">
@@ -263,11 +264,19 @@
                                 <i class="ph ph-heart text-xl"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
+                        <div class="flex items-center gap-3 flex-wrap mt-5 pb-4 border-b border-line">
                             <div class="product-price heading5"></div>
                             <div class="product-origin-price font-normal text-secondary2" style="display:none"><del></del></div>
                             <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full" style="display:none"></div>
-                            <div class="desc text-secondary mt-3" style="display:none"></div>
+                            <div class="qv-stock caption2 text-secondary mt-1" style="display:none"></div>
+                        </div>
+                        <div class="qv-description-block mt-4 pb-4 border-b border-line" style="display:none">
+                            <div class="text-button-uppercase text-secondary2 mb-1.5">Description</div>
+                            <div class="qv-description text-secondary body2 line-clamp-4 max-h-24 overflow-y-auto"></div>
+                        </div>
+                        <div class="qv-specs-block mt-4 pb-4 border-b border-line" style="display:none">
+                            <div class="text-button-uppercase text-secondary2 mb-1.5">Specifications</div>
+                            <div class="qv-specs body2 text-secondary"></div>
                         </div>
                         <div class="list-action mt-6">
                             <div class="qv-size-block mt-3" style="display:none">
