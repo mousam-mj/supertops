@@ -255,9 +255,15 @@ Route::get('/faqs', function () {
     return view('faqs');
 })->name('faqs');
 
-// Policy & content pages (About Us, Terms, Privacy, Return & Refund, Cancellation) - dynamic from admin
-Route::get('/about', [PolicyPageController::class, 'show'])->defaults('slug', 'about-us')->name('about');
-Route::get('/about-us', [PolicyPageController::class, 'show'])->defaults('slug', 'about-us')->name('about-us');
+// About Us - dedicated view (aboutus.blade.php)
+Route::get('/about', function () {
+    return view('aboutus');
+})->name('about');
+Route::get('/about-us', function () {
+    return view('aboutus');
+})->name('about-us');
+
+// Policy & content pages (Terms, Privacy, Return & Refund, Cancellation) - dynamic from admin
 Route::get('/terms-and-conditions', [PolicyPageController::class, 'show'])->defaults('slug', 'terms-and-conditions')->name('terms-and-conditions');
 Route::get('/privacy-policy', [PolicyPageController::class, 'show'])->defaults('slug', 'privacy-policy')->name('privacy-policy');
 Route::get('/return-and-refund', [PolicyPageController::class, 'show'])->defaults('slug', 'return-and-refund')->name('return-and-refund');

@@ -8,8 +8,11 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Categories</h4>
-                <p class="text-muted mb-0">Manage your product categories</p>
+                <h4 class="mb-1 fw-bold" style="color: #2d3748;">{{ isset($subOnly) && $subOnly ? 'Sub Categories' : 'All Categories' }}</h4>
+                <p class="text-muted mb-0">{{ isset($subOnly) && $subOnly ? 'Manage sub-categories only (categories with a parent)' : 'Manage your product categories' }}</p>
+                @if(isset($subOnly) && $subOnly)
+                    <a href="{{ route('admin.categories.index') }}" class="text-primary small mt-1 d-inline-block">View all categories</a>
+                @endif
             </div>
             <a href="{{{ route('admin.categories.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Category
@@ -43,9 +46,17 @@
                                     <td>{{ $category->id }}</td>
                                     <td>
                                         @if($category->image)
-                                            <img src="{{ storage_asset($category->image) }}" 
-                                                 alt="{{ $category->name }}" 
-                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            @php $catImgUrl = storage_asset($category->image); @endphp
+                                            <div class="position-relative" style="width: 60px; height: 60px;">
+                                                <img src="{{ $catImgUrl }}" 
+                                                     alt="{{ $category->name }}" 
+                                                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                                     onerror="this.style.display='none'; var n=this.nextElementSibling; if(n) n.classList.remove('d-none');">
+                                                <div class="d-none bg-light d-flex align-items-center justify-content-center position-absolute top-0 start-0" 
+                                                     style="width: 60px; height: 60px; border-radius: 8px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            </div>
                                         @else
                                             <div class="bg-light d-flex align-items-center justify-content-center" 
                                                  style="width: 60px; height: 60px; border-radius: 8px;">
@@ -143,9 +154,13 @@
                         <div class="tree-item mb-3">
                             <div class="d-flex align-items-center mb-2">
                                 @if($mainCategory->image)
-                                    <img src="{{ storage_asset($mainCategory->image) }}" 
-                                         alt="{{ $mainCategory->name }}" 
-                                         style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px;">
+                                    <span class="position-relative d-inline-block" style="width: 40px; height: 40px;">
+                                        <img src="{{ storage_asset($mainCategory->image) }}" 
+                                             alt="{{ $mainCategory->name }}" 
+                                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px;"
+                                             onerror="this.style.display='none'; var n=this.nextElementSibling; if(n) n.classList.remove('d-none');">
+                                        <span class="d-none position-absolute top-0 start-0 bg-light rounded" style="width:40px;height:40px;"><i class="bi bi-image text-muted"></i></span>
+                                    </span>
                                 @else
                                     <i class="bi bi-folder-fill text-warning me-2"></i>
                                 @endif
@@ -160,9 +175,13 @@
                                         <div class="tree-item mb-2">
                                             <div class="d-flex align-items-center mb-1">
                                                 @if($subCategory->image)
-                                                    <img src="{{ storage_asset($subCategory->image) }}" 
-                                                         alt="{{ $subCategory->name }}" 
-                                                         style="width: 35px; height: 35px; object-fit: cover; border-radius: 5px; margin-right: 8px;">
+                                                    <span class="position-relative d-inline-block" style="width: 35px; height: 35px;">
+                                                        <img src="{{ storage_asset($subCategory->image) }}" 
+                                                             alt="{{ $subCategory->name }}" 
+                                                             style="width: 35px; height: 35px; object-fit: cover; border-radius: 5px; margin-right: 8px;"
+                                                             onerror="this.style.display='none'; var n=this.nextElementSibling; if(n) n.classList.remove('d-none');">
+                                                        <span class="d-none position-absolute top-0 start-0"><i class="bi bi-image text-muted"></i></span>
+                                                    </span>
                                                 @else
                                                     <i class="bi bi-folder text-info me-2"></i>
                                                 @endif
@@ -176,9 +195,13 @@
                                     @foreach($subCategory->children as $product)
                                         <div class="d-flex align-items-center mb-1">
                                             @if($product->image)
-                                                <img src="{{ storage_asset($product->image) }}" 
-                                                     alt="{{ $product->name }}" 
-                                                     style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
+                                                <span class="position-relative d-inline-block" style="width: 30px; height: 30px;">
+                                                    <img src="{{ storage_asset($product->image) }}" 
+                                                         alt="{{ $product->name }}" 
+                                                         style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;"
+                                                         onerror="this.style.display='none'; var n=this.nextElementSibling; if(n) n.classList.remove('d-none');">
+                                                    <span class="d-none position-absolute top-0 start-0"><i class="bi bi-image text-muted"></i></span>
+                                                </span>
                                             @else
                                                 <i class="bi bi-file-earmark text-secondary me-2"></i>
                                             @endif

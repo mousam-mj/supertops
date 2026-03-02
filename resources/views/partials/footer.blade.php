@@ -10,8 +10,9 @@
                     @php
                         $footerAboutText = \App\Models\Setting::get('contact_page_text');
                         $footerAboutHtml = $footerAboutText ? strip_tags($footerAboutText, '<p><br><strong><b><em><i><u><a><span>') : '';
+                        $footerAboutMeaningful = $footerAboutHtml !== '' && strlen(trim(strip_tags($footerAboutHtml))) > 15 && !preg_match('/^(\s*(Hi|hi|test|Test)\s*)+$/i', trim(strip_tags($footerAboutHtml)));
                     @endphp
-                    @if($footerAboutHtml !== '')
+                    @if($footerAboutMeaningful)
                         <div class="footer-about-text caption1 text-secondary mt-4 max-w-sm prose prose-sm max-w-none">{!! $footerAboutHtml !!}</div>
                     @endif
 
@@ -118,7 +119,12 @@
             </div>
             <div class="footer-bottom py-3 flex items-center justify-between gap-5 max-lg:justify-center max-lg:flex-col border-t border-line">
                 <div class="left flex items-center gap-8">
-                    <div class="copyright caption1 text-secondary">{{ \App\Models\Setting::get('copyright_text', '©2025 Perch. All Rights Reserved.') ?: '©2025 Perch. All Rights Reserved.' }}</div>
+                    @php
+                        $copyrightRaw = \App\Models\Setting::get('copyright_text', '©' . date('Y') . ' Perch. All Rights Reserved.');
+                        $copyrightText = $copyrightRaw ?: ('©' . date('Y') . ' Perch. All Rights Reserved.');
+                        $copyrightText = preg_replace('/\b(19|20)\d{2}\b/', date('Y'), $copyrightText);
+                    @endphp
+                    <div class="copyright caption1 text-secondary">{{ $copyrightText }}</div>
                 </div>
             </div>
         </div>

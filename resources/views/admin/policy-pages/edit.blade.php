@@ -47,7 +47,7 @@
                                       rows="18"
                                       placeholder="Paste or type HTML here (e.g. <p>, <strong>, <a>, <ul>)">{{ old('content', $policy_page->content) }}</textarea>
                         </div>
-                        <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML code.</small>
+                        <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML. Content saved while in <strong>Edit as HTML</strong> is stored exactly as entered (no code change).</small>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleBtn.addEventListener('click', function() {
         isHtmlMode = !isHtmlMode;
         if (isHtmlMode) {
-            textarea.value = quill.root.innerHTML;
+            // Do NOT overwrite textarea with Quill HTML – preserve raw HTML (like CKEditor HTML support)
             editorEl.classList.add('d-none');
             textarea.classList.remove('d-none');
             toggleLabel.textContent = 'Visual editor';
@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         if (isHtmlMode) {
             textarea.classList.remove('d-none');
+            // Submit raw textarea value as-is (no Quill transformation)
         } else {
             textarea.value = quill.root.innerHTML;
         }

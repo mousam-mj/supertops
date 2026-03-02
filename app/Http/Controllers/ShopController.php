@@ -115,6 +115,10 @@ class ShopController extends Controller
         $priceMin = $priceRange && $priceRange->min_price !== null ? (float) $priceRange->min_price : 0;
         $priceMax = $priceRange && $priceRange->max_price !== null ? (float) $priceRange->max_price : 300;
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return view('shop-products-partial', compact('products'));
+        }
+
         return view('shop', compact('categories', 'category', 'products', 'categoryProductCounts', 'filterSizes', 'filterColors', 'priceMin', 'priceMax', 'filterSize', 'filterColor'));
     }
 

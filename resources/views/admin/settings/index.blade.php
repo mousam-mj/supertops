@@ -151,7 +151,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Copyright Text</label>
-                                <input type="text" name="copyright_text" class="form-control" value="{{ old('copyright_text', $settings['copyright_text'] ?? '') }}" placeholder="©2025 Perch. All Rights Reserved.">
+                                <input type="text" name="copyright_text" class="form-control" value="{{ old('copyright_text', $settings['copyright_text'] ?? '') }}" placeholder="{{ '©' . date('Y') . ' Perch. All Rights Reserved.' }}">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Meta Description (SEO)</label>

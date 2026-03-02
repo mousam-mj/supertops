@@ -647,7 +647,7 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="copyright caption1 md:mt-20 mt-12 py-3 border-t border-line">©2024 Anvogue. All Rights Reserved.</div>
+                        <div class="copyright caption1 md:mt-20 mt-12 py-3 border-t border-line">©{{ date('Y') }} Anvogue. All Rights Reserved.</div>
                     </div>
                 </div>
                 <div class="right justify-start flex-shrink-0 lg:w-[47%] bg-surface lg:py-20 py-12">

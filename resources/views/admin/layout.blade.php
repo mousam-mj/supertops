@@ -456,7 +456,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index', ['sub_only' => 1]) }}">
                                 <i class="bi bi-folder2 me-2"></i> Sub Categories
                             </a>
                         </li>

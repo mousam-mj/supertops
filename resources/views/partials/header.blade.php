@@ -49,21 +49,14 @@
                                         </li>
                                     @endif
                                 @endforeach
-                                <li class="h-full relative">
-                                    <a href="#!" class="text-button-uppercase duration-300 h-full flex items-center justify-center"> Pages </a>
-                                    <div class="sub-menu py-3 px-5 -left-10 absolute bg-white rounded-b-xl">
-                                        <ul class="w-full">
-                                            <li>
-                                        <a href="{{{ route('about') }}}" class="link text-secondary duration-300"> About Us </a>
-                                            </li>
-                                            <li>
-                                        <a href="{{{ route('contact') }}}" class="link text-secondary duration-300"> Contact Us </a>
-                                            </li>
-                                            <li>
-                                        <a href="{{{ route('faqs') }}}" class="link text-secondary duration-300"> FAQs </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <li class="h-full">
+                                    <a href="{{ route('about') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">About Us</a>
+                                </li>
+                                <li class="h-full">
+                                    <a href="{{ route('contact') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">Contact Us</a>
+                                </li>
+                                <li class="h-full">
+                                    <a href="{{ route('faqs') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">FAQs</a>
                                 </li>
                             </ul>
                         </div>
@@ -125,7 +118,10 @@
                                 <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                                     <i class="ph ph-x text-sm"></i>
                                 </div>
-                        <a href="{{{ route('home') }}}" class="logo text-3xl font-semibold text-center">Perch</a>
+                        <a href="{{ route('home') }}" class="logo flex justify-center">
+                                @php $mobileLogo = \App\Models\Setting::get('site_logo'); @endphp
+                                <img src="{{ $mobileLogo ? storage_asset($mobileLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-10 object-contain" />
+                            </a>
                             </div>
                             <div class="form-search relative mt-2">
                                 <form method="GET" action="{{{ route('shop') }}}">

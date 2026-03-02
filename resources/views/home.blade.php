@@ -396,52 +396,6 @@
             </div>
         </div>
 
-        <div class="brand-block md:py-[60px] py-[32px]">
-            <div class="container">
-                <div class="list-brand">
-                    <div class="swiper swiper-list-brand">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="1" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="2" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="3" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="4" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="5" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="6" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="7" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Modal Newsletter - hidden to prevent click/interference issues -->
         <div class="modal-newsletter" style="display: none !important; pointer-events: none !important;">
             <div class="container h-full flex items-center justify-center w-full">

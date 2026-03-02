@@ -626,14 +626,14 @@
                 <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
                         @if(request()->hasAny(['category', 'size', 'color', 'min_price', 'max_price', 'search']))
-                        <a href="{{ route('shop') }}" class="btn-clear-filters mb-6">Clear all filters</a>
+                        <a href="{{ route('shop') }}" class="btn-clear-filters mb-6 shop-filter-link">Clear all filters</a>
                         @endif
                         <div class="filter-type-block pb-8 border-b border-line">
                             <div class="heading6">Category</div>
                             <div class="list-type filter-type menu-tab mt-4">
                                 @foreach($categories as $cat)
                                     @if(($categoryProductCounts[$cat->id] ?? 0) > 0)
-                                    <a href="{{ route('shop', ['category' => $cat->slug]) }}" class="item tab-item flex items-center justify-between cursor-pointer {{ ($category && $category->id === $cat->id) ? 'active' : '' }}" data-item="{{ $cat->slug }}">
+                                    <a href="{{ route('shop', ['category' => $cat->slug]) }}" class="item tab-item flex items-center justify-between cursor-pointer shop-filter-link {{ ($category && $category->id === $cat->id) ? 'active' : '' }}" data-item="{{ $cat->slug }}">
                                         <div class="type-name text-secondary has-line-before hover:text-black capitalize">{{ $cat->name }}</div>
                                         <div class="text-secondary2 number">{{ $categoryProductCounts[$cat->id] ?? 0 }}</div>
                                     </a>
@@ -646,7 +646,7 @@
                             <div class="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
                                 @foreach($filterSizes as $size)
                                     @php $querySize = array_merge(request()->query(), ($filterSize === $size->name ? [] : ['size' => $size->name])); @endphp
-                                    <a href="{{ route('shop', $querySize) }}" class="size-item text-button min-w-[44px] h-[44px] px-2 flex items-center justify-center rounded-full border border-line cursor-pointer {{ ($filterSize === $size->name) ? 'active border-black bg-black text-white' : '' }}" data-item="{{ $size->name }}" title="{{ $size->name }}">{{ $size->name }}</a>
+                                    <a href="{{ route('shop', $querySize) }}" class="size-item text-button min-w-[44px] h-[44px] px-2 flex items-center justify-center rounded-full border border-line cursor-pointer shop-filter-link {{ ($filterSize === $size->name) ? 'active border-black bg-black text-white' : '' }}" data-item="{{ $size->name }}" title="{{ $size->name }}">{{ $size->name }}</a>
                                 @endforeach
                             </div>
                         </div>
@@ -679,7 +679,7 @@
                                 @endphp
                                 @foreach($filterColors as $color)
                                     @php $queryColor = array_merge(request()->query(), (($filterColor && strtolower(trim($filterColor)) === strtolower($color->name)) ? [] : ['color' => $color->name])); @endphp
-                                    <a href="{{ route('shop', $queryColor) }}" class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line cursor-pointer {{ ($filterColor && strtolower(trim($filterColor)) === strtolower($color->name)) ? 'active border-black ring-2 ring-black' : '' }}" data-item="{{ $color->name }}">
+                                    <a href="{{ route('shop', $queryColor) }}" class="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line cursor-pointer shop-filter-link {{ ($filterColor && strtolower(trim($filterColor)) === strtolower($color->name)) ? 'active border-black ring-2 ring-black' : '' }}" data-item="{{ $color->name }}">
                                         <div class="color w-5 h-5 rounded-full flex-shrink-0" style="background: {{ $colorHex[strtolower($color->name)] ?? '#d1d5db' }};"></div>
                                         <div class="caption1 capitalize">{{ $color->name }}</div>
                                     </a>
@@ -728,13 +728,14 @@
 
                         <div class="list-filtered flex items-center gap-3 flex-wrap"></div>
 
+                        <div id="shop-products-container" data-shop-url="{{ route('shop') }}">
                         <div class="list-product hide-product-sold grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 md:gap-[30px] gap-4 mt-7">
                             @forelse($products as $product)
                                 @include('partials.product-card', ['product' => $product])
                             @empty
                                 <div class="col-span-full text-center py-16">
                                     <p class="text-secondary body1">No products found.</p>
-                                    <a href="{{ route('shop') }}" class="button-main mt-4 inline-block">Browse Shop</a>
+                                    <a href="{{ route('shop') }}" class="button-main mt-4 inline-block shop-filter-link">Browse Shop</a>
                                 </div>
                             @endforelse
                         </div>
@@ -744,6 +745,7 @@
                             {{ $products->links() }}
                         </div>
                         @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -751,34 +753,105 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var filterPrice = document.querySelector('.filter-price');
-    if (!filterPrice) return;
-    var rangeMin = filterPrice.querySelector('.range-min');
-    var rangeMax = filterPrice.querySelector('.range-max');
-    var minPriceEl = filterPrice.querySelector('.min-price');
-    var maxPriceEl = filterPrice.querySelector('.max-price');
-    var applyBtn = document.getElementById('shop-apply-price');
+    var shopBaseUrl = '{{ route("shop") }}';
+    var container = document.getElementById('shop-products-container');
+    var sidebar = document.querySelector('.shop-product .sidebar');
 
-    function formatPrice(v) { return '₹' + parseInt(v, 10).toLocaleString('en-IN'); }
-    function updatePriceDisplay() {
-        if (rangeMin && minPriceEl) minPriceEl.textContent = formatPrice(rangeMin.value);
-        if (rangeMax && maxPriceEl) maxPriceEl.textContent = formatPrice(rangeMax.value);
+    function updateSidebarActive(queryString) {
+        var params = new URLSearchParams(queryString);
+        var cat = params.get('category');
+        var size = params.get('size');
+        var color = params.get('color');
+        if (sidebar) {
+            sidebar.querySelectorAll('.filter-type-block .tab-item[data-item]').forEach(function(el) {
+                el.classList.toggle('active', el.getAttribute('data-item') === cat);
+            });
+            sidebar.querySelectorAll('.size-item[data-item]').forEach(function(el) {
+                var isActive = el.getAttribute('data-item') === size;
+                el.classList.toggle('active', isActive);
+                el.classList.toggle('border-black', isActive);
+                el.classList.toggle('bg-black', isActive);
+                el.classList.toggle('text-white', isActive);
+            });
+            sidebar.querySelectorAll('.color-item[data-item]').forEach(function(el) {
+                var cName = (el.getAttribute('data-item') || '').toLowerCase();
+                var isActive = color && cName === color.toLowerCase();
+                el.classList.toggle('active', isActive);
+                el.classList.toggle('border-black', isActive);
+                el.classList.toggle('ring-2', isActive);
+                el.classList.toggle('ring-black', isActive);
+            });
+        }
     }
-    if (rangeMin) rangeMin.addEventListener('input', updatePriceDisplay);
-    if (rangeMax) rangeMax.addEventListener('input', updatePriceDisplay);
 
-    if (applyBtn && rangeMin && rangeMax) {
-        applyBtn.addEventListener('click', function() {
-            var minVal = parseInt(rangeMin.value, 10);
-            var maxVal = parseInt(rangeMax.value, 10);
-            if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
-            var params = new URLSearchParams(window.location.search);
-            params.set('min_price', String(minVal));
-            params.set('max_price', String(maxVal));
-            var baseUrl = '{{ route("shop") }}';
-            var sep = baseUrl.indexOf('?') !== -1 ? '&' : '?';
-            window.location.href = baseUrl + sep + params.toString();
+    function loadShopProducts(url, pushState) {
+        if (!container) return;
+        container.style.opacity = '0.6';
+        container.style.pointerEvents = 'none';
+        var fullUrl = url.indexOf(shopBaseUrl) === 0 ? url : shopBaseUrl + (url.indexOf('?') === 0 ? url : '?' + (url || ''));
+        fetch(fullUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
+        }).then(function(r) { return r.text(); }).then(function(html) {
+            container.innerHTML = html;
+            if (pushState !== false) {
+                var u = new URL(fullUrl, window.location.origin);
+                history.pushState({}, '', u.pathname + (u.search || ''));
+                updateSidebarActive(u.search || '');
+            }
+        }).catch(function() {
+            window.location.href = fullUrl;
+        }).finally(function() {
+            container.style.opacity = '';
+            container.style.pointerEvents = '';
         });
+    }
+
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('a.shop-filter-link');
+        if (link && link.href && link.href.indexOf(shopBaseUrl) !== -1) {
+            e.preventDefault();
+            loadShopProducts(link.href);
+            return;
+        }
+        var paginationLink = e.target.closest('#shop-products-container a[href*="/shop"]');
+        if (paginationLink && paginationLink.href) {
+            e.preventDefault();
+            loadShopProducts(paginationLink.href);
+        }
+    });
+
+    window.addEventListener('popstate', function() {
+        loadShopProducts(shopBaseUrl + window.location.search, false);
+    });
+
+    var filterPrice = document.querySelector('.filter-price');
+    if (filterPrice) {
+        var rangeMin = filterPrice.querySelector('.range-min');
+        var rangeMax = filterPrice.querySelector('.range-max');
+        var minPriceEl = filterPrice.querySelector('.min-price');
+        var maxPriceEl = filterPrice.querySelector('.max-price');
+        var applyBtn = document.getElementById('shop-apply-price');
+
+        function formatPrice(v) { return '₹' + parseInt(v, 10).toLocaleString('en-IN'); }
+        function updatePriceDisplay() {
+            if (rangeMin && minPriceEl) minPriceEl.textContent = formatPrice(rangeMin.value);
+            if (rangeMax && maxPriceEl) maxPriceEl.textContent = formatPrice(rangeMax.value);
+        }
+        if (rangeMin) rangeMin.addEventListener('input', updatePriceDisplay);
+        if (rangeMax) rangeMax.addEventListener('input', updatePriceDisplay);
+
+        if (applyBtn && rangeMin && rangeMax) {
+            applyBtn.addEventListener('click', function() {
+                var minVal = parseInt(rangeMin.value, 10);
+                var maxVal = parseInt(rangeMax.value, 10);
+                if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
+                var params = new URLSearchParams(window.location.search);
+                params.set('min_price', String(minVal));
+                params.set('max_price', String(maxVal));
+                var sep = shopBaseUrl.indexOf('?') !== -1 ? '&' : '?';
+                loadShopProducts(shopBaseUrl + sep + params.toString());
+            });
+        }
     }
 });
 </script>

@@ -105,51 +105,49 @@
             </div>
         </div>
         @php
-            $bannerImages = is_array($category->banner_images) && !empty($category->banner_images) 
-                ? $category->banner_images 
-                : (is_array($mainCategory->banner_images ?? null) && !empty($mainCategory->banner_images ?? null) 
-                    ? $mainCategory->banner_images 
-                    : []);
-            $bannerTexts = is_array($category->banner_texts) && !empty($category->banner_texts) 
-                ? $category->banner_texts 
-                : (is_array($mainCategory->banner_texts ?? null) && !empty($mainCategory->banner_texts ?? null) 
-                    ? $mainCategory->banner_texts 
-                    : []);
-            // Default images and texts for collection block
-            $defaultCollectionImages = [
-                'assets/images/product/Bottle-1.webp',
-                'assets/images/product/Bottle-4.webp',
-                'assets/images/product/Bottle-8.webp'
-            ];
-            $defaultCollectionTexts = ['Drinkware', 'Barware', 'Kitchenware'];
+            $subCategoriesList = $subCategories ?? collect();
         @endphp
         <div class="collection-block mt-5">
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
                 <div class="banner-block md:pt-20 pt-10">
                     <div class="container">
-                        <div class="list-banner grid md:grid-cols-3 gap-[20px]">
-                            @for($i = 0; $i < 3; $i++)
-                                @php
-                                    $collectionImage = !empty($bannerImages[$i] ?? null) ? storage_asset($bannerImages[$i] ?? null) : asset($defaultCollectionImages[$i]);
-                                    $collectionText = !empty($bannerTexts[$i]) ? $bannerTexts[$i] : $defaultCollectionTexts[$i];
-                                    $slugForLookup = \Illuminate\Support\Str::slug($collectionText);
-                                    $catForCard = \App\Models\Category::where('is_active', true)->where('name', $collectionText)->first()
-                                        ?? \App\Models\Category::where('is_active', true)->whereRaw('LOWER(slug) = ?', [strtolower($slugForLookup)])->first();
-                                    if (!$catForCard && in_array(strtolower($collectionText), ['kichenware', 'kitchenware'])) {
-                                        $catForCard = \App\Models\Category::where('is_active', true)->where('name', 'Kitchenware')->first()
-                                            ?? \App\Models\Category::where('is_active', true)->whereRaw('LOWER(slug) IN (?, ?)', ['kitchenware', 'kichenware'])->first();
-                                    }
-                                    $collectionSlug = $catForCard ? $catForCard->slug : $category->slug;
-                                @endphp
-                                <a href="{{ route('category', $collectionSlug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                                    <div class="banner-img w-full">
-                                        <img src="{{ $collectionImage }}" alt="{{ $collectionText }}" class="w-full duration-500">
-                                    </div>
-                                    <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $collectionText }}</div>
-                                    <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText }}</div>
-                                </a>
-                            @endfor
-                        </div>
+                        @if($subCategoriesList->isNotEmpty())
+                            <div class="list-banner grid md:grid-cols-3 gap-[20px]">
+                                @foreach($subCategoriesList as $subCat)
+                                    @php
+                                        $subImage = $subCat->image ? storage_asset($subCat->image) : asset('assets/images/product/Bottle-1.webp');
+                                    @endphp
+                                    <a href="{{ route('category', $subCat->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                                        <div class="banner-img w-full">
+                                            <img src="{{ $subImage }}" alt="{{ $subCat->name }}" class="w-full aspect-[4/5] object-cover duration-500">
+                                        </div>
+                                        <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $subCat->name }}</div>
+                                        <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            {{-- No sub-categories: show sibling categories of same main category if any --}}
+                            @php
+                                $siblingCategories = $mainCategory
+                                    ? \App\Models\Category::where('is_active', true)->where('main_category_id', $mainCategory->id)->where('parent_id', $category->parent_id)->where('id', '!=', $category->id)->orderBy('sort_order')->get()
+                                    : collect();
+                            @endphp
+                            @if($siblingCategories->isNotEmpty())
+                                <div class="list-banner grid md:grid-cols-3 gap-[20px]">
+                                    @foreach($siblingCategories->take(3) as $sibCat)
+                                        @php $sibImage = $sibCat->image ? storage_asset($sibCat->image) : asset('assets/images/product/Bottle-1.webp'); @endphp
+                                        <a href="{{ route('category', $sibCat->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                                            <div class="banner-img w-full">
+                                                <img src="{{ $sibImage }}" alt="{{ $sibCat->name }}" class="w-full aspect-[4/5] object-cover duration-500">
+                                            </div>
+                                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $sibCat->name }}</div>
+                                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</div>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>
@@ -404,51 +402,6 @@
             </div>
         </div>
 
-        <div class="brand-block md:py-[60px] py-[32px]">
-            <div class="container">
-                <div class="list-brand">
-                    <div class="swiper swiper-list-brand">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="1" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="2" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="3" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="4" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="5" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="6" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="brand-item relative flex items-center justify-center h-[36px]">
-                                    <img src="{{ asset('assets/images/perch-logo.png') }}" alt="7" class="h-full w-auto duration-500 relative object-cover" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 @endsection
 
 @section('scripts')

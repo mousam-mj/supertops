@@ -12,15 +12,24 @@ class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * When ?sub_only=1 (e.g. from "Sub Categories" nav), show only sub-categories (has parent).
      */
     public function index()
     {
-        $categories = Category::with(['parent', 'children'])
+        $query = Category::with(['parent', 'children'])
             ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get();
-        
-        return view('admin.categories.index', compact('categories'));
+            ->orderBy('name');
+
+        if (request()->boolean('sub_only')) {
+            $query->whereNotNull('parent_id');
+        }
+
+        $categories = $query->get();
+
+        return view('admin.categories.index', [
+            'categories' => $categories,
+            'subOnly' => request()->boolean('sub_only'),
+        ]);
     }
 
     /**
@@ -174,10 +183,10 @@ class CategoryController extends Controller
             return back()->withErrors(['parent_id' => 'Category cannot be its own parent.'])->withInput();
         }
 
-        // Prevent circular parent relationships
+        // Prevent circular parent: chosen parent must not be a descendant of this category
         if ($validated['parent_id']) {
             $parent = Category::find($validated['parent_id']);
-            if ($parent && $this->isDescendant($parent, $category)) {
+            if ($parent && $this->isDescendant($category, $parent)) {
                 return back()->withErrors(['parent_id' => 'Cannot set a descendant as parent.'])->withInput();
             }
         }
