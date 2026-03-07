@@ -90,10 +90,11 @@
                                             }
                                         }
                                         $allImages = array_unique($allImages);
+                                        $placeholderImg = asset('assets/images/product/perch-bottal.webp');
                 @endphp
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
-                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
                 </div>
                                     @endforeach
                             </div>
@@ -102,7 +103,7 @@
                                 <div class="swiper-wrapper">
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
-                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover cursor-pointer" />
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover cursor-pointer" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
                             </div>
                         @endforeach
                     </div>
@@ -115,7 +116,7 @@
                             <div class="swiper-wrapper">
                                 @foreach($allImages as $img)
                                     <div class="swiper-slide">
-                                        <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                        <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
                                     </div>
                                 @endforeach
                             </div>

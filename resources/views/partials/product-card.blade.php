@@ -37,10 +37,11 @@
                     } else {
                         $hoverImage = $mainImage;
                     }
+                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
                 @endphp
                 
-                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" />
-                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
             
             @if(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
@@ -119,7 +120,7 @@
                              style="{{ !$colorImage ? 'background-color: ' . $color . ';' : '' }}"
                              data-color="{{ $color }}">
                             @if($colorImage)
-                                <img src="{{ $colorImage }}" alt="{{ $color }}" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ $colorImage }}" alt="{{ $color }}" class="rounded-xl w-full h-full object-cover" onerror="this.onerror=null; this.style.display='none';" />
                             @endif
                             <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm opacity-0 hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $color }}</div>
                         </div>
