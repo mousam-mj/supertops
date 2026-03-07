@@ -14,14 +14,25 @@
     <!-- Products Section -->
     <section class="products" style="padding: 60px 8%; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; background: transparent !important;">
         @forelse($featuredProducts->take(6) as $product)
+            @php
+                $getImageUrl = function($path) {
+                    if (!$path) return null;
+                    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
+                    if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
+                    return asset('storage/' . $path);
+                };
+                $productImg = $getImageUrl($product->image ?? null);
+                $productDesc = $product->short_description ?? $product->description ?? '';
+                $productDescText = is_string($productDesc) ? Str::limit(strip_tags($productDesc), 50) : '';
+            @endphp
             <div class="card" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 15px; padding: 20px; text-align: center; transition: 0.4s;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 0 25px #00ffee';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="width: 100%; border-radius: 10px; margin-bottom: 15px;" />
+                @if($productImg)
+                    <img src="{{ $productImg }}" alt="{{ $product->name }}" style="width: 100%; border-radius: 10px; margin-bottom: 15px; object-fit: cover; aspect-ratio: 3/4;" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('assets/images/product/perch-bottal.webp') }}';" />
                 @else
                     <div style="width: 100%; height: 200px; background: linear-gradient(45deg, #ff00cc, #3333ff); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 15px;">📱</div>
                 @endif
                 <h3 style="margin-top: 15px; font-size: 20px; font-weight: 600; color: white !important;">{{ $product->name }}</h3>
-                <p style="color: #aaa !important; margin: 10px 0;">{{ Str::limit($product->short_description ?? $product->description, 50) }}</p>
+                <p style="color: #aaa !important; margin: 10px 0;">{{ $productDescText ?: 'Premium quality product.' }}</p>
                 <div style="margin-top: 15px; font-size: 18px; font-weight: 600; color: #00ffee !important;">₹{{ number_format($product->sale_price ?? $product->price, 2) }}</div>
                 <a href="{{ route('product.show', $product->slug) }}" style="display: inline-block; margin-top: 15px; padding: 8px 20px; background: linear-gradient(45deg, #ff00cc, #3333ff); color: white !important; border-radius: 20px; text-decoration: none; font-size: 14px;">View Details</a>
             </div>

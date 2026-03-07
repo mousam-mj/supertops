@@ -39,11 +39,21 @@
                                 @foreach($products as $product)
                                     <tr>
                                         <td>
+                                            @php
+                                                $getImageUrl = function($path) {
+                                                    if (!$path) return null;
+                                                    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
+                                                    if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
+                                                    return asset('storage/' . $path);
+                                                };
+                                                $thumbUrl = $getImageUrl($product->image ?? null);
+                                                $placeUrl = asset('assets/images/product/perch-bottal.webp');
+                                            @endphp
                                             <div class="d-flex align-items-center">
-                                                @if($product->image)
-                                                    <img src="{{ asset('storage/' . $product->image) }}" 
-                                                         alt="{{ $product->name }}" 
-                                                         style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                @if($thumbUrl)
+                                                    <img src="{{ $thumbUrl }}" alt="{{ $product->name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;" onerror="this.onerror=null; this.src='{{ $placeUrl }}';">
+                                                @else
+                                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 40px; height: 40px; margin-right: 10px; background: rgba(255,255,255,0.08);"><i class="bi bi-image text-muted"></i></div>
                                                 @endif
                                                 <div>
                                                     <a href="{{{ route('admin.products.show', $product) }}}" class="fw-semibold">{{ $product->name }}</a>

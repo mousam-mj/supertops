@@ -110,6 +110,26 @@ Route::get('/test-email', function() {
     }
 })->name('test.email');
 
+// Serve uploaded storage files (when direct /storage/ returns 403 on server)
+Route::get('/storage/{path}', function (string $path) {
+    $path = request()->path();
+    if (!str_starts_with($path, 'storage/')) {
+        abort(404);
+    }
+    $path = substr($path, 8); // skip 'storage/'
+    $path = str_replace(['..', '\\'], ['', '/'], $path);
+    if ($path === '' || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+    $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+    if (!is_file($fullPath)) {
+        abort(404);
+    }
+    return response()->file($fullPath, [
+        'Content-Type' => \Illuminate\Support\Facades\File::mimeType($fullPath),
+    ]);
+})->where('path', '.*')->name('storage.serve');
+
 // Shop Routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/collection', [ShopController::class, 'index'])->name('shop.collection');

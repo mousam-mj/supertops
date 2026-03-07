@@ -11,12 +11,23 @@
                 <h5 class="mb-0">Product Information</h5>
             </div>
             <div class="card-body">
-                @if($product->image)
+                @php
+                    $getImageUrl = function($path) {
+                        if (!$path) return null;
+                        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
+                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
+                        return asset('storage/' . $path);
+                    };
+                    $productImageUrl = $getImageUrl($product->image ?? null);
+                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
+                @endphp
+                @if($productImageUrl)
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $product->image) }}" 
+                        <img src="{{ $productImageUrl }}" 
                              alt="{{ $product->name }}" 
                              class="img-fluid" 
-                             style="max-width: 300px; border-radius: 8px;">
+                             style="max-width: 300px; border-radius: 8px;"
+                             onerror="this.onerror=null; this.src='{{ $placeholderImg }}';">
                     </div>
                 @endif
                 <table class="table">
@@ -95,7 +106,7 @@
                     @if($product->description)
                     <tr>
                         <th>Description</th>
-                        <td>{{ $product->description }}</td>
+                        <td>{!! $product->description !!}</td>
                     </tr>
                     @endif
                     <tr>
