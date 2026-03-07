@@ -126,6 +126,10 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/payments-history/analytics', [App\Http\Controllers\Api\Admin\PaymentHistoryController::class, 'analytics']);
     Route::get('/payments-history/export', [App\Http\Controllers\Api\Admin\PaymentHistoryController::class, 'export']);
 
+    // Shiprocket Integration (delivery)
+    Route::post('/orders/{id}/shiprocket/create-shipment', [App\Http\Controllers\Api\Admin\ShiprocketController::class, 'createShipment']);
+    Route::get('/orders/{id}/shiprocket/track', [App\Http\Controllers\Api\Admin\ShiprocketController::class, 'track']);
+
     // Delhivery Integration
     Route::post('/orders/{id}/delhivery/create-shipment', [App\Http\Controllers\Api\Admin\DelhiveryController::class, 'createShipment']);
     Route::get('/orders/{id}/delhivery/track', [App\Http\Controllers\Api\Admin\DelhiveryController::class, 'track']);

@@ -30,6 +30,10 @@ class Order extends Model
         'delhivery_data',
         'delhivery_tracking_data',
         'delhivery_cancelled',
+        'shiprocket_order_id',
+        'shiprocket_shipment_id',
+        'shiprocket_awb',
+        'shiprocket_data',
         'notes',
         // Legacy fields for backward compatibility
         'customer_name',
@@ -51,6 +55,7 @@ class Order extends Model
         'delhivery_data' => 'array',
         'delhivery_tracking_data' => 'array',
         'delhivery_cancelled' => 'boolean',
+        'shiprocket_data' => 'array',
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'shipping' => 'decimal:2',
