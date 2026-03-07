@@ -136,6 +136,10 @@ class ProductController extends Controller
         }
         if (!empty($galleryPaths)) {
             $validated['images'] = $galleryPaths;
+            // Use first gallery image as main image if no main image uploaded
+            if (empty($validated['image'])) {
+                $validated['image'] = $galleryPaths[0];
+            }
         }
 
         // Handle product video
@@ -227,18 +231,20 @@ class ProductController extends Controller
             }
         }
 
-        // Handle remove_image
+        // Handle remove_image / new image – only set validated['image'] when intentionally changing
         if ($request->filled('remove_image') && $request->remove_image == '1') {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
-                $validated['image'] = null;
             }
+            $validated['image'] = null;
         } elseif ($request->hasFile('image')) {
-            // Delete old image when uploading new one
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            // Preserve existing image when no new upload and not removing
+            unset($validated['image']);
         }
 
         // Handle remove_gallery_images
@@ -264,6 +270,10 @@ class ProductController extends Controller
         }
         if (isset($existingImages)) {
             $validated['images'] = array_values(array_unique($existingImages));
+            // If product has no main image but has gallery, set main image to first gallery
+            if (empty($product->image) && !empty($validated['images']) && !isset($validated['image'])) {
+                $validated['image'] = $validated['images'][0];
+            }
         }
 
         // Handle remove_video
@@ -281,8 +291,12 @@ class ProductController extends Controller
 
         $product->update($validated);
 
+        $message = 'Product updated successfully.';
+        if ($request->hasFile('image') || $request->hasFile('gallery_images')) {
+            $message .= ' If the image does not appear on the site, run on the server: php artisan storage:link';
+        }
         return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully.');
+            ->with('success', $message);
     }
 
     /**

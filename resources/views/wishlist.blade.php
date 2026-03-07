@@ -656,7 +656,7 @@
     var origin = (typeof window.location !== 'undefined' && window.location.origin) ? window.location.origin.replace(/\/$/, '') : '{{ url("") }}'.replace(/\/$/, '');
     var baseUrl = origin;
     var apiBase = origin + '/api';
-    var defaultImg = origin + '/assets/images/product/perch-bottal.webp';
+    var defaultImg = origin + '/assets/images/product/placeholder.svg';
 
     function toAbsoluteImgUrl(url) {
         if (!url) return defaultImg;

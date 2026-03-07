@@ -245,7 +245,7 @@
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Leave empty to keep current image. Recommended size: 800x800px. Max size: 2MB</small>
+                            <small class="form-text text-muted">Main image shows on shop/search. Leave empty to keep current. If you only add gallery images, the first gallery image is used as product image. Max 2MB.</small>
                             <div id="imagePreview" class="mt-2" style="display: none;">
                                 <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </div>

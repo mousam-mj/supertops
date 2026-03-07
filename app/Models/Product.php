@@ -148,11 +148,12 @@ class Product extends Model
     }
 
     /**
-     * Default placeholder image URL (bottle) – use when product has no image or image fails to load.
+     * Default placeholder image URL – use when product has no image or image fails to load.
+     * Neutral "no image" graphic only; not a product image.
      */
     public static function placeholderImageUrl(): string
     {
-        return asset('assets/images/product/perch-bottal.webp');
+        return asset('assets/images/product/placeholder.svg');
     }
 
     /**
@@ -176,10 +177,18 @@ class Product extends Model
 
     /**
      * Main product image URL (or placeholder).
+     * Uses main image; if missing, uses first gallery image so uploads in gallery still show.
      */
     public function getDisplayImageUrlAttribute(): string
     {
-        return self::imageUrlForPath($this->image);
+        if ($this->image && trim((string) $this->image) !== '') {
+            return self::imageUrlForPath($this->image);
+        }
+        $images = $this->images;
+        if (is_array($images) && count($images) > 0 && !empty($images[0]) && is_string($images[0])) {
+            return self::imageUrlForPath($images[0]);
+        }
+        return self::placeholderImageUrl();
     }
 
     /**

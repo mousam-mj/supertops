@@ -439,13 +439,13 @@ const handleItemModalWishlist = () => {
         "border-b",
         "border-line"
       );
-      const modalImgSrc = (item.thumbImage && item.thumbImage[0]) ? item.thumbImage[0] : (typeof window.location !== 'undefined' ? window.location.origin : '') + '/assets/images/product/perch-bottal.webp';
+      const modalImgSrc = (item.thumbImage && item.thumbImage[0]) ? item.thumbImage[0] : (typeof window.location !== 'undefined' ? window.location.origin : '') + '/assets/images/product/placeholder.svg';
       const modalImgAlt = (item.name || 'product').replace(/'/g, '&#39;');
       prdItem.innerHTML = `
                 <div class="infor flex items-center gap-5">
                     <div class="bg-img">
                         <img src="${modalImgSrc}" alt="${modalImgAlt}"
-                            class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=(window.location.origin||'')+'/assets/images/product/perch-bottal.webp'" />
+                            class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=(window.location.origin||'')+'/assets/images/product/placeholder.svg'" />
                     </div>
                     <div class=''>
                         <div class="name text-button">${item.name || 'Product'}</div>

@@ -187,7 +187,7 @@
     }
 
     function getImageUrl(path) {
-        if (!path) return '/assets/images/product/perch-bottal.webp';
+        if (!path) return '/assets/images/product/placeholder.svg';
         if (path.startsWith('http')) return path;
         if (path.startsWith('assets/') || path.startsWith('/assets/')) return path.startsWith('/') ? path : '/' + path;
         return path.startsWith('storage/') ? '/' + path : '/storage/' + path;
@@ -328,7 +328,7 @@
         
         // Get image URL - match Laravel asset() helper logic
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             
             // Full URL
             if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -766,7 +766,7 @@
         
         // Get image URL
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;
@@ -968,7 +968,7 @@
         
         // Get image URL - use same function as cart items
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;

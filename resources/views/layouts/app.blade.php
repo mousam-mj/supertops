@@ -1128,7 +1128,7 @@
                 <div class="left lg:w-[388px] md:w-[300px] flex-shrink-0 px-6">
                     <div class="list-img max-md:flex items-center gap-4">
                         <div class="bg-img w-full aspect-[3/4] max-md:w-[150px] max-md:flex-shrink-0 rounded-[20px] overflow-hidden md:mt-6">
-                            <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="item" class="w-full h-full object-cover" />
+                            <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="item" class="w-full h-full object-cover" />
                         </div>
                     </div>
                 </div>

@@ -125,8 +125,8 @@
                             </div>
                         </div>
                         <div class="product-img w-full h-full aspect-[3/4]">
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
                         </div>
                         <div class="countdown-time-block py-1.5 flex items-center justify-center">
                             <div class="text-xs font-semibold uppercase text-red">
@@ -181,15 +181,15 @@
 
                         <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Yellow</div>
                             </div>
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                             </div>
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
                             </div>
                         </div>
@@ -220,8 +220,8 @@
                             </div>
                         </div>
                         <div class="product-img w-full h-full aspect-[3/4]">
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
                         </div>
                         <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                             <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
@@ -289,8 +289,8 @@
                             </div>
                         </div>
                         <div class="product-img w-full h-full aspect-[3/4]">
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
                         </div>
                         <div class="countdown-time-block py-1.5 flex items-center justify-center">
                             <div class="text-xs font-semibold uppercase text-red">
@@ -344,15 +344,15 @@
                         <div class="product-name text-title duration-300">Raglan Sleeve T-shirt</div>
                         <div class="list-color list-color-image max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Yellow</div>
                             </div>
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Red</div>
                             </div>
                             <div class="color-item w-12 h-12 rounded-xl duration-300 relative">
-                                <img src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ asset('assets/images/product/placeholder.svg') }}" alt="color" class="rounded-xl w-full h-full object-cover" />
                                 <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm">Green</div>
                             </div>
                         </div>
@@ -383,8 +383,8 @@
                             </div>
                         </div>
                         <div class="product-img w-full h-full aspect-[3/4]">
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
-                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/perch-bottal.webp') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
+                            <img class="w-full h-full object-cover duration-700" src="{{ asset('assets/images/product/placeholder.svg') }}" alt="img" />
                         </div>
                         <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
                             <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
