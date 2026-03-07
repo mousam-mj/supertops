@@ -3,16 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\MainCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
     /**
-     * Show shop page with category filter, search, and filters
+     * Show shop page – mobile accessories only (category filter, search, sort)
      */
     public function index(Request $request)
     {
+        $mobileMain = MainCategory::where('slug', 'mobile-accessories')->where('is_active', true)->first();
+        $mobileCategoryIds = $mobileMain
+            ? Category::where('main_category_id', $mobileMain->id)->pluck('id')->toArray()
+            : [];
+
         $categorySlug = $request->get('category');
         $search = $request->get('search');
         $sort = $request->get('sort', 'default');
@@ -21,13 +27,18 @@ class ShopController extends Controller
         $category = null;
         $products = Product::where('is_active', true)->with('category');
 
+        // Restrict to mobile accessories only
+        if (!empty($mobileCategoryIds)) {
+            $products = $products->whereIn('category_id', $mobileCategoryIds);
+        }
+
         // Category filter
         if ($categorySlug) {
             $category = Category::where('slug', $categorySlug)
+                ->whereIn('id', $mobileCategoryIds ?: [0])
                 ->with(['children.children', 'parent'])
                 ->where('is_active', true)
                 ->first();
-                
             if ($category) {
                 $categoryIds = $this->getCategoryIds($category);
                 $products = $products->whereIn('category_id', $categoryIds);
@@ -38,21 +49,17 @@ class ShopController extends Controller
         if ($search) {
             $products = $products->where(function($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
         // Price filter
         if ($minPrice) {
-            $products = $products->where(function($query) use ($minPrice) {
-                $query->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
-            });
+            $products = $products->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
         }
         if ($maxPrice) {
-            $products = $products->where(function($query) use ($maxPrice) {
-                $query->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
-            });
+            $products = $products->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
         }
 
         // Sort
@@ -78,13 +85,22 @@ class ShopController extends Controller
 
         $products = $products->paginate(16)->withQueryString();
 
-        $categories = Category::whereNull('parent_id')
-            ->with(['children.children'])
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        // Only mobile accessory categories for sidebar and tabs
+        $categories = $mobileMain
+            ? Category::where('main_category_id', $mobileMain->id)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->withCount(['products' => function ($q) {
+                    $q->where('is_active', true);
+                }])
+                ->get()
+            : collect();
 
-        return view('shop', compact('categories', 'category', 'products'));
+        $totalMobileProducts = !empty($mobileCategoryIds)
+            ? Product::where('is_active', true)->whereIn('category_id', $mobileCategoryIds)->count()
+            : 0;
+
+        return view('shop', compact('categories', 'category', 'products', 'totalMobileProducts'));
     }
 
     /**
