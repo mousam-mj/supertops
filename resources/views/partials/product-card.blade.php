@@ -108,7 +108,7 @@
 
             @if(isset($product->colors) && is_array($product->colors) && count($product->colors) > 0)
                 <div class="list-color {{ isset($product->images) && is_array($product->images) && count($product->images) > 0 ? 'list-color-image' : '' }} max-md:hidden flex items-center gap-3 flex-wrap duration-500 py-2">
-                    @foreach($product->colors->take(3) as $index => $color)
+                    @foreach(array_slice($product->colors, 0, 3) as $index => $color)
                         @php
                             $colorImage = null;
                             if (isset($product->images) && is_array($product->images) && isset($product->images[$index])) {
