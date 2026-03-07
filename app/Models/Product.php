@@ -135,16 +135,63 @@ class Product extends Model
     public function getStockForColorSize($color = null, $size = null)
     {
         $query = $this->inventories();
-        
+
         if ($color) {
             $query->where('color', $color);
         }
-        
+
         if ($size) {
             $query->where('size', $size);
         }
-        
+
         return $query->sum('quantity');
+    }
+
+    /**
+     * Default placeholder image URL (bottle) – use when product has no image or image fails to load.
+     */
+    public static function placeholderImageUrl(): string
+    {
+        return asset('assets/images/product/perch-bottal.webp');
+    }
+
+    /**
+     * Resolve full image URL from path (http/https, assets/, or storage/).
+     * Returns placeholder URL if path is null or empty.
+     */
+    public static function imageUrlForPath(?string $path): string
+    {
+        if (!$path || trim($path) === '') {
+            return self::placeholderImageUrl();
+        }
+        $path = trim($path);
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
+            return asset(ltrim($path, '/'));
+        }
+        return asset('storage/' . $path);
+    }
+
+    /**
+     * Main product image URL (or placeholder).
+     */
+    public function getDisplayImageUrlAttribute(): string
+    {
+        return self::imageUrlForPath($this->image);
+    }
+
+    /**
+     * First image from images array (for hover/second thumb), or main image.
+     */
+    public function getHoverImageUrlAttribute(): string
+    {
+        $images = $this->images;
+        if (is_array($images) && count($images) > 0 && !empty($images[0])) {
+            return self::imageUrlForPath(is_string($images[0]) ? $images[0] : null);
+        }
+        return $this->display_image_url;
     }
 }
 

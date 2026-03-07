@@ -661,16 +661,7 @@
                                                     @php
                                                         $firstItem = $order->items->first();
                                                         $product = $firstItem->product ?? null;
-                                                        
-                                                        $getImageUrl = function($path) {
-                                                            if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                                                            if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                                                                return asset($path);
-                                                            }
-                                                            return asset('storage/' . $path);
-                                                        };
-                                                        
-                                                        $productImage = $product ? $getImageUrl($product->image ?? null) : asset('assets/images/product/perch-bottal.webp');
+                                                        $productImage = $product ? ($product->display_image_url ?? \App\Models\Product::placeholderImageUrl()) : \App\Models\Product::placeholderImageUrl();
                                                         $productName = $firstItem ? ($firstItem->product_name ?? $product->name ?? 'Product') : 'Product';
                                                         $productSlug = $product ? $product->slug : '#';
                                                         $categoryName = $product && $product->category ? $product->category->name : '';
@@ -733,14 +724,6 @@
                                 @if($orders && $orders->count() > 0)
                                     @foreach($orders as $order)
                                         @php
-                                            $getImageUrl = function($path) {
-                                                if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                                                if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                                                    return asset($path);
-                                                }
-                                                return asset('storage/' . $path);
-                                            };
-                                            
                                             $statusColors = [
                                                 'pending' => 'bg-yellow text-yellow',
                                                 'processing' => 'bg-purple text-purple',
@@ -767,7 +750,7 @@
                                                 @foreach($order->items as $item)
                                                     @php
                                                         $product = $item->product;
-                                                        $productImage = $product ? $getImageUrl($product->image ?? null) : asset('assets/images/product/perch-bottal.webp');
+                                                        $productImage = $product ? ($product->display_image_url ?? \App\Models\Product::placeholderImageUrl()) : \App\Models\Product::placeholderImageUrl();
                                                         $productName = $item->product_name ?? ($product ? $product->name : 'Product');
                                                         $productSlug = $product ? $product->slug : '#';
                                                         $itemPrice = $item->price ?? ($item->total ?? 0);

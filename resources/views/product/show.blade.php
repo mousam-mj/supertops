@@ -73,25 +73,16 @@
                             <div class="swiper mySwiper2 rounded-2xl overflow-hidden">
                                 <div class="swiper-wrapper">
                                     @php
-                    $getImageUrl = function($path) {
-                        if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                                            if (str_starts_with($path, 'http')) return $path;
-                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                            return asset($path);
-                        }
-                        return asset('storage/' . $path);
-                    };
-                    
-                    $mainImage = $getImageUrl($product->image ?? null);
+                                        $placeholderImg = \App\Models\Product::placeholderImageUrl();
+                                        $mainImage = $product->display_image_url ?? $placeholderImg;
                                         $allImages = [$mainImage];
                                         if (isset($product->images) && is_array($product->images)) {
                                             foreach ($product->images as $img) {
-                                                $allImages[] = $getImageUrl($img);
+                                                $allImages[] = \App\Models\Product::imageUrlForPath(is_string($img) ? $img : null);
                                             }
                                         }
                                         $allImages = array_unique($allImages);
-                                        $placeholderImg = asset('assets/images/product/perch-bottal.webp');
-                @endphp
+                                    @endphp
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
                                             <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />

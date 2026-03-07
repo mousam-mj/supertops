@@ -12,24 +12,16 @@
             </div>
             <div class="card-body">
                 @php
-                    $getImageUrl = function($path) {
-                        if (!$path) return null;
-                        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
-                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
-                        return asset('storage/' . $path);
-                    };
-                    $productImageUrl = $getImageUrl($product->image ?? null);
-                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
+                    $productImageUrl = $product->display_image_url ?? \App\Models\Product::placeholderImageUrl();
+                    $placeholderImg = \App\Models\Product::placeholderImageUrl();
                 @endphp
-                @if($productImageUrl)
-                    <div class="mb-3">
-                        <img src="{{ $productImageUrl }}" 
-                             alt="{{ $product->name }}" 
-                             class="img-fluid" 
-                             style="max-width: 300px; border-radius: 8px;"
-                             onerror="this.onerror=null; this.src='{{ $placeholderImg }}';">
-                    </div>
-                @endif
+                <div class="mb-3">
+                    <img src="{{ $productImageUrl }}" 
+                         alt="{{ $product->name }}" 
+                         class="img-fluid" 
+                         style="max-width: 300px; border-radius: 8px;"
+                         onerror="this.onerror=null; this.src='{{ $placeholderImg }}';">
+                </div>
                 <table class="table">
                     <tr>
                         <th width="200">ID</th>

@@ -115,14 +115,12 @@ class ProductController extends Controller
             ->with('category')
             ->firstOrFail();
 
-        $baseUrl = rtrim($request->getSchemeAndHttpHost() ?: config('app.url'), '/');
-        $thumbImage = $product->image
-            ? (str_starts_with($product->image, 'http') ? $product->image : $baseUrl . '/storage/' . ltrim($product->image, '/'))
-            : $baseUrl . '/assets/images/product/perch-bottal.webp';
+        $thumbImage = $product->display_image_url;
         $images = $product->images && is_array($product->images) ? $product->images : [];
-        $thumbImages = array_map(function ($img) use ($baseUrl) {
-            return str_starts_with($img, 'http') ? $img : $baseUrl . '/storage/' . ltrim($img, '/');
-        }, array_merge([$thumbImage], $images));
+        $thumbImages = array_values(array_unique(array_merge(
+            [$thumbImage],
+            array_map(fn ($img) => \App\Models\Product::imageUrlForPath(is_string($img) ? $img : null), $images)
+        )));
 
         return response()->json([
             'success' => true,

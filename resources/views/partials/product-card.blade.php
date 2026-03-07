@@ -21,25 +21,10 @@
             
             <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
                 @php
-                    $getImageUrl = function($path) {
-                        if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
-                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                            return asset($path);
-                        }
-                        return asset('storage/' . $path);
-                    };
-                    
-                    $mainImage = $getImageUrl($product->image ?? null);
-                    $hoverImage = null;
-                    if (isset($product->images) && is_array($product->images) && count($product->images) > 0) {
-                        $hoverImage = $getImageUrl($product->images[0]);
-                    } else {
-                        $hoverImage = $mainImage;
-                    }
-                    $placeholderImg = asset('assets/images/product/perch-bottal.webp');
+                    $placeholderImg = \App\Models\Product::placeholderImageUrl();
+                    $mainImage = $product->display_image_url ?? $placeholderImg;
+                    $hoverImage = $product->hover_image_url ?? $mainImage;
                 @endphp
-                
                 <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
                 <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
@@ -113,7 +98,7 @@
                         @php
                             $colorImage = null;
                             if (isset($product->images) && is_array($product->images) && isset($product->images[$index])) {
-                                $colorImage = $getImageUrl($product->images[$index]);
+                                $colorImage = \App\Models\Product::imageUrlForPath(is_string($product->images[$index]) ? $product->images[$index] : null);
                             }
                         @endphp
                         <div class="color-item {{ $colorImage ? 'w-12 h-12 rounded-xl' : 'w-8 h-8 rounded-full' }} duration-300 relative cursor-pointer" 

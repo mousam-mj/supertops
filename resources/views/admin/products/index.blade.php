@@ -102,28 +102,14 @@
                                     <td>{{ $product->id }}</td>
                                     <td>
                                         @php
-                                            $getImageUrl = function($path) {
-                                                if (!$path) return null;
-                                                if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-                                                    return $path;
-                                                }
-                                                if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                                                    return asset($path);
-                                                }
-                                                return asset('storage/' . $path);
-                                            };
-                                            $imageUrl = $getImageUrl($product->image ?? null);
+                                            $imageUrl = $product->display_image_url ?? \App\Models\Product::placeholderImageUrl();
+                                            $placeUrl = \App\Models\Product::placeholderImageUrl();
                                         @endphp
-                                        @if($imageUrl)
-                                            <img src="{{ $imageUrl }}" 
-                                                 alt="{{ $product->name }}" 
-                                                 class="admin-table-thumb"
-                                                 loading="lazy">
-                                        @else
-                                            <div class="admin-table-thumb admin-table-thumb-placeholder d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        @endif
+                                        <img src="{{ $imageUrl }}" 
+                                             alt="{{ $product->name }}" 
+                                             class="admin-table-thumb"
+                                             loading="lazy"
+                                             onerror="this.onerror=null; this.src='{{ $placeUrl }}';">
                                     </td>
                                     <td class="admin-table-name">
                                         <div class="fw-semibold text-truncate" title="{{ $product->name }}">{{ $product->name }}</div>
