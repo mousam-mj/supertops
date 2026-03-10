@@ -50,7 +50,7 @@
                     <div class="heading4 text-center whitespace-nowrap">{{ $category->name }}</div>
                 @endif
                     </div>
-                    <a href="{{ route('category', $category->slug) }}" class="pointer-events-auto button-main order-2">{{ $heroButtonText }}</a>
+                    <a href="{{ route('shop') }}" class="pointer-events-auto button-main order-2">{{ $heroButtonText }}</a>
                 </div>
             </div>
 
@@ -117,13 +117,13 @@
                                     @php
                                         $subImage = $subCat->image ? storage_asset($subCat->image) : asset('assets/images/product/Bottle-1.webp');
                                     @endphp
-                                    <a href="{{ route('category', $subCat->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                                    <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                                         <div class="banner-img w-full">
                                             <img src="{{ $subImage }}" alt="{{ $subCat->name }}" class="w-full aspect-[4/5] object-cover duration-500">
                                         </div>
                                         <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $subCat->name }}</div>
-                                        <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</div>
-                                    </a>
+                                        <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</a>
+                                    </div>
                                 @endforeach
                             </div>
                         @else
@@ -137,13 +137,13 @@
                                 <div class="list-banner grid md:grid-cols-3 gap-[20px]">
                                     @foreach($siblingCategories->take(3) as $sibCat)
                                         @php $sibImage = $sibCat->image ? storage_asset($sibCat->image) : asset('assets/images/product/Bottle-1.webp'); @endphp
-                                        <a href="{{ route('category', $sibCat->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                                             <div class="banner-img w-full">
                                                 <img src="{{ $sibImage }}" alt="{{ $sibCat->name }}" class="w-full aspect-[4/5] object-cover duration-500">
                                             </div>
                                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $sibCat->name }}</div>
-                                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</div>
-                                        </a>
+                                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">{{ $heroButtonText ?? 'Shop Now' }}</a>
+                                        </div>
                                     @endforeach
                                 </div>
                             @endif
@@ -278,7 +278,7 @@
                         }
                     @endphp
                     @for($i = 0; $i < 2; $i++)
-                        <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 @if(!empty($bannerImages) && count($bannerImages) >= 2 && !empty($bannerImages[$i]))
                                     <img src="{{ storage_asset($bannerImages[$i] ?? null) }}" alt="{{ $twoBannerTexts[$i] }}" class="w-full duration-500">
@@ -288,9 +288,9 @@
                             </div>
                             <div class="banner-content absolute left-[30px] bottom-[30px]">
                                 <div class="heading4">{{ $twoBannerTexts[$i] }}</div>
-                                <div class="text-button text-black relative inline-block pb-1 border-b-2 border-black duration-500 mt-2">Shop Now</div>
+                                <a href="{{ route('shop') }}" class="text-button text-black relative inline-block pb-1 border-b-2 border-black duration-500 mt-2">Shop Now</a>
                             </div>
-                        </a>
+                        </div>
                     @endfor
                 </div>
             </div>
@@ -303,7 +303,7 @@
                     <div class="text-content sm:w-1/3 max-sm:pt-10 max-sm:pb-[40px] flex flex-col items-center justify-center z-[1]">
                         <div class="text-sub-display">Sale! Up To 50% Off!</div>
                         <div class="heading1 text-center md:mt-4 mt-2">Perch Bottle <br class="max-xl:hidden">on sale</div>
-                        <a href="{{ route('category', $category->slug) }}" class="button-main md:mt-8 mt-3" tabindex="0">Shop Now</a>
+                        <a href="{{ route('shop') }}" class="button-main md:mt-8 mt-3" tabindex="0">Shop Now</a>
                     </div>
                     <div class="sub-img sm:w-2/3 w-full h-full sm:pl-10">
                         <img src="{{ asset('assets/images/banner/perch123(1).webp') }}" alt="bg-toys1" class="w-full h-full object-cover z-[1] relative" />

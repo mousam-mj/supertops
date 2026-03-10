@@ -276,13 +276,13 @@
                     </div>
                 </div>
                                 @endif
-                                <!-- <div class="text-title mt-5">Quantity:</div> -->
+                                <div class="text-title mt-5">Quantity:</div>
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
-                                    <!-- <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
+                                    <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1"></i>
                                         <div class="quantity body1 font-semibold">1</div>
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
-                                    </div> -->
+                                    </div>
                                     <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
                                 </div>
                                 <div class="button-block mt-5">
@@ -309,23 +309,6 @@
                                         <div class="text-title">38</div>
                                         <div class="text-secondary">people viewing this product right now!</div>
                 </div>
-                    @if($product->sku)
-                                        <div class="flex items-center gap-1 mt-3">
-                                            <div class="text-title">SKU:</div>
-                                            <div class="text-secondary">{{ $product->sku }}</div>
-                        </div>
-                    @endif
-                                    @if($product->category)
-                                        <div class="flex items-center gap-1 mt-3">
-                                            <div class="text-title">Categories:</div>
-                                            <div class="list-category text-secondary">
-                                                <a href="{{ route('category', $product->category->slug) }}" class="hover:underline">{{ $product->category->name }}</a>
-                                                @if($product->category->parent)
-                                                    , <a href="{{ route('category', $product->category->parent->slug) }}" class="hover:underline">{{ $product->category->parent->name }}</a>
-                            @endif
-                                            </div>
-                        </div>
-                    @endif
                                     @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
                                         <div class="product-specifications mt-4 pt-4 border-t border-line">
                                             <div class="text-title mb-3">Specifications:</div>
@@ -422,12 +405,6 @@
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
                                                 <p>Category: {{ $product->category->name }}</p>
-                                            </div>
-                                        @endif
-                                        @if($product->sku)
-                                            <div class="item flex gap-1 text-secondary mt-1">
-                                                <i class="ph ph-dot text-2xl"></i>
-                                                <p>SKU: {{ $product->sku }}</p>
                                             </div>
                                         @endif
                                         @if($product->in_stock)

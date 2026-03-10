@@ -42,12 +42,12 @@
                 <div class="right-content flex flex-wrap gap-y-8 basis-3/4 max-lg:basis-full">
                     <div class="list-nav flex justify-between basis-2/3 max-md:basis-full gap-4">
                         <div class="item flex flex-col basis-1/3">
-                            <div class="text-button-uppercase pb-3">Infomation</div>
+                            <div class="text-button-uppercase pb-3">Information</div>
                             <a class="caption1 has-line-before duration-300 w-fit" href="{{ route('about') }}">About Us</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('contact') }}">Contact us</a>
                             <!-- <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!"> Career </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('my-account') }}}"> My Account</a> -->
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}"> Order & Returns</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}"> Orders & Returns</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">FAQs </a>
                         </div>
                         <div class="item flex flex-col basis-1/3">

@@ -68,7 +68,7 @@
                         ];
                     @endphp
                     @forelse($homeCategories as $index => $category)
-                        <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 @if($category->image)
                                     <img src="{{ storage_asset($category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
@@ -77,31 +77,31 @@
                                 @endif
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
-                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                        </a>
+                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
+                        </div>
                     @empty
                         {{-- Fallback if no categories --}}
-                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
-                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                        </a>
-                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
+                        </div>
+                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
-                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                        </a>
-                        <a href="{{ route('shop') }}" class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
+                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
+                        </div>
+                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
                                 <img src="{{ asset('assets/images/product/Bottle-8.webp') }}" alt="bg-img" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Kitchenware</div>
-                            <div class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
-                        </a>
+                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
+                        </div>
                     @endforelse
                 </div>
             </div>
