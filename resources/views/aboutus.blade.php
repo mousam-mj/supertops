@@ -43,7 +43,7 @@ Built for people who value design, functionality, and quality, Perch brings toge
         <div class="choose-us-block md:pt-20 pt-14 pb-7">
             <div class="container flex max-lg:flex-col max-lg:gap-y-8 items-center justify-between">
                 <div class="bg-img lg:w-7/12 lg:pr-[45px] md:w-1/2 w-5/6">
-                    <img src="./assets/images/instagram/p1(1).webp" alt="bg-img" class="w-full">
+                    <img src="./assets/images/instagram/p1(1).webp" alt="bg-img" class="w-full rounded-2xl">
                 </div>
                 <div class="content lg:w-5/12 lg:pl-[45px]">
                     <div class="heading4 font-medium">Designed for Modern Living</div>
@@ -165,8 +165,8 @@ Whether it’s your morning coffee, office lunch, home bar, kitchen shelf, or tr
             </div>
             <div class="container relative z-[1] flex max-md:flex-wrap items-center md:justify-end justify-center">
                 <div class="bg-img sm:w-7/12 max-md:pt-8 w-[90%] relative md:pr-[100px] md:absolute md:top-1/2 md:-translate-y-1/2 md:left-0 z-[0]">
-                    <img src="./assets/images/image-flash-sale-organic.png" alt="bg-img" class="w-full object-cover">
-                <div style="position: absolute; top: 8px; left: 8px; z-index: 1000; cursor: pointer; opacity: 1; transition: opacity 200ms; width: 24px; height: 24px;"><svg viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg"><title>Add to Photoshop Extension</title><path d="M44.26 0H9.74C4.36075 0 0 4.36075 0 9.74V44.26C0 49.6393 4.36075 54 9.74 54H44.26C49.6393 54 54 49.6393 54 44.26V9.74C54 4.36075 49.6393 0 44.26 0Z" fill="#001E36"></path><path d="M18.7398 14.4297C25.7698 14.4297 29.7298 17.7197 29.7298 23.2397C29.7298 29.6797 24.3598 32.2697 19.3298 32.2697H15.9298V39.2297H9.0498V14.4297H18.7498H18.7398ZM15.9298 20.3097V26.3797H18.9598C21.0698 26.3797 22.5498 25.5297 22.5498 23.3797C22.5498 21.4197 21.2898 20.3097 19.1098 20.3097H15.9298Z" fill="#31A8FF"></path><path d="M31.4299 37.9995L31.4699 32.2595C33.4299 33.5595 36.1699 34.3695 38.0599 34.3695C39.3499 34.3695 39.9499 33.9995 39.9499 33.3295C39.9499 32.5895 39.1399 32.2895 37.5799 31.8095C34.5799 30.9195 31.2899 29.6995 31.2899 25.7795C31.2899 21.8595 34.5799 19.5595 39.3599 19.5595C41.6199 19.5595 43.4699 19.8895 45.0999 20.5995L45.0599 26.0795C43.7699 25.2995 41.2099 24.5995 39.5499 24.5995C38.3299 24.5995 37.8499 24.9695 37.8499 25.5295C37.8499 26.1995 38.4399 26.3795 40.2199 26.9395C43.6599 27.9795 46.5499 29.0895 46.5499 33.1195C46.5499 37.1495 43.3999 39.5595 38.4799 39.5595C35.8899 39.5595 33.4499 39.1195 31.4499 38.0095L31.4299 37.9995Z" fill="#31A8FF"></path></svg></div></div>
+                    <img src="./assets/images/slider/bg-toys.png" alt="bg-img" class="w-full object-cover">
+                </div>
                 <div class="right flex items-center md:justify-center md:w-5/12 w-full lg:py-[156px] md:py-24 max-md:pt-3 max-md:pb-8">
                     <div class="text-content">
                         <div class="heading2">Flash Sale!</div>

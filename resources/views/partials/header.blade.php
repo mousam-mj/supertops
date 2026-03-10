@@ -55,9 +55,7 @@
                                 <li class="h-full">
                                     <a href="{{ route('contact') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">Contact Us</a>
                                 </li>
-                                <li class="h-full">
-                                    <a href="{{ route('faqs') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">FAQs</a>
-                                </li>
+                                
                             </ul>
                         </div>
                         <div class="right flex gap-12 z-[1]">

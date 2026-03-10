@@ -5,29 +5,15 @@
 @section('content')
 <div id="home-content">
 <!-- Slider (dynamic from admin Hero Banners) -->
-            <div class="slider-block style-two xl:h-[860px] lg:h-[800px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] sm:-mt-[75px] w-full">
+            <div class="slider-block style-two xl:h-[820px] lg:h-[700px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] sm:-mt-[75px] w-full">
                 <div class="slider-main h-full w-full">
                     <div class="swiper swiper-slider h-full relative">
                         <div class="swiper-wrapper">
                             @forelse($heroBanners as $banner)
                                 <div class="swiper-slide">
                                     <div class="slider-item h-full w-full relative overflow-hidden">
-                                        <div class="container w-full h-full relative">
-                                            @if($banner->subtitle || $banner->name || $banner->button_text)
-                                                <div class="text-content absolute left-0 top-0 w-full h-full flex flex-col justify-center z-10 px-4 md:px-8">
-                                                    @if($banner->subtitle)
-                                                        <div class="text-sub-display text-secondary md:mb-2">{{ $banner->subtitle }}</div>
-                                                    @endif
-                                                    @if($banner->name)
-                                                        <div class="text-display text-black font-bold md:mt-2" style="line-height: 1.2;">{{ $banner->name }}</div>
-                                                    @endif
-                                                    @if($banner->button_text && $banner->deeplink)
-                                                        <a href="{{ url($banner->deeplink) }}" class="button-main bg-green text-black hover:bg-black hover:text-white md:mt-6 mt-4 inline-block w-fit">{{ $banner->button_text }}</a>
-                                                    @elseif($banner->button_text)
-                                                        <a href="{{ route('shop') }}" class="button-main bg-green text-black hover:bg-black hover:text-white md:mt-6 mt-4 inline-block w-fit">{{ $banner->button_text }}</a>
-                                                    @endif
-                                                </div>
-                                            @endif
+                                        <div class=" w-full h-full relative">
+                                            
                                             <div class="sub-img absolute left-0 top-0 w-full h-full z-[-1]">
                                                 @if($banner->banner_image)
                                                     <img src="{{ storage_asset($banner->banner_image) }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
