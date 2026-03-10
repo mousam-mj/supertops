@@ -47,6 +47,13 @@ return [
         'api_endpoint' => env('DELHIVERY_API_ENDPOINT', 'https://staging-express.delhivery.com'),
     ],
 
+    'shiprocket' => [
+        'email' => env('SHIPROCKET_EMAIL'),
+        'password' => env('SHIPROCKET_PASSWORD'),
+        'api_url' => env('SHIPROCKET_API_URL', 'https://apiv2.shiprocket.in'),
+        'pickup_postcode' => env('SHIPROCKET_PICKUP_POSTCODE', '110001'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

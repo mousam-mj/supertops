@@ -586,7 +586,7 @@
                 <div class="flex justify-between max-lg:flex-col gap-y-10">
                     <div class="left lg:w-2/3 lg:pr-4">
                         <div class="heading3">Drop Us A Line</div>
-                        <div class="body1 text-secondary2 mt-3">Use the form below to get in touch with the sales team</div>
+                        <div class="body1 text-secondary2 mt-3">Use the form below to get in touch with us</div>
                         <form class="md:mt-6 mt-4">
                             <div class="grid sm:grid-cols-2 grid-cols-1 gap-4 gap-y-5">
                                 <div class="name">

@@ -598,7 +598,7 @@
                             <div class="list-featrue mt-5">
                                 <div class="item flex lg:gap-10 gap-6">
                                     <div class="w-1/2">
-                                        <div class="heading6">Infomation:</div>
+                                        <div class="heading6">Information:</div>
                                         <div class="text-secondary mt-2">
                                             +1 666 234 8888<br />
                                             hi.avitex@gmail.com
@@ -645,7 +645,7 @@
                             <div class="list-featrue mt-5">
                                 <div class="item flex lg:gap-10 gap-6">
                                     <div class="w-1/2">
-                                        <div class="heading6">Infomation:</div>
+                                        <div class="heading6">Information:</div>
                                         <div class="text-secondary mt-2">
                                             +1 666 234 8888<br />
                                             hi.avitex@gmail.com
@@ -694,7 +694,7 @@
                             <div class="list-featrue mt-5">
                                 <div class="item flex lg:gap-10 gap-6">
                                     <div class="w-1/2">
-                                        <div class="heading6">Infomation:</div>
+                                        <div class="heading6">Information:</div>
                                         <div class="text-secondary mt-2">
                                             +1 666 234 8888<br />
                                             hi.avitex@gmail.com

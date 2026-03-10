@@ -8,7 +8,7 @@
         <img src="{{ asset('assets/images/slider/11b-scaled.webp') }}" alt="bg-img" class="w-full duration-500" />
     </div>
     <div class="heading4 absolute bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category ? $category->name : 'Category' }}</div>
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</div>
+    <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
 </div>
 
 <div class="banner-block relative">
