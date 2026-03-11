@@ -110,14 +110,8 @@
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="phoneNumber" type="tel" placeholder="Phone Numbers *" value="{{ $user->phone ?? ($defaultAddress->phone ?? '') }}" required />
                                         </div>
-                                        <div class="col-span-full select-block">
-                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="region" name="region">
-                                                <option value="default">Choose Country/Region</option>
-                                                <option value="India" {{ ($defaultAddress && $defaultAddress->state == 'India') ? 'selected' : '' }}>India</option>
-                                                <option value="France" {{ ($defaultAddress && $defaultAddress->state == 'France') ? 'selected' : '' }}>France</option>
-                                                <option value="Singapore" {{ ($defaultAddress && $defaultAddress->state == 'Singapore') ? 'selected' : '' }}>Singapore</option>
-                                            </select>
-                                            <i class="ph ph-caret-down arrow-down"></i>
+                                        <div class="">
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="region" name="region" type="text" placeholder="Country *" value="{{ $defaultAddress->country ?? 'India' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="Town/City *" value="{{ $defaultAddress->city ?? '' }}" required />
@@ -125,14 +119,8 @@
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street,..." value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
                                         </div>
-                                        <div class="select-block">
-                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="country" name="country">
-                                                <option value="default">Choose State</option>
-                                                <option value="India" {{ ($defaultAddress && $defaultAddress->state == 'India') ? 'selected' : '' }}>India</option>
-                                                <option value="France" {{ ($defaultAddress && $defaultAddress->state == 'France') ? 'selected' : '' }}>France</option>
-                                                <option value="Singapore" {{ ($defaultAddress && $defaultAddress->state == 'Singapore') ? 'selected' : '' }}>Singapore</option>
-                                            </select>
-                                            <i class="ph ph-caret-down arrow-down"></i>
+                                        <div class="">
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="country" name="country" type="text" placeholder="State *" value="{{ $defaultAddress->state ?? '' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="postal" type="text" placeholder="Postal Code *" value="{{ $defaultAddress->pincode ?? '' }}" required />

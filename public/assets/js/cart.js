@@ -886,13 +886,13 @@
                             const totalFromAPI = data.data?.total || total;
                             const totalElement = document.querySelector('.total-cart, .checkout-total');
                             if (totalElement) {
-                                totalElement.textContent = totalFromAPI.toFixed(2);
+                                totalElement.textContent = '₹' + totalFromAPI.toFixed(2);
                             }
                         } else {
                             checkoutList.innerHTML = '<div class="text-center py-10 text-secondary">Your cart is empty</div>';
                             const totalElement = document.querySelector('.total-cart, .checkout-total');
                             if (totalElement) {
-                                totalElement.textContent = '0.00';
+                                totalElement.textContent = '₹0.00';
                             }
                         }
                     }
