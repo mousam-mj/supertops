@@ -47,10 +47,14 @@
                         <div class="caption1 text-secondary mb-2">Amount breakdown</div>
                         <div class="space-y-1 body2">
                             <div class="flex justify-between"><span>Subtotal</span><span>₹{{ number_format((float) $subtotal, 2) }}</span></div>
-                            @if($shippingCharge > 0)
-                                <div class="flex justify-between"><span>Shipping</span><span>₹{{ number_format((float) $shippingCharge, 2) }}</span></div>
+                            <div class="flex justify-between">
+                                <span>Shipping</span>
+                                <span>{{ $shippingCharge > 0 ? '₹' . number_format((float) $shippingCharge, 2) : 'Free' }}</span>
+                            </div>
+                            @if($couponDiscount > 0)
+                                <div class="flex justify-between text-green-600"><span>Discount</span><span>-₹{{ number_format((float) $couponDiscount, 2) }}</span></div>
                             @endif
-                            <div class="flex justify-between font-semibold pt-2"><span>Total</span><span>₹{{ number_format((float) $totalAmount, 2) }}</span></div>
+                            <div class="flex justify-between font-semibold pt-2 border-t border-line"><span>Total</span><span>₹{{ number_format((float) $totalAmount, 2) }}</span></div>
                         </div>
                     </div>
                 </div>

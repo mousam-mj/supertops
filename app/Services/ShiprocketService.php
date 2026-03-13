@@ -259,4 +259,37 @@ class ShiprocketService
     {
         return $this->pickupPostcode;
     }
+
+    /**
+     * Cancel a shipment
+     */
+    public function cancelShipment($shipmentId): array
+    {
+        $token = $this->getToken();
+        if (! $token) {
+            return ['success' => false, 'message' => 'Authentication failed'];
+        }
+
+        try {
+            $response = Http::withToken($token)
+                ->post("{$this->baseUrl}/v1/external/orders/cancel/shipment/awbs", [
+                    'awbs' => [$shipmentId]
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return [
+                    'success' => true,
+                    'data' => $data,
+                    'message' => 'Shipment cancelled successfully'
+                ];
+            }
+            
+            Log::warning('Shiprocket cancel shipment failed', ['response' => $response->body()]);
+            return ['success' => false, 'message' => $response->body()];
+        } catch (\Throwable $e) {
+            Log::error('Shiprocket cancel shipment error: ' . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
 }

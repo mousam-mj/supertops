@@ -117,6 +117,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/orders', [App\Http\Controllers\Api\Admin\OrderController::class, 'index']);
     Route::get('/orders/{id}', [App\Http\Controllers\Api\Admin\OrderController::class, 'show']);
     Route::put('/orders/{id}', [App\Http\Controllers\Api\Admin\OrderController::class, 'update']);
+    Route::post('/orders/{id}/cancel', [App\Http\Controllers\Api\Admin\OrderController::class, 'cancel']);
     Route::get('/orders/{id}/invoice', [App\Http\Controllers\Api\Admin\OrderController::class, 'invoice']);
 
     // Payments History

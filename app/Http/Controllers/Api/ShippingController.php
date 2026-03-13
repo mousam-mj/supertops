@@ -40,11 +40,8 @@ class ShippingController extends Controller
                     ],
                 ]);
             }
-            return response()->json([
-                'success' => false,
-                'message' => 'Pincode is not serviceable for delivery',
-                'data' => ['pincode' => $pincode, 'serviceable' => false],
-            ], 400);
+            // Don't return error immediately, fall through to other providers
+            \Log::info('Shiprocket not serviceable for pincode: ' . $pincode . ', trying fallback providers');
         }
 
         // 2) Delhivery (legacy)
@@ -80,15 +77,17 @@ class ShippingController extends Controller
         }
 
         // 3) Flat fallback when no provider configured
-        $shippingCharge = $this->calculateFallbackShipping($weight);
+        $shippingCharge = $this->calculateFallbackShipping($weight, $pincode);
+        $estimatedDelivery = $this->getEstimatedDelivery($pincode);
+        
         return response()->json([
             'success' => true,
             'data' => [
                 'pincode' => $pincode,
                 'serviceable' => true,
                 'shipping_charge' => $shippingCharge,
-                'estimated_delivery' => '3-5 business days',
-                'provider' => 'flat',
+                'estimated_delivery' => $estimatedDelivery,
+                'provider' => 'zone_based',
             ],
         ]);
     }
@@ -101,9 +100,74 @@ class ShippingController extends Controller
         return $baseCharge + $weightCharge + $codCharge;
     }
 
-    private function calculateFallbackShipping($weight)
+    private function calculateFallbackShipping($weight, $pincode = null)
     {
-        return 50 + max(0, ($weight - 1) * 10);
+        $baseCharge = 50;
+        $weightCharge = max(0, ($weight - 1) * 10);
+        
+        // Zone-based pricing for better accuracy
+        if ($pincode) {
+            $zone = $this->getPincodeZone($pincode);
+            switch ($zone) {
+                case 'local': // Same state (MP)
+                    $baseCharge = 40;
+                    break;
+                case 'regional': // Nearby states
+                    $baseCharge = 60;
+                    break;
+                case 'metro': // Metro cities
+                    $baseCharge = 80;
+                    break;
+                case 'remote': // Far locations
+                    $baseCharge = 100;
+                    break;
+                default:
+                    $baseCharge = 50;
+            }
+        }
+        
+        return $baseCharge + $weightCharge;
+    }
+    
+    private function getPincodeZone($pincode)
+    {
+        $firstThree = substr($pincode, 0, 3);
+        
+        // MP (local) - 452xxx, 462xxx, 482xxx etc
+        if (in_array($firstThree, ['452', '462', '482', '486', '484', '485', '480', '481', '483'])) {
+            return 'local';
+        }
+        
+        // Regional (nearby states) - Gujarat, Rajasthan, Maharashtra
+        if (in_array($firstThree, ['380', '390', '395', '302', '313', '324', '400', '411', '440'])) {
+            return 'regional';
+        }
+        
+        // Metro cities
+        if (in_array($firstThree, ['110', '121', '122', '400', '560', '600', '700', '500'])) {
+            return 'metro';
+        }
+        
+        // Default to remote for other areas
+        return 'remote';
+    }
+    
+    private function getEstimatedDelivery($pincode)
+    {
+        $zone = $this->getPincodeZone($pincode);
+        
+        switch ($zone) {
+            case 'local':
+                return '1-2 business days';
+            case 'regional':
+                return '2-3 business days';
+            case 'metro':
+                return '3-4 business days';
+            case 'remote':
+                return '5-7 business days';
+            default:
+                return '3-5 business days';
+        }
     }
 }
 
