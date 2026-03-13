@@ -254,7 +254,11 @@
                             <div class="list-product-checkout"></div>
                             <div class="ship-block py-5 flex justify-between border-b border-line">
                                 <div class="text-title">Shipping</div>
-                                <div class="text-title">Free</div>
+                                <div class="text-title shipping-charge">₹0.00</div>
+                            </div>
+                            <div class="delivery-estimate py-3 flex justify-between border-b border-line" style="display: none;">
+                                <div class="text-secondary">Estimated Delivery</div>
+                                <div class="text-secondary estimated-delivery">-</div>
                             </div>
                             <div class="total-cart-block pt-5 flex justify-between">
                                 <div class="heading5">Total</div>
@@ -348,18 +352,8 @@ function validateForm() {
         payment_method: document.querySelector('input[name="payment"]:checked')?.value || 'test'
     };
     
-    // Get shipping cost
-    const shippingRadio = document.querySelector('input[name="ship"]:checked');
-    let shipping = 0;
-    if (shippingRadio) {
-        if (shippingRadio.value) {
-            shipping = parseFloat(shippingRadio.value.replace(/[{}]/g, '')) || 0;
-        } else if (shippingRadio.id === 'local') {
-            shipping = 30;
-        } else if (shippingRadio.id === 'flat') {
-            shipping = 40;
-        }
-    }
+    // Get shipping cost from the calculated shipping charge
+    let shipping = currentShippingCharge || 0;
     
     // Discount removed from UI - use 0
     const discount = 0;
@@ -708,6 +702,178 @@ if (testBtn) {
         setTimeout(function() {
             initCheckout();
         }, 100);
+    });
+
+    // Global variables to track cart and shipping
+    let cartSubtotal = 0;
+    let currentShippingCharge = 0;
+
+    // Initialize cart subtotal from loaded cart items
+    function initializeCartSubtotal() {
+        // Get cart subtotal from API or calculate from loaded items
+        fetch('/api/cart', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const items = data.data.items || data.data || [];
+                cartSubtotal = 0;
+                items.forEach(item => {
+                    const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
+                    cartSubtotal += price * item.quantity;
+                });
+                updateTotalDisplay();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading cart:', error);
+        });
+    }
+
+    // Update total display
+    function updateTotalDisplay() {
+        const totalElement = document.querySelector('.total-cart');
+        if (totalElement) {
+            const finalTotal = cartSubtotal + currentShippingCharge;
+            totalElement.textContent = '₹' + finalTotal.toFixed(2);
+        }
+    }
+
+    // Shipping calculation
+    function calculateShipping() {
+        const postalCode = document.getElementById('postal')?.value?.trim();
+        if (!postalCode || postalCode.length !== 6) {
+            // Reset shipping if postal code is invalid
+            currentShippingCharge = 0;
+            const shippingElement = document.querySelector('.shipping-charge');
+            if (shippingElement) {
+                shippingElement.textContent = '₹0.00';
+            }
+            
+            // Hide delivery estimate
+            const deliveryBlock = document.querySelector('.delivery-estimate');
+            if (deliveryBlock) {
+                deliveryBlock.style.display = 'none';
+            }
+            
+            updateTotalDisplay();
+            return;
+        }
+
+        // Show loading state
+        const shippingElement = document.querySelector('.shipping-charge');
+        if (shippingElement) {
+            shippingElement.textContent = 'Calculating...';
+        }
+
+        fetch('/api/shipping/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({
+                pincode: postalCode,
+                weight: 1,
+                cod_amount: 0
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                currentShippingCharge = parseFloat(data.data.shipping_charge) || 0;
+                const shippingElement = document.querySelector('.shipping-charge');
+                if (shippingElement) {
+                    shippingElement.textContent = currentShippingCharge > 0 ? '₹' + currentShippingCharge.toFixed(2) : 'Free';
+                }
+                
+                // Show delivery estimate
+                const deliveryBlock = document.querySelector('.delivery-estimate');
+                const deliveryElement = document.querySelector('.estimated-delivery');
+                if (data.data.estimated_delivery && deliveryElement && deliveryBlock) {
+                    deliveryElement.textContent = data.data.estimated_delivery;
+                    deliveryBlock.style.display = 'flex';
+                } else if (deliveryBlock) {
+                    deliveryBlock.style.display = 'none';
+                }
+                
+                updateTotalDisplay();
+            } else {
+                // Handle error - set to fallback shipping
+                currentShippingCharge = 50; // Fallback shipping charge
+                const shippingElement = document.querySelector('.shipping-charge');
+                if (shippingElement) {
+                    shippingElement.textContent = '₹' + currentShippingCharge.toFixed(2);
+                }
+                
+                // Show fallback delivery estimate
+                const deliveryBlock = document.querySelector('.delivery-estimate');
+                const deliveryElement = document.querySelector('.estimated-delivery');
+                if (deliveryElement && deliveryBlock) {
+                    deliveryElement.textContent = '3-5 business days';
+                    deliveryBlock.style.display = 'flex';
+                }
+                
+                updateTotalDisplay();
+            }
+        })
+        .catch(error => {
+            console.error('Shipping calculation error:', error);
+            // Fallback to default shipping
+            currentShippingCharge = 50;
+            const shippingElement = document.querySelector('.shipping-charge');
+            if (shippingElement) {
+                shippingElement.textContent = '₹' + currentShippingCharge.toFixed(2);
+            }
+            
+            // Show fallback delivery estimate
+            const deliveryBlock = document.querySelector('.delivery-estimate');
+            const deliveryElement = document.querySelector('.estimated-delivery');
+            if (deliveryElement && deliveryBlock) {
+                deliveryElement.textContent = '3-5 business days';
+                deliveryBlock.style.display = 'flex';
+            }
+            
+            updateTotalDisplay();
+        });
+    }
+
+    // Add event listener for postal code changes
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize cart subtotal
+        initializeCartSubtotal();
+        
+        const postalInput = document.getElementById('postal');
+        if (postalInput) {
+            postalInput.addEventListener('blur', calculateShipping);
+            postalInput.addEventListener('input', function() {
+                if (this.value.length === 6) {
+                    calculateShipping();
+                }
+            });
+        }
+
+        // Also calculate shipping when other address fields change (optional)
+        const addressFields = ['region', 'country', 'city'];
+        addressFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('change', function() {
+                    // Recalculate shipping if postal code is already entered
+                    const postalCode = document.getElementById('postal')?.value?.trim();
+                    if (postalCode && postalCode.length === 6) {
+                        calculateShipping();
+                    }
+                });
+            }
+        });
     });
 })();
 </script>

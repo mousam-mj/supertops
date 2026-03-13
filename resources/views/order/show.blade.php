@@ -53,7 +53,35 @@
                         <div class="caption1 text-secondary mb-1">Payment</div>
                         <div class="body1 font-semibold capitalize">{{ $order->payment_method ?? '—' }}</div>
                     </div>
+                    @if($order->shiprocket_awb || $order->delhivery_waybill)
+                        <div>
+                            <div class="caption1 text-secondary mb-1">Tracking Number</div>
+                            <div class="body1 font-semibold">{{ $order->shiprocket_awb ?? $order->delhivery_waybill }}</div>
+                        </div>
+                        <div>
+                            <div class="caption1 text-secondary mb-1">Courier</div>
+                            <div class="body1 font-semibold">{{ $order->shiprocket_awb ? 'Shiprocket' : 'Delhivery' }}</div>
+                        </div>
+                    @endif
                 </div>
+                
+                @if($order->shiprocket_awb || $order->delhivery_waybill)
+                    <div class="border-t border-line pt-6 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="heading6">Delivery Tracking</h2>
+                            <button class="button-main py-2 px-4" onclick="trackUserOrder()">
+                                <i class="ph ph-map-pin mr-2"></i>Track Order
+                            </button>
+                        </div>
+                        <div id="tracking-info" class="hidden">
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="text-center">
+                                    <div class="loading-spinner mb-2">Loading tracking information...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
                 <div class="border-t border-line pt-6">
                     <h2 class="heading6 mb-4">Items</h2>
                     <div class="space-y-4">
@@ -111,3 +139,101 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function trackUserOrder() {
+    const orderId = {{ $order->id }};
+    const provider = '{{ $order->shiprocket_awb ? "shiprocket" : "delhivery" }}';
+    const trackingInfo = document.getElementById('tracking-info');
+    
+    // Show loading
+    trackingInfo.classList.remove('hidden');
+    trackingInfo.innerHTML = `
+        <div class="bg-gray-50 rounded-xl p-4">
+            <div class="text-center">
+                <div class="loading-spinner mb-2">Loading tracking information...</div>
+            </div>
+        </div>
+    `;
+    
+    fetch(`/api/admin/orders/${orderId}/${provider}/track`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data) {
+            displayTrackingInfo(data.data);
+        } else {
+            trackingInfo.innerHTML = `
+                <div class="bg-red-50 rounded-xl p-4">
+                    <div class="text-center text-red-600">
+                        Failed to load tracking information. Please try again later.
+                    </div>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        trackingInfo.innerHTML = `
+            <div class="bg-red-50 rounded-xl p-4">
+                <div class="text-center text-red-600">
+                    Error loading tracking information. Please try again later.
+                </div>
+            </div>
+        `;
+    });
+}
+
+function displayTrackingInfo(trackingData) {
+    const trackingInfo = document.getElementById('tracking-info');
+    let html = `
+        <div class="bg-gray-50 rounded-xl p-4">
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <div class="caption1 text-secondary mb-1">Tracking Number</div>
+                    <div class="body1 font-semibold">${trackingData.awb || trackingData.waybill || 'N/A'}</div>
+                </div>
+                <div>
+                    <div class="caption1 text-secondary mb-1">Current Status</div>
+                    <div class="body1 font-semibold">${trackingData.current_status || 'In Transit'}</div>
+                </div>
+            </div>
+            <div class="border-t border-line pt-4">
+                <h3 class="body1 font-semibold mb-3">Tracking History</h3>
+                <div class="space-y-3">
+    `;
+    
+    if (trackingData.tracking_data && trackingData.tracking_data.length > 0) {
+        trackingData.tracking_data.forEach((track, index) => {
+            html += `
+                <div class="flex gap-4 ${index === 0 ? 'text-black' : 'text-secondary'}">
+                    <div class="flex-shrink-0 w-3 h-3 rounded-full ${index === 0 ? 'bg-green-500' : 'bg-gray-300'} mt-1"></div>
+                    <div class="flex-1">
+                        <div class="body2 font-semibold">${track.status || track.activity || 'Status Update'}</div>
+                        <div class="caption1 text-secondary">${track.location || track.remarks || ''}</div>
+                        <div class="caption1 text-secondary">${track.date || track.timestamp || ''}</div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        html += '<div class="text-secondary caption1">No detailed tracking information available.</div>';
+    }
+    
+    html += `
+                </div>
+            </div>
+        </div>
+    `;
+    
+    trackingInfo.innerHTML = html;
+}
+</script>
+@endpush
