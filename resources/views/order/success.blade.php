@@ -51,6 +51,12 @@
                                 <span>Shipping</span>
                                 <span>{{ $shippingCharge > 0 ? '₹' . number_format((float) $shippingCharge, 2) : 'Free' }}</span>
                             </div>
+                            @if(isset($codCharge) && $codCharge > 0)
+                                <div class="flex justify-between">
+                                    <span>COD Charges</span>
+                                    <span>₹{{ number_format((float) $codCharge, 2) }}</span>
+                                </div>
+                            @endif
                             @if($couponDiscount > 0)
                                 <div class="flex justify-between text-green-600"><span>Discount</span><span>-₹{{ number_format((float) $couponDiscount, 2) }}</span></div>
                             @endif

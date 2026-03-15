@@ -7,6 +7,69 @@
     /* Checkout - compact breadcrumb, reduce gap */
     .checkout-page-content .checkout-breadcrumb { min-height: unset !important; }
     .checkout-page-content .checkout-breadcrumb .breadcrumb-main { min-height: unset !important; }
+    
+    /* Payment Section Styling */
+    .payment-card {
+        transition: all 0.3s ease;
+    }
+    
+    .payment-card:hover {
+        border-color: #000;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .payment-method-card:hover {
+        background-color: #f9fafb;
+        transform: translateY(-1px);
+    }
+    
+    /* Payment Button Container */
+    #payment-button-container {
+        transition: all 0.3s ease;
+    }
+    
+    /* Payment Button Styling */
+    #place-order-btn {
+        position: relative !important;
+        z-index: 10 !important;
+        transform: none !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+    
+    #place-order-btn:not(:disabled) {
+        background: linear-gradient(135deg, #000 0%, #333 100%) !important;
+        cursor: pointer !important;
+    }
+    
+    #place-order-btn:not(:disabled):hover {
+        background: linear-gradient(135deg, #333 0%, #000 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+    }
+    
+    #place-order-btn:disabled {
+        background-color: #9ca3af !important;
+        cursor: not-allowed !important;
+    }
+    
+    /* Button text visibility */
+    #place-order-btn span, #place-order-btn i {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: white !important;
+    }
+    
+    /* Payment section disabled state */
+    #payment-section[style*="opacity: 0.5"] {
+        filter: grayscale(0.5);
+    }
+    
+    #payment-section[style*="opacity: 1"] {
+        filter: none;
+        border-color: #000 !important;
+    }
 </style>
 <div class="page-content checkout-page-content">
     <!-- Menu bar (mobile) -->
@@ -130,119 +193,117 @@
                                         </div>
                                     </div>
                                     <div class="payment-block md:mt-10 mt-6">
-                                        <div class="heading5">Choose payment Option:</div>
-                                        <div class="list-payment mt-5">
-                                            <div class="type bg-surface p-5 border border-line rounded-lg">
-                                                <input class="cursor-pointer" type="radio" id="test" name="payment" value="test" checked />
-                                                <label class="text-button pl-2 cursor-pointer" for="test">Test Payment (For Testing)</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">This is a test payment method. No actual payment will be processed. Order will be placed successfully.</div>
-                                                </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="credit" name="payment" value="razorpay" />
-                                                <label class="text-button pl-2 cursor-pointer" for="credit">Credit Card</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberCredit">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberCredit" placeholder="ex.1234567290" />
+                                        <div class="heading5 mb-6">Payment Method</div>
+                                        <div class="list-payment">
+                                            <!-- Razorpay Online Payment - Theme Based Design -->
+                                            <div class="payment-card bg-white border-2 border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300" id="payment-section" style="opacity: 0.5; pointer-events: none;">
+                                                <input type="hidden" name="payment" value="razorpay" />
+                                                
+                                                <!-- Header -->
+                                                <div class="p-6 border-b border-gray-100">
+                                                    <div class="flex items-center justify-between">
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center">
+                                                                <i class="ph ph-credit-card text-white text-xl"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="font-bold text-lg text-gray-900">Pay Online</h3>
+                                                                <p class="text-sm text-gray-500">Secure & Instant Payment</p>
+                                                            </div>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateCredit">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateCredit" name="date" />
+                                                        <div class="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full">
+                                                            <i class="ph ph-shield-check text-green-600"></i>
+                                                            <span class="text-xs font-semibold text-green-700">SECURED</span>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvCredit">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvCredit" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveCredit" name="save" />
-                                                        <label class="text-button" for="saveCredit">Save Card Details</label>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="delivery" name="payment" value="cod" />
-                                                <label class="text-button pl-2 cursor-pointer" for="delivery">Cash on delivery</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberDelivery">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberDelivery" placeholder="ex.1234567290" />
+                                                
+                                                <!-- Content -->
+                                                <div class="p-6">
+                                                    <p class="text-gray-600 mb-6 leading-relaxed">
+                                                        Pay securely using Credit Card, Debit Card, Net Banking, UPI (GPay/PhonePe/Paytm), or Digital Wallets.
+                                                    </p>
+                                                    
+                                                    <!-- Payment Methods Grid -->
+                                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
+                                                            <i class="ph ph-credit-card text-2xl text-gray-700 mb-2 block"></i>
+                                                            <span class="text-xs font-medium text-gray-700">Cards</span>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateDelivery">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateDelivery" name="date" />
+                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
+                                                            <i class="ph ph-bank text-2xl text-gray-700 mb-2 block"></i>
+                                                            <span class="text-xs font-medium text-gray-700">Net Banking</span>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvDelivery">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvDelivery" placeholder="****" />
+                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
+                                                            <i class="ph ph-device-mobile text-2xl text-gray-700 mb-2 block"></i>
+                                                            <span class="text-xs font-medium text-gray-700">UPI</span>
+                                                        </div>
+                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
+                                                            <i class="ph ph-wallet text-2xl text-gray-700 mb-2 block"></i>
+                                                            <span class="text-xs font-medium text-gray-700">Wallets</span>
                                                         </div>
                                                     </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveDelivery" name="save" />
-                                                        <label class="text-button" for="saveDelivery">Save Card Details</label>
+                                                    
+                                                    <!-- Razorpay Branding -->
+                                                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                                                        <div class="flex items-center gap-3">
+                                                            <img src="https://cdn.razorpay.com/static/assets/logo/payment.svg" alt="Razorpay" class="h-8">
+                                                            <span class="text-sm font-medium text-gray-600">Powered by Razorpay</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-1">
+                                                            <i class="ph ph-lock text-gray-500"></i>
+                                                            <span class="text-xs text-gray-500">SSL Encrypted</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="apple" name="payment" />
-                                                <label class="text-button pl-2 cursor-pointer" for="apple">Apple Pay</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberApple">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberApple" placeholder="ex.1234567290" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="dateApple">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="dateApple" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvApple">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvApple" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="saveApple" name="save" />
-                                                        <label class="text-button" for="saveApple">Save Card Details</label>
+                                                
+                                                <!-- Footer -->
+                                                <div class="px-6 pb-6">
+                                                    <div class="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                                                        <i class="ph ph-truck text-blue-600"></i>
+                                                        <span>Delivery charges calculated based on your pincode</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="type bg-surface p-5 border border-line rounded-lg mt-5">
-                                                <input class="cursor-pointer" type="radio" id="paypal" name="payment" />
-                                                <label class="text-button pl-2 cursor-pointer" for="paypal">PayPal</label>
-                                                <div class="infor">
-                                                    <div class="text-on-surface-variant1 pt-4">Make your payment directly into our bank account. Your order will not be shipped until the funds have cleared in our account.</div>
-                                                    <div class="row">
-                                                        <div class="col-12 mt-3">
-                                                            <label for="cardNumberPaypal">Card Numbers</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="cardNumberPaypal" placeholder="ex.1234567290" />
+                                            
+                                            <!-- Payment Availability Message -->
+                                            <div id="payment-message" class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                                <div class="flex items-start gap-3">
+                                                    <i class="ph ph-info text-amber-600 text-lg mt-0.5"></i>
+                                                    <div class="flex-1">
+                                                        <h4 class="font-medium text-amber-800 mb-2">Complete Your Address</h4>
+                                                        <p class="text-sm text-amber-700 mb-3">Please fill your complete address and enter pincode to calculate delivery charges before payment.</p>
+                                                        
+                                                        <!-- Progress Steps -->
+                                                        <div class="space-y-2">
+                                                            <div class="flex items-center gap-2 text-sm" id="step-address">
+                                                                <i class="ph ph-circle text-amber-600"></i>
+                                                                <span class="text-amber-700">Fill complete address details</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-2 text-sm" id="step-pincode">
+                                                                <i class="ph ph-circle text-amber-600"></i>
+                                                                <span class="text-amber-700">Enter 6-digit pincode</span>
+                                                            </div>
+                                                            <div class="flex items-center gap-2 text-sm" id="step-delivery">
+                                                                <i class="ph ph-circle text-amber-600"></i>
+                                                                <span class="text-amber-700">Calculate delivery charges</span>
+                                                            </div>
                                                         </div>
-                                                        <div class="mt-3">
-                                                            <label for="datePaypal">Date</label>
-                                                            <input class="border-line px-4 py-3 w-full rounded mt-2" type="date" id="datePaypal" name="date" />
-                                                        </div>
-                                                        <div class="mt-3">
-                                                            <label for="ccvPaypal">CCV</label>
-                                                            <input class="cursor-pointer border-line px-4 py-3 w-full rounded mt-2" type="text" id="ccvPaypal" placeholder="****" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mt-3">
-                                                        <input type="checkbox" id="savePaypal" name="save" />
-                                                        <label class="text-button" for="savePaypal">Save Card Details</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="block-button md:mt-10 mt-6">
-                                        <button type="button" class="button-main w-full py-3 px-5 bg-black text-white hover:bg-gray-800 rounded-lg transition-colors duration-300 uppercase tracking-wider cursor-pointer" id="place-order-btn" style="display: block !important; visibility: visible !important;" onclick="console.log('Button clicked via inline'); if(typeof window.handleOrderSubmission === 'function'){window.handleOrderSubmission(event);}else{console.error('handleOrderSubmission not available');} return false;">Place Order</button>
+                                    <div class="block-button md:mt-10 mt-6" id="payment-button-container" style="display: none;">
+                                        <button type="button" class="payment-button w-full py-4 px-6 bg-gray-400 text-white rounded-xl font-bold text-lg cursor-not-allowed border-none outline-none transition-all duration-300" id="place-order-btn" disabled onclick="console.log('Button clicked via inline'); if(typeof window.handleOrderSubmission === 'function'){window.handleOrderSubmission(event);}else{console.error('handleOrderSubmission not available');} return false;">
+                                            <div class="flex items-center justify-center gap-4">
+                                                <i class="ph ph-credit-card text-xl" id="btn-icon"></i>
+                                                <div class="flex flex-col items-center">
+                                                    <span id="btn-text" class="font-bold text-base">Pay Securely</span>
+                                                    <span id="btn-amount" class="font-bold text-sm opacity-90 mt-1">₹0.00</span>
+                                                </div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -318,7 +379,11 @@ function validateForm() {
     }
     
     console.log('handleOrderSubmission called');
-    
+    console.log('Current variables:', {
+        cartSubtotal: window.cartSubtotal || cartSubtotal,
+        currentShippingCharge: window.currentShippingCharge || currentShippingCharge
+    });
+
     const submitBtn = document.getElementById('place-order-btn');
     if (!submitBtn) {
         console.error('Place Order button not found');
@@ -349,11 +414,14 @@ function validateForm() {
         state: document.getElementById('country').value,
         pincode: document.getElementById('postal').value.trim(),
         notes: document.getElementById('note')?.value.trim() || '',
-        payment_method: document.querySelector('input[name="payment"]:checked')?.value || 'test'
+        payment_method: 'razorpay'
     };
     
     // Get shipping cost from the calculated shipping charge
     let shipping = currentShippingCharge || 0;
+    
+    // No COD charges - only online payment
+    let codCharge = 0;
     
     // Discount removed from UI - use 0
     const discount = 0;
@@ -373,7 +441,8 @@ function validateForm() {
                 shipping_address_id: selectedAddressId,
                 payment_method: formData.payment_method,
                 notes: formData.notes,
-                shipping_charge: shipping
+                shipping_charge: shipping,
+                cod_charge: codCharge
             };
         } else {
             orderData = {
@@ -389,7 +458,8 @@ function validateForm() {
                 },
                 payment_method: formData.payment_method,
                 notes: formData.notes,
-                shipping_charge: shipping
+                shipping_charge: shipping,
+                cod_charge: codCharge
             };
         }
     } else {
@@ -407,7 +477,8 @@ function validateForm() {
             },
             payment_method: formData.payment_method || 'test',
             notes: formData.notes || '',
-            shipping_charge: shipping || 0
+            shipping_charge: shipping || 0,
+            cod_charge: codCharge
         };
         
         console.log('Guest order data:', orderData);
@@ -419,6 +490,12 @@ function validateForm() {
     // Log the data being sent
     console.log('Order data being sent:', orderData);
     console.log('Form data collected:', formData);
+    
+    // Handle Razorpay payment
+    if (formData.payment_method === 'razorpay') {
+        handleRazorpayPayment(orderData);
+        return;
+    }
     
     // Submit order (web route uses session auth so logged-in user is recognized)
     fetch('/place-order', {
@@ -505,15 +582,26 @@ if (testBtn) {
     function initCheckout() {
         console.log('Initializing checkout form...');
         
-        // Ensure Place Order button is visible
+        // Style Place Order button but keep it hidden initially
         const placeOrderBtn = document.getElementById('place-order-btn');
+        const paymentButtonContainer = document.getElementById('payment-button-container');
+        
         if (placeOrderBtn) {
-            placeOrderBtn.style.display = 'block';
-            placeOrderBtn.style.visibility = 'visible';
-            placeOrderBtn.style.opacity = '1';
-            console.log('Place Order button found');
+            placeOrderBtn.style.background = 'linear-gradient(135deg, #000 0%, #333 100%)';
+            placeOrderBtn.style.color = 'white';
+            placeOrderBtn.style.border = 'none';
+            placeOrderBtn.style.outline = 'none';
+            placeOrderBtn.style.borderRadius = '12px';
+            placeOrderBtn.style.boxShadow = '0 4px 14px rgba(0,0,0,0.1)';
+            console.log('Place Order button found and styled');
         } else {
             console.error('Place Order button not found!');
+        }
+        
+        // Keep payment button hidden initially
+        if (paymentButtonContainer) {
+            paymentButtonContainer.style.display = 'none';
+            console.log('Payment button container hidden initially');
         }
         
         // Handle checkout form submission
@@ -707,6 +795,12 @@ if (testBtn) {
     // Global variables to track cart and shipping
     let cartSubtotal = 0;
     let currentShippingCharge = 0;
+    let isAddressComplete = false;
+    let isDeliveryCalculated = false;
+    
+    // Ensure variables are globally accessible
+    window.cartSubtotal = cartSubtotal;
+    window.currentShippingCharge = currentShippingCharge;
 
     // Initialize cart subtotal from loaded cart items
     function initializeCartSubtotal() {
@@ -727,7 +821,45 @@ if (testBtn) {
                     const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
                     cartSubtotal += price * item.quantity;
                 });
+                
+                // Update global variables
+                window.cartSubtotal = cartSubtotal;
+                window.currentShippingCharge = currentShippingCharge;
+                
                 updateTotalDisplay();
+                
+                // Initialize payment button for Razorpay
+                setTimeout(() => {
+                    const finalTotal = (window.cartSubtotal || cartSubtotal || 100) + (window.currentShippingCharge || currentShippingCharge || 0);
+                    updatePaymentButton('razorpay', finalTotal);
+                    
+                    // Ensure button elements are visible
+                    const btnText = document.getElementById('btn-text');
+                    const btnAmount = document.getElementById('btn-amount');
+                    const btnIcon = document.getElementById('btn-icon');
+                    
+                    if (btnText) {
+                        btnText.style.display = 'inline-block';
+                        btnText.style.visibility = 'visible';
+                        btnText.style.opacity = '1';
+                        btnText.textContent = 'Pay Securely';
+                    }
+                    
+                    if (btnAmount) {
+                        btnAmount.style.display = 'inline-block';
+                        btnAmount.style.visibility = 'visible';
+                        btnAmount.style.opacity = '1';
+                        btnAmount.textContent = '₹' + finalTotal.toFixed(2);
+                    }
+                    
+                    if (btnIcon) {
+                        btnIcon.style.display = 'inline-block';
+                        btnIcon.style.visibility = 'visible';
+                        btnIcon.style.opacity = '1';
+                    }
+                    
+                    console.log('Button initialized with total:', finalTotal);
+                }, 100);
             }
         })
         .catch(error => {
@@ -738,9 +870,182 @@ if (testBtn) {
     // Update total display
     function updateTotalDisplay() {
         const totalElement = document.querySelector('.total-cart');
+        const finalTotal = (window.cartSubtotal || cartSubtotal || 100) + (window.currentShippingCharge || currentShippingCharge || 0); // No COD charges
+        
         if (totalElement) {
-            const finalTotal = cartSubtotal + currentShippingCharge;
             totalElement.textContent = '₹' + finalTotal.toFixed(2);
+        }
+        
+        // Update button text and amount for Razorpay only
+        updatePaymentButton('razorpay', finalTotal);
+        
+        console.log('Total display updated:', finalTotal);
+    }
+
+    // Check if address is complete
+    function checkAddressCompletion() {
+        const firstName = document.getElementById('firstName')?.value?.trim();
+        const lastName = document.getElementById('lastName')?.value?.trim();
+        const email = document.getElementById('email')?.value?.trim();
+        const phone = document.getElementById('phoneNumber')?.value?.trim();
+        const address = document.getElementById('apartment')?.value?.trim();
+        const city = document.getElementById('city')?.value?.trim();
+        const state = document.getElementById('country')?.value?.trim();
+        const pincode = document.getElementById('postal')?.value?.trim();
+        
+        const isBasicComplete = firstName && lastName && email && phone && address && city && state;
+        const isPincodeValid = pincode && pincode.length === 6;
+        const isComplete = isBasicComplete && isPincodeValid;
+        
+        // Update progress indicators
+        updateProgressSteps(isBasicComplete, isPincodeValid);
+        
+        if (isComplete !== isAddressComplete) {
+            isAddressComplete = isComplete;
+            updatePaymentAvailability();
+        }
+        
+        return isComplete;
+    }
+
+    // Update progress step indicators
+    function updateProgressSteps(isBasicComplete, isPincodeValid) {
+        const stepAddress = document.getElementById('step-address');
+        const stepPincode = document.getElementById('step-pincode');
+        const stepDelivery = document.getElementById('step-delivery');
+        
+        // Step 1: Address completion
+        if (stepAddress) {
+            const icon = stepAddress.querySelector('i');
+            const text = stepAddress.querySelector('span');
+            if (isBasicComplete) {
+                icon.className = 'ph ph-check-circle text-green-600';
+                text.className = 'text-green-700 line-through';
+            } else {
+                icon.className = 'ph ph-circle text-amber-600';
+                text.className = 'text-amber-700';
+            }
+        }
+        
+        // Step 2: Pincode validation
+        if (stepPincode) {
+            const icon = stepPincode.querySelector('i');
+            const text = stepPincode.querySelector('span');
+            if (isPincodeValid) {
+                icon.className = 'ph ph-check-circle text-green-600';
+                text.className = 'text-green-700 line-through';
+            } else {
+                icon.className = 'ph ph-circle text-amber-600';
+                text.className = 'text-amber-700';
+            }
+        }
+        
+        // Step 3: Delivery calculation
+        if (stepDelivery) {
+            const icon = stepDelivery.querySelector('i');
+            const text = stepDelivery.querySelector('span');
+            if (isDeliveryCalculated) {
+                icon.className = 'ph ph-check-circle text-green-600';
+                text.className = 'text-green-700 line-through';
+            } else {
+                icon.className = 'ph ph-circle text-amber-600';
+                text.className = 'text-amber-700';
+            }
+        }
+    }
+
+    // Update payment availability based on address and delivery calculation
+    function updatePaymentAvailability() {
+        const paymentSection = document.getElementById('payment-section');
+        const paymentMessage = document.getElementById('payment-message');
+        const paymentButtonContainer = document.getElementById('payment-button-container');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnIcon = document.getElementById('btn-icon');
+        
+        if (isAddressComplete && isDeliveryCalculated) {
+            // Enable payment
+            if (paymentSection) {
+                paymentSection.style.opacity = '1';
+                paymentSection.style.pointerEvents = 'auto';
+                paymentSection.style.borderColor = '#000';
+            }
+            
+            if (paymentMessage) {
+                paymentMessage.style.display = 'none';
+            }
+            
+            // Show payment button
+            if (paymentButtonContainer) {
+                paymentButtonContainer.style.display = 'block';
+            }
+            
+            if (placeOrderBtn) {
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                placeOrderBtn.classList.add('cursor-pointer');
+                placeOrderBtn.style.background = 'linear-gradient(135deg, #000 0%, #333 100%)';
+            }
+            
+            if (btnText) btnText.textContent = 'Pay Securely';
+            if (btnIcon) btnIcon.className = 'ph ph-credit-card text-xl';
+            
+            updateTotalDisplay();
+        } else {
+            // Disable payment
+            if (paymentSection) {
+                paymentSection.style.opacity = '0.5';
+                paymentSection.style.pointerEvents = 'none';
+                paymentSection.style.borderColor = '#d1d5db';
+            }
+            
+            if (paymentMessage) {
+                paymentMessage.style.display = 'block';
+                const messageText = paymentMessage.querySelector('p');
+                if (messageText) {
+                    if (!isAddressComplete) {
+                        messageText.textContent = 'Please fill your complete address and enter pincode to calculate delivery charges before payment.';
+                    } else if (!isDeliveryCalculated) {
+                        messageText.textContent = 'Calculating delivery charges... Please wait.';
+                    }
+                }
+            }
+            
+            // Hide payment button
+            if (paymentButtonContainer) {
+                paymentButtonContainer.style.display = 'none';
+            }
+        }
+    }
+
+    // Update payment button for Razorpay only
+    function updatePaymentButton(paymentMethod, totalAmount) {
+        const btnText = document.getElementById('btn-text');
+        const btnAmount = document.getElementById('btn-amount');
+        const btnIcon = document.getElementById('btn-icon');
+        
+        if (!btnText || !btnAmount || !btnIcon) return;
+        
+        // Always Razorpay payment
+        btnText.textContent = 'Pay Securely';
+        btnAmount.textContent = '₹' + totalAmount.toFixed(2);
+        btnIcon.className = 'ph ph-credit-card text-xl';
+        
+        // Ensure all elements are visible
+        [btnText, btnAmount, btnIcon].forEach(el => {
+            if (el) {
+                el.style.display = 'inline-block';
+                el.style.visibility = 'visible';
+                el.style.opacity = '1';
+                el.style.color = 'white';
+            }
+        });
+        
+        // Special styling for amount
+        if (btnAmount) {
+            btnAmount.style.backgroundColor = 'rgba(255,255,255,0.3)';
+            btnAmount.style.color = '#1e40af';
+            btnAmount.style.fontWeight = 'bold';
         }
     }
 
@@ -750,17 +1055,21 @@ if (testBtn) {
         if (!postalCode || postalCode.length !== 6) {
             // Reset shipping if postal code is invalid
             currentShippingCharge = 0;
+            window.currentShippingCharge = currentShippingCharge;
+            isDeliveryCalculated = false;
+            
             const shippingElement = document.querySelector('.shipping-charge');
             if (shippingElement) {
                 shippingElement.textContent = '₹0.00';
             }
-            
+
             // Hide delivery estimate
             const deliveryBlock = document.querySelector('.delivery-estimate');
             if (deliveryBlock) {
                 deliveryBlock.style.display = 'none';
             }
-            
+
+            updatePaymentAvailability();
             updateTotalDisplay();
             return;
         }
@@ -789,6 +1098,7 @@ if (testBtn) {
         .then(data => {
             if (data.success && data.data) {
                 currentShippingCharge = parseFloat(data.data.shipping_charge) || 0;
+                window.currentShippingCharge = currentShippingCharge;
                 const shippingElement = document.querySelector('.shipping-charge');
                 if (shippingElement) {
                     shippingElement.textContent = currentShippingCharge > 0 ? '₹' + currentShippingCharge.toFixed(2) : 'Free';
@@ -804,10 +1114,14 @@ if (testBtn) {
                     deliveryBlock.style.display = 'none';
                 }
                 
+                // Mark delivery as calculated
+                isDeliveryCalculated = true;
+                updatePaymentAvailability();
                 updateTotalDisplay();
             } else {
                 // Handle error - set to fallback shipping
                 currentShippingCharge = 50; // Fallback shipping charge
+                window.currentShippingCharge = currentShippingCharge;
                 const shippingElement = document.querySelector('.shipping-charge');
                 if (shippingElement) {
                     shippingElement.textContent = '₹' + currentShippingCharge.toFixed(2);
@@ -828,6 +1142,7 @@ if (testBtn) {
             console.error('Shipping calculation error:', error);
             // Fallback to default shipping
             currentShippingCharge = 50;
+            window.currentShippingCharge = currentShippingCharge;
             const shippingElement = document.querySelector('.shipping-charge');
             if (shippingElement) {
                 shippingElement.textContent = '₹' + currentShippingCharge.toFixed(2);
@@ -850,22 +1165,36 @@ if (testBtn) {
         // Initialize cart subtotal
         initializeCartSubtotal();
         
+        // Initialize payment button after a short delay to ensure cart is loaded
+        setTimeout(() => {
+            checkAddressCompletion();
+            updatePaymentAvailability();
+            updateTotalDisplay();
+        }, 1000);
+        
         const postalInput = document.getElementById('postal');
         if (postalInput) {
             postalInput.addEventListener('blur', calculateShipping);
             postalInput.addEventListener('input', function() {
+                checkAddressCompletion();
                 if (this.value.length === 6) {
                     calculateShipping();
+                } else {
+                    isDeliveryCalculated = false;
+                    updatePaymentAvailability();
                 }
             });
         }
 
-        // Also calculate shipping when other address fields change (optional)
-        const addressFields = ['region', 'country', 'city'];
+        // Add listeners to all address fields
+        const addressFields = ['firstName', 'lastName', 'email', 'phoneNumber', 'apartment', 'city', 'country', 'region'];
         addressFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
+                field.addEventListener('input', checkAddressCompletion);
+                field.addEventListener('blur', checkAddressCompletion);
                 field.addEventListener('change', function() {
+                    checkAddressCompletion();
                     // Recalculate shipping if postal code is already entered
                     const postalCode = document.getElementById('postal')?.value?.trim();
                     if (postalCode && postalCode.length === 6) {
@@ -874,6 +1203,153 @@ if (testBtn) {
                 });
             }
         });
+
+        // No payment method change handling needed - only Razorpay available
     });
+
+    // Razorpay Payment Handler - Make it global
+    window.handleRazorpayPayment = function(orderData) {
+        let codCharge = 0; // No COD charges for online payment only
+        
+        // Use global variables with fallbacks
+        const currentCartSubtotal = window.cartSubtotal || cartSubtotal || 100; // Fallback to 100 if cart not loaded
+        const currentShipping = window.currentShippingCharge || currentShippingCharge || 0;
+        const totalAmount = currentCartSubtotal + currentShipping;
+        
+        console.log('Payment calculation:', {
+            cartSubtotal: currentCartSubtotal,
+            shipping: currentShipping,
+            total: totalAmount
+        });
+
+        // Test Razorpay configuration first
+        fetch('/api/payments/test-config', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(configData => {
+            console.log('Razorpay config test:', configData);
+        })
+        .catch(error => {
+            console.error('Config test failed:', error);
+        });
+
+        // First create Razorpay order
+        fetch('/api/payments/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                amount: totalAmount, // Amount in rupees - backend will convert to paise
+                currency: 'INR'
+            })
+        })
+        .then(response => {
+            console.log('Payment API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Payment API response data:', data);
+            if (data.success && data.data) {
+                // Initialize Razorpay checkout
+                const options = {
+                    key: data.data.key || '{{ config("services.razorpay.key") }}',
+                    amount: data.data.amount, // Amount in paise
+                    currency: data.data.currency,
+                    name: 'Perch Bottle',
+                    description: 'Order Payment',
+                    order_id: data.data.id,
+                    handler: function(response) {
+                        // Payment successful, now place the order
+                        orderData.razorpay_order_id = data.data.id;
+                        orderData.razorpay_payment_id = response.razorpay_payment_id;
+                        orderData.razorpay_signature = response.razorpay_signature;
+                        
+                        // Place order with payment details
+                        placeOrderAfterPayment(orderData);
+                    },
+                    prefill: {
+                        name: (orderData.shipping_address?.first_name || '') + ' ' + (orderData.shipping_address?.last_name || ''),
+                        email: orderData.shipping_address?.email || '',
+                        contact: orderData.shipping_address?.phone || ''
+                    },
+                    theme: {
+                        color: '#000000'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('Razorpay payment cancelled');
+                            // Re-enable the submit button
+                            const submitBtn = document.querySelector('.place-order-btn');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Place Order';
+                            }
+                        }
+                    }
+                };
+                
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } else {
+                alert('Failed to initialize payment: ' + (data.message || 'Unknown error'));
+                resetSubmitButton();
+            }
+        })
+        .catch(error => {
+            console.error('Error creating Razorpay order:', error);
+            alert('Error initializing payment. Please try again.');
+            resetSubmitButton();
+        });
+    }
+
+    function placeOrderAfterPayment(orderData) {
+        fetch('/place-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data && data.data.id) {
+                console.log('Order placed successfully after payment');
+                window.location.href = `/order-success/${data.data.id}`;
+            } else {
+                alert('Payment successful but order creation failed. Please contact support.');
+                console.error('Order creation failed:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order after payment:', error);
+            alert('Payment successful but order creation failed. Please contact support.');
+        });
+    }
+
+    function resetSubmitButton() {
+        const submitBtn = document.querySelector('.place-order-btn');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Place Order';
+        }
+    }
+
 })();
 </script>

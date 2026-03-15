@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
     <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" />
     <link rel="stylesheet" href="{{ asset('dist/output-tailwind.css') }}" />
+    
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         /* Cart, Wishlist & Search icons - ensure clickable */
         .header-menu .cart-icon,

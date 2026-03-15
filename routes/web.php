@@ -163,7 +163,17 @@ Route::get('/test/hello', function() {
 // Order Success Route
 Route::get('/order-success/{id}', function($id) {
     $order = \App\Models\Order::with('items')->findOrFail($id);
-    return view('order.success', compact('order'));
+    
+    // Calculate order breakdown
+    $subtotal = $order->items->sum(function($item) {
+        return $item->price * $item->quantity;
+    });
+    $shippingCharge = $order->shipping_charge ?? 0;
+    $codCharge = $order->cod_charge ?? 0;
+    $couponDiscount = $order->coupon_discount ?? 0;
+    $totalAmount = $order->total_amount;
+    
+    return view('order.success', compact('order', 'subtotal', 'shippingCharge', 'codCharge', 'couponDiscount', 'totalAmount'));
 })->name('order.success');
 
 // Forgot Password Route

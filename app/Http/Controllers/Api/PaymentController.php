@@ -27,15 +27,31 @@ class PaymentController extends Controller
      */
     public function createOrder(Request $request)
     {
+        Log::info('Payment order creation request:', $request->all());
+        
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'currency' => 'nullable|string|size:3',
         ]);
 
+        $key = config('services.razorpay.key');
+        $secret = config('services.razorpay.secret');
+        
+        Log::info('Razorpay config:', [
+            'key_exists' => !empty($key),
+            'secret_exists' => !empty($secret),
+            'key_prefix' => substr($key, 0, 10) . '...'
+        ]);
+
         if (!$this->razorpay) {
+            Log::error('Razorpay API not initialized', [
+                'key' => $key,
+                'secret_length' => strlen($secret ?? '')
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Razorpay is not configured',
+                'message' => 'Razorpay is not configured properly',
             ], 500);
         }
 
@@ -52,8 +68,10 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'id' => $razorpayOrder['id'], // Razorpay expects 'id' not 'order_id'
                     'order_id' => $razorpayOrder['id'],
-                    'amount' => $request->amount,
+                    'amount' => $amount, // Amount in paise for Razorpay
+                    'amount_rupees' => $request->amount, // Amount in rupees for display
                     'currency' => $currency,
                     'key' => config('services.razorpay.key'),
                 ],
@@ -122,6 +140,25 @@ class PaymentController extends Controller
                 'message' => 'Payment verification failed: ' . $e->getMessage(),
             ], 400);
         }
+    }
+
+    /**
+     * Test Razorpay configuration
+     */
+    public function testConfig()
+    {
+        $key = config('services.razorpay.key');
+        $secret = config('services.razorpay.secret');
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'key_configured' => !empty($key),
+                'secret_configured' => !empty($secret),
+                'key_prefix' => $key ? substr($key, 0, 15) . '...' : null,
+                'razorpay_initialized' => !is_null($this->razorpay)
+            ]
+        ]);
     }
 
     /**
