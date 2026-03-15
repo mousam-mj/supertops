@@ -77,12 +77,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
-
-    // Payment
-    Route::post('/payments/create-order', [PaymentController::class, 'createOrder']);
-    Route::post('/payments/verify', [PaymentController::class, 'verify']);
-    Route::get('/payments/status/{orderId}', [PaymentController::class, 'status']);
 });
+
+// Payment Routes (Public - No Authentication Required)
+Route::get('/payments/test-config', [PaymentController::class, 'testConfig']);
+Route::post('/payments/create-order', [PaymentController::class, 'createOrder']);
+Route::post('/payments/verify', [PaymentController::class, 'verify']);
+Route::get('/payments/status/{orderId}', [PaymentController::class, 'status']);
 
 // Admin Routes (Requires Authentication + Admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {

@@ -17,6 +17,7 @@ class Order extends Model
         'status_locked',
         'total_amount',
         'shipping_charge',
+        'cod_charge',
         'coupon_id',
         'coupon_discount',
         'shipping_address',

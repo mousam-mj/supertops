@@ -46,6 +46,7 @@ class OrderController extends Controller
             'razorpay_payment_id' => 'nullable|string',
             'razorpay_signature' => 'nullable|string',
             'shipping_charge' => 'nullable|numeric|min:0',
+            'cod_charge' => 'nullable|numeric|min:0',
         ];
 
         // Determine if this is a logged-in user request or guest request
@@ -332,10 +333,11 @@ class OrderController extends Controller
             }
         }
 
-        // Calculate shipping
+        // Calculate shipping and COD charges
         $shippingCharge = $request->shipping_charge ?? 0; // Use provided shipping charge or default to 0
+        $codCharge = $request->cod_charge ?? 0; // Use provided COD charge or default to 0
 
-        $totalAmount = $subtotal - $couponDiscount + $shippingCharge;
+        $totalAmount = $subtotal - $couponDiscount + $shippingCharge + $codCharge;
 
         DB::beginTransaction();
         try {
@@ -351,6 +353,7 @@ class OrderController extends Controller
                 'shipping' => $shippingCharge, // Add shipping field (legacy)
                 'total' => $totalAmount, // Add total field (legacy)
                 'shipping_charge' => $shippingCharge,
+                'cod_charge' => $codCharge,
                 'coupon_id' => $coupon?->id,
                 'coupon_discount' => $couponDiscount,
                 'shipping_address' => is_array($shippingAddress) ? json_encode($shippingAddress) : $shippingAddress,
