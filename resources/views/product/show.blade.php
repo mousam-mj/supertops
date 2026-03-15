@@ -285,6 +285,30 @@
                                     </div>
                                     <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
                                 </div>
+                                <!-- Pincode Checker -->
+                                <div class="pincode-checker mt-5 p-4 border border-line rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="ph ph-map-pin text-xl"></i>
+                                        <div class="text-title">Check Delivery</div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <input type="text" 
+                                               id="pincode-input" 
+                                               placeholder="Enter pincode" 
+                                               class="flex-1 px-3 py-2 border border-line rounded-lg text-sm"
+                                               maxlength="6"
+                                               pattern="[0-9]{6}">
+                                        <button type="button" 
+                                                id="check-pincode-btn" 
+                                                class="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors">
+                                            Check
+                                        </button>
+                                    </div>
+                                    <div id="delivery-info" class="mt-3 hidden">
+                                        <!-- Delivery information will be populated here -->
+                                    </div>
+                                </div>
+
                                 <div class="button-block mt-5">
                                     <button type="button" class="buy-it-now-btn button-main w-full text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
                                 </div>
@@ -299,10 +323,10 @@
                                             <div class="text-title">Ask A Question</div>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-1 mt-3">
+                                    <div class="flex items-center gap-1 mt-3" id="estimated-delivery-info">
                                         <i class="ph ph-timer body1"></i>
                                         <div class="text-title">Estimated Delivery:</div>
-                                        <div class="text-secondary">14 January - 18 January</div>
+                                        <div class="text-secondary" id="delivery-estimate-text">Enter pincode to check delivery</div>
                                     </div>
                                     <div class="flex items-center gap-1 mt-3">
                                         <i class="ph ph-eye body1"></i>
@@ -1310,4 +1334,127 @@
             initImagePopup();
         }
     })();
+
+    // Pincode Checker Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const pincodeInput = document.getElementById('pincode-input');
+        const checkBtn = document.getElementById('check-pincode-btn');
+        const deliveryInfo = document.getElementById('delivery-info');
+        const deliveryEstimateText = document.getElementById('delivery-estimate-text');
+
+        // Check pincode on button click
+        checkBtn.addEventListener('click', checkDelivery);
+
+        // Check pincode on Enter key
+        pincodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkDelivery();
+            }
+        });
+
+        // Auto-check when 6 digits are entered
+        pincodeInput.addEventListener('input', function() {
+            const pincode = this.value.trim();
+            if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
+                setTimeout(() => checkDelivery(), 500); // Small delay for better UX
+            }
+        });
+
+        function checkDelivery() {
+            const pincode = pincodeInput.value.trim();
+            
+            // Validate pincode
+            if (!pincode || pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
+                showDeliveryError('Please enter a valid 6-digit pincode');
+                return;
+            }
+
+            // Show loading state
+            checkBtn.textContent = 'Checking...';
+            checkBtn.disabled = true;
+            deliveryInfo.classList.add('hidden');
+
+            // Make API call
+            fetch('/api/shipping/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    pincode: pincode,
+                    weight: 1,
+                    cod_amount: 0
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    showDeliverySuccess(data.data);
+                } else {
+                    showDeliveryError(data.message || 'Delivery not available to this pincode');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showDeliveryError('Error checking delivery. Please try again.');
+            })
+            .finally(() => {
+                checkBtn.textContent = 'Check';
+                checkBtn.disabled = false;
+            });
+        }
+
+        function showDeliverySuccess(deliveryData) {
+            const shippingCharge = parseFloat(deliveryData.shipping_charge) || 0;
+            const estimatedDelivery = deliveryData.estimated_delivery || '3-5 business days';
+            const provider = deliveryData.provider || 'Standard';
+
+            deliveryInfo.innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="ph ph-check-circle text-green-600"></i>
+                        <span class="text-green-800 font-semibold text-sm">Delivery Available</span>
+                    </div>
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Shipping Charge:</span>
+                            <span class="font-semibold">${shippingCharge > 0 ? '₹' + shippingCharge.toFixed(2) : 'Free'}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Estimated Delivery:</span>
+                            <span class="font-semibold">${estimatedDelivery}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Service Provider:</span>
+                            <span class="font-semibold capitalize">${provider}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Update the main delivery estimate
+            deliveryEstimateText.textContent = estimatedDelivery;
+            
+            deliveryInfo.classList.remove('hidden');
+        }
+
+        function showDeliveryError(message) {
+            deliveryInfo.innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-x-circle text-red-600"></i>
+                        <span class="text-red-800 text-sm">${message}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Reset the main delivery estimate
+            deliveryEstimateText.textContent = 'Enter pincode to check delivery';
+            
+            deliveryInfo.classList.remove('hidden');
+        }
+    });
 </script>
