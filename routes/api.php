@@ -85,6 +85,28 @@ Route::post('/payments/create-order', [PaymentController::class, 'createOrder'])
 Route::post('/payments/verify', [PaymentController::class, 'verify']);
 Route::get('/payments/status/{orderId}', [PaymentController::class, 'status']);
 
+// OTP Routes (Public - No Authentication Required)
+Route::post('/otp/send', [App\Http\Controllers\Api\OTPController::class, 'sendOTP']);
+Route::post('/otp/verify', [App\Http\Controllers\Api\OTPController::class, 'verifyOTP']);
+Route::post('/otp/resend', [App\Http\Controllers\Api\OTPController::class, 'resendOTP']);
+Route::get('/otp/check-verification', [App\Http\Controllers\Api\OTPController::class, 'checkVerification']);
+
+// Mobile Authentication Routes (Public)
+Route::post('/auth/register/send-otp', [App\Http\Controllers\Api\MobileAuthController::class, 'sendRegistrationOTP']);
+Route::post('/auth/register/verify', [App\Http\Controllers\Api\MobileAuthController::class, 'verifyAndRegister']);
+Route::post('/auth/login/send-otp', [App\Http\Controllers\Api\MobileAuthController::class, 'sendLoginOTP']);
+Route::post('/auth/login/verify', [App\Http\Controllers\Api\MobileAuthController::class, 'verifyAndLogin']);
+Route::post('/auth/login/resend-otp', [App\Http\Controllers\Api\MobileAuthController::class, 'resendLoginOTP']);
+
+// Test route for debugging
+Route::post('/auth/test', function(Request $request) {
+    return response()->json([
+        'success' => true,
+        'message' => 'Test endpoint working',
+        'received_data' => $request->all()
+    ]);
+});
+
 // Admin Routes (Requires Authentication + Admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Dashboard

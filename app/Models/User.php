@@ -27,6 +27,7 @@ class User extends Authenticatable
         'is_admin',
         'role',
         'email_verification_token',
+        'phone_verified_at',
         'email_verified_at',
         'gender',
         'date_of_birth',

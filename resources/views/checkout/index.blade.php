@@ -288,6 +288,13 @@
                                                                 <i class="ph ph-circle text-amber-600"></i>
                                                                 <span class="text-amber-700">Calculate delivery charges</span>
                                                             </div>
+                                                            <div class="flex items-center gap-2 text-sm" id="step-mobile">
+                                                                <i class="ph ph-circle text-amber-600"></i>
+                                                                <span class="text-amber-700">Verify mobile number</span>
+                                                                <button type="button" id="verify-mobile-btn" class="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 hidden">
+                                                                    Verify
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -331,6 +338,45 @@
         </div>
     </div>
 </div>
+<!-- OTP Verification Modal -->
+<div id="otp-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-md w-full p-6 relative">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-device-mobile text-blue-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Verify Your Mobile Number</h3>
+            <p class="text-gray-600">We've sent a 6-digit OTP to</p>
+            <p class="font-semibold text-gray-900" id="otp-mobile-display">+91 XXXXXXXXXX</p>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Enter OTP</label>
+            <input type="text" id="otp-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-lg font-mono tracking-widest" placeholder="000000" maxlength="6">
+            <div id="otp-error" class="text-red-600 text-sm mt-2 hidden"></div>
+        </div>
+        
+        <div class="flex gap-3 mb-4">
+            <button type="button" id="verify-otp-btn" class="flex-1 bg-black text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+                Verify OTP
+            </button>
+            <button type="button" id="resend-otp-btn" class="px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
+                Resend
+            </button>
+        </div>
+        
+        <div class="text-center">
+            <button type="button" id="close-otp-modal" class="text-gray-500 hover:text-gray-700">
+                Cancel
+            </button>
+        </div>
+        
+        <div id="otp-timer" class="text-center text-sm text-gray-500 mt-4">
+            Resend OTP in <span id="timer-count">60</span> seconds
+        </div>
+    </div>
+</div>
+
 @endsection
 @section('scripts')
 <script>
@@ -797,6 +843,8 @@ if (testBtn) {
     let currentShippingCharge = 0;
     let isAddressComplete = false;
     let isDeliveryCalculated = false;
+    let isMobileVerified = false;
+    let currentMobile = '';
     
     // Ensure variables are globally accessible
     window.cartSubtotal = cartSubtotal;
@@ -897,6 +945,12 @@ if (testBtn) {
         const isPincodeValid = pincode && pincode.length === 6;
         const isComplete = isBasicComplete && isPincodeValid;
         
+        // Check if mobile number changed and needs verification
+        if (phone && phone !== currentMobile && phone.length === 10) {
+            isMobileVerified = false;
+            currentMobile = phone;
+        }
+        
         // Update progress indicators
         updateProgressSteps(isBasicComplete, isPincodeValid);
         
@@ -913,6 +967,8 @@ if (testBtn) {
         const stepAddress = document.getElementById('step-address');
         const stepPincode = document.getElementById('step-pincode');
         const stepDelivery = document.getElementById('step-delivery');
+        const stepMobile = document.getElementById('step-mobile');
+        const verifyMobileBtn = document.getElementById('verify-mobile-btn');
         
         // Step 1: Address completion
         if (stepAddress) {
@@ -952,6 +1008,26 @@ if (testBtn) {
                 text.className = 'text-amber-700';
             }
         }
+        
+        // Step 4: Mobile verification
+        if (stepMobile) {
+            const icon = stepMobile.querySelector('i');
+            const text = stepMobile.querySelector('span');
+            
+            if (isMobileVerified) {
+                icon.className = 'ph ph-check-circle text-green-600';
+                text.className = 'text-green-700 line-through';
+                verifyMobileBtn.classList.add('hidden');
+            } else if (isBasicComplete && currentMobile && currentMobile.length === 10) {
+                icon.className = 'ph ph-circle text-blue-600';
+                text.className = 'text-blue-700';
+                verifyMobileBtn.classList.remove('hidden');
+            } else {
+                icon.className = 'ph ph-circle text-amber-600';
+                text.className = 'text-amber-700';
+                verifyMobileBtn.classList.add('hidden');
+            }
+        }
     }
 
     // Update payment availability based on address and delivery calculation
@@ -963,7 +1039,7 @@ if (testBtn) {
         const btnText = document.getElementById('btn-text');
         const btnIcon = document.getElementById('btn-icon');
         
-        if (isAddressComplete && isDeliveryCalculated) {
+        if (isAddressComplete && isDeliveryCalculated && isMobileVerified) {
             // Enable payment
             if (paymentSection) {
                 paymentSection.style.opacity = '1';
@@ -1205,6 +1281,176 @@ if (testBtn) {
         });
 
         // No payment method change handling needed - only Razorpay available
+    });
+
+    // OTP Verification Functions
+    function showOTPModal(mobile) {
+        currentMobile = mobile;
+        document.getElementById('otp-mobile-display').textContent = `+91 ${mobile}`;
+        document.getElementById('otp-modal').classList.remove('hidden');
+        document.getElementById('otp-input').focus();
+        startOTPTimer();
+    }
+
+    function hideOTPModal() {
+        document.getElementById('otp-modal').classList.add('hidden');
+        document.getElementById('otp-input').value = '';
+        document.getElementById('otp-error').classList.add('hidden');
+    }
+
+    function sendOTP(mobile) {
+        return fetch('/api/otp/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+            body: JSON.stringify({ mobile: mobile })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('OTP sent successfully:', data);
+                showOTPModal(mobile);
+            } else {
+                alert('Failed to send OTP: ' + data.message);
+            }
+            return data;
+        })
+        .catch(error => {
+            console.error('Error sending OTP:', error);
+            alert('Failed to send OTP. Please try again.');
+        });
+    }
+
+    function verifyOTP(mobile, otp) {
+        return fetch('/api/otp/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+            body: JSON.stringify({ 
+                mobile: mobile,
+                otp: otp 
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                isMobileVerified = true;
+                hideOTPModal();
+                updatePaymentAvailability();
+                alert('Mobile number verified successfully!');
+            } else {
+                document.getElementById('otp-error').textContent = data.message;
+                document.getElementById('otp-error').classList.remove('hidden');
+            }
+            return data;
+        })
+        .catch(error => {
+            console.error('Error verifying OTP:', error);
+            document.getElementById('otp-error').textContent = 'Verification failed. Please try again.';
+            document.getElementById('otp-error').classList.remove('hidden');
+        });
+    }
+
+    function resendOTP(mobile) {
+        return fetch('/api/otp/resend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+            body: JSON.stringify({ mobile: mobile })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                startOTPTimer();
+                alert('OTP resent successfully!');
+            } else {
+                alert('Failed to resend OTP: ' + data.message);
+            }
+            return data;
+        })
+        .catch(error => {
+            console.error('Error resending OTP:', error);
+            alert('Failed to resend OTP. Please try again.');
+        });
+    }
+
+    function startOTPTimer() {
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer-count');
+        const resendBtn = document.getElementById('resend-otp-btn');
+        
+        resendBtn.disabled = true;
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                resendBtn.disabled = false;
+                document.getElementById('otp-timer').innerHTML = 'You can now resend OTP';
+            }
+        }, 1000);
+    }
+
+    // OTP Modal Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close modal
+        document.getElementById('close-otp-modal').addEventListener('click', hideOTPModal);
+        
+        // Verify OTP button
+        document.getElementById('verify-otp-btn').addEventListener('click', function() {
+            const otp = document.getElementById('otp-input').value.trim();
+            if (otp.length === 6) {
+                verifyOTP(currentMobile, otp);
+            } else {
+                document.getElementById('otp-error').textContent = 'Please enter a valid 6-digit OTP';
+                document.getElementById('otp-error').classList.remove('hidden');
+            }
+        });
+        
+        // Resend OTP button
+        document.getElementById('resend-otp-btn').addEventListener('click', function() {
+            if (!this.disabled) {
+                resendOTP(currentMobile);
+            }
+        });
+        
+        // OTP input auto-verify on 6 digits
+        document.getElementById('otp-input').addEventListener('input', function() {
+            const otp = this.value.trim();
+            if (otp.length === 6) {
+                verifyOTP(currentMobile, otp);
+            }
+            // Clear error on input
+            document.getElementById('otp-error').classList.add('hidden');
+        });
+        
+        // Close modal on outside click
+        document.getElementById('otp-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideOTPModal();
+            }
+        });
+        
+        // Verify mobile button
+        document.getElementById('verify-mobile-btn').addEventListener('click', function() {
+            const mobile = document.getElementById('phoneNumber')?.value?.trim();
+            if (mobile && mobile.length === 10) {
+                sendOTP(mobile);
+            } else {
+                alert('Please enter a valid 10-digit mobile number');
+            }
+        });
     });
 
     // Razorpay Payment Handler - Make it global
