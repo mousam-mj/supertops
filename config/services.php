@@ -60,4 +60,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'msg91' => [
+        'auth_key' => env('MSG91_AUTH_KEY'),
+        'sender_id' => env('MSG91_SENDER_ID', 'PRCBOT'),
+        'route' => env('MSG91_ROUTE', 4),
+        'country' => env('MSG91_COUNTRY', 91),
+        'template_id' => env('MSG91_TEMPLATE_ID'),
+    ],
+
 ];

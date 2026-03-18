@@ -578,55 +578,129 @@
                 <div class="content-main flex gap-y-8 max-md:flex-col">
                     <div class="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r border-line">
                         <div class="heading4">Login</div>
-                        @if(session('success'))
-                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-4" role="alert">
-                                {{ session('success') }}
+                        
+                        <!-- Error Message Container -->
+                        <div id="login-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-warning-circle text-red-600 text-lg mt-0.5"></i>
+                                <div class="flex-1">
+                                    <div class="font-medium text-red-800 mb-2" id="login-error-title">Login Failed</div>
+                                    <div class="text-sm text-red-700" id="login-error-message"></div>
+                                </div>
                             </div>
-                        @endif
-                        @if(session('error'))
-                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4" role="alert">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-            @if($errors->any())
-                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4" role="alert">
-                                <ul class="list-disc list-inside">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-                        <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mt-4 text-sm" role="alert">
-                            <div class="font-semibold mb-2">Default Login Credentials:</div>
-                            <div><strong>User:</strong> john@example.com / password</div>
-                            <div><strong>Admin:</strong> admin@test.com / password</div>
-                </div>
+                        </div>
+                        
+                        <!-- Helper Message -->
+                        <div id="login-helper" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-700">
+                                <i class="ph ph-info mr-1"></i>
+                                Enter your email address and password to login to your account.
+                            </p>
+                        </div>
 
-                        <form method="POST" action="{{ route('login.submit') }}" class="md:mt-7 mt-4">
+                        <!-- Mobile OTP Login Form (Hidden by default) -->
+                        <form id="mobile-login-form" class="md:mt-7 mt-4 hidden">
+                            @csrf
+                            
+                            <!-- Mobile Number Input -->
+                            <div class="mobile-input">
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+91</span>
+                                    <input 
+                                        class="border-line px-4 pt-3 pb-3 w-full rounded-lg pl-12" 
+                                        id="mobile" 
+                                        name="mobile" 
+                                        type="tel" 
+                                        placeholder="Enter 10-digit mobile number *" 
+                                        pattern="[6-9][0-9]{9}"
+                                        maxlength="10"
+                                        required 
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- OTP Section (Initially Hidden) -->
+                            <div id="otp-section" class="mt-5 hidden">
+                                <div class="otp-input">
+                                    <input 
+                                        class="border-line px-4 pt-3 pb-3 w-full rounded-lg text-center tracking-widest font-mono text-lg" 
+                                        id="otp" 
+                                        name="otp" 
+                                        type="text" 
+                                        placeholder="Enter 6-digit OTP" 
+                                        maxlength="6"
+                                        pattern="[0-9]{6}"
+                                    />
+                                </div>
+                                
+                                <!-- OTP Timer and Resend -->
+                                <div class="flex items-center justify-between mt-3">
+                                    <div class="text-sm text-gray-600">
+                                        <span id="otp-timer"></span>
+                                    </div>
+                                    <button type="button" id="resend-otp" class="text-sm font-semibold text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed" disabled>
+                                        Resend OTP
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="block-button md:mt-7 mt-4">
+                                <button 
+                                    type="submit" 
+                                    id="login-submit-btn"
+                                    class="button-main text-white border-0 w-full text-center block" 
+                                    style="background-color: #B09FE6; transition: background-color 0.3s ease;" 
+                                    onmouseover="this.style.backgroundColor='#9B8AD0'" 
+                                    onmouseout="this.style.backgroundColor='#B09FE6'"
+                                >
+                                    Send OTP
+                                </button>
+                            </div>
+                            
+                            <!-- Admin Login Link -->
+                            <div class="block-button mt-3">
+                                <a href="{{ route('admin.login') }}" class="button-main bg-white text-black border border-black w-full text-center block">Admin Login</a>
+                            </div>
+                            
+                            <!-- Toggle Login Method -->
+                            <div class="text-center mt-4">
+                                <button type="button" id="toggle-login-method" class="text-sm text-gray-600 hover:text-gray-800 underline">
+                                    Use Email & Password Login Instead
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Email/Password Login Form -->
+                        <form id="email-login-form" class="md:mt-7 mt-4" method="POST" action="{{ route('login.submit') }}">
                             @csrf
                             <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('home')) }}" />
+                            
                             <div class="email">
-                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg @error('email') border-red-500 @enderror" id="email" name="email" type="email" placeholder="Username or email address *" value="{{ old('email') }}" required />
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" name="email" type="email" placeholder="Email Address *" required />
                             </div>
                             <div class="pass mt-5">
-                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg @error('password') border-red-500 @enderror" id="password" name="password" type="password" placeholder="Password *" required />
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password" name="password" type="password" placeholder="Password *" required />
                             </div>
                             <div class="flex items-center justify-between mt-5">
                                 <div class="flex items-center">
                                     <div class="block-input">
-                                        <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} />
+                                        <input type="checkbox" name="remember" id="remember" />
                                         <i class="ph-fill ph-check-square icon-checkbox text-2xl"></i>
                                     </div>
                                     <label for="remember" class="pl-2 cursor-pointer">Remember me</label>
                                 </div>
-                                <a href="{{ route('forgot-password') }}" class="font-semibold hover:underline">Forgot Your Password? </a>
+                                <a href="{{ route('forgot-password') }}" class="font-semibold hover:underline">Forgot Password?</a>
                             </div>
                             <div class="block-button md:mt-7 mt-4">
                                 <button type="submit" class="button-main text-white border-0 w-full text-center block" style="background-color: #B09FE6; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#9B8AD0'" onmouseout="this.style.backgroundColor='#B09FE6'">Login</button>
                             </div>
-                            <div class="block-button mt-3">
-                                <a href="{{ route('admin.login') }}" class="button-main bg-white text-black border border-black w-full text-center block">Admin Login</a>
+                            
+                            <!-- Toggle to Mobile Login (Optional) -->
+                            <div class="text-center mt-4">
+                                <button type="button" id="toggle-mobile-login" class="text-sm text-gray-600 hover:text-gray-800 underline">
+                                    Use Mobile OTP Login Instead
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -642,4 +716,366 @@
                 </div>
             </div>
         </div>
+        
+        <script>
+        // Login form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileLoginForm = document.getElementById('mobile-login-form');
+            const emailLoginForm = document.getElementById('email-login-form');
+            const mobileInput = document.getElementById('mobile');
+            const otpSection = document.getElementById('otp-section');
+            const otpInput = document.getElementById('otp');
+            const submitBtn = document.getElementById('login-submit-btn');
+            const resendBtn = document.getElementById('resend-otp');
+            const otpTimer = document.getElementById('otp-timer');
+            const toggleLoginMethod = document.getElementById('toggle-login-method');
+            const toggleMobileLogin = document.getElementById('toggle-mobile-login');
+            
+            let isOtpSent = false;
+            let timerInterval = null;
+            let timerSeconds = 0;
+            
+            // Helper functions for error display
+            function showLoginError(message, title = 'Login Failed') {
+                const errorContainer = document.getElementById('login-error');
+                const errorTitle = document.getElementById('login-error-title');
+                const errorMessage = document.getElementById('login-error-message');
+                const helperMessage = document.getElementById('login-helper');
+                
+                if (errorTitle) errorTitle.textContent = title;
+                if (errorMessage) errorMessage.textContent = message;
+                if (errorContainer) {
+                    errorContainer.classList.remove('hidden');
+                    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                if (helperMessage) helperMessage.classList.add('hidden');
+            }
+            
+            function clearLoginError() {
+                const errorContainer = document.getElementById('login-error');
+                const helperMessage = document.getElementById('login-helper');
+                
+                if (errorContainer) errorContainer.classList.add('hidden');
+                if (helperMessage) helperMessage.classList.remove('hidden');
+            }
+            
+            // Clear errors when user starts typing
+            mobileInput.addEventListener('input', function() {
+                clearLoginError();
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 10) value = value.slice(0, 10);
+                this.value = value;
+            });
+            
+            // Clear errors when user types OTP
+            otpInput.addEventListener('input', function() {
+                clearLoginError();
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 6) value = value.slice(0, 6);
+                this.value = value;
+                
+                if (value.length === 6) {
+                    setTimeout(() => {
+                        mobileLoginForm.dispatchEvent(new Event('submit'));
+                    }, 500);
+                }
+            });
+            
+            // Start OTP timer
+            function startTimer() {
+                timerSeconds = 60;
+                resendBtn.disabled = true;
+                
+                timerInterval = setInterval(function() {
+                    if (timerSeconds > 0) {
+                        const minutes = Math.floor(timerSeconds / 60);
+                        const seconds = timerSeconds % 60;
+                        otpTimer.textContent = `Resend OTP in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                        timerSeconds--;
+                    } else {
+                        clearInterval(timerInterval);
+                        otpTimer.textContent = '';
+                        resendBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+            
+            // Toggle between login methods
+            if (toggleLoginMethod) {
+                toggleLoginMethod.addEventListener('click', function() {
+                    mobileLoginForm.classList.add('hidden');
+                    emailLoginForm.classList.remove('hidden');
+                    clearLoginError();
+                });
+            }
+            
+            if (toggleMobileLogin) {
+                toggleMobileLogin.addEventListener('click', function() {
+                    emailLoginForm.classList.add('hidden');
+                    mobileLoginForm.classList.remove('hidden');
+                    clearLoginError();
+                });
+            }
+            
+            // Form submission
+            mobileLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!isOtpSent) {
+                    // Send OTP
+                    const mobile = mobileInput.value.trim();
+                    
+                    if (!mobile || mobile.length !== 10) {
+                        alert('Please enter a valid 10-digit mobile number');
+                        return;
+                    }
+                    
+                    if (!mobile.match(/^[6-9][0-9]{9}$/)) {
+                        alert('Mobile number must start with 6, 7, 8, or 9');
+                        return;
+                    }
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Sending OTP...';
+                    
+                    fetch('/api/auth/login/send-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify({ mobile: mobile })
+                    })
+                    .then(response => {
+                        console.log('Send OTP Response status:', response.status);
+                        console.log('Send OTP Response ok:', response.ok);
+                        
+                        // Check if response has the json method
+                        if (typeof response.json === 'function') {
+                            return response.json();
+                        } else if (typeof response.text === 'function') {
+                            return response.text().then(text => {
+                                console.log('Send OTP Raw response:', text);
+                                try {
+                                    return JSON.parse(text);
+                                } catch (e) {
+                                    console.error('Send OTP Failed to parse JSON:', e);
+                                    throw new Error('Invalid JSON response: ' + text);
+                                }
+                            });
+                        } else {
+                            console.log('Send OTP Direct response:', response);
+                            return response;
+                        }
+                    })
+                    .then(data => {
+                        console.log('Send OTP data:', data);
+                        if (data && data.success) {
+                            isOtpSent = true;
+                            otpSection.classList.remove('hidden');
+                            mobileInput.disabled = true;
+                            submitBtn.textContent = 'Verify & Login';
+                            startTimer();
+                            otpInput.focus();
+                            // Show OTP in development mode for testing
+                            if (data.otp) {
+                                console.log('Development OTP:', data.otp);
+                                // Auto-fill OTP for development/testing
+                                otpInput.value = data.otp;
+                        // Auto-submit after a short delay
+                        setTimeout(() => {
+                            mobileLoginForm.dispatchEvent(new Event('submit'));
+                        }, 1000);
+                            }
+                        } else {
+                            let errorMessage = data.message || 'Failed to send OTP';
+                            
+                            if (data.errors) {
+                                console.log('Login errors:', data.errors);
+                            }
+                            
+                            // Show user-friendly message in UI
+                            if (errorMessage.includes('not registered')) {
+                                showLoginError('This mobile number is not registered. Please register first.', 'Account Not Found');
+                            } else {
+                                showLoginError(errorMessage);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Send OTP Error:', error);
+                        alert('Failed to send OTP. Please try again.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                    });
+                    
+                } else {
+                    // Verify OTP and login
+                    const mobile = mobileInput.value.trim();
+                    const otp = otpInput.value.trim();
+                    
+                    if (!otp || otp.length !== 6) {
+                        alert('Please enter a valid 6-digit OTP');
+                        return;
+                    }
+                    
+                    if (!otp.match(/^[0-9]{6}$/)) {
+                        alert('OTP must be 6 digits');
+                        return;
+                    }
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Verifying...';
+                    
+                    fetch('/api/auth/login/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify({ 
+                            mobile: mobile,
+                            otp: otp 
+                        })
+                    })
+                    .then(response => {
+                        console.log('Verify OTP Response status:', response.status);
+                        console.log('Verify OTP Response ok:', response.ok);
+                        
+                        // Check if response has the json method
+                        if (typeof response.json === 'function') {
+                            return response.json();
+                        } else if (typeof response.text === 'function') {
+                            return response.text().then(text => {
+                                console.log('Verify OTP Raw response:', text);
+                                try {
+                                    return JSON.parse(text);
+                                } catch (e) {
+                                    console.error('Verify OTP Failed to parse JSON:', e);
+                                    throw new Error('Invalid JSON response: ' + text);
+                                }
+                            });
+                        } else {
+                            console.log('Verify OTP Direct response:', response);
+                            return response;
+                        }
+                    })
+                    .then(data => {
+                        console.log('Verify OTP data:', data);
+                        if (data && data.success) {
+                            // Store token if provided
+                            if (data.token) {
+                                localStorage.setItem('auth_token', data.token);
+                                console.log('Token stored:', data.token);
+                            }
+                            
+                            // Store user data if provided
+                            if (data.user) {
+                                localStorage.setItem('user_data', JSON.stringify(data.user));
+                                console.log('User data stored:', data.user);
+                            }
+                            
+                            // Use redirect URL from response or default to home
+                            const redirectUrl = data.redirect_url || '{{ route("home") }}';
+                            
+                            // Force a full page reload to update session
+                            window.location.replace(redirectUrl);
+                        } else {
+                            let errorMessage = data.message || 'Login failed';
+                            
+                            if (data.errors) {
+                                console.log('Verification errors:', data.errors);
+                            }
+                            
+                            // Show error in UI
+                            if (errorMessage.includes('expired') || errorMessage.includes('invalid')) {
+                                showLoginError('The OTP you entered is invalid or has expired. Please request a new OTP.', 'Invalid OTP');
+                            } else {
+                                showLoginError(errorMessage);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Verify OTP Error:', error);
+                        alert('Failed to verify OTP. Please try again.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Verify & Login';
+                    });
+                }
+            });
+            
+            // Resend OTP
+            resendBtn.addEventListener('click', function() {
+                const mobile = mobileInput.value.trim();
+                
+                if (!mobile || mobile.length !== 10) {
+                    alert('Please enter a valid mobile number');
+                    return;
+                }
+                
+                resendBtn.disabled = true;
+                const originalText = resendBtn.textContent;
+                resendBtn.textContent = 'Sending...';
+                
+                fetch('/api/auth/login/resend-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({ mobile: mobile })
+                })
+                .then(response => {
+                    console.log('Resend OTP Response status:', response.status);
+                    console.log('Resend OTP Response ok:', response.ok);
+                    
+                    // Check if response has the json method
+                    if (typeof response.json === 'function') {
+                        return response.json();
+                    } else if (typeof response.text === 'function') {
+                        return response.text().then(text => {
+                            console.log('Resend OTP Raw response:', text);
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('Resend OTP Failed to parse JSON:', e);
+                                throw new Error('Invalid JSON response: ' + text);
+                            }
+                        });
+                    } else {
+                        console.log('Resend OTP Direct response:', response);
+                        return response;
+                    }
+                })
+                .then(data => {
+                    console.log('Resend OTP data:', data);
+                    if (data && data.success) {
+                        alert('OTP sent successfully!');
+                        startTimer();
+                        otpInput.value = '';
+                        otpInput.focus();
+                    } else {
+                        alert(data.message || 'Failed to resend OTP. Please try again.');
+                        resendBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Resend OTP Error:', error);
+                    alert('Failed to resend OTP. Please try again.');
+                    resendBtn.disabled = false;
+                })
+                .finally(() => {
+                    resendBtn.textContent = originalText;
+                });
+            });
+            
+            // This is now handled in the input validation above
+        });
+        </script>
 @endsection
