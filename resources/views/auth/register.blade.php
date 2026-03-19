@@ -590,6 +590,23 @@
                             </div>
                         </div>
                         
+                        <!-- Popup Modal for Errors/Success -->
+                        <div id="message-popup-overlay" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+                            <div id="message-popup" class="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-auto">
+                                <div class="p-6">
+                                    <div id="popup-icon" class="w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
+                                        <i class="ph text-2xl"></i>
+                                    </div>
+                                    <h3 id="popup-title" class="text-lg font-bold text-center mb-2"></h3>
+                                    <p id="popup-message" class="text-sm text-gray-600 text-center mb-4"></p>
+                                    <div id="popup-details" class="hidden mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-700"></div>
+                                    <button type="button" id="popup-close-btn" class="w-full py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <form class="md:mt-7 mt-4" id="mobile-register-form">
                             <div class="name">
                                 <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="reg-name" type="text" placeholder="Full Name *" required />
@@ -826,6 +843,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function showPopupMessage(title, message, type = 'error', details = null) {
+        const overlay = document.getElementById('message-popup-overlay');
+        const iconBox = document.getElementById('popup-icon');
+        const icon = iconBox.querySelector('i');
+        const titleEl = document.getElementById('popup-title');
+        const messageEl = document.getElementById('popup-message');
+        const detailsEl = document.getElementById('popup-details');
+        
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        
+        if (type === 'success') {
+            iconBox.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto bg-green-100';
+            icon.className = 'ph ph-check-circle text-2xl text-green-600';
+        } else {
+            iconBox.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto bg-red-100';
+            icon.className = 'ph ph-warning-circle text-2xl text-red-600';
+        }
+        
+        if (details && (typeof details === 'string' || (typeof details === 'object' && Object.keys(details).length > 0))) {
+            detailsEl.classList.remove('hidden');
+            if (typeof details === 'string') {
+                detailsEl.innerHTML = details;
+            } else {
+                detailsEl.innerHTML = '<div class="font-medium mb-2">Details:</div>' + 
+                    Object.entries(details).map(([key, msgs]) => 
+                        '<div class="mb-1"><span class="font-medium text-gray-800">' + key.replace(/_/g, ' ') + ':</span> ' + (Array.isArray(msgs) ? msgs.join(', ') : msgs) + '</div>'
+                    ).join('');
+            }
+        } else {
+            detailsEl.classList.add('hidden');
+        }
+        
+        overlay.classList.remove('hidden');
+    }
+    
+    document.getElementById('popup-close-btn').addEventListener('click', function() {
+        document.getElementById('message-popup-overlay').classList.add('hidden');
+    });
+    document.getElementById('message-popup-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+    });
+    
     // Ensure Send OTP button is visible on page load
     const sendOtpBtn = document.getElementById('send-otp-btn');
     if (sendOtpBtn) {
@@ -899,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (mobile.length !== 10 || !/^[6-9]\d{9}$/.test(mobile)) {
-            alert('Please enter a valid 10-digit mobile number');
+            showPopupMessage('Invalid Mobile', 'Please enter a valid 10-digit mobile number starting with 6-9.', 'error');
             return;
         }
         
@@ -1001,11 +1061,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.replace(redirectUrl);
             } else {
                 showOTPError(data.message);
+                showPopupMessage('Verification Failed', data.message || 'Invalid or expired OTP.', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
             showOTPError('Verification failed. Please try again.');
+            showPopupMessage('Error', 'Verification failed. Please try again.', 'error');
         });
     });
     
@@ -1023,21 +1085,24 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 name: document.getElementById('reg-name').value,
                 mobile: registrationMobile,
-                email: document.getElementById('reg-email').value
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value,
+                password_confirmation: document.getElementById('reg-confirm-password').value
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 startRegistrationTimer();
-                alert('OTP resent successfully!');
+                showPopupMessage('Success', 'OTP resent successfully! Check your mobile for the new OTP.', 'success');
             } else {
-                alert('Failed to resend OTP: ' + data.message);
+                const msg = data.message || 'Failed to resend OTP';
+                showPopupMessage('Resend Failed', msg, 'error', data.errors || null);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to resend OTP. Please try again.');
+            showPopupMessage('Error', 'Failed to resend OTP. Please check your connection and try again.', 'error');
         });
     });
     
