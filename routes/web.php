@@ -261,9 +261,13 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     return redirect()->route('contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
 })->name('contact.submit');
 
-// FAQs Route
+// FAQs Route (dynamic from admin)
 Route::get('/faqs', function () {
-    return view('faqs');
+    $faqCategories = \App\Models\FaqCategory::where('is_active', true)
+        ->with(['activeItems'])
+        ->orderBy('sort_order')
+        ->get();
+    return view('faqs', compact('faqCategories'));
 })->name('faqs');
 
 // About Us - dedicated view (aboutus.blade.php)
@@ -565,6 +569,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/policy-pages', [AdminPolicyPageController::class, 'index'])->name('policy-pages.index');
         Route::get('/policy-pages/{policy_page}/edit', [AdminPolicyPageController::class, 'edit'])->name('policy-pages.edit');
         Route::put('/policy-pages/{policy_page}', [AdminPolicyPageController::class, 'update'])->name('policy-pages.update');
+
+        // FAQs
+        Route::get('/faqs', [App\Http\Controllers\Admin\FaqController::class, 'index'])->name('faqs.index');
+        Route::get('/faqs/category/create', [App\Http\Controllers\Admin\FaqController::class, 'createCategory'])->name('faqs.create-category');
+        Route::post('/faqs/category', [App\Http\Controllers\Admin\FaqController::class, 'storeCategory'])->name('faqs.store-category');
+        Route::get('/faqs/category/{faq}/edit', [App\Http\Controllers\Admin\FaqController::class, 'editCategory'])->name('faqs.edit-category');
+        Route::put('/faqs/category/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'updateCategory'])->name('faqs.update-category');
+        Route::delete('/faqs/category/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'destroyCategory'])->name('faqs.destroy-category');
+        Route::get('/faqs/category/{faq}/items', [App\Http\Controllers\Admin\FaqController::class, 'items'])->name('faqs.items');
+        Route::get('/faqs/category/{faq}/items/create', [App\Http\Controllers\Admin\FaqController::class, 'createItem'])->name('faqs.create-item');
+        Route::post('/faqs/category/{faq}/items', [App\Http\Controllers\Admin\FaqController::class, 'storeItem'])->name('faqs.store-item');
+        Route::get('/faqs/category/{faq}/items/{item}/edit', [App\Http\Controllers\Admin\FaqController::class, 'editItem'])->name('faqs.edit-item');
+        Route::put('/faqs/category/{faq}/items/{item}', [App\Http\Controllers\Admin\FaqController::class, 'updateItem'])->name('faqs.update-item');
+        Route::delete('/faqs/category/{faq}/items/{item}', [App\Http\Controllers\Admin\FaqController::class, 'destroyItem'])->name('faqs.destroy-item');
 
         // Product reviews (list & delete)
         Route::get('/reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
