@@ -19,21 +19,39 @@ class MobileAuthController extends Controller
         $this->otpService = $otpService;
     }
 
+    private function autoEmailFromMobile(string $mobile): string
+    {
+        // Email column is non-nullable in this project, so OTP registration always needs an email.
+        // If client doesn't provide email, generate a deterministic one from mobile.
+        return "c_{$mobile}@otp.supertops.local";
+    }
+
+    private function normalizeMobile(string $mobile): string
+    {
+        return preg_replace('/\s+/', '', $mobile);
+    }
+
     /**
      * Send OTP for registration
      */
     public function sendRegistrationOTP(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $payload = $request->all();
+        // If email exists but is empty, treat it as not provided.
+        if (array_key_exists('email', $payload) && trim((string) $payload['email']) === '') {
+            unset($payload['email']);
+        }
+
+        $validator = Validator::make($payload, [
             'mobile' => 'required|digits:10|regex:/^[6-9]\d{9}$/',
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
             \Log::info('Registration OTP validation failed:', [
-                'request_data' => $request->all(),
+                'request_data' => $payload,
                 'errors' => $validator->errors()->toArray()
             ]);
             
@@ -44,7 +62,7 @@ class MobileAuthController extends Controller
             ], 400);
         }
 
-        $mobile = $request->mobile;
+        $mobile = $this->normalizeMobile((string) $payload['mobile']);
         
         // Check if mobile number already exists (check both formats)
         $existingUser = \App\Models\User::where('phone', $mobile)
@@ -58,26 +76,9 @@ class MobileAuthController extends Controller
                 'errors' => ['mobile' => ['This mobile number is already registered']]
             ], 400);
         }
-        
-        // Additional validation for email uniqueness
-        $emailValidator = Validator::make($request->all(), [
-            'email' => 'unique:users,email',
-        ]);
-        
-        if ($emailValidator->fails()) {
-            \Log::info('Email uniqueness validation failed:', [
-                'email' => $request->email,
-                'errors' => $emailValidator->errors()->toArray()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Email address is already registered',
-                'errors' => $emailValidator->errors()
-            ], 400);
-        }
 
-        $mobile = $request->mobile;
+        $email = isset($payload['email']) ? (string) $payload['email'] : '';
+        $email = $email !== '' ? $email : $this->autoEmailFromMobile($mobile);
         
         try {
             $result = $this->otpService->sendOTP($mobile);
@@ -85,10 +86,10 @@ class MobileAuthController extends Controller
             if ($result['success']) {
                 // Store registration data temporarily
                 $registrationData = [
-                    'name' => $request->name,
+                    'name' => (string) $payload['name'],
                     'mobile' => $mobile,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
+                    'email' => $email,
+                    'password' => Hash::make((string) $payload['password']),
                 ];
                 
                 cache()->put("registration_data_" . $mobile, $registrationData, 600); // 10 minutes
@@ -139,7 +140,7 @@ class MobileAuthController extends Controller
             ], 400);
         }
 
-        $mobile = $request->mobile;
+        $mobile = $this->normalizeMobile((string) $request->mobile);
         $otp = $request->otp;
 
         // Verify OTP
@@ -160,10 +161,26 @@ class MobileAuthController extends Controller
         }
 
         try {
+            // Guard: avoid duplicate creation on retries / race conditions.
+            $alreadyRegistered = \App\Models\User::where('phone', $mobile)
+                ->orWhere('phone', '+91' . $mobile)
+                ->exists();
+            if ($alreadyRegistered) {
+                cache()->forget("registration_data_" . $mobile);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mobile number is already registered. Please use login instead.'
+                ], 400);
+            }
+
+            $email = !empty($registrationData['email'])
+                ? (string) $registrationData['email']
+                : $this->autoEmailFromMobile($mobile);
+
             // Create user
             $user = User::create([
-                'name' => $registrationData['name'],
-                'email' => $registrationData['email'],
+                'name' => (string) $registrationData['name'],
+                'email' => $email,
                 'phone' => $mobile,
                 'password' => $registrationData['password'],
                 'phone_verified_at' => now(),
