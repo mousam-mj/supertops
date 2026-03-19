@@ -78,21 +78,47 @@ class MobileAuthController extends Controller
         }
 
         $mobile = $request->mobile;
-        $result = $this->otpService->sendOTP($mobile);
+        
+        try {
+            $result = $this->otpService->sendOTP($mobile);
 
-        if ($result['success']) {
-            // Store registration data temporarily
-            $registrationData = [
-                'name' => $request->name,
-                'mobile' => $mobile,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ];
+            if ($result['success']) {
+                // Store registration data temporarily
+                $registrationData = [
+                    'name' => $request->name,
+                    'mobile' => $mobile,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ];
+                
+                cache()->put("registration_data_" . $mobile, $registrationData, 600); // 10 minutes
+                
+                \Log::info('Registration OTP sent successfully:', [
+                    'mobile' => $mobile,
+                    'has_test_otp' => isset($result['otp'])
+                ]);
+            } else {
+                \Log::error('Failed to send registration OTP:', [
+                    'mobile' => $mobile,
+                    'error' => $result
+                ]);
+            }
+
+            return response()->json($result);
             
-            cache()->put("registration_data_" . $mobile, $registrationData, 300); // 5 minutes
-        }
+        } catch (\Exception $e) {
+            \Log::error('Registration OTP send error:', [
+                'mobile' => $mobile,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        return response()->json($result);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP due to system error. Please try again.',
+                'error' => 'System error occurred'
+            ], 500);
+        }
     }
 
     /**
@@ -198,8 +224,38 @@ class MobileAuthController extends Controller
             ], 404);
         }
 
-        $result = $this->otpService->sendOTP($mobile);
-        return response()->json($result);
+        try {
+            $result = $this->otpService->sendOTP($mobile);
+            
+            if ($result['success']) {
+                \Log::info('Login OTP sent successfully:', [
+                    'mobile' => $mobile,
+                    'user_id' => $user->id,
+                    'has_test_otp' => isset($result['otp'])
+                ]);
+            } else {
+                \Log::error('Failed to send login OTP:', [
+                    'mobile' => $mobile,
+                    'user_id' => $user->id,
+                    'error' => $result
+                ]);
+            }
+            
+            return response()->json($result);
+            
+        } catch (\Exception $e) {
+            \Log::error('Login OTP send error:', [
+                'mobile' => $mobile,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP due to system error. Please try again.',
+                'error' => 'System error occurred'
+            ], 500);
+        }
     }
 
     /**
