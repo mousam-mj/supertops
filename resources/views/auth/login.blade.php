@@ -878,16 +878,6 @@
                             submitBtn.textContent = 'Verify & Login';
                             startTimer();
                             otpInput.focus();
-                            // Show OTP in development mode for testing
-                            if (data.otp) {
-                                console.log('Development OTP:', data.otp);
-                                // Auto-fill OTP for development/testing
-                                otpInput.value = data.otp;
-                        // Auto-submit after a short delay
-                        setTimeout(() => {
-                            mobileLoginForm.dispatchEvent(new Event('submit'));
-                        }, 1000);
-                            }
                         } else {
                             let errorMessage = data.message || 'Failed to send OTP';
                             

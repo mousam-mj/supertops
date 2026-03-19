@@ -665,13 +665,6 @@
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Verify Your Mobile Number</h3>
                                 <p class="text-gray-600">We've sent a 6-digit OTP to</p>
                                 <p class="font-semibold text-gray-900" id="reg-mobile-display">+91 XXXXXXXXXX</p>
-                                
-                                <!-- Development OTP Display -->
-                                <div id="dev-otp-display" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg hidden">
-                                    <div class="text-sm font-medium text-yellow-800 mb-1">🧪 Development Mode - Test OTP:</div>
-                                    <div class="text-2xl font-mono font-bold text-yellow-900 tracking-wider" id="dev-otp-code"></div>
-                                    <div class="text-xs text-yellow-700 mt-1">Copy this OTP to test the verification</div>
-                                </div>
                             </div>
                             
                             <form id="otp-verify-form">
@@ -954,28 +947,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('reg-mobile-display').textContent = `+91 ${mobile}`;
                 document.getElementById('reg-otp-input').focus();
                 startRegistrationTimer();
-                
-                // Show OTP in development mode for testing
-                if (data.otp) {
-                    console.log('Development OTP:', data.otp);
-                    const otpCodeElement = document.getElementById('dev-otp-code');
-                    const otpDisplayElement = document.getElementById('dev-otp-display');
-                    const otpInput = document.getElementById('reg-otp-input');
-                    
-                    if (otpCodeElement && otpDisplayElement) {
-                        otpCodeElement.textContent = data.otp;
-                        otpDisplayElement.classList.remove('hidden');
-                    }
-                    
-                    // Auto-fill OTP for development/testing
-                    if (otpInput) {
-                        otpInput.value = data.otp;
-                        // Auto-submit after a short delay
-                        setTimeout(() => {
-                            document.getElementById('otp-verify-form').dispatchEvent(new Event('submit'));
-                        }, 1500);
-                    }
-                }
             } else if (data && data.success === false) {
                 // Handle error response - show in UI
                 showRegistrationErrors(data);

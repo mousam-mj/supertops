@@ -60,15 +60,11 @@ class OTPService
             Log::info('MSG91 OTP Send Request:', [
                 'mobile' => $mobile,
                 'template_id' => $this->templateId,
-                'has_template' => !empty($this->templateId),
-                'otp' => $otp
+                'has_template' => !empty($this->templateId)
             ]);
 
-            // On local: Use SMS API directly (works without IP whitelisting, like Service-Sarthi)
-            // On production: Try Flow API first, fallback to SMS if Flow fails
-            if (config('app.env') === 'local') {
-                $result = $this->sendSMSOTP($mobile, $otp);
-            } elseif (!empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
+            // Try Flow API first if template available, fallback to SMS if Flow fails
+            if (!empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
                 $result = $this->sendFlowOTP($mobile, $otp);
                 if (!$result['success'] && $this->shouldFallbackToSMS($result)) {
                     Log::info('MSG91 Flow failed, falling back to SMS API', [
@@ -199,18 +195,11 @@ class OTPService
 
         if (isset($responseData['type'])) {
             if ($responseData['type'] === 'success') {
-                $result = [
+                return [
                     'success' => true,
                     'message' => 'OTP sent successfully',
                     'request_id' => $responseData['message'] ?? null
                 ];
-                
-                // Only include OTP in development mode
-                if (config('app.env') === 'local' || config('app.debug')) {
-                    $result['otp'] = $otp;
-                }
-                
-                return $result;
             } else {
                 // Handle specific MSG91 errors
                 $errorMessage = $this->getErrorMessage($responseData['message'] ?? 'Unknown error');
@@ -245,18 +234,11 @@ class OTPService
         $responseData = $response->json();
 
         if (isset($responseData['type']) && $responseData['type'] === 'success') {
-            $result = [
+            return [
                 'success' => true,
                 'message' => 'OTP sent successfully',
                 'request_id' => $responseData['message'] ?? null
             ];
-            
-            // Only include OTP in development mode
-            if (config('app.env') === 'local' || config('app.debug')) {
-                $result['otp'] = $otp;
-            }
-            
-            return $result;
         }
 
         // Handle SMS API errors
