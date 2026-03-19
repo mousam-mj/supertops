@@ -40,13 +40,14 @@ class OTPService
             $url = "https://control.msg91.com/api/v5/flow";
 
             $payload = [
-                'template_id' => config('services.msg91.template_id', ''), // You'll need to create a flow template
+                'template_id' => config('services.msg91.template_id', ''),
                 'short_url' => '0',
                 'realTimeResponse' => '1',
                 'recipients' => [
                     [
                         'mobiles' => $this->country . $mobile,
-                        'OTP' => $otp, // Variable name in your template
+                        'VAR1' => $otp, // Using VAR1 as shown in MSG91 docs
+                        'OTP' => $otp,  // Also keep OTP for backward compatibility
                     ]
                 ]
             ];
@@ -64,19 +65,30 @@ class OTPService
             ]);
 
             if ($response->successful()) {
-                // Prepare response
-                $result = [
-                    'success' => true,
-                    'message' => 'OTP sent successfully',
-                    'request_id' => $response->json()['data'][0]['id'] ?? null
-                ];
+                $responseData = $response->json();
                 
-                // Only include OTP in development/testing mode for debugging
-                if (config('app.env') === 'local' || config('app.debug')) {
-                    $result['otp'] = $otp; // For testing only - remove in production
+                // Check if MSG91 returned success
+                if (isset($responseData['type']) && $responseData['type'] === 'success') {
+                    $result = [
+                        'success' => true,
+                        'message' => 'OTP sent successfully',
+                        'request_id' => $responseData['message'] ?? null
+                    ];
+                    
+                    // Only include OTP in development/testing mode for debugging
+                    if (config('app.env') === 'local' || config('app.debug')) {
+                        $result['otp'] = $otp; // For testing only - remove in production
+                    }
+                    
+                    return $result;
+                } else {
+                    // MSG91 returned an error
+                    return [
+                        'success' => false,
+                        'message' => 'Failed to send OTP: ' . ($responseData['message'] ?? 'Unknown error'),
+                        'error' => $responseData
+                    ];
                 }
-                
-                return $result;
             } else {
                 return [
                     'success' => false,
