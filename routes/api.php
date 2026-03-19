@@ -107,6 +107,51 @@ Route::post('/auth/test', function(Request $request) {
     ]);
 });
 
+// Test MSG91 directly
+Route::post('/test-msg91', function(Request $request) {
+    $mobile = $request->mobile ?? '8839507322';
+    $otp = rand(100000, 999999);
+    
+    // Show what we're sending
+    $templateId = config('services.msg91.template_id');
+    $authKey = config('services.msg91.auth_key');
+    
+    // Get server IP
+    $serverIp = file_get_contents('https://ipinfo.io/ip');
+    
+    $payload = [
+        'template_id' => $templateId,
+        'short_url' => '0',
+        'realTimeResponse' => '1',
+        'recipients' => [
+            [
+                'mobiles' => '91' . $mobile,
+                'VAR1' => $otp,
+                'OTP' => $otp,
+            ]
+        ]
+    ];
+    
+    $response = Http::withHeaders([
+        'accept' => 'application/json',
+        'authkey' => $authKey,
+        'content-type' => 'application/json'
+    ])->post('https://control.msg91.com/api/v5/flow', $payload);
+    
+    return response()->json([
+        'server_ip' => trim($serverIp),
+        'debug_info' => [
+            'template_id' => $templateId,
+            'template_id_empty' => empty($templateId),
+            'auth_key_length' => strlen($authKey),
+            'payload' => $payload
+        ],
+        'response_status' => $response->status(),
+        'response_body' => $response->json(),
+        'success' => $response->successful()
+    ]);
+});
+
 // Admin Routes (Requires Authentication + Admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Dashboard

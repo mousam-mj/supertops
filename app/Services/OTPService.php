@@ -39,40 +39,93 @@ class OTPService
             // MSG91 Flow API endpoint
             $url = "https://control.msg91.com/api/v5/flow";
 
-            $payload = [
-                'template_id' => config('services.msg91.template_id', ''),
-                'short_url' => '0',
-                'realTimeResponse' => '1',
-                'recipients' => [
-                    [
-                        'mobiles' => $this->country . $mobile,
-                        'VAR1' => $otp, // Using VAR1 as shown in MSG91 docs
-                        'OTP' => $otp,  // Also keep OTP for backward compatibility
-                    ]
-                ]
-            ];
-
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'authkey' => $this->authKey,
-                'content-type' => 'application/json'
-            ])->post($url, $payload);
-
-            Log::info('MSG91 Flow OTP Send Response:', [
+            $templateId = config('services.msg91.template_id', '');
+            
+            Log::info('MSG91 OTP Send Request:', [
                 'mobile' => $mobile,
-                'status' => $response->status(),
-                'response' => $response->json()
+                'template_id' => $templateId,
+                'template_id_empty' => empty($templateId),
+                'otp' => $otp
             ]);
+            
+            // Check if template_id is empty or invalid
+            if (empty($templateId) || $templateId === 'your_template_id_here') {
+                // Use simple SMS API as fallback
+                $smsUrl = "https://control.msg91.com/api/sendotp.php";
+                $response = Http::asForm()->post($smsUrl, [
+                    'authkey' => $this->authKey,
+                    'mobile' => $this->country . $mobile,
+                    'message' => "Your OTP is {$otp}. Valid for 5 minutes. Do not share with anyone.",
+                    'sender' => $this->senderId,
+                    'otp' => $otp
+                ]);
+                
+                Log::info('MSG91 SMS OTP Send Response:', [
+                    'mobile' => $mobile,
+                    'status' => $response->status(),
+                    'response' => $response->body()
+                ]);
+            } else {
+                // Use Flow API with template
+                $payload = [
+                    'template_id' => $templateId,
+                    'short_url' => '0',
+                    'realTimeResponse' => '1',
+                    'recipients' => [
+                        [
+                            'mobiles' => $this->country . $mobile,
+                            'VAR1' => $otp, // Using VAR1 as shown in MSG91 docs
+                            'OTP' => $otp,  // Also keep OTP for backward compatibility
+                        ]
+                    ]
+                ];
+
+                $response = Http::withHeaders([
+                    'accept' => 'application/json',
+                    'authkey' => $this->authKey,
+                    'content-type' => 'application/json'
+                ])->post($url, $payload);
+                
+                Log::info('MSG91 Flow OTP Send Response:', [
+                    'mobile' => $mobile,
+                    'status' => $response->status(),
+                    'response' => $response->json()
+                ]);
+            }
 
             if ($response->successful()) {
                 $responseData = $response->json();
                 
-                // Check if MSG91 returned success
-                if (isset($responseData['type']) && $responseData['type'] === 'success') {
+                // Handle Flow API response
+                if (isset($responseData['type'])) {
+                    if ($responseData['type'] === 'success') {
+                        $result = [
+                            'success' => true,
+                            'message' => 'OTP sent successfully',
+                            'request_id' => $responseData['message'] ?? null
+                        ];
+                        
+                        // Only include OTP in development/testing mode for debugging
+                        if (config('app.env') === 'local' || config('app.debug')) {
+                            $result['otp'] = $otp; // For testing only - remove in production
+                        }
+                        
+                        return $result;
+                    } else {
+                        // MSG91 Flow API returned an error
+                        return [
+                            'success' => false,
+                            'message' => 'Failed to send OTP: ' . ($responseData['message'] ?? 'Unknown error'),
+                            'error' => $responseData
+                        ];
+                    }
+                }
+                // Handle SMS API response (different format)
+                else if (isset($responseData['type']) || $response->body() === 'OTP sent successfully') {
                     $result = [
                         'success' => true,
                         'message' => 'OTP sent successfully',
-                        'request_id' => $responseData['message'] ?? null
+                        'request_id' => null
                     ];
                     
                     // Only include OTP in development/testing mode for debugging
@@ -82,10 +135,10 @@ class OTPService
                     
                     return $result;
                 } else {
-                    // MSG91 returned an error
+                    // Unknown response format
                     return [
                         'success' => false,
-                        'message' => 'Failed to send OTP: ' . ($responseData['message'] ?? 'Unknown error'),
+                        'message' => 'Failed to send OTP: Unexpected response format',
                         'error' => $responseData
                     ];
                 }
