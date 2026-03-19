@@ -268,10 +268,10 @@
                                         <div class="list-size flex items-center gap-2 flex-wrap mt-3">
                                             @foreach($availableSizes as $size)
                                                 @php $isAvailableForFirst = in_array($size, $sizesForFirstColor ?? $availableSizes, true); @endphp
-                                                <div class="size-item w-12 h-12 rounded-lg border-2 border-line hover:border-black cursor-pointer duration-300 flex items-center justify-center text-sm font-semibold {{ ($firstSize === $size) ? 'active border-black bg-black text-white' : '' }} {{ !$isAvailableForFirst ? 'size-unavailable opacity-60' : '' }}" 
+                                                <div class="size-item min-w-[5rem] h-12 px-4 rounded-lg border-2 border-line hover:border-black cursor-pointer duration-300 flex items-center justify-center text-sm font-semibold text-center {{ ($firstSize === $size) ? 'active border-black bg-black text-white' : '' }} {{ !$isAvailableForFirst ? 'size-unavailable opacity-60' : '' }}" 
                                                      data-size="{{ $size }}" title="{{ !$isAvailableForFirst ? 'This size is not available for this color' : '' }}">
                                                     {{ $size }}
-                    </div>
+                                                </div>
                                             @endforeach
                     </div>
                 </div>
