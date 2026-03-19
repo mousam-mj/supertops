@@ -43,9 +43,9 @@ class OTPService
                 $otp = rand(100000, 999999);
             }
 
-            // Store OTP in cache for 5 minutes
+            // Store OTP in cache for 10 minutes
             $cacheKey = "otp_" . $mobile;
-            Cache::put($cacheKey, $otp, 300); // 5 minutes
+            Cache::put($cacheKey, $otp, 600); // 10 minutes
 
             // Validate MSG91 configuration
             if (empty($this->authKey)) {
@@ -64,9 +64,19 @@ class OTPService
                 'otp' => $otp
             ]);
 
-            // Use Flow API if template is available, otherwise use SMS API
-            if (!empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
+            // On local: Use SMS API directly (works without IP whitelisting, like Service-Sarthi)
+            // On production: Try Flow API first, fallback to SMS if Flow fails
+            if (config('app.env') === 'local') {
+                $result = $this->sendSMSOTP($mobile, $otp);
+            } elseif (!empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
                 $result = $this->sendFlowOTP($mobile, $otp);
+                if (!$result['success'] && $this->shouldFallbackToSMS($result)) {
+                    Log::info('MSG91 Flow failed, falling back to SMS API', [
+                        'mobile' => $mobile,
+                        'flow_error' => $result['error']['message'] ?? ''
+                    ]);
+                    $result = $this->sendSMSOTP($mobile, $otp);
+                }
             } else {
                 $result = $this->sendSMSOTP($mobile, $otp);
             }
@@ -133,7 +143,7 @@ class OTPService
         $data = [
             'authkey' => $this->authKey,
             'mobile' => $this->country . $mobile,
-            'message' => "Your OTP is {$otp}. Valid for 5 minutes. Do not share with anyone.",
+            'message' => "Your OTP is {$otp}. Valid for 10 minutes. Do not share with anyone.",
             'sender' => $this->senderId,
             'otp' => $otp
         ];
@@ -147,6 +157,29 @@ class OTPService
         ]);
 
         return $this->handleSMSResponse($response, $otp);
+    }
+
+    /**
+     * Check if we should fallback to SMS API when Flow API fails
+     */
+    private function shouldFallbackToSMS(array $result): bool
+    {
+        $msg = $result['error']['message'] ?? $result['error'] ?? '';
+        if (is_array($msg)) {
+            $msg = $msg['message'] ?? '';
+        }
+        $recoverableErrors = [
+            'IP is not whitelisted',
+            'template id missing',
+            'Authentication failure',
+            'Invalid template id',
+        ];
+        foreach ($recoverableErrors as $err) {
+            if (stripos((string) $msg, $err) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
