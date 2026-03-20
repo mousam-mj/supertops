@@ -17,7 +17,7 @@ class OTPService
     public function __construct()
     {
         $this->authKey = config('services.msg91.auth_key');
-        $this->senderId = config('services.msg91.sender_id', 'PRCBOT');
+        $this->senderId = config('services.msg91.sender_id', 'PADIAB');
         $this->route = config('services.msg91.route', 4);
         $this->country = config('services.msg91.country', 91);
         $this->templateId = config('services.msg91.template_id');
@@ -108,8 +108,8 @@ class OTPService
             'recipients' => [
                 [
                     'mobiles' => $this->country . $mobile,
-                    'VAR1' => $otp,
-                    'OTP' => $otp,
+                    'var1' => $otp,
+                    
                 ]
             ]
         ];
@@ -139,7 +139,7 @@ class OTPService
         $data = [
             'authkey' => $this->authKey,
             'mobile' => $this->country . $mobile,
-            'message' => "Your OTP is {$otp}. Valid for 10 minutes. Do not share with anyone.",
+            'message' => "Your OTP for verification is {$otp}. Do not share this OTP with anyone. PADIA BRANDWORKS",
             'sender' => $this->senderId,
             'otp' => $otp
         ];
