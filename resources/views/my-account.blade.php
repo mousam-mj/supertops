@@ -625,6 +625,18 @@
                     </div>
                     <div class="right list-filter md:w-2/3 w-full pl-2.5">
                         <div class="filter-item text-content w-full active" data-item="dashboard">
+                            @if(session('welcome_message') || request()->get('welcome_message'))
+                                <div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">
+                                    <i class="ph ph-check-circle text-green-600 text-2xl flex-shrink-0"></i>
+                                    <p class="text-green-800 font-medium">{{ session('welcome_message') ?? request()->get('welcome_message') }}</p>
+                                </div>
+                            @endif
+                            @if(session('login_success') || request()->get('login_success'))
+                                <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-center gap-3">
+                                    <i class="ph ph-smiley text-blue-600 text-2xl flex-shrink-0"></i>
+                                    <p class="text-blue-800 font-medium">{{ session('login_success') ?? request()->get('login_success') }}</p>
+                                </div>
+                            @endif
                             <div class="overview grid sm:grid-cols-3 gap-5">
                                 <div class="overview-item flex items-center justify-between p-5 border border-line rounded-lg box-shadow-xs">
                                     <div class="counter">
@@ -1020,10 +1032,10 @@
                                         <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="email" name="email" type="email" value="{{ old('email', $user->email) }}" placeholder="Email address" required />
                                     </div>
                                     <div class="gender">
-                                        <label for="gender" class="caption1 capitalize">Gender <span class="text-red">*</span></label>
+                                        <label for="gender" class="caption1 capitalize">Gender</label>
                                         <div class="select-block mt-2">
-                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="gender" name="gender" required>
-                                                <option value="" disabled>Choose Gender</option>
+                                            <select class="border border-line px-4 py-3 w-full rounded-lg" id="gender" name="gender">
+                                                <option value="">Choose Gender</option>
                                                 <option value="Male" {{ old('gender', $user->gender ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
                                                 <option value="Female" {{ old('gender', $user->gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
                                                 <option value="Other" {{ old('gender', $user->gender ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
@@ -1032,8 +1044,8 @@
                                         </div>
                                     </div>
                                     <div class="birth">
-                                        <label for="birth" class="caption1">Day of Birth <span class="text-red">*</span></label>
-                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth ?? '') }}" placeholder="Day of Birth" required />
+                                        <label for="birth" class="caption1">Day of Birth</label>
+                                        <input class="border-line mt-2 px-4 py-3 w-full rounded-lg" id="birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth ?? '') }}" placeholder="Day of Birth" />
                                     </div>
                                 </div>
                                 <div class="block-button lg:mt-10 mt-6" style="display: block !important;">

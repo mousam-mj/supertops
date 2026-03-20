@@ -1056,8 +1056,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Redirect automatically without alert
-                const redirectUrl = data.redirect_url || '{{ route("home") }}';
+                // Redirect to My Account with welcome message
+                let redirectUrl = data.redirect_url || '{{ route("my-account") }}';
+                if (data.welcome_message) {
+                    redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + 'welcome_message=' + encodeURIComponent(data.welcome_message);
+                }
                 window.location.replace(redirectUrl);
             } else {
                 showOTPError(data.message);

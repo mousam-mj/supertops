@@ -200,7 +200,8 @@ class MobileAuthController extends Controller
                 'message' => 'Registration successful',
                 'user' => $user,
                 'token' => $token,
-                'redirect_url' => route('home')
+                'redirect_url' => route('my-account'),
+                'welcome_message' => 'Welcome, ' . $user->name . '! Your account has been created successfully.'
             ]);
 
         } catch (\Exception $e) {
@@ -332,7 +333,8 @@ class MobileAuthController extends Controller
                 'message' => 'Login successful',
                 'user' => $user,
                 'token' => $token,
-                'redirect_url' => route('home')
+                'redirect_url' => route('my-account'),
+                'login_success' => 'Welcome back! You have successfully logged in.'
             ]);
 
         } catch (\Exception $e) {

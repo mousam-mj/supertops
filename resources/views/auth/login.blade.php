@@ -674,7 +674,7 @@
                         <!-- Email/Password Login Form -->
                         <form id="email-login-form" class="md:mt-7 mt-4" method="POST" action="{{ route('login.submit') }}">
                             @csrf
-                            <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('home')) }}" />
+                            <input type="hidden" name="redirect" value="{{ request()->get('redirect', route('my-account')) }}" />
                             
                             <div class="email">
                                 <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="email" name="email" type="email" placeholder="Email Address *" required />
@@ -968,10 +968,11 @@
                                 console.log('User data stored:', data.user);
                             }
                             
-                            // Use redirect URL from response or default to home
-                            const redirectUrl = data.redirect_url || '{{ route("home") }}';
-                            
-                            // Force a full page reload to update session
+                            // Redirect to My Account with welcome message
+                            let redirectUrl = data.redirect_url || '{{ route("my-account") }}';
+                            if (data.login_success) {
+                                redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + 'login_success=' + encodeURIComponent(data.login_success);
+                            }
                             window.location.replace(redirectUrl);
                         } else {
                             let errorMessage = data.message || 'Login failed';

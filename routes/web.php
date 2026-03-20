@@ -427,8 +427,8 @@ Route::put('/my-account/settings', function (\Illuminate\Http\Request $request) 
         'last_name' => 'required|string|max:255',
         'phone' => 'required|string|max:20',
         'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-        'gender' => 'required|in:Male,Female,Other',
-        'date_of_birth' => 'required|date',
+        'gender' => 'nullable|in:Male,Female,Other',
+        'date_of_birth' => 'nullable|date',
         'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
     
@@ -452,15 +452,15 @@ Route::put('/my-account/settings', function (\Illuminate\Http\Request $request) 
             $validated['avatar'] = $avatarPath;
         }
         
-        // Update user
+        // Update user (date_of_birth is optional)
         $user->update([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'phone' => $validated['phone'],
             'email' => $validated['email'],
-            'gender' => $validated['gender'],
-            'date_of_birth' => $validated['date_of_birth'],
+            'gender' => !empty($validated['gender']) ? $validated['gender'] : null,
+            'date_of_birth' => !empty($validated['date_of_birth']) ? $validated['date_of_birth'] : null,
             'avatar' => $validated['avatar'] ?? $user->avatar,
         ]);
         
