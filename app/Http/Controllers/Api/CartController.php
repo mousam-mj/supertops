@@ -82,10 +82,12 @@ class CartController extends Controller
                 ->get();
         }
         
-        // Filter out items where product is null or deleted
-        $cartItems = $cartItems->filter(function($item) {
-            return $item->product !== null;
-        });
+        // Remove orphan cart items (deleted products) and filter
+        $orphanIds = $cartItems->filter(fn($i) => $i->product === null)->pluck('id');
+        if ($orphanIds->isNotEmpty()) {
+            Cart::whereIn('id', $orphanIds)->delete();
+        }
+        $cartItems = $cartItems->filter(fn($item) => $item->product !== null);
 
         $count = $cartItems->sum('quantity');
 
@@ -132,7 +134,14 @@ class CartController extends Controller
                 ->whereNull('user_id')
                 ->get();
         }
-        
+
+        // Remove cart items for deleted products (orphans) and filter
+        $orphanIds = $cartItems->filter(fn($i) => $i->product === null)->pluck('id');
+        if ($orphanIds->isNotEmpty()) {
+            Cart::whereIn('id', $orphanIds)->delete();
+        }
+        $cartItems = $cartItems->filter(fn($item) => $item->product !== null)->values();
+
         // Calculate total and ensure product data is properly loaded
         $total = 0;
         $items = $cartItems->map(function($item) use (&$total) {

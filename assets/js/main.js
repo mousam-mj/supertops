@@ -391,7 +391,10 @@ if (closeWishlistIcon) {
   closeWishlistIcon.addEventListener("click", closeModalWishlist);
 }
 if (continueWishlistIcon) {
-  continueWishlistIcon.addEventListener("click", closeModalWishlist);
+  continueWishlistIcon.addEventListener("click", function(e) {
+    e.preventDefault();
+    window.location.href = continueWishlistIcon.getAttribute("href") || "/shop";
+  });
 }
 
 if (modalWishlistMain) {

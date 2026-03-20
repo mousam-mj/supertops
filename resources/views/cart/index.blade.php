@@ -107,28 +107,19 @@
                                 <div class="text-title">Subtotal</div>
                                 <div class="text-title">₹<span class="total-product">136</span><span>.00</span></div>
                             </div>
-                            <div class="ship-block py-5 flex justify-between border-b border-line">
-                                <div class="text-title">Shipping</div>
-                                <div class="choose-type flex gap-12">
-                                    <div class="left">
-                                        <div class="type">
-                                            <input id="shipping" type="radio" name="ship" />
-                                            <label class="pl-1" for="shipping">Free Shipping:</label>
-                                        </div>
-                                        <div class="type mt-1">
-                                            <input id="local" type="radio" name="ship" value="{30}" />
-                                            <label class="text-on-surface-variant1 pl-1" for="local">Local:</label>
-                                        </div>
-                                        <div class="type mt-1">
-                                            <input id="flat" type="radio" name="ship" value="{40}" />
-                                            <label class="text-on-surface-variant1 pl-1" for="flat">Flat Rate:</label>
-                                        </div>
+                            <div class="ship-block py-5 border-b border-line">
+                                <div class="text-title mb-3">Shipping</div>
+                                <div class="pincode-shipping flex flex-col gap-3">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="cart-pincode" class="border border-line px-4 py-2.5 rounded-lg w-full max-w-[140px]" placeholder="Enter pincode" maxlength="6" pattern="[0-9]*" inputmode="numeric" />
+                                        <button type="button" id="cart-check-shipping" class="button-main px-4 py-2.5 bg-black text-white rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer">Check</button>
                                     </div>
-                                    <div class="right">
-                                        <div class="ship">₹0.00</div>
-                                        <div class="local text-on-surface-variant1 mt-1">₹30.00</div>
-                                        <div class="flat text-on-surface-variant1 mt-1">₹40.00</div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="caption1 text-secondary2" id="cart-shipping-label">Enter pincode to calculate</span>
+                                        <span class="text-title font-semibold" id="cart-shipping-charge">₹0.00</span>
                                     </div>
+                                    <div id="cart-delivery-estimate" class="caption1 text-green-600 hidden"></div>
+                                    <div id="cart-shipping-error" class="caption1 text-red-600 hidden"></div>
                                 </div>
                             </div>
                             <div class="total-cart-block pt-4 pb-4 flex justify-between">
@@ -139,7 +130,7 @@
                                 <form action="{{ route('checkout.index') }}" method="GET" id="checkout-form" style="width: 100%; margin: 0;">
                                     <button type="submit" class="checkout-btn button-main w-full text-center py-3 px-5 bg-black text-white hover:bg-gray-800 rounded-lg transition-colors duration-300 uppercase tracking-wider cursor-pointer" id="checkout-link">Process To Checkout</button>
                                 </form>
-                                <a class="text-button hover-underline" href="{{ route('home') }}">Continue shopping </a>
+                                <a id="continue-shopping-link" class="text-button hover-underline block text-center" href="{{ route('shop') }}">Continue shopping </a>
                             </div>
                         </div>
                     </div>
@@ -147,5 +138,21 @@
             </div>
         </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('continue-shopping-link');
+    if (link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = '{{ route("shop") }}';
+            return false;
+        }, true);
+    }
+});
+</script>
+@endpush
 
 @endsection

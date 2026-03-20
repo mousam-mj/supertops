@@ -477,10 +477,11 @@
                     if (cartList) {
                         cartList.innerHTML = '';
                         // API returns data.data.items or data.data directly
-                        const items = data.data?.items || data.data || [];
+                        const items = (data.data?.items || data.data || []).filter(item => item && item.product);
                         if (items && items.length > 0) {
                             let total = 0;
                             items.forEach(item => {
+                                if (!item.product) return;
                                 const cartItem = createCartItemElement(item);
                                 cartList.appendChild(cartItem);
                                 const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
@@ -817,13 +818,18 @@
 
         // Direct navigation function
         const navigateToCheckout = function() {
-            console.log('Navigating to:', checkoutUrl);
-            // Use replace to avoid back button issues
-            window.location.replace(checkoutUrl);
-            // Fallback if replace doesn't work
+            let url = checkoutUrl;
+            const pincodeInput = document.getElementById('cart-pincode');
+            if (pincodeInput) {
+                const p = String(pincodeInput.value || '').trim().replace(/\D/g, '');
+                if (p.length === 6) {
+                    url = checkoutUrl + (checkoutUrl.indexOf('?') >= 0 ? '&' : '?') + 'pincode=' + encodeURIComponent(p);
+                }
+            }
+            window.location.replace(url);
             setTimeout(function() {
                 if (window.location.href.indexOf(checkoutUrl) === -1) {
-                    window.location.href = checkoutUrl;
+                    window.location.href = url;
                 }
             }, 100);
         };
@@ -1090,25 +1096,16 @@
         });
     }
     
+    // Cart page: stored shipping charge from pincode API (used when no radios)
+    let cartShippingCharge = 0;
+    
     // Update cart page total
     function updateCartPageTotal(subtotal) {
         const discountElement = document.querySelector('.discount');
         const discount = discountElement ? parseFloat(discountElement.textContent) || 0 : 0;
         
-        // Get shipping cost
-        const shippingRadio = document.querySelector('input[name="ship"]:checked');
-        let shipping = 0;
-        if (shippingRadio) {
-            if (shippingRadio.value) {
-                shipping = parseFloat(shippingRadio.value.replace(/[{}]/g, '')) || 0;
-            } else if (shippingRadio.id === 'shipping') {
-                shipping = 0; // Free shipping
-            } else if (shippingRadio.id === 'local') {
-                shipping = 30;
-            } else if (shippingRadio.id === 'flat') {
-                shipping = 40;
-            }
-        }
+        // Use pincode-based shipping charge (from API)
+        const shipping = cartShippingCharge;
         
         const total = subtotal - discount + shipping;
         
@@ -1126,34 +1123,108 @@
         }
     }
     
-    // Handle shipping selection change
-    document.addEventListener('change', function(e) {
-        if (e.target.name === 'ship') {
-            const cartList = document.querySelector('.list-product-main');
-            if (cartList && cartList.children.length > 0) {
-                // Recalculate total with new shipping
-                fetch('/api/cart', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const items = data.data?.items || data.data || [];
-                        let subtotal = 0;
-                        items.forEach(item => {
-                            const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
-                            subtotal += price * item.quantity;
-                        });
-                        updateCartPageTotal(subtotal);
-                    }
-                });
-            }
+    // Cart page: pincode shipping - call API and update charge
+    function initCartPincodeShipping() {
+        const pincodeInput = document.getElementById('cart-pincode');
+        const checkBtn = document.getElementById('cart-check-shipping');
+        const chargeEl = document.getElementById('cart-shipping-charge');
+        const labelEl = document.getElementById('cart-shipping-label');
+        const estimateEl = document.getElementById('cart-delivery-estimate');
+        const errorEl = document.getElementById('cart-shipping-error');
+        
+        if (!pincodeInput || !checkBtn || !chargeEl) return;
+
+        function hideMessages() {
+            if (estimateEl) { estimateEl.classList.add('hidden'); estimateEl.textContent = ''; }
+            if (errorEl) { errorEl.classList.add('hidden'); errorEl.textContent = ''; }
         }
-    });
+
+        checkBtn.addEventListener('click', function() {
+            const pincode = String(pincodeInput.value || '').trim().replace(/\D/g, '');
+            hideMessages();
+            
+            if (pincode.length !== 6) {
+                if (errorEl) {
+                    errorEl.textContent = 'Please enter a valid 6-digit pincode';
+                    errorEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            fetch('/api/shipping/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    pincode: pincode,
+                    weight: 1,
+                    cod_amount: 0
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success && res.data) {
+                    cartShippingCharge = parseFloat(res.data.shipping_charge) || 0;
+                    chargeEl.textContent = cartShippingCharge === 0 ? 'Free' : '₹' + cartShippingCharge.toFixed(2);
+                    if (labelEl) labelEl.textContent = pincode + ' — serviceable';
+                    if (estimateEl && res.data.estimated_delivery) {
+                        estimateEl.textContent = 'Delivery: ' + res.data.estimated_delivery;
+                        estimateEl.classList.remove('hidden');
+                    }
+                    // Recalculate total
+                    fetch('/api/cart', {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        credentials: 'same-origin'
+                    })
+                    .then(function(cr) { return cr.json(); })
+                    .then(function(cartData) {
+                        if (cartData.success) {
+                            const items = cartData.data?.items || cartData.data || [];
+                            let subtotal = 0;
+                            items.forEach(function(item) {
+                                const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
+                                subtotal += price * item.quantity;
+                            });
+                            updateCartPageTotal(subtotal);
+                        }
+                    });
+                } else {
+                    if (errorEl) {
+                        errorEl.textContent = res.message || 'Pincode not serviceable. Please try another.';
+                        errorEl.classList.remove('hidden');
+                    }
+                }
+            })
+            .catch(function(err) {
+                console.error('Shipping API error:', err);
+                if (errorEl) {
+                    errorEl.textContent = 'Unable to check shipping. Please try again.';
+                    errorEl.classList.remove('hidden');
+                }
+            })
+            .finally(function() {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check';
+            });
+        });
+
+        // Allow Enter key in pincode field
+        pincodeInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkBtn.click();
+            }
+        });
+    }
 
     // Create checkout item element
     function createCheckoutItemElement(item) {
@@ -1288,6 +1359,7 @@
         // Load cart page items if on cart page
         if (document.querySelector('.list-product-main')) {
             loadCartPageItems();
+            initCartPincodeShipping();
         }
         
         // Initialize checkout button handler

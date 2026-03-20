@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -297,6 +298,9 @@ class ProductController extends Controller
         if ($product->video) {
             Storage::disk('public')->delete($product->video);
         }
+
+        // Remove from cart and wishlist (cart is DB; wishlist is localStorage - cleaned on next visit)
+        Cart::where('product_id', $product->id)->delete();
 
         $product->delete();
 

@@ -800,16 +800,26 @@
         });
         Promise.all(fetchPromises).then(function(results) {
             var dataById = {};
-            results.forEach(function(r) { if (r && r.id) dataById[r.id] = r.data; });
+            var idsToRemove = [];
+            results.forEach(function(r) {
+                if (r && r.id) {
+                    dataById[r.id] = r.data;
+                    if (!r.data) idsToRemove.push(r.id);
+                }
+            });
             idsInOrder.forEach(function(id) {
                 var productData = dataById[id];
                 if (productData) {
                     appendProduct(normalizeProduct(productData));
-                } else {
-                    var fallback = uniqueItems.find(function(p) { return String(p.id) === String(id); });
-                    if (fallback) appendProduct(normalizeProduct(fallback));
                 }
             });
+            if (idsToRemove.length > 0) {
+                var idsSet = {};
+                idsToRemove.forEach(function(id) { idsSet[String(id)] = true; });
+                var arr = uniqueItems.filter(function(p) { return !idsSet[String(p.id)]; });
+                localStorage.setItem('wishlistStore', JSON.stringify(arr));
+                if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
+            }
             finish();
         });
     }

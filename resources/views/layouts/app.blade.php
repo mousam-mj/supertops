@@ -233,8 +233,8 @@
             </div>
             <div class="list-product px-6"></div>
             <div class="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
-                <a href="{{{ route('wishlist') }}}" class="button-main w-full text-center uppercase"> View All Wish List</a>
-                <div class="text-button-uppercase continue mt-2 text-center has-line-before cursor-pointer inline-block">Continue shopping</div>
+                <a href="{{ route('wishlist') }}" class="button-main w-full text-center uppercase block"> View All Wish List</a>
+                <a href="{{ route('shop') }}" class="text-button-uppercase continue mt-2 text-center has-line-before cursor-pointer inline-block block">Continue shopping</a>
             </div>
         </div>
     </div>
