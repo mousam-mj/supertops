@@ -291,18 +291,26 @@ class AuthController extends Controller
 
         Cache::put("password_reset_otp_{$request->email}", $otp, $expiresAt);
 
+        $mailSent = false;
         try {
             Mail::raw("Your password reset OTP is: {$otp}. Valid for 5 minutes.", function ($message) use ($request) {
                 $message->to($request->email)
                     ->subject('Password Reset OTP');
             });
+            $mailSent = true;
         } catch (\Exception $e) {
             \Log::error('Password reset OTP email failed: ' . $e->getMessage());
         }
 
+        $message = 'Password reset OTP sent to your email.';
+        if (!$mailSent && config('app.debug')) {
+            $message .= ' (Email failed - use OTP for testing: ' . $otp . ')';
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Password reset OTP sent to your email',
+            'message' => $message,
+            'data' => $mailSent ? [] : (config('app.debug') ? ['otp' => $otp] : []),
         ]);
     }
 

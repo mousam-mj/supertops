@@ -577,4 +577,22 @@
                 </div>
             </div>
         </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var items = document.querySelectorAll('.faqs-block .question-item');
+    items.forEach(function(item) {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var wasOpen = item.classList.contains('open');
+            items.forEach(function(other) { other.classList.remove('open'); });
+            if (!wasOpen) item.classList.add('open');
+        }, true);
+    });
+});
+</script>
+@endpush
 @endsection

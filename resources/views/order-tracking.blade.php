@@ -594,7 +594,7 @@
                     <div class="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
                         <div class="text-content">
                             <div class="heading4">Already have an account?</div>
-                            <div class="mt-2 text-secondary">Welcome back. Sign in to access your personalized experience, saved preferences, and more. We{String.raw`'re`} thrilled to have you with us again!</div>
+                            <div class="mt-2 text-secondary">Welcome back. Sign in to access your personalized experience, saved preferences, and more. We're thrilled to have you with us again!</div>
                             <div class="block-button md:mt-7 mt-4">
                                 <a href="{{ route('login') }}" class="button-main">Login</a>
                             </div>

@@ -181,6 +181,11 @@ Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('forgot-password');
 
+// Reset Password Route (OTP + new password)
+Route::get('/reset-password', function () {
+    return view('auth.reset-password');
+})->name('reset-password');
+
 // Order Tracking Route
 Route::get('/order-tracking', function () {
     $order = null;

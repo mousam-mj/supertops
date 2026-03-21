@@ -120,8 +120,12 @@
                 <div class="content-main flex max-lg:flex-col-reverse gap-y-10 justify-between">
                     <div class="left lg:w-1/2">
                         <div class="login bg-surface py-3 px-4 flex justify-between rounded-lg">
-                            <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
-                            <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
+                            @auth
+                                <div class="left flex items-center"><span class="text-on-surface-variant1">You're already logged in with {{ auth()->user()->email }}</span></div>
+                            @else
+                                <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
+                                <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
+                            @endauth
                         </div>
                         <div class="form-login-block mt-3">
                             <form class="p-5 border border-line rounded-lg">
@@ -287,13 +291,6 @@
                                                             <div class="flex items-center gap-2 text-sm" id="step-delivery">
                                                                 <i class="ph ph-circle text-amber-600"></i>
                                                                 <span class="text-amber-700">Calculate delivery charges</span>
-                                                            </div>
-                                                            <div class="flex items-center gap-2 text-sm" id="step-mobile">
-                                                                <i class="ph ph-circle text-amber-600"></i>
-                                                                <span class="text-amber-700">Verify mobile number</span>
-                                                                <button type="button" id="verify-mobile-btn" class="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 hidden">
-                                                                    Verify
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1039,7 +1036,7 @@ if (testBtn) {
         const btnText = document.getElementById('btn-text');
         const btnIcon = document.getElementById('btn-icon');
         
-        if (isAddressComplete && isDeliveryCalculated && isMobileVerified) {
+        if (isAddressComplete && isDeliveryCalculated) {
             // Enable payment
             if (paymentSection) {
                 paymentSection.style.opacity = '1';
@@ -1442,8 +1439,9 @@ if (testBtn) {
             }
         });
         
-        // Verify mobile button
-        document.getElementById('verify-mobile-btn').addEventListener('click', function() {
+        // Verify mobile button (removed - mobile verification no longer required at checkout)
+        const verifyMobileBtn = document.getElementById('verify-mobile-btn');
+        if (verifyMobileBtn) verifyMobileBtn.addEventListener('click', function() {
             const mobile = document.getElementById('phoneNumber')?.value?.trim();
             if (mobile && mobile.length === 10) {
                 sendOTP(mobile);

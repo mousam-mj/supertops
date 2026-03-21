@@ -665,7 +665,7 @@
                                 </div>
                                 <label for="agree" class="pl-2 cursor-pointer text-secondary2"
                                     >I agree to the
-                                    <a href="#!" class="text-black hover:underline pl-1">Terms of User</a>
+                                    <a href="{{ route('terms-and-conditions') }}" class="text-black hover:underline pl-1" target="_blank">Terms of Use</a>
                                 </label>
                             </div>
                             <div class="block-button md:mt-7 mt-4">
@@ -715,7 +715,7 @@
                     <div class="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
                         <div class="text-content">
                             <div class="heading4">Already have an account?</div>
-                                <div class="text-secondary">Welcome back. Sign in to access your personalized experience, saved preferences, and more. We{String.raw`'re`} thrilled to have you with us again!</div>
+                                <div class="text-secondary">Welcome back. Sign in to access your personalized experience, saved preferences, and more. We're thrilled to have you with us again!</div>
                                 <div class="block-button md:mt-7 mt-4">
                                     <a href="{{ route('login') }}" class="button-main">Login</a>
                                 </div>

@@ -3,6 +3,46 @@
 @section('title', 'Forgot Password - Perch Bottle')
 
 @section('content')
+<style>
+.forgot-error-alert.hidden,
+.forgot-success-alert.hidden {
+    display: none !important;
+}
+.forgot-error-alert:not(.hidden) {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #b91c1c;
+    font-size: 14px;
+}
+.forgot-error-alert i {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.forgot-success-alert:not(.hidden) {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    color: #15803d;
+    font-size: 14px;
+}
+.forgot-success-alert i {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+</style>
 <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
                     <div class="container h-full">
@@ -577,17 +617,33 @@
             <div class="container">
                 <div class="content-main flex gap-y-8 max-md:flex-col">
                     <div class="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r border-line">
-                        <div class="heading4">Reset your password</div>
-                        <div class="body1 mt-2">We will send you an email to reset your password</div>
-                        <form class="md:mt-7 mt-4">
-                            <div class="email">
-                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="email" placeholder="Username or email address *" required />
+                        @auth
+                            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="heading4 text-green-800">You're already logged in with {{ auth()->user()->email }}</div>
+                                <div class="body1 mt-2 text-green-700">No need to reset password. <a href="{{ route('my-account') }}" class="text-button underline">Go to My Account</a></div>
                             </div>
-                            <div class="block-button md:mt-7 mt-4">
-                                <button class="button-main">Submit</button>
-                            </div>
-                        </form>
+                        @else
+                            <div class="heading4">Reset your password</div>
+                            <div class="body1 mt-2">We will send you an email to reset your password</div>
+                            <form id="forgot-password-form" class="md:mt-7 mt-4">
+                                <div id="forgot-password-error" class="forgot-error-alert hidden">
+                                    <i class="ph ph-warning-circle"></i>
+                                    <span class="forgot-error-text"></span>
+                                </div>
+                                <div id="forgot-password-success" class="forgot-success-alert hidden">
+                                    <i class="ph ph-check-circle"></i>
+                                    <span class="forgot-success-text"></span>
+                                </div>
+                                <div class="email">
+                                    <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="forgot-email" name="email" type="email" placeholder="Email address *" required />
+                                </div>
+                                <div class="block-button md:mt-7 mt-4" style="display: block !important;">
+                                    <button type="submit" class="button-main w-full text-center py-3 bg-black text-white hover:bg-gray-800" id="forgot-submit-btn" style="display: block !important; visibility: visible !important; background-color: #000 !important; color: #fff !important;">Submit</button>
+                                </div>
+                            </form>
+                        @endauth
                     </div>
+                    @guest
                     <div class="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
                         <div class="text-content">
                             <div class="heading4">New Customer</div>
@@ -597,7 +653,79 @@
                             </div>
                         </div>
                     </div>
+                    @endguest
                 </div>
             </div>
         </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('forgot-password-form');
+    if (!form) return;
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var emailEl = document.getElementById('forgot-email');
+        var errorEl = document.getElementById('forgot-password-error');
+        var successEl = document.getElementById('forgot-password-success');
+        var btn = document.getElementById('forgot-submit-btn');
+        var email = (emailEl && emailEl.value || '').trim();
+        errorEl.classList.add('hidden');
+        successEl.classList.add('hidden');
+        var errorTextEl = errorEl.querySelector('.forgot-error-text');
+        var successTextEl = successEl.querySelector('.forgot-success-text');
+        if (!email) {
+            if (errorTextEl) errorTextEl.textContent = 'Please enter your email address.';
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ email: email })
+        })
+        .then(function(r) {
+            return r.json().then(function(data) {
+                return { ok: r.ok, status: r.status, data: data };
+            });
+        })
+        .then(function(result) {
+            var data = result.data;
+            if (result.ok && data && data.success) {
+                if (successTextEl) successTextEl.textContent = data.message || 'OTP sent! Check your email.';
+                successEl.classList.remove('hidden');
+                var delayMs = (data.data && data.data.otp) ? 8000 : 1500;
+                setTimeout(function() {
+                    window.location.href = '{{ route("reset-password") }}?email=' + encodeURIComponent(email);
+                }, delayMs);
+            } else {
+                var msg = data && data.message;
+                if (data && data.errors && data.errors.email) {
+                    msg = Array.isArray(data.errors.email) ? data.errors.email[0] : data.errors.email;
+                }
+                if (errorTextEl) errorTextEl.textContent = msg || 'Failed to send reset email. Please try again.';
+                errorEl.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Submit';
+            }
+        })
+        .catch(function(err) {
+            console.error(err);
+            if (errorTextEl) errorTextEl.textContent = 'An error occurred. Please try again.';
+            errorEl.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = 'Submit';
+        });
+    });
+});
+</script>
+@endpush
 @endsection
