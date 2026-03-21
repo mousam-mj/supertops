@@ -1499,10 +1499,18 @@ if (testBtn) {
         })
         .then(response => {
             console.log('Payment API response status:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
+            return response.text().then(function(text) {
+                try {
+                    var data = JSON.parse(text);
+                    if (!response.ok) {
+                        throw new Error(data.message || data.error || 'HTTP ' + response.status);
+                    }
+                    return data;
+                } catch (e) {
+                    if (!response.ok) throw new Error('Server error: ' + response.status + (text ? ' - ' + text.substring(0, 100) : ''));
+                    throw e;
+                }
+            });
         })
         .then(data => {
             console.log('Payment API response data:', data);
@@ -1554,7 +1562,11 @@ if (testBtn) {
         })
         .catch(error => {
             console.error('Error creating Razorpay order:', error);
-            alert('Error initializing payment. Please try again.');
+            var msg = error && error.message ? error.message : 'Please try again.';
+            if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                msg = 'Network error. Check your connection and ensure the site is on HTTPS.';
+            }
+            alert('Error initializing payment. ' + msg);
             resetSubmitButton();
         });
     }
