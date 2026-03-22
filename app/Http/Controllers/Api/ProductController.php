@@ -113,7 +113,11 @@ class ProductController extends Controller
         $product = Product::where('id', (int) $id)
             ->where('is_active', true)
             ->with('category')
-            ->firstOrFail();
+            ->first();
+
+        if (!$product) {
+            return response()->json(['success' => false, 'data' => null, 'message' => 'Product not found'], 404);
+        }
 
         $baseUrl = rtrim($request->getSchemeAndHttpHost() ?: config('app.url'), '/');
         $toFullUrl = function ($path) use ($baseUrl) {

@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ColorSizeSeeder::class,
             UserSeeder::class,
             ProductSeeder::class,
+            CustomizeProductSeeder::class,
             OrderSeeder::class,
             PolicyPageSeeder::class,
         ]);

@@ -283,6 +283,10 @@ Route::get('/about-us', function () {
     return view('aboutus');
 })->name('about-us');
 
+// Customize Tumbler (product-specific)
+Route::get('/customize', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize');
+Route::get('/customize/{slug}', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize.product');
+
 // Policy & content pages (Terms, Privacy, Return & Refund, Cancellation) - dynamic from admin
 Route::get('/terms-and-conditions', [PolicyPageController::class, 'show'])->defaults('slug', 'terms-and-conditions')->name('terms-and-conditions');
 Route::get('/privacy-policy', [PolicyPageController::class, 'show'])->defaults('slug', 'privacy-policy')->name('privacy-policy');

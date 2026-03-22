@@ -300,7 +300,6 @@ class ProductSeeder extends Seeder
             $existingProduct = Product::where('slug', $slug)->first();
             
             if ($existingProduct) {
-                // Update existing product
                 $existingProduct->update([
                     'name' => $productData['name'],
                     'description' => $this->generateDescription($productData['name']),
@@ -318,7 +317,6 @@ class ProductSeeder extends Seeder
                     'sort_order' => $productData['sort_order'] ?? $index + 1,
                 ]);
             } else {
-                // Create new product
                 Product::create([
                     'name' => $productData['name'],
                     'slug' => $slug,

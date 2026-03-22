@@ -292,8 +292,9 @@
                                     </div>
                                 </div>
 
-                                <div class="button-block mt-5">
-                                    <button type="button" class="buy-it-now-btn button-main w-full text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
+                                <div class="button-block mt-5 flex gap-3">
+                                    <a href="{{ route('customize.product', ['slug' => $product->slug]) }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline">Customize</a>
+                                    <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
                                 </div>
                             </div>
                             <div class="get-it mt-6">

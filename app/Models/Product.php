@@ -32,6 +32,7 @@ class Product extends Model
         'sizes',
         'colors',
         'specifications',
+        'customize_config',
         'product_type',
         'sort_order',
     ];
@@ -50,6 +51,7 @@ class Product extends Model
         'sizes' => 'array',
         'colors' => 'array',
         'specifications' => 'array',
+        'customize_config' => 'array',
         'sort_order' => 'integer',
     ];
 

@@ -55,7 +55,9 @@
                                 <li class="h-full">
                                     <a href="{{ route('contact') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">Contact Us</a>
                                 </li>
-                                
+                                <li class="h-full flex items-center">
+                                    <a href="{{ route('customize') }}" class="text-button-uppercase bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 duration-300">Customize</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="right flex gap-12 z-[1]">
@@ -194,6 +196,9 @@
                                                             </li>
                                                             <li>
                                 <a href="{{{ route('contact') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Contact Us</a>
+                                                            </li>
+                                                            <li>
+                                <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white mx-4">Customize</a>
                                                             </li>
                                                             <li>
                                 <a href="{{{ route('faqs') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">FAQs</a>

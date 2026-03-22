@@ -253,7 +253,7 @@ if (listSearchResults) {
   const queryValue = urlParams.get("query") || urlParams.get("q");
   // Only run if using old ?query= param and no server-rendered products
   if (queryValue && listProductResult && listProductResult.children.length === 0) {
-    fetch("./assets/data/Product.json")
+    fetch("/assets/data/Product.json")
       .then((response) => response.json())
       .then((products) => {
         const filterPrd = products.filter(
@@ -1200,7 +1200,7 @@ if (document.querySelector(".swiper-list-three-product")) {
 const lookbookUnderwear = document.querySelector('.lookbook-underwear')
 
 if (lookbookUnderwear) {
-  fetch("./assets/data/Product.json")
+  fetch("/assets/data/Product.json")
     .then((response) => response.json())
     .then((products) => {
       const itemDot = lookbookUnderwear.querySelector('.list-img .item .dots')
@@ -2275,7 +2275,7 @@ const handleActiveColorChange = () => {
 const filterProductImg = document.querySelector('.filter-product-img')
 
 if (filterProductImg) {
-  fetch('./assets/data/Product.json')
+  fetch('/assets/data/Product.json')
     .then(response => response.json())
     .then(data => {
       const prdId = filterProductImg.querySelector('.product-infor').getAttribute('data-item')
@@ -2359,7 +2359,7 @@ const listThreeProduct = document.querySelectorAll(
 );
 
 // Fetch products from JSON file (assuming products.json)
-fetch("./assets/data/Product.json")
+fetch("/assets/data/Product.json")
   .then((response) => response.json())
   .then((products) => {
     // Display the first 4 products
@@ -2843,7 +2843,7 @@ const createProductItemMarketplace = (product) => {
 
 // fetch product in marketplace
 if (document.querySelector('.tab-features-block.style-marketplace')) {
-  fetch("./assets/data/Product.json")
+  fetch("/assets/data/Product.json")
     .then((response) => response.json())
     .then((products) => {
       // Display the first 4 products
