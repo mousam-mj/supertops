@@ -184,7 +184,7 @@
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="Town/City *" value="{{ $defaultAddress->city ?? '' }}" required />
                                         </div>
                                         <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street *" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="country" name="country" type="text" placeholder="State *" value="{{ $defaultAddress->state ?? '' }}" required />
