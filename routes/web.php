@@ -284,6 +284,7 @@ Route::get('/about-us', function () {
 })->name('about-us');
 
 // Customize Tumbler (product-specific)
+Route::get('/customize-assets/app.js', [App\Http\Controllers\CustomizeController::class, 'appJs'])->name('customize.app.js');
 Route::get('/customize', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize');
 Route::get('/customize/{slug}', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize.product');
 

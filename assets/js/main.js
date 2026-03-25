@@ -1386,15 +1386,15 @@ const closeCompareIcon = document.querySelector(
 const clearCompareIcon = document.querySelector(".modal-compare-main .clear");
 
 const openModalCompare = () => {
-  modalCompareMain.classList.add("open");
+  if (modalCompareMain) modalCompareMain.classList.add("open");
 };
 
 const closeModalCompare = () => {
-  modalCompareMain.classList.remove("open");
+  if (modalCompareMain) modalCompareMain.classList.remove("open");
 };
 
-closeCompareIcon.addEventListener("click", closeModalCompare);
-clearCompareIcon.addEventListener("click", closeModalCompare);
+if (closeCompareIcon) closeCompareIcon.addEventListener("click", closeModalCompare);
+if (clearCompareIcon) clearCompareIcon.addEventListener("click", closeModalCompare);
 
 // Set compare length
 const handleItemModalCompare = () => {
@@ -1405,6 +1405,7 @@ const handleItemModalCompare = () => {
   const listItemCompare = document.querySelector(
     ".modal-compare-block .list-product"
   );
+  if (!listItemCompare) return;
 
   listItemCompare.innerHTML = "";
 
@@ -1461,8 +1462,8 @@ const handleItemModalCompare = () => {
   const clearCompareBtn = document.querySelector(
     ".modal-compare-block .block-button .clear"
   );
-  clearCompareBtn.addEventListener("click", () => {
-    localStorage.setItem("compareStore", []);
+  if (clearCompareBtn) clearCompareBtn.addEventListener("click", () => {
+    localStorage.setItem("compareStore", JSON.stringify([]));
     updateCompareIcons();
   });
 };

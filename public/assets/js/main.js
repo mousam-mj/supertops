@@ -1492,7 +1492,7 @@ const handleItemModalCompare = () => {
     ".modal-compare-block .block-button .clear"
   );
   if (clearCompareBtn) clearCompareBtn.addEventListener("click", () => {
-    localStorage.setItem("compareStore", []);
+    localStorage.setItem("compareStore", JSON.stringify([]));
     updateCompareIcons();
   });
 };

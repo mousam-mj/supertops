@@ -255,7 +255,11 @@
 @endsection
 
 @push('scripts')
+@php
+    $customizeAppPath = public_path('assets/js/customize-app.js');
+    $customizeAppV = is_readable($customizeAppPath) ? filemtime($customizeAppPath) : (int) time();
+@endphp
 <script>window.CUSTOMIZE_CONFIG = @json($config);</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="{{ asset('assets/js/customize-app.js') }}"></script>
+<script src="{{ route('customize.app.js', ['v' => $customizeAppV]) }}"></script>
 @endpush
