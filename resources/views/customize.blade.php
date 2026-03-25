@@ -12,18 +12,25 @@
 .customize-page .nav-step:first-child{padding-left:0;}
 .customize-page .nav-step:hover{color:#1a1a1a;}
 .customize-page .nav-step.active{font-weight:700;color:#1a1a1a;border-bottom-color:#1a1a1a;}
+.customize-page .nav-step.done:not(.active){color:#555;font-weight:600;}
+.customize-page .nav-steps{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin;-webkit-overflow-scrolling:touch;}
+.customize-page .flow-hint{font-size:12px;color:#888;margin-top:10px;line-height:1.45;}
+.customize-page .engrave-skip-label{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;margin-bottom:12px;cursor:pointer;}
+.customize-page .engrave-skip-label input{width:16px;height:16px;accent-color:#1a1a1a;}
 .customize-page .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.customize-page .nav-cart-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.customize-page .price-hint{font-size:11px;color:#888;font-weight:400;max-width:220px;text-align:right;line-height:1.3;}
 .customize-page .add-cart-btn{background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s;}
 .customize-page .add-cart-btn:hover{background:#333;}
 .customize-page .close-btn{width:32px;height:32px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#999;font-size:18px;border-radius:50%;transition:background .2s;text-decoration:none;color:inherit;}
 .customize-page .close-btn:hover{background:#f0f0f0;color:#1a1a1a;}
 .customize-page .content{display:flex;flex:1;min-height:0;}
-.customize-page .left-col{flex:0 0 56%;background:#f4f4f2;display:flex;flex-direction:column;align-items:center;padding:24px 28px 18px;position:relative;border-right:1px solid #e8e8e8;}
+.customize-page .left-col{flex:0 0 56%;background:#f0f0ee;display:flex;flex-direction:column;align-items:center;padding:24px 28px 18px;position:relative;border-right:1px solid #e8e8e8;}
 .customize-page .bottle-title{font-size:17px;font-weight:700;align-self:flex-start;margin-bottom:12px;}
 .customize-page #three-wrap{width:100%;flex:1;position:relative;min-height:390px;display:flex;align-items:center;justify-content:center;}
 .customize-page #three-wrap canvas{border-radius:10px;cursor:grab;display:block;}
 .customize-page #three-wrap canvas:active{cursor:grabbing;}
-.customize-page .loading-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f4f4f2;border-radius:10px;z-index:10;}
+.customize-page .loading-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f0f0ee;border-radius:10px;z-index:10;}
 .customize-page .spinner{width:36px;height:36px;border:3px solid #ddd;border-top-color:#1a1a1a;border-radius:50%;animation:customize-spin .8s linear infinite;}
 @keyframes customize-spin{to{transform:rotate(360deg)}}
 .customize-page .loading-text{font-size:13px;color:#888;}
@@ -66,7 +73,8 @@
 .customize-page .cat-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
 .customize-page .engrave-sel-label{margin-left:auto;font-size:12px;color:#666;}
 .customize-page .engrave-sel-label span{font-weight:700;color:#1a1a1a;}
-.customize-page .engrave-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+.customize-page .engrave-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;transition:opacity .2s;}
+.customize-page .engrave-grid.engrave-off{opacity:0.42;pointer-events:none;}
 .customize-page .engrave-tile{aspect-ratio:1;border:1.5px solid #e0e0e0;border-radius:8px;background:#fafafa;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:5px;overflow:hidden;}
 .customize-page .engrave-tile:hover{border-color:#aaa;background:#efefef;}.customize-page .engrave-tile.selected{border:2.5px solid #1a1a1a;background:#fff;}
 .customize-page .engrave-tile svg{width:100%;height:100%;stroke:#1a1a1a;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;}
@@ -89,11 +97,14 @@
         <div class="nav-step active" data-step="1" onclick="goTo(1)">Tumbler</div>
         <div class="nav-step" data-step="2" onclick="goTo(2)">Lid</div>
         <div class="nav-step" data-step="3" onclick="goTo(3)">Straw</div>
-        <div class="nav-step" data-step="4" onclick="goTo(4)">Boot</div>
+        <div class="nav-step" data-step="4" onclick="goTo(4)">Handle</div>
         <div class="nav-step" data-step="5" onclick="goTo(5)">Engraving</div>
       </div>
       <div class="nav-right">
-        <button class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'] + ($config['has_engraving'] ? $config['engraving_price'] : 0), 2) }}</button>
+        <div class="nav-cart-wrap">
+          <button class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'] + ($config['has_engraving'] ? $config['engraving_price'] : 0), 2) }}</button>
+          <span class="price-hint" id="price-hint"></span>
+        </div>
         <a href="{{ route('home') }}" class="close-btn" title="Close">✕</a>
       </div>
     </div>
@@ -113,11 +124,11 @@
           <div class="side-wish">
             <button class="wish-btn" id="wish-btn" onclick="toggleWish()">♡</button>
           </div>
-          <div class="hint-label">Drag to rotate · Scroll to zoom</div>
+          <div class="hint-label">Drag to rotate · Scroll to zoom · Preview shows all parts; use tabs to change each</div>
         </div>
         <div class="bottom-links">
-          <span class="bottom-link">↑ Share Design</span>
-          <span class="bottom-link">↺ Start Over</span>
+          <button type="button" class="bottom-link" style="background:none;border:none;padding:0;font:inherit;" onclick="shareCustomizeDesign()">↑ Share link</button>
+          <button type="button" class="bottom-link" style="background:none;border:none;padding:0;font:inherit;" onclick="startOverCustomize()">↺ Start over</button>
         </div>
         <div class="bottom-note">Please be aware that customized products are not eligible for returns.</div>
       </div>
@@ -126,7 +137,7 @@
         <div class="step-panel active" id="panel-1">
           <div class="step-heading">Tumbler</div>
           <div class="step-counter">1 of 5</div>
-          <div class="step-subtext">Select your tumbler size</div>
+          <div class="step-subtext">Choose size and body color. Lid, straw and handle use their own colors — set them in the next steps.</div>
           <div class="size-cards" id="size-cards">
             @php $sz = $config['sizes'] ?? []; $lastIdx = count($sz) ? count($sz)-1 : 0; @endphp
             @foreach($sz as $i => $size)
@@ -145,8 +156,9 @@
             <div class="swatches-track" id="bottle-swatches"></div>
             <button class="color-arrow" onclick="shiftS('bottle',1)">&#8250;</button>
           </div>
-          <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Stone') }}</div>
+          <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – Lid</button></div>
+          <p class="flow-hint">Tip: complete each step left to right, or jump using the tabs above. Your 3D preview updates live.</p>
         </div>
 
         <!-- Step 2: Lid -->
@@ -164,7 +176,7 @@
             <div class="swatches-track" id="cap-swatches"></div>
             <button class="color-arrow" onclick="shiftS('cap',1)">&#8250;</button>
           </div>
-          <div class="color-name-label" id="cap-color-label">{{ ($config['cap_colors'][0]['name'] ?? 'Neon Yellow') }}</div>
+          <div class="color-name-label" id="cap-color-label">{{ ($config['cap_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(1)">Previous – Tumbler</button>
             <button class="next-btn" onclick="goTo(3)">Next – Straw</button>
@@ -186,25 +198,29 @@
             <div class="swatches-track" id="strap-swatches"></div>
             <button class="color-arrow" onclick="shiftS('strap',1)">&#8250;</button>
           </div>
-          <div class="color-name-label" id="strap-color-label">{{ ($config['strap_colors'][0]['name'] ?? 'Camellia') }}</div>
+          <div class="color-name-label" id="strap-color-label">{{ ($config['strap_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(2)">Previous – Lid</button>
-            <button class="next-btn" onclick="goTo(4)">Next – Boot</button>
+            <button class="next-btn" onclick="goTo(4)">Next – Handle</button>
           </div>
         </div>
 
-        <!-- Step 4: Boot -->
+        <!-- Step 4: Handle (side grip; silicone boot at base matches handle color) -->
         <div class="step-panel" id="panel-4">
-          <div class="step-heading">Boot</div>
+          <div class="step-heading">Handle</div>
           <div class="step-counter">4 of 5</div>
-          <div class="step-subtext">Choose a color for your boot</div>
-          <div class="color-label">Choose a color for your boot</div>
-          <div class="color-row">
-            <button class="color-arrow" onclick="shiftS('boot',-1)">&#8249;</button>
-            <div class="swatches-track" id="boot-swatches"></div>
-            <button class="color-arrow" onclick="shiftS('boot',1)">&#8250;</button>
+          <div class="step-subtext">Choose a color for your handle. The protective base ring uses the same color.</div>
+          <div class="option-card">
+            <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><path d="M22 8 Q28 8 28 18 L28 48 Q28 56 22 56 Q16 56 16 48 L16 18 Q16 8 22 8Z" stroke="#222" stroke-width="2.2" fill="#e8e8e8"/></svg></div>
+            <div class="option-info"><div class="option-name">Ergonomic side handle</div><div class="option-desc">Matches the silicone boot at the bottom of your tumbler.</div></div>
           </div>
-          <div class="color-name-label" id="boot-color-label">{{ ($config['boot_colors'][0]['name'] ?? 'Black') }}</div>
+          <div class="color-label">Choose a color for your handle</div>
+          <div class="color-row">
+            <button class="color-arrow" onclick="shiftS('handle',-1)">&#8249;</button>
+            <div class="swatches-track" id="handle-swatches"></div>
+            <button class="color-arrow" onclick="shiftS('handle',1)">&#8250;</button>
+          </div>
+          <div class="color-name-label" id="handle-color-label">{{ ($config['handle_colors'][0]['name'] ?? ($config['boot_colors'][0]['name'] ?? 'Lavender')) }}</div>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(3)">Previous – Straw</button>
             <button class="next-btn" onclick="goTo(5)">Next – Engraving</button>
@@ -215,6 +231,8 @@
         <div class="step-panel" id="panel-5">
           <div class="step-heading">Engraving</div>
           <div class="step-counter">5 of 5</div>
+          <div class="step-subtext">Pick a graphic or skip engraving to pay only the tumbler price.</div>
+          <label class="engrave-skip-label"><input type="checkbox" id="engrave-none-cb"> No engraving (price without engraving)</label>
           <div class="engrave-mode">
             <label><input type="radio" name="engrave-side" value="single" checked> Single</label>
             <label><input type="radio" name="engrave-side" value="double"> Double</label>
@@ -225,8 +243,8 @@
           </div>
           <div class="engrave-grid" id="engrave-grid"></div>
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(4)">Previous – Boot</button>
-            <select class="qty-select"><option>1</option><option>2</option><option>3</option></select>
+            <button class="prev-btn" onclick="goTo(4)">Previous – Handle</button>
+            <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
             <button class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'] + ($config['has_engraving'] ? $config['engraving_price'] : 0), 2) }}</span></button>
           </div>
         </div>

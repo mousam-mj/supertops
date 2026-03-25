@@ -35,11 +35,12 @@ class CustomizeProductSeeder extends Seeder
 
         $customizeConfig = [
             'sizes' => [
-                ['name' => '24 oz', 'desc' => 'Insulated tumbler for life on the go.', 'price' => 3500],
-                ['name' => '32 oz', 'desc' => 'Medium insulated tumbler.', 'price' => 4000],
-                ['name' => '40 oz', 'desc' => 'Large insulated tumbler with handle and straw.', 'price' => 4500],
+                ['name' => '24 oz (~710 ml)', 'desc' => 'Insulated tumbler for life on the go.', 'price' => 3500],
+                ['name' => '32 oz (~950 ml)', 'desc' => 'Medium insulated tumbler.', 'price' => 4000],
+                ['name' => '40 oz (~1.2 L)', 'desc' => 'Large insulated tumbler with handle and straw.', 'price' => 4500],
             ],
             'bottle_colors' => [
+                ['name' => 'Lavender', 'hex' => '#c4b8e8'],
                 ['name' => 'Stone', 'hex' => '#6b6b6b'],
                 ['name' => 'Black', 'hex' => '#1a1a1a'],
                 ['name' => 'White', 'hex' => '#f0f0ee'],
@@ -50,24 +51,33 @@ class CustomizeProductSeeder extends Seeder
                 ['name' => 'Tan', 'hex' => '#c2a97d'],
             ],
             'cap_colors' => [
-                ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
+                ['name' => 'Lavender', 'hex' => '#c4b8e8'],
+                ['name' => 'Stone', 'hex' => '#6b6b6b'],
+                ['name' => 'Black', 'hex' => '#1a1a1a'],
+                ['name' => 'White', 'hex' => '#f0f0ee'],
                 ['name' => 'Pacific', 'hex' => '#3b78c4'],
+                ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
                 ['name' => 'Green', 'hex' => '#3aaa5a'],
                 ['name' => 'Camellia', 'hex' => '#e87aaa'],
-                ['name' => 'Black', 'hex' => '#1a1a1a'],
-                ['name' => 'White', 'hex' => '#f0f0ee'],
             ],
             'strap_colors' => [
-                ['name' => 'Camellia', 'hex' => '#e87aaa'],
+                ['name' => 'Lavender', 'hex' => '#c4b8e8'],
+                ['name' => 'Stone', 'hex' => '#6b6b6b'],
                 ['name' => 'Black', 'hex' => '#1a1a1a'],
                 ['name' => 'Pacific', 'hex' => '#3b78c4'],
+                ['name' => 'Camellia', 'hex' => '#e87aaa'],
                 ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
             ],
-            'boot_colors' => [
+            'handle_colors' => [
+                ['name' => 'Lavender', 'hex' => '#c4b8e8'],
+                ['name' => 'Stone', 'hex' => '#6b6b6b'],
+                ['name' => 'Pacific', 'hex' => '#3b78c4'],
                 ['name' => 'Black', 'hex' => '#1a1a1a'],
                 ['name' => 'White', 'hex' => '#f0f0ee'],
-                ['name' => 'Stone', 'hex' => '#6b6b6b'],
                 ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
+                ['name' => 'Camellia', 'hex' => '#e87aaa'],
+                ['name' => 'Mermaid Green', 'hex' => '#4aab6a'],
+                ['name' => 'Dragonfruit', 'hex' => '#c4426a'],
             ],
             'engraving_price' => 600,
             'has_engraving' => true,
@@ -75,8 +85,8 @@ class CustomizeProductSeeder extends Seeder
 
         $data = [
             'name' => '1200ml Running Tumbler',
-            'description' => 'Premium quality 1200ml Running Tumbler. Customize size, colors (tumbler, lid, straw, boot) and add engraving. Made with high-grade materials for durability and style.',
-            'short_description' => 'Customizable insulated tumbler with size, color options and engraving.',
+            'description' => 'Premium quality 1200ml Running Tumbler (mouth Ø 97mm). Customize tumbler, lid, straw, handle and engraving. Base boot matches handle color. Made with high-grade materials.',
+            'short_description' => 'Customizable insulated tumbler — tumbler, lid, straw, handle, engraving.',
             'category_id' => $category->id,
             'price' => 2500,
             'sale_price' => 2499,

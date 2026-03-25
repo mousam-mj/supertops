@@ -175,7 +175,7 @@
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="email" type="email" placeholder="Email Address *" value="{{ $user->email ?? '' }}" required />
                                         </div>
                                         <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="phoneNumber" type="tel" placeholder="Phone Numbers *" value="{{ $user->phone ?? ($defaultAddress->phone ?? '') }}" required />
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="phoneNumber" type="tel" placeholder="Phone Number *" value="{{ $user->phone ?? ($defaultAddress->phone ?? '') }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="region" name="region" type="text" placeholder="Country *" value="{{ $defaultAddress->country ?? 'India' }}" required />
@@ -184,7 +184,7 @@
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="Town/City *" value="{{ $defaultAddress->city ?? '' }}" required />
                                         </div>
                                         <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street,..." value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="country" name="country" type="text" placeholder="State *" value="{{ $defaultAddress->state ?? '' }}" required />

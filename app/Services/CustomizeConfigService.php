@@ -65,6 +65,7 @@ class CustomizeConfigService
     ];
 
     protected static array $defaultBootColors = [
+        ['name' => 'Lavender', 'hex' => '#c4b8e8'],
         ['name' => 'Black', 'hex' => '#1a1a1a'],
         ['name' => 'White', 'hex' => '#f0f0ee'],
         ['name' => 'Stone', 'hex' => '#6b6b6b'],
@@ -74,6 +75,7 @@ class CustomizeConfigService
     ];
 
     protected static array $defaultTumblerColors = [
+        ['name' => 'Lavender', 'hex' => '#c4b8e8'],
         ['name' => 'Stone', 'hex' => '#6b6b6b'],
         ['name' => 'Black', 'hex' => '#1a1a1a'],
         ['name' => 'White', 'hex' => '#f0f0ee'],
@@ -85,18 +87,22 @@ class CustomizeConfigService
     ];
 
     protected static array $defaultLidColors = [
-        ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
-        ['name' => 'Pacific', 'hex' => '#3b78c4'],
-        ['name' => 'Green', 'hex' => '#3aaa5a'],
-        ['name' => 'Camellia', 'hex' => '#e87aaa'],
+        ['name' => 'Lavender', 'hex' => '#c4b8e8'],
+        ['name' => 'Stone', 'hex' => '#6b6b6b'],
         ['name' => 'Black', 'hex' => '#1a1a1a'],
         ['name' => 'White', 'hex' => '#f0f0ee'],
+        ['name' => 'Pacific', 'hex' => '#3b78c4'],
+        ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
+        ['name' => 'Green', 'hex' => '#3aaa5a'],
+        ['name' => 'Camellia', 'hex' => '#e87aaa'],
     ];
 
     protected static array $defaultStrawColors = [
-        ['name' => 'Camellia', 'hex' => '#e87aaa'],
+        ['name' => 'Lavender', 'hex' => '#c4b8e8'],
+        ['name' => 'Stone', 'hex' => '#6b6b6b'],
         ['name' => 'Black', 'hex' => '#1a1a1a'],
         ['name' => 'Pacific', 'hex' => '#3b78c4'],
+        ['name' => 'Camellia', 'hex' => '#e87aaa'],
         ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
     ];
 
@@ -113,6 +119,7 @@ class CustomizeConfigService
         $capColors = $customizeConfig['cap_colors'] ?? $customizeConfig['lid_colors'] ?? self::$defaultLidColors;
         $strapColors = $customizeConfig['strap_colors'] ?? $customizeConfig['straw_colors'] ?? self::$defaultStrawColors;
         $bootColors = $customizeConfig['boot_colors'] ?? self::$defaultBootColors;
+        $handleColors = $customizeConfig['handle_colors'] ?? $customizeConfig['boot_colors'] ?? self::$defaultBootColors;
 
         $sizes = $customizeConfig['sizes'] ?? [
             ['name' => '24 oz', 'desc' => 'Insulated tumbler for life on the go.', 'price' => 3500],
@@ -132,6 +139,7 @@ class CustomizeConfigService
             'cap_colors' => $capColors,
             'strap_colors' => $strapColors,
             'boot_colors' => $bootColors,
+            'handle_colors' => $handleColors,
             'sizes' => $sizes,
             'base_price' => $basePrice,
             'engraving_price' => $engravingPrice,
