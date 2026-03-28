@@ -15,6 +15,7 @@ const capColors=cfg.cap_colors&&cfg.cap_colors.length?cfg.cap_colors:DEFAULT_CAP
 const strapColors=cfg.strap_colors&&cfg.strap_colors.length?cfg.strap_colors:DEFAULT_STRAP;
 const DEFAULT_HANDLE=[{name:'Lavender',hex:'#c4b8e8'},{name:'Stone',hex:'#6b6b6b'},{name:'Pacific',hex:'#3b78c4'},{name:'Black',hex:'#1a1a1a'},{name:'White',hex:'#f0f0ee'},{name:'Neon Yellow',hex:'#ffe000'},{name:'Camellia',hex:'#e87aaa'},{name:'Mermaid Green',hex:'#4aab6a'}];
 const handleColors=(cfg.handle_colors&&cfg.handle_colors.length)?cfg.handle_colors:((cfg.boot_colors&&cfg.boot_colors.length)?cfg.boot_colors:DEFAULT_HANDLE);
+const bootColors=(cfg.boot_colors&&cfg.boot_colors.length)?cfg.boot_colors:((cfg.handle_colors&&cfg.handle_colors.length)?cfg.handle_colors:DEFAULT_HANDLE);
 const sizes=cfg.sizes&&cfg.sizes.length?cfg.sizes:[{name:'40 oz',price:cfg.base_price||45}];
 let basePrice=typeof cfg.base_price==='number'?cfg.base_price:45;
 if(sizes.length>0){ var last=sizes[sizes.length-1]; basePrice=typeof last.price==='number'?last.price:basePrice; }
@@ -23,8 +24,19 @@ const hasEngraving=cfg.has_engraving!==false;
 const productName=cfg.product_name||'1200ml Running Tumbler';
 const currency=cfg.currency||'₹';
 
-const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,eIdx:0,hasE:true,wish:false,qty:1,maxVisited:1};
+const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,eIdx:0,hasE:true,wish:false,qty:1,maxVisited:1};
 const VIS=7;
+
+function normalizeHex(h){
+  if(h==null||h==='') return '#888888';
+  var s=String(h).trim();
+  if(s.charAt(0)!=='#') s='#'+s;
+  if(s.length===4){
+    var r=s.charAt(1),g=s.charAt(2),b=s.charAt(3);
+    s='#'+r+r+g+g+b+b;
+  }
+  return s;
+}
 
 // Perch 1200ml CAD space → Three.js (same as perch-customizer.html; parts stay aligned)
 const CX=48.5, CY=48.5, CZ=175.15, SCALE=230/350;
@@ -39,7 +51,7 @@ function initThree(){
   const wrap = document.getElementById('three-wrap');
   if(!wrap) return;
   if(scene){
-    loadAllParts();
+    loadAllParts().catch(function(){});
     return;
   }
 
@@ -114,7 +126,7 @@ function initThree(){
     renderer.setSize(W2,H2);
   });
 
-  loadAllParts();
+  loadAllParts().catch(function(){});
   animLoop();
 }
 
@@ -124,7 +136,7 @@ function b64ToArrayBuffer(b64){
   return buf;
 }
 
-function parseSTLMesh(buf){
+function parseBinaryStl(buf){
   const dv=new DataView(buf);
   const n=dv.getUint32(80,true);
   const verts=new Float32Array(n*9);
@@ -148,11 +160,42 @@ function parseSTLMesh(buf){
   geo.computeVertexNormals();
   return geo;
 }
+function parseAsciiStl(text){
+  const verts=[];
+  const re=/vertex\s+([-+eE\d.]+)\s+([-+eE\d.]+)\s+([-+eE\d.]+)/g;
+  let m;
+  while((m=re.exec(text))!==null){
+    const sx=parseFloat(m[1]), sy=parseFloat(m[2]), sz=parseFloat(m[3]);
+    verts.push((sx-CX)*SCALE,(sz-CZ)*SCALE,-(sy-CY)*SCALE);
+  }
+  if(verts.length<9) return null;
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(verts),3));
+  geo.computeVertexNormals();
+  return geo;
+}
+function parseSTLMesh(buf){
+  if(buf.byteLength>=84){
+    const dv=new DataView(buf);
+    const tri=dv.getUint32(80,true);
+    if(tri>0&&tri<5e7&&84+tri*50===buf.byteLength){
+      return parseBinaryStl(buf);
+    }
+  }
+  const hdrLen=Math.min(120,buf.byteLength);
+  const hdr=new TextDecoder('ascii').decode(new Uint8Array(buf,0,hdrLen));
+  if(/^\s*solid\b/i.test(hdr)){
+    const ascii=parseAsciiStl(new TextDecoder('utf-8').decode(buf));
+    if(ascii) return ascii;
+  }
+  return parseBinaryStl(buf);
+}
 
 function makePartMaterial(key, hex){
+  const h=normalizeHex(hex);
   const thin=key==='handle'||key==='boot'||key==='straw'||key==='cap';
   const mat=new THREE.MeshStandardMaterial({
-    color:new THREE.Color(hex),
+    color:new THREE.Color(h),
     metalness:0.04,
     roughness:0.38,
     envMapIntensity:0.85,
@@ -160,12 +203,11 @@ function makePartMaterial(key, hex){
   });
   if(thin){
     mat.polygonOffset=true;
-    // Positive offset = deeper (behind). Straw was +4 so the lid hid the real straw color.
-    mat.polygonOffsetFactor=key==='straw'?-2.5:(key==='cap'?3:1);
+    mat.polygonOffsetFactor=key==='straw'?-1.5:(key==='cap'?2:(key==='boot'?2:1));
     mat.polygonOffsetUnits=key==='straw'?-1:1;
   }
-  mat._cur=new THREE.Color(hex);
-  mat._tgt=new THREE.Color(hex);
+  mat._cur=new THREE.Color(h);
+  mat._tgt=new THREE.Color(h);
   return mat;
 }
 
@@ -190,36 +232,92 @@ function disposeModelParts(){
   M.body=M.cap=M.handle=M.boot=M.straw=null;
 }
 
+function partStlUrlsReady(){
+  var u=cfg.part_stl_urls;
+  return !!(u&&u.body&&u.cap&&u.straw&&u.handle&&u.boot);
+}
+function fetchStlBuffer(url){
+  return fetch(url,{credentials:'same-origin'}).then(function(r){
+    if(!r.ok) throw new Error('STL '+r.status+': '+url);
+    return r.arrayBuffer();
+  });
+}
 function loadAllParts(){
-  try{
-    disposeModelParts();
-    const hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex;
-    const parts=[
-      ['body',BODY_B64,hb],
-      ['cap',CAP_B64,hc],
-      ['handle',HANDLE_B64,hh],
-      ['boot',BOOT_B64,hh],
-      ['straw',STRAP_B64,hs],
-    ];
-    const drawOrder={body:0,boot:1,handle:2,cap:3,straw:15};
-    for(let i=0;i<parts.length;i++){
-      const key=parts[i][0], b64=parts[i][1], hex=parts[i][2];
-      const geo=parseSTLMesh(b64ToArrayBuffer(b64));
-      const mat=makePartMaterial(key, hex);
-      const mesh=new THREE.Mesh(geo, mat);
+  var loadingEl=document.getElementById('loading-msg');
+  function loadErr(msg){
+    console.error(msg);
+    if(loadingEl) loadingEl.innerHTML='<div style="color:#e04;font-size:13px;padding:20px;text-align:center;">'+String(msg)+'</div>';
+  }
+  function addPartMeshes(geos){
+    var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
+    var hexMap={body:hb,cap:hc,handle:hh,boot:hbo,straw:hs};
+    var drawOrder={body:0,boot:1,handle:2,cap:3,straw:15};
+    var keys=['body','cap','handle','boot','straw'];
+    for(var i=0;i<keys.length;i++){
+      var key=keys[i];
+      var geo=geos[key];
+      var mat=makePartMaterial(key, hexMap[key]);
+      var mesh=new THREE.Mesh(geo, mat);
       mesh.castShadow=false;
       mesh.receiveShadow=false;
       mesh.renderOrder=drawOrder[key]!==undefined?drawOrder[key]:0;
       group.add(mesh);
       M[key]=mesh;
     }
-    document.getElementById('loading-msg').style.display='none';
+    if(loadingEl) loadingEl.style.display='none';
     syncAllPartsFromState();
     setupEngravePreview();
+  }
+  try{
+    disposeModelParts();
+    var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
+    if(partStlUrlsReady()){
+      var u=cfg.part_stl_urls;
+      return Promise.all([
+        fetchStlBuffer(u.body),
+        fetchStlBuffer(u.cap),
+        fetchStlBuffer(u.handle),
+        fetchStlBuffer(u.boot),
+        fetchStlBuffer(u.straw)
+      ]).then(function(bufs){
+        addPartMeshes({
+          body: parseSTLMesh(bufs[0]),
+          cap: parseSTLMesh(bufs[1]),
+          handle: parseSTLMesh(bufs[2]),
+          boot: parseSTLMesh(bufs[3]),
+          straw: parseSTLMesh(bufs[4])
+        });
+      }).catch(function(e){
+        loadErr('Error: '+(e&&e.message?e.message:String(e)));
+      });
+    }
+    var parts=[
+      ['body',BODY_B64,hb],
+      ['cap',BOOT_B64,hc],
+      ['handle',HANDLE_B64,hh],
+      ['boot',CAP_B64,hbo],
+      ['straw',STRAP_B64,hs],
+    ];
+    var drawOrder={body:0,boot:1,handle:2,cap:3,straw:15};
+    for(var i=0;i<parts.length;i++){
+      var key=parts[i][0], b64=parts[i][1], hex=parts[i][2];
+      var geo=parseSTLMesh(b64ToArrayBuffer(b64));
+      var mat=makePartMaterial(key, hex);
+      var mesh=new THREE.Mesh(geo, mat);
+      mesh.castShadow=false;
+      mesh.receiveShadow=false;
+      mesh.renderOrder=drawOrder[key]!==undefined?drawOrder[key]:0;
+      group.add(mesh);
+      M[key]=mesh;
+    }
+    if(loadingEl) loadingEl.style.display='none';
+    syncAllPartsFromState();
+    setupEngravePreview();
+    return Promise.resolve();
   }catch(e){
     console.error(e);
-    document.getElementById('loading-msg').innerHTML=
-      '<div style="color:#e04;font-size:13px;padding:20px;text-align:center;">Error: '+e.message+'</div>';
+    loadErr('Error: '+e.message);
+    return Promise.reject(e);
   }
 }
 
@@ -229,10 +327,12 @@ function syncAllPartsFromState(){
   var ch=capColors[S.cIdx]&&capColors[S.cIdx].hex;
   var sh=strapColors[S.sIdx]&&strapColors[S.sIdx].hex;
   var hh=handleColors[S.hIdx]&&handleColors[S.hIdx].hex;
+  var boh=bootColors[S.boIdx]&&bootColors[S.boIdx].hex;
   if(bh) snapMatColor(M.body, bh);
   if(ch) snapMatColor(M.cap, ch);
   if(sh) snapMatColor(M.straw, sh);
-  if(hh){ snapMatColor(M.handle, hh); snapMatColor(M.boot, hh); }
+  if(hh) snapMatColor(M.handle, hh);
+  if(boh) snapMatColor(M.boot, boh);
 }
 
 function setupEngravePreview(){
@@ -312,18 +412,25 @@ function animLoop(){
 
 function snapMatColor(mesh, hex){
   if(!mesh||!mesh.material) return;
-  mesh.material._tgt.set(hex);
-  mesh.material._cur.set(hex);
-  mesh.material.color.set(hex);
+  var h=normalizeHex(hex);
+  try{
+    mesh.material._tgt.setStyle(h);
+    mesh.material._cur.setStyle(h);
+    mesh.material.color.setStyle(h);
+  }catch(err){
+    mesh.material._tgt.set(h);
+    mesh.material._cur.set(h);
+    mesh.material.color.set(h);
+  }
   mesh.material.needsUpdate=true;
 }
 function setBodyColor(hex){ snapMatColor(M.body, hex); }
 function setCapColor(hex){ snapMatColor(M.cap, hex); }
-function setStrapColor(hex){ snapMatColor(M.straw, hex); }
-function setHandleColor(hex){
-  snapMatColor(M.handle, hex);
-  snapMatColor(M.boot, hex);
+function setStrapColor(hex){
+  snapMatColor(M.straw, normalizeHex(hex));
 }
+function setHandleColor(hex){ snapMatColor(M.handle, hex); }
+function setBootColor(hex){ snapMatColor(M.boot, hex); }
 
 function resetCam(){
   if(flipGroup) flipGroup.rotation.x=Math.PI;
@@ -344,31 +451,35 @@ function renderSw(id, colors_arr, sel, off, lblId){
   const w=document.getElementById(id); if(!w)return; w.innerHTML='';
   colors_arr.slice(off, off+VIS).forEach((c,i)=>{
     const ri=off+i, el=document.createElement('div');
-    const hx=c.hex||(c.color||'#888888');
+    const hx=normalizeHex(c.hex||c.color||'#888888');
     el.className='swatch'+(ri===sel?' selected':'')+(c.outOfStock?' out-of-stock':'');
     el.style.background=hx; el.title=c.name;
     if(!c.outOfStock)el.onclick=()=>{
-      if(id==='bottle-swatches'){ S.bIdx=ri; document.getElementById(lblId).textContent=c.name; setBodyColor(hx); }
-      else if(id==='cap-swatches'){ S.cIdx=ri; document.getElementById(lblId).textContent=c.name; setCapColor(hx); }
-      else if(id==='strap-swatches'){ S.sIdx=ri; document.getElementById(lblId).textContent=c.name; setStrapColor(hx); }
-      else if(id==='handle-swatches'){ S.hIdx=ri; document.getElementById(lblId).textContent=c.name; setHandleColor(hx); }
+      var lbl=document.getElementById(lblId);
+      if(id==='bottle-swatches'){ S.bIdx=ri; if(lbl) lbl.textContent=c.name; setBodyColor(hx); }
+      else if(id==='cap-swatches'){ S.cIdx=ri; if(lbl) lbl.textContent=c.name; setCapColor(hx); }
+      else if(id==='strap-swatches'){ S.sIdx=ri; if(lbl) lbl.textContent=c.name; setStrapColor(hx); }
+      else if(id==='handle-swatches'){ S.hIdx=ri; if(lbl) lbl.textContent=c.name; setHandleColor(hx); }
+      else if(id==='boot-swatches'){ S.boIdx=ri; if(lbl) lbl.textContent=c.name; setBootColor(hx); }
       renderAll();
     };
     w.appendChild(el);
   });
 }
 function shiftS(t,d){
-  if(t==='bottle'){ S.bOff=Math.max(0,Math.min(bottleColors.length-VIS,S.bOff+d)); renderSw('bottle-swatches',bottleColors,S.bIdx,S.bOff,'bottle-color-label'); }
-  else if(t==='cap'){ S.cOff=Math.max(0,Math.min(capColors.length-VIS,S.cOff+d)); renderSw('cap-swatches',capColors,S.cIdx,S.cOff,'cap-color-label'); }
-  else if(t==='strap'){ S.sOff=Math.max(0,Math.min(strapColors.length-VIS,S.sOff+d)); renderSw('strap-swatches',strapColors,S.sIdx,S.sOff,'strap-color-label'); }
-  else if(t==='handle'){ S.hOff=Math.max(0,Math.min(handleColors.length-VIS,S.hOff+d)); renderSw('handle-swatches',handleColors,S.hIdx,S.hOff,'handle-color-label'); }
-  syncAllPartsFromState();
+  if(t==='bottle'){ S.bOff=Math.max(0,Math.min(bottleColors.length-VIS,S.bOff+d)); }
+  else if(t==='cap'){ S.cOff=Math.max(0,Math.min(capColors.length-VIS,S.cOff+d)); }
+  else if(t==='strap'){ S.sOff=Math.max(0,Math.min(strapColors.length-VIS,S.sOff+d)); }
+  else if(t==='handle'){ S.hOff=Math.max(0,Math.min(handleColors.length-VIS,S.hOff+d)); }
+  else if(t==='boot'){ S.boOff=Math.max(0,Math.min(bootColors.length-VIS,S.boOff+d)); }
+  renderAll();
 }
 function renderAll(){
   renderSw('bottle-swatches',bottleColors,S.bIdx,S.bOff,'bottle-color-label');
   renderSw('cap-swatches',capColors,S.cIdx,S.cOff,'cap-color-label');
   renderSw('strap-swatches',strapColors,S.sIdx,S.sOff,'strap-color-label');
   renderSw('handle-swatches',handleColors,S.hIdx,S.hOff,'handle-color-label');
+  renderSw('boot-swatches',bootColors,S.boIdx,S.boOff,'boot-color-label');
   syncAllPartsFromState();
 }
 function selectSize(idx){
@@ -415,19 +526,22 @@ function renderEng(){
 }
 function filterCat(btn){document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 
+function fmtMoney(n){
+  return currency+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
 function updatePrice(){
   var qty=Math.max(1,S.qty||1);
   var unit=basePrice+(S.hasE&&hasEngraving?engravingPrice:0);
   var total=unit*qty;
   var tb=document.getElementById('top-cart-btn');
-  if(tb) tb.textContent='Add to Cart – '+currency+total.toFixed(2);
-  var fp=document.getElementById('final-price'); if(fp) fp.textContent=currency+total.toFixed(2);
+  if(tb) tb.textContent='Add to Cart – '+fmtMoney(total);
+  var fp=document.getElementById('final-price'); if(fp) fp.textContent=fmtMoney(total);
   var hint=document.getElementById('price-hint');
   if(hint){
-    var s=currency+basePrice.toFixed(2)+' size';
-    if(hasEngraving&&S.hasE) s+=' + '+currency+engravingPrice.toFixed(2)+' engraving';
+    var s=fmtMoney(basePrice)+' size';
+    if(hasEngraving&&S.hasE) s+=' + '+fmtMoney(engravingPrice)+' engraving';
     else if(hasEngraving) s+=' (engraving off)';
-    if(qty>1) s+=' · '+qty+'× '+currency+unit.toFixed(2)+' = '+currency+total.toFixed(2);
+    if(qty>1) s+=' · '+qty+'× '+fmtMoney(unit)+' = '+fmtMoney(total);
     hint.textContent=s;
   }
 }
@@ -449,7 +563,7 @@ function goTo(s){
   updateNavSteps();
   var rc=document.querySelector('.customize-page .right-col');
   if(rc) rc.scrollTop=0;
-  syncAllPartsFromState();
+  renderAll();
   updateEngravePreview();
   if(s===5) syncEngraveGridUi();
 }
@@ -468,8 +582,8 @@ function shareCustomizeDesign(){
 }
 
 function startOverCustomize(){
-  S.bIdx=S.cIdx=S.sIdx=S.hIdx=0;
-  S.bOff=S.cOff=S.sOff=S.hOff=0;
+  S.bIdx=S.cIdx=S.sIdx=S.hIdx=S.boIdx=0;
+  S.bOff=S.cOff=S.sOff=S.hOff=S.boOff=0;
   S.eIdx=0;
   S.hasE=true;
   S.qty=1;
@@ -500,7 +614,7 @@ function addToCart(){
   var unit=basePrice+(S.hasE&&hasEngraving?engravingPrice:0);
   var t=unit*(S.qty||1);
   var sizeName=sizes[S.sizeIdx]?sizes[S.sizeIdx].name:'40 oz';
-  alert('✅ Added!\n\n'+productName+' ('+sizeName+') × '+(S.qty||1)+'\nTumbler: '+bottleColors[S.bIdx].name+'\nLid: '+capColors[S.cIdx].name+'\nStraw: '+strapColors[S.sIdx].name+'\nHandle (+ base boot): '+handleColors[S.hIdx].name+'\nEngraving: '+(S.hasE?ENG[S.eIdx].name:'None')+'\n'+(S.qty>1?('Unit: '+currency+unit.toFixed(2)+'\n'):'')+'Total: '+currency+t.toFixed(2));
+  alert('✅ Added!\n\n'+productName+' ('+sizeName+') × '+(S.qty||1)+'\nBody: '+bottleColors[S.bIdx].name+'\nLid Ring: '+capColors[S.cIdx].name+'\nStraw: '+strapColors[S.sIdx].name+'\nHandle: '+handleColors[S.hIdx].name+'\nBottom Base: '+bootColors[S.boIdx].name+'\n'+(S.qty>1?('Unit: '+currency+unit.toFixed(2)+'\n'):'')+'Total: '+currency+t.toFixed(2));
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
@@ -509,6 +623,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   var cl=document.getElementById('cap-color-label');if(cl)cl.textContent=capColors[S.cIdx].name;
   var sl=document.getElementById('strap-color-label');if(sl)sl.textContent=strapColors[S.sIdx].name;
   var hdl=document.getElementById('handle-color-label');if(hdl)hdl.textContent=handleColors[S.hIdx].name;
+  var bol=document.getElementById('boot-color-label');if(bol)bol.textContent=bootColors[S.boIdx].name;
   var sc=document.querySelectorAll('.size-card'); 
   var selCard=document.querySelector('.size-card.selected');
   if(selCard){ S.sizeIdx=parseInt(selCard.getAttribute('data-size-idx')||'0',10); }

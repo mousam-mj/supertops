@@ -131,10 +131,24 @@ class CustomizeConfigService
         $basePrice = (float) ($lastSize['price'] ?? $product->sale_price ?? $product->price ?? 45);
         $engravingPrice = (float) ($customizeConfig['engraving_price'] ?? 600);
 
+        $defaultPartStlUrls = [
+            'body' => asset('assets/models/tumbler-1200ml-parts/body.stl'),
+            'cap' => asset('assets/models/tumbler-1200ml-parts/cover.stl'),
+            'straw' => asset('assets/models/tumbler-1200ml-parts/straw.stl'),
+            'handle' => asset('assets/models/tumbler-1200ml-parts/handle.stl'),
+            'boot' => asset('assets/models/tumbler-1200ml-parts/base.stl'),
+        ];
+        $partStlUrls = array_replace(
+            $defaultPartStlUrls,
+            is_array($customizeConfig['part_stl_urls'] ?? null) ? $customizeConfig['part_stl_urls'] : []
+        );
+
         return [
             'product_id' => $product->id,
             'product_name' => $product->name,
             'product_slug' => $product->slug,
+            'stl_model_url' => asset('assets/models/perch-tumbler-1200ml.stl'),
+            'part_stl_urls' => $partStlUrls,
             'bottle_colors' => $bottleColors,
             'cap_colors' => $capColors,
             'strap_colors' => $strapColors,
