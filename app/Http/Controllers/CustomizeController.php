@@ -24,6 +24,30 @@ class CustomizeController extends Controller
     }
 
     /**
+     * Serve part STLs from the app origin so static/CDN deploy gaps do not 404
+     * (same idea as {@see appJs}).
+     */
+    public function partStl(string $part): BinaryFileResponse
+    {
+        $map = [
+            'body' => 'assets/models/tumbler-1200ml-parts/body.stl',
+            'cap' => 'assets/models/tumbler-1200ml-parts/cover.stl',
+            'straw' => 'assets/models/tumbler-1200ml-parts/straw.stl',
+            'handle' => 'assets/models/tumbler-1200ml-parts/handle.stl',
+            'boot' => 'assets/models/tumbler-1200ml-parts/base.stl',
+        ];
+        abort_unless(isset($map[$part]), 404);
+
+        $path = public_path($map[$part]);
+        abort_unless(is_readable($path), 404, 'STL missing on server. Deploy public/'.$map[$part]);
+
+        return response()->file($path, [
+            'Content-Type' => 'model/stl',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
+    /**
      * Show customize page for a product.
      * /customize or /customize/{slug}
      */

@@ -288,7 +288,18 @@ function loadAllParts(){
           straw: parseSTLMesh(bufs[4])
         });
       }).catch(function(e){
-        loadErr('Error: '+(e&&e.message?e.message:String(e)));
+        console.warn('Part STL fetch failed, using embedded meshes:', e);
+        try{
+          addPartMeshes({
+            body: parseSTLMesh(b64ToArrayBuffer(BODY_B64)),
+            cap: parseSTLMesh(b64ToArrayBuffer(BOOT_B64)),
+            handle: parseSTLMesh(b64ToArrayBuffer(HANDLE_B64)),
+            boot: parseSTLMesh(b64ToArrayBuffer(CAP_B64)),
+            straw: parseSTLMesh(b64ToArrayBuffer(STRAP_B64))
+          });
+        }catch(err2){
+          loadErr('Error: '+(err2&&err2.message?err2.message:String(err2)));
+        }
       });
     }
     var parts=[

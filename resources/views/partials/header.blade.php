@@ -57,7 +57,6 @@
                                 </li>
                                 <li class="h-full flex items-center gap-2">
                                     <a href="{{ route('customize') }}" class="text-button-uppercase bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 duration-300">Customize</a>
-                                    <a href="{{ route('customize') }}" class="text-button-uppercase border border-black text-black px-4 py-2 rounded-lg hover:bg-black hover:text-white duration-300">Part Colors</a>
                                 </li>
                             </ul>
                         </div>
@@ -199,10 +198,7 @@
                                 <a href="{{{ route('contact') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Contact Us</a>
                                                             </li>
                                                             <li class="px-4 mt-2">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white">Customize</a>
-                                    <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all border border-black text-black">Part Colors</a>
-                                </div>
+                                <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white">Customize</a>
                                                             </li>
                                                             <li>
                                 <a href="{{{ route('faqs') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">FAQs</a>

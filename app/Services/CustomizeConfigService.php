@@ -132,11 +132,11 @@ class CustomizeConfigService
         $engravingPrice = (float) ($customizeConfig['engraving_price'] ?? 600);
 
         $defaultPartStlUrls = [
-            'body' => asset('assets/models/tumbler-1200ml-parts/body.stl'),
-            'cap' => asset('assets/models/tumbler-1200ml-parts/cover.stl'),
-            'straw' => asset('assets/models/tumbler-1200ml-parts/straw.stl'),
-            'handle' => asset('assets/models/tumbler-1200ml-parts/handle.stl'),
-            'boot' => asset('assets/models/tumbler-1200ml-parts/base.stl'),
+            'body' => route('customize.part.stl', ['part' => 'body']),
+            'cap' => route('customize.part.stl', ['part' => 'cap']),
+            'straw' => route('customize.part.stl', ['part' => 'straw']),
+            'handle' => route('customize.part.stl', ['part' => 'handle']),
+            'boot' => route('customize.part.stl', ['part' => 'boot']),
         ];
         $partStlUrls = array_replace(
             $defaultPartStlUrls,
