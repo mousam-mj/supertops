@@ -147,6 +147,10 @@
                                 @php
                                     $colorLines = $item->adminCustomizationColorLines();
                                     $sizeLabel = $item->adminDisplaySize();
+                                    $custArr = $item->customizationArray();
+                                    $engrText = is_array($custArr) && !empty($custArr['engraving_text']) && is_string($custArr['engraving_text']) ? trim($custArr['engraving_text']) : '';
+                                    $engrObj = is_array($custArr) && isset($custArr['engraving']) && is_array($custArr['engraving']) ? $custArr['engraving'] : null;
+                                    $engrArtPath = $engrObj && !empty($engrObj['engraving_image']) && is_string($engrObj['engraving_image']) ? trim($engrObj['engraving_image']) : '';
                                 @endphp
                                 <tr>
                                     <td>
@@ -158,6 +162,25 @@
                                             <div class="mt-2">
                                                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->customization_image) }}" alt="Customizer preview" class="rounded border" style="max-width:140px;height:auto;">
                                             </div>
+                                        @endif
+                                        @if($engrObj)
+                                            <div class="small mt-2">
+                                                <span class="text-muted fw-semibold">Engraving:</span>
+                                                {{ $engrObj['category_name'] ?? $engrObj['category_slug'] ?? '—' }}
+                                                @if(!empty($engrObj['text']) && is_string($engrObj['text']))
+                                                    <span class="text-muted"> — </span>{{ trim($engrObj['text']) }}
+                                                @endif
+                                            </div>
+                                            @if($engrArtPath !== '')
+                                                <div class="small mt-1">
+                                                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" target="_blank" rel="noopener">Engraving artwork</a>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" alt="Engraving upload" class="rounded border" style="max-width:120px;height:auto;">
+                                                </div>
+                                            @endif
+                                        @elseif($engrText !== '')
+                                            <div class="small mt-2"><span class="text-muted fw-semibold">Engraving:</span> {{ $engrText }}</div>
                                         @endif
                                     </td>
                                     <td>{{ $item->product_sku ?? '—' }}</td>

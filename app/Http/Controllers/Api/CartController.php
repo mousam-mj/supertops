@@ -262,6 +262,11 @@ class CartController extends Controller
             'color' => 'nullable|string',
             'customization' => 'nullable|array',
             'customization.size_idx' => 'nullable|integer|min:0',
+            'customization.engraving_text' => 'nullable|string|max:2000',
+            'customization.engraving' => 'nullable|array',
+            'customization.engraving.category_slug' => 'nullable|string|max:120',
+            'customization.engraving.text' => 'nullable|string|max:2000',
+            'customization.engraving.image_data' => 'nullable|string|max:1600000',
             'custom_unit_price' => 'nullable|numeric|min:0',
             'customization_image' => 'nullable|string|max:6500000',
         ]);
@@ -300,12 +305,32 @@ class CartController extends Controller
                 ], 422);
             }
 
+            $engrResult = CustomizeConfigService::applyCustomizerEngravingToUnit($expectedUnit, $customizationPayload);
+            if (! $engrResult['ok']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $engrResult['message'] ?? 'Invalid engraving options.',
+                ], 422);
+            }
+            $expectedUnit = $engrResult['unit'];
+
             $claimed = round((float) $request->input('custom_unit_price', -1), 2);
             if (abs($claimed - $expectedUnit) > 0.02) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Price mismatch. Please refresh the customizer and try again.',
                 ], 422);
+            }
+
+            if (isset($customizationPayload['engraving']) && is_array($customizationPayload['engraving'])) {
+                $imgData = $customizationPayload['engraving']['image_data'] ?? null;
+                if (is_string($imgData) && $imgData !== '') {
+                    $stored = $this->storeCustomizationImage($imgData);
+                    unset($customizationPayload['engraving']['image_data']);
+                    if ($stored) {
+                        $customizationPayload['engraving']['engraving_image'] = $stored;
+                    }
+                }
             }
 
             $customizationJson = json_encode($customizationPayload, JSON_UNESCAPED_UNICODE);
@@ -740,6 +765,26 @@ class CartController extends Controller
             $parts[] = 'Size #'.((int) $d['size_idx'] + 1);
         }
         $parts[] = 'Custom colors';
+        if (! empty($d['engraving']) && is_array($d['engraving'])) {
+            $eg = $d['engraving'];
+            $cn = isset($eg['category_name']) && is_string($eg['category_name']) ? trim($eg['category_name']) : '';
+            $slug = isset($eg['category_slug']) && is_string($eg['category_slug']) ? trim($eg['category_slug']) : '';
+            $line = $cn !== '' ? $cn : ($slug !== '' ? $slug : 'Engraving');
+            if (! empty($eg['text']) && is_string($eg['text']) && trim($eg['text']) !== '') {
+                $parts[] = $line.': '.trim($eg['text']);
+            } elseif (! empty($eg['engraving_image']) && is_string($eg['engraving_image'])) {
+                $parts[] = $line.' (image)';
+            } elseif (! empty($eg['image_data']) && is_string($eg['image_data']) && str_starts_with(trim($eg['image_data']), 'data:image/')) {
+                $parts[] = $line.' (image)';
+            } else {
+                $parts[] = $line;
+            }
+        } elseif (! empty($d['engraving_text']) && is_string($d['engraving_text'])) {
+            $et = trim($d['engraving_text']);
+            if ($et !== '') {
+                $parts[] = 'Engraving: '.$et;
+            }
+        }
 
         return implode(' · ', $parts);
     }

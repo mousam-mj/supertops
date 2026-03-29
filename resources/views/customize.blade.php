@@ -3,6 +3,11 @@
 @section('title', ($config['product_name'] ?? 'Customize') . ' | Perch')
 
 @section('content')
+@php
+  $engrOn = !empty($config['has_engraving']);
+  $engrCatMode = !empty($config['engraving_category_mode']);
+  $stepTotal = (int) ($config['customize_max_step'] ?? 5);
+@endphp
 <style>
 .customize-page{font-family:'Inter',sans-serif;background:#f4f4f2;color:#161616;padding:20px 14px;min-height:72vh}
 .customize-page .modal{max-width:1240px;margin:0 auto;background:#fff;border:1px solid #e8e8e8;border-radius:20px;overflow:hidden;box-shadow:0 10px 45px rgba(0,0,0,.08)}
@@ -75,6 +80,28 @@
 .customize-page .prev-btn{background:#fff;border:1px solid #161616;color:#161616}
 .customize-page .next-btn{background:#161616;border:1px solid #161616;color:#fff}
 .customize-page .qty-select{padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff}
+.customize-page .customize-engraving-block{margin-top:1.25rem;padding:14px 16px;border:1px solid #e2e2dc;border-radius:12px;background:#fafaf8}
+.customize-page .engraving-label{font-size:14px;font-weight:600;color:#161616;margin-bottom:6px}
+.customize-page .engraving-hint{font-size:12px;color:#666;margin:0 0 10px;line-height:1.45}
+.customize-page .engraving-check-wrap{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;margin-bottom:8px;cursor:pointer}
+.customize-page .engraving-check-wrap input{width:16px;height:16px;accent-color:#161616}
+.customize-page .engraving-textarea{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:52px;box-sizing:border-box}
+.customize-page .engraving-textarea:disabled{opacity:.55;background:#f0f0ee}
+.customize-page .engraving-card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+@media(min-width:520px){.customize-page .engraving-card-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
+.customize-page .engraving-card{display:flex;align-items:center;gap:12px;border:1px solid #ddd;border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;text-align:left;transition:.15s;width:100%;font:inherit}
+.customize-page .engraving-card:hover{border-color:#161616;background:#fafafa}
+.customize-page .engraving-card.selected{border-color:#161616;box-shadow:0 0 0 1px #161616 inset}
+.customize-page .engraving-card-thumb{width:48px;height:48px;border-radius:10px;background:#f0f0ee;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.customize-page .engraving-card-thumb img{width:100%;height:100%;object-fit:cover}
+.customize-page .engraving-card-body{flex:1;min-width:0}
+.customize-page .engraving-card-title{font-size:14px;font-weight:700;color:#161616}
+.customize-page .engraving-card-price{font-size:13px;font-weight:600;color:#444;margin-top:2px}
+.customize-page .engraving-card-chev{color:#999;font-size:18px;flex-shrink:0}
+.customize-page .engraving-detail-back{background:none;border:none;padding:0;font-size:13px;color:#161616;text-decoration:underline;cursor:pointer;margin-bottom:12px}
+.customize-page .engraving-detail-title{font-size:16px;font-weight:700;margin-bottom:8px}
+.customize-page .engraving-file-input{display:block;width:100%;max-width:100%;margin:12px 0;padding:10px 12px;font-size:14px;border:1px solid #c8c8c8;border-radius:10px;background:#fff;box-sizing:border-box;min-height:46px;cursor:pointer}
+.customize-page .engraving-upload-label{display:block;font-size:13px;font-weight:600;color:#333;margin-top:4px}
 .customize-page .flow-hint{font-size:12px;color:#8a8a8a;margin-top:8px}
 @keyframes customize-spin{to{transform:rotate(360deg)}}
 @media(max-width:980px){
@@ -95,6 +122,9 @@
         <div class="nav-step" data-step="3" onclick="goTo(3)">Straw</div>
         <div class="nav-step" data-step="4" onclick="goTo(4)">Handle</div>
         <div class="nav-step" data-step="5" onclick="goTo(5)">Bottom Base</div>
+        @if($engrOn && $engrCatMode)
+        <div class="nav-step" data-step="6" onclick="goTo(6)">Engraving</div>
+        @endif
       </div>
       <div class="nav-right">
         <div class="nav-cart-wrap">
@@ -135,7 +165,7 @@
         <!-- Step 1: Tumbler -->
         <div class="step-panel active" id="panel-1">
           <div class="step-heading">Body</div>
-          <div class="step-counter">1 of 5</div>
+          <div class="step-counter">1 of {{ $stepTotal }}</div>
           <div class="step-subtext">Main tumbler body ka color yahan set karein. Baaki marked parts next steps me milenge.</div>
           <div class="size-cards" id="size-cards">
             @php
@@ -182,7 +212,7 @@
         <!-- Step 2: Lid -->
         <div class="step-panel" id="panel-2">
           <div class="step-heading">Lid Ring</div>
-          <div class="step-counter">2 of 5</div>
+          <div class="step-counter">2 of {{ $stepTotal }}</div>
           <div class="step-subtext">Top ring/lid section ka color select karein.</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="11" stroke="#222" stroke-width="2"/><path d="M15 4 Q22 4 22 12" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -204,7 +234,7 @@
         <!-- Step 3: Straw -->
         <div class="step-panel" id="panel-3">
           <div class="step-heading">Straw</div>
-          <div class="step-counter">3 of 5</div>
+          <div class="step-counter">3 of {{ $stepTotal }}</div>
           <div class="step-subtext">Marked straw ka color yahan change hoga.</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><path d="M8 26 Q8 6 15 6 Q22 6 22 26" stroke="#222" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
@@ -226,7 +256,7 @@
         <!-- Step 4: Handle -->
         <div class="step-panel" id="panel-4">
           <div class="step-heading">Handle</div>
-          <div class="step-counter">4 of 5</div>
+          <div class="step-counter">4 of {{ $stepTotal }}</div>
           <div class="step-subtext">Side handle ka color alag set karein.</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><path d="M22 8 Q28 8 28 18 L28 48 Q28 56 22 56 Q16 56 16 48 L16 18 Q16 8 22 8Z" stroke="#222" stroke-width="2.2" fill="#e8e8e8"/></svg></div>
@@ -248,7 +278,7 @@
         <!-- Step 5: Bottom Base -->
         <div class="step-panel" id="panel-5">
           <div class="step-heading">Bottom Base</div>
-          <div class="step-counter">5 of 5</div>
+          <div class="step-counter">5 of {{ $stepTotal }}</div>
           <div class="step-subtext">Neeche ka base/boot ring color yahan alag se set karein (image ke bottom marked area).</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><path d="M5 47 H25 V55 H5 Z" stroke="#222" stroke-width="2" fill="#e8e8e8"/></svg></div>
@@ -261,13 +291,48 @@
             <button class="color-arrow" onclick="shiftS('boot',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="boot-color-label">{{ ($config['boot_colors'][0]['name'] ?? 'Lavender') }}</div>
+          @if($engrOn && !$engrCatMode)
+          <div class="customize-engraving-block" id="customize-engraving-wrap">
+            <div class="engraving-label">{{ $config['engraving_label'] ?? 'Engraving' }}</div>
+            @php $engrP = (float) ($config['engraving_price'] ?? 0); @endphp
+            <p class="engraving-hint">Optional.@if($engrP > 0) Add {{ $config['currency'] ?? '₹' }}{{ number_format($engrP, 2) }} when you enter text.@endif Max {{ (int) ($config['engraving_max_chars'] ?? 40) }} characters.</p>
+            <label class="engraving-check-wrap"><input type="checkbox" id="customize-engraving-check" autocomplete="off"> <span>Add engraving</span></label>
+            <textarea id="customize-engraving-text" class="engraving-textarea" rows="2" maxlength="{{ (int) ($config['engraving_max_chars'] ?? 40) }}" placeholder="e.g. your name" autocomplete="off"></textarea>
+          </div>
+          @endif
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(4)">Previous – Handle</button>
+            <button type="button" class="prev-btn" onclick="goTo(4)">Previous – Handle</button>
+            @if($engrOn && $engrCatMode)
+            <button type="button" class="next-btn" onclick="goTo(6)">Next – Engraving</button>
+            @else
             <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
             <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
+            @endif
           </div>
         </div>
+
+        @if($engrOn && $engrCatMode)
+        <div class="step-panel" id="panel-6">
+          <div class="step-heading">{{ $config['engraving_label'] ?? 'Engraving' }}</div>
+          <div class="step-counter">6 of {{ $stepTotal }}</div>
+          <div class="step-subtext">Choose an option. Each card has its own price — added to your tumbler. Skip by leaving none selected, or go back to change colors.</div>
+          <div id="engraving-grid-view">
+            <div class="engraving-card-grid" id="engraving-card-grid"></div>
+          </div>
+          <div id="engraving-detail-view" style="display:none">
+            <button type="button" class="engraving-detail-back" id="engraving-detail-back">← Back to options</button>
+            <div class="engraving-detail-title" id="engraving-detail-title"></div>
+            <div id="engraving-detail-body"></div>
+          </div>
+          <div class="bottom-nav">
+            <button type="button" class="prev-btn" onclick="goTo(5)">Previous – Bottom Base</button>
+            <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price-engr">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
+            <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
+          </div>
+        </div>
+        @endif
       </div>
     </div>
   </div>

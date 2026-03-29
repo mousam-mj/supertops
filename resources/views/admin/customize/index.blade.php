@@ -24,7 +24,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.customize.update') }}" method="post" id="admin-customize-form">
+<form action="{{ route('admin.customize.update') }}" method="post" id="admin-customize-form" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -55,6 +55,11 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tab-sizes-btn" data-bs-toggle="tab" data-bs-target="#tab-sizes" type="button" role="tab" aria-controls="tab-sizes" aria-selected="false">
                         <i class="bi bi-rulers me-1"></i>Sizes &amp; prices
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-engraving-btn" data-bs-toggle="tab" data-bs-target="#tab-engraving" type="button" role="tab" aria-controls="tab-engraving" aria-selected="false">
+                        <i class="bi bi-pencil-square me-1"></i>Engraving
                     </button>
                 </li>
                 @foreach($paletteMeta as $key => $meta)
@@ -98,6 +103,90 @@
                         </table>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-primary mt-2 customize-add-row" data-tbody="customize-sizes-tbody"><i class="bi bi-plus-lg me-1"></i>Add more</button>
+                </div>
+
+                <div class="tab-pane fade" id="tab-engraving" role="tabpanel" aria-labelledby="tab-engraving-btn" tabindex="0">
+                    <p class="text-muted small">Add <strong>categories</strong> (like Hydro Flask): each row is a card with its own price. Types: <strong>Simple</strong> (select only), <strong>Text</strong> (customer enters text), <strong>Upload</strong> (customer uploads artwork). If you add any category with a name, the public customizer shows the Engraving step automatically (you can still use the checkbox below for legacy text-only mode when there are no categories). Leave all category rows empty to use only the legacy single price on the last color step.</p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="has_engraving" name="has_engraving" value="1" {{ old('has_engraving', $hasEngraving) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="has_engraving">Offer engraving on the public customizer</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-lg-6">
+                            <label class="form-label">Engraving step title</label>
+                            <input type="text" name="engraving_label" class="form-control" value="{{ old('engraving_label', $engravingLabel) }}" placeholder="Engraving">
+                            <small class="text-muted">Heading on the engraving step (e.g. &ldquo;Engraving&rdquo;).</small>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <label class="form-label">Max characters (text type)</label>
+                            <input type="number" name="engraving_max_chars" class="form-control" min="1" max="500" value="{{ old('engraving_max_chars', $engravingMaxChars) }}">
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <label class="form-label">Legacy price (₹)</label>
+                            <input type="number" name="engraving_price" class="form-control" step="0.01" min="0" value="{{ old('engraving_price', $engravingPrice) }}" placeholder="0">
+                            <small class="text-muted">Used only if <strong>no</strong> categories below — single optional text on last color step.</small>
+                        </div>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Engraving categories (grid cards)</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th style="width:9rem">Slug <span class="text-muted fw-normal">(optional)</span></th>
+                                    <th style="width:7rem">Price ₹</th>
+                                    <th style="min-width:14rem">Type</th>
+                                    <th>Icon <span class="text-muted fw-normal">(URL or file when Upload type)</span></th>
+                                    <th class="text-end" style="width:4rem"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="customize-engraving-categories-tbody" class="customize-repeatable-tbody" data-input-prefix="engraving_categories">
+                                @foreach($engravingCategoryRows as $i => $erow)
+                                    <tr>
+                                        <td><input type="text" class="form-control form-control-sm" name="engraving_categories[{{ $i }}][name]" value="{{ old('engraving_categories.'.$i.'.name', $erow['name']) }}" placeholder="e.g. Text"></td>
+                                        <td><input type="text" class="form-control form-control-sm" name="engraving_categories[{{ $i }}][slug]" value="{{ old('engraving_categories.'.$i.'.slug', $erow['slug']) }}" placeholder="auto"></td>
+                                        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm" name="engraving_categories[{{ $i }}][price]" value="{{ old('engraving_categories.'.$i.'.price', $erow['price']) }}" placeholder="0"></td>
+                                        <td>
+                                            @php
+                                                $engrTypeRaw = old('engraving_categories.'.$i.'.type', $erow['type'] ?? 'simple');
+                                                $engrType = is_string($engrTypeRaw) ? strtolower(trim($engrTypeRaw)) : 'simple';
+                                                if (! in_array($engrType, ['simple', 'text', 'upload'], true)) {
+                                                    $engrType = 'simple';
+                                                }
+                                            @endphp
+                                            <div class="d-flex flex-column gap-1 small engraving-type-radios" role="group" aria-label="Engraving category type">
+                                                <label class="d-flex align-items-center gap-2 mb-0 fw-normal">
+                                                    <input type="radio" class="form-check-input mt-0" name="engraving_categories[{{ $i }}][type]" value="simple" {{ $engrType === 'simple' ? 'checked' : '' }}>
+                                                    <span>Simple <span class="text-muted">(one tap)</span></span>
+                                                </label>
+                                                <label class="d-flex align-items-center gap-2 mb-0 fw-normal">
+                                                    <input type="radio" class="form-check-input mt-0" name="engraving_categories[{{ $i }}][type]" value="text" {{ $engrType === 'text' ? 'checked' : '' }}>
+                                                    <span>Text <span class="text-muted">(customer types)</span></span>
+                                                </label>
+                                                <label class="d-flex align-items-center gap-2 mb-0 fw-normal">
+                                                    <input type="radio" class="form-check-input mt-0" name="engraving_categories[{{ $i }}][type]" value="upload" {{ $engrType === 'upload' ? 'checked' : '' }}>
+                                                    <span>Upload <span class="text-muted">(PNG / JPG / WebP)</span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="align-top">
+                                            <input type="text" class="form-control form-control-sm mb-1" name="engraving_categories[{{ $i }}][icon]" value="{{ old('engraving_categories.'.$i.'.icon', $erow['icon']) }}" placeholder="https://…">
+                                            <div class="engraving-cat-icon-file-wrap" style="display: {{ $engrType === 'upload' ? 'block' : 'none' }}">
+                                                <label class="form-label small text-muted mb-0">Card thumbnail — choose file (optional)</label>
+                                                <input type="file" class="form-control form-control-sm mt-1" name="engraving_categories[{{ $i }}][icon_upload]" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-danger customize-row-delete" title="Delete row"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 customize-add-row" data-tbody="customize-engraving-categories-tbody"><i class="bi bi-plus-lg me-1"></i>Add category</button>
                 </div>
 
                 @foreach($paletteMeta as $key => $meta)
@@ -191,7 +280,7 @@
         if (!prefix) return;
         var re = new RegExp('^' + escRe(prefix) + '\\[\\d+\\]');
         tbody.querySelectorAll('tr').forEach(function (tr, i) {
-            tr.querySelectorAll('input[name]').forEach(function (inp) {
+            tr.querySelectorAll('input[name],select[name]').forEach(function (inp) {
                 inp.name = inp.name.replace(re, prefix + '[' + i + ']');
             });
             tr.querySelectorAll('input[type="color"][data-sync-hex]').forEach(function (p) {
@@ -215,15 +304,43 @@
         });
     }
 
+    function syncEngravingCatIconFileWrap(tr) {
+        if (!tr || !tr.closest('#customize-engraving-categories-tbody')) return;
+        var wrap = tr.querySelector('.engraving-cat-icon-file-wrap');
+        if (!wrap) return;
+        var upload = false;
+        tr.querySelectorAll('input[type="radio"][name*="[type]"]').forEach(function (r) {
+            if (r.value === 'upload' && r.checked) upload = true;
+        });
+        wrap.style.display = upload ? 'block' : 'none';
+    }
+
     function clearRowInputs(tr) {
         tr.querySelectorAll('input').forEach(function (inp) {
             if (inp.type === 'color') inp.value = '#888888';
             else if (inp.type === 'number') inp.value = '';
+            else if (inp.type === 'file') inp.value = '';
+            else if (inp.type === 'radio') { /* handled below */ }
             else inp.value = '';
+        });
+        tr.querySelectorAll('select').forEach(function (sel) { sel.selectedIndex = 0; });
+        tr.querySelectorAll('input[type="radio"]').forEach(function (r) {
+            var n = r.name || '';
+            if (n.indexOf('engraving_categories') !== -1 && n.indexOf('[type]') !== -1) {
+                r.checked = r.value === 'simple';
+            }
         });
     }
 
     form.querySelectorAll('.customize-repeatable-tbody tr').forEach(bindHexPickerRow);
+    form.querySelectorAll('#customize-engraving-categories-tbody tr').forEach(syncEngravingCatIconFileWrap);
+
+    form.addEventListener('change', function (e) {
+        var t = e.target;
+        if (t && t.type === 'radio' && t.name && t.name.indexOf('engraving_categories') !== -1 && t.name.indexOf('[type]') !== -1) {
+            syncEngravingCatIconFileWrap(t.closest('tr'));
+        }
+    });
 
     form.addEventListener('click', function (e) {
         var del = e.target.closest('.customize-row-delete');
@@ -232,7 +349,7 @@
             var tbody = tr && tr.closest('.customize-repeatable-tbody');
             if (!tbody || !tr) return;
             var rows = tbody.querySelectorAll('tr');
-            if (rows.length <= 1) {
+            if (rows.length <= 1 && tbody.id !== 'customize-engraving-categories-tbody') {
                 alert('At least one row is required.');
                 return;
             }
@@ -254,6 +371,7 @@
             tbody.appendChild(clone);
             reindexTbody(tbody);
             bindHexPickerRow(clone);
+            if (tbody.id === 'customize-engraving-categories-tbody') syncEngravingCatIconFileWrap(clone);
             e.preventDefault();
         }
     });

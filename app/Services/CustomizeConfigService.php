@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\Setting;
+use Illuminate\Support\Str;
 
 class CustomizeConfigService
 {
@@ -252,6 +253,19 @@ class CustomizeConfigService
             ? (string) $customizeConfig['display_name']
             : 'Customize';
 
+        $hasEngravingFlag = ! empty($customizeConfig['has_engraving']);
+        $engravingPrice = round(max(0, (float) ($customizeConfig['engraving_price'] ?? 0)), 2);
+        $engravingMaxChars = max(1, min(500, (int) ($customizeConfig['engraving_max_chars'] ?? 40)));
+        $engravingLabel = isset($customizeConfig['engraving_label']) && is_string($customizeConfig['engraving_label']) && trim($customizeConfig['engraving_label']) !== ''
+            ? trim($customizeConfig['engraving_label'])
+            : 'Engraving';
+
+        $engravingCategories = self::normalizeEngravingCategoriesArray($customizeConfig['engraving_categories'] ?? []);
+        $engravingCategoryMode = count($engravingCategories) > 0;
+        // Any saved category row enables the engraving step (upload/text/simple), even if the master checkbox was left off.
+        $hasEngraving = $hasEngravingFlag || $engravingCategoryMode;
+        $customizeMaxStep = $engravingCategoryMode ? 6 : 5;
+
         return [
             'product_id' => $product->id,
             'cart_product_id' => self::getCartProductId(),
@@ -267,7 +281,209 @@ class CustomizeConfigService
             'sizes' => $sizes,
             'base_price' => $basePrice,
             'currency' => '₹',
+            'has_engraving' => $hasEngraving,
+            'engraving_price' => $engravingPrice,
+            'engraving_max_chars' => $engravingMaxChars,
+            'engraving_label' => $engravingLabel,
+            'engraving_categories' => $engravingCategories,
+            'engraving_category_mode' => $engravingCategoryMode,
+            'customize_max_step' => $customizeMaxStep,
         ];
+    }
+
+    /**
+     * @param  array<int, mixed>  $rows
+     * @return list<array{slug: string, name: string, price: float, type: string, icon: ?string}>
+     */
+    public static function normalizeEngravingCategoriesArray(array $rows): array
+    {
+        $out = [];
+        $usedSlugs = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $name = trim((string) ($row['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $slug = trim((string) ($row['slug'] ?? ''));
+            if ($slug === '') {
+                $slug = Str::slug($name);
+            }
+            $slug = strtolower(preg_replace('/[^a-z0-9\-]+/', '-', $slug) ?? '');
+            $slug = trim($slug, '-');
+            if ($slug === '') {
+                $slug = 'option-'.(count($out) + 1);
+            }
+            while (isset($usedSlugs[$slug])) {
+                $slug .= 'x';
+            }
+            $usedSlugs[$slug] = true;
+            $price = round(max(0, (float) ($row['price'] ?? 0)), 2);
+            $type = strtolower(trim((string) ($row['type'] ?? 'simple')));
+            if (! in_array($type, ['text', 'simple', 'upload'], true)) {
+                $type = 'simple';
+            }
+            $icon = isset($row['icon']) && is_string($row['icon']) && trim($row['icon']) !== ''
+                ? trim($row['icon']) : null;
+            if ($icon !== null && strlen($icon) > 2000) {
+                $icon = null;
+            }
+            $out[] = [
+                'slug' => $slug,
+                'name' => $name,
+                'price' => $price,
+                'type' => $type,
+                'icon' => $icon,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return list<array{slug: string, name: string, price: float, type: string, icon: ?string}>
+     */
+    public static function normalizedEngravingCategoriesFromGlobal(): array
+    {
+        $g = self::getGlobalCustomizeConfig();
+
+        return self::normalizeEngravingCategoriesArray($g['engraving_categories'] ?? []);
+    }
+
+    public static function engravingCategoryMode(): bool
+    {
+        return self::engravingEnabled() && count(self::normalizedEngravingCategoriesFromGlobal()) > 0;
+    }
+
+    /**
+     * Apply engraving add-on to customizer unit price. Supports category grid or legacy single text + price.
+     *
+     * @param  array<string, mixed>  $customizationPayload
+     * @return array{ok: bool, unit?: float, message?: string}
+     */
+    public static function applyCustomizerEngravingToUnit(float $baseUnit, array $customizationPayload): array
+    {
+        if (! self::engravingEnabled()) {
+            if (self::customizationPayloadHasEngravingSelection($customizationPayload)) {
+                return ['ok' => false, 'message' => 'Engraving is not available.'];
+            }
+
+            return ['ok' => true, 'unit' => $baseUnit];
+        }
+
+        $categories = self::normalizedEngravingCategoriesFromGlobal();
+        if (count($categories) > 0) {
+            return self::applyCategoryEngravingToUnit($baseUnit, $customizationPayload, $categories);
+        }
+
+        $text = isset($customizationPayload['engraving_text']) && is_string($customizationPayload['engraving_text'])
+            ? trim($customizationPayload['engraving_text']) : '';
+        if ($text === '') {
+            return ['ok' => true, 'unit' => $baseUnit];
+        }
+        $maxChars = self::engravingMaxChars();
+        if (mb_strlen($text) > $maxChars) {
+            return ['ok' => false, 'message' => "Engraving text must be at most {$maxChars} characters."];
+        }
+        $addon = self::engravingPrice();
+
+        return ['ok' => true, 'unit' => round($baseUnit + $addon, 2)];
+    }
+
+    /**
+     * @param  array<string, mixed>  $customizationPayload
+     */
+    public static function customizationPayloadHasEngravingSelection(array $customizationPayload): bool
+    {
+        if (isset($customizationPayload['engraving_text']) && is_string($customizationPayload['engraving_text']) && trim($customizationPayload['engraving_text']) !== '') {
+            return true;
+        }
+        $e = $customizationPayload['engraving'] ?? null;
+        if (! is_array($e)) {
+            return false;
+        }
+
+        return trim((string) ($e['category_slug'] ?? '')) !== '';
+    }
+
+    /**
+     * @param  list<array{slug: string, name: string, price: float, type: string, icon: ?string}>  $categories
+     * @param  array<string, mixed>  $customizationPayload
+     * @return array{ok: bool, unit?: float, message?: string}
+     */
+    protected static function applyCategoryEngravingToUnit(float $baseUnit, array $customizationPayload, array $categories): array
+    {
+        $e = $customizationPayload['engraving'] ?? [];
+        if (! is_array($e)) {
+            $e = [];
+        }
+        $slug = trim((string) ($e['category_slug'] ?? ''));
+        if ($slug === '') {
+            if (isset($customizationPayload['engraving_text']) && trim((string) $customizationPayload['engraving_text']) !== '') {
+                return ['ok' => false, 'message' => 'Please choose an engraving option on the Engraving step.'];
+            }
+
+            return ['ok' => true, 'unit' => $baseUnit];
+        }
+
+        $cat = null;
+        foreach ($categories as $c) {
+            if ($c['slug'] === $slug) {
+                $cat = $c;
+                break;
+            }
+        }
+        if ($cat === null) {
+            return ['ok' => false, 'message' => 'Invalid engraving selection.'];
+        }
+
+        $addon = $cat['price'];
+        $maxChars = self::engravingMaxChars();
+        if ($cat['type'] === 'text') {
+            $text = isset($e['text']) && is_string($e['text']) ? trim($e['text']) : '';
+            if ($text === '') {
+                return ['ok' => false, 'message' => 'Please enter engraving text for this option.'];
+            }
+            if (mb_strlen($text) > $maxChars) {
+                return ['ok' => false, 'message' => "Engraving text must be at most {$maxChars} characters."];
+            }
+        } elseif ($cat['type'] === 'upload') {
+            $img = isset($e['image_data']) && is_string($e['image_data']) ? trim($e['image_data']) : '';
+            if ($img === '' || ! str_starts_with($img, 'data:image/')) {
+                return ['ok' => false, 'message' => 'Please upload an image for this engraving option.'];
+            }
+            if (strlen($img) > 1_500_000) {
+                return ['ok' => false, 'message' => 'Image is too large. Use a smaller file.'];
+            }
+        }
+
+        return ['ok' => true, 'unit' => round($baseUnit + $addon, 2)];
+    }
+
+    public static function engravingEnabled(): bool
+    {
+        $g = self::getGlobalCustomizeConfig();
+        if (! empty($g['has_engraving'])) {
+            return true;
+        }
+
+        return count(self::normalizeEngravingCategoriesArray($g['engraving_categories'] ?? [])) > 0;
+    }
+
+    public static function engravingPrice(): float
+    {
+        $g = self::getGlobalCustomizeConfig();
+
+        return round(max(0, (float) ($g['engraving_price'] ?? 0)), 2);
+    }
+
+    public static function engravingMaxChars(): int
+    {
+        $g = self::getGlobalCustomizeConfig();
+
+        return max(1, min(500, (int) ($g['engraving_max_chars'] ?? 40)));
     }
 
     protected static function colorsArrayToConfig(array $colors): array

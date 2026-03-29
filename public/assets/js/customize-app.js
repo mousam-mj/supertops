@@ -21,8 +21,26 @@ let basePrice=typeof cfg.base_price==='number'?cfg.base_price:45;
 if(sizes.length>0){ var last=sizes[sizes.length-1]; basePrice=typeof last.price==='number'?last.price:basePrice; }
 const productName=cfg.product_name||'Customize';
 const currency=cfg.currency||'₹';
+const engrEnabled=!!cfg.has_engraving;
+var _ep=parseFloat(cfg.engraving_price);
+const engrPrice=(engrEnabled&&isFinite(_ep))?Math.round(Math.max(0,_ep)*100)/100:0;
+var _em=parseInt(cfg.engraving_max_chars,10);
+const engrMax=(!isFinite(_em)||_em<1)?40:Math.min(500,_em);
+function normEngraveType(t){
+  var s=String(t==null?'':t).toLowerCase().trim();
+  return (s==='text'||s==='upload'||s==='simple')?s:'simple';
+}
+const engrCatMode=!!cfg.engraving_category_mode;
+const engrCats=(Array.isArray(cfg.engraving_categories)?cfg.engraving_categories:[]).map(function(c){
+  if(!c||typeof c!=='object') return null;
+  var o={};
+  for(var k in c){ if(Object.prototype.hasOwnProperty.call(c,k)) o[k]=c[k]; }
+  o.type=normEngraveType(o.type);
+  return o;
+}).filter(function(c){ return c!==null; });
+const maxStep=typeof cfg.customize_max_step==='number'?cfg.customize_max_step:5;
 
-const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1};
+const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1,engrSel:null};
 const VIS=7;
 
 function normalizeHex(h){
@@ -429,21 +447,172 @@ function selectSize(idx){
 function fmtMoney(n){
   return currency+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
+function engrCatBySlug(slug){
+  if(!slug) return null;
+  for(var i=0;i<engrCats.length;i++){
+    if(engrCats[i].slug===slug) return engrCats[i];
+  }
+  return null;
+}
+function validateEngravingSelection(){
+  if(!engrCatMode||!engrEnabled) return null;
+  if(!S.engrSel||!S.engrSel.slug) return null;
+  var c=engrCatBySlug(S.engrSel.slug);
+  if(!c) return 'Invalid engraving selection.';
+  if(normEngraveType(c.type)==='text'&&!String(S.engrSel.text||'').trim()) return 'Please save your engraving text for "'+(c.name||'this option')+'".';
+  if(normEngraveType(c.type)==='upload'&&!(S.engrSel.image_data&&String(S.engrSel.image_data).length)) return 'Please upload an image for "'+(c.name||'this option')+'".';
+  return null;
+}
+function engravingUnitAdd(){
+  if(!engrEnabled) return 0;
+  if(engrCatMode){
+    if(!S.engrSel||!S.engrSel.slug) return 0;
+    var c=engrCatBySlug(S.engrSel.slug);
+    if(!c) return 0;
+    return Math.round(Math.max(0,Number(c.price)||0)*100)/100;
+  }
+  var ch=document.getElementById('customize-engraving-check');
+  var ta=document.getElementById('customize-engraving-text');
+  if(!ch||!ta||!ch.checked||ta.disabled) return 0;
+  var t=String(ta.value||'').trim();
+  if(!t) return 0;
+  return engrPrice;
+}
 function updatePrice(){
   if(sizes.length&&sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number'){
     basePrice=sizes[S.sizeIdx].price;
   }
   var qty=Math.max(1,S.qty||1);
-  var unit=basePrice;
+  var extra=engravingUnitAdd();
+  var unit=basePrice+extra;
   var total=unit*qty;
   var tb=document.getElementById('top-cart-btn');
   if(tb) tb.textContent='Add to Cart – '+fmtMoney(total);
   var fp=document.getElementById('final-price'); if(fp) fp.textContent=fmtMoney(total);
+  var fp2=document.getElementById('final-price-engr'); if(fp2) fp2.textContent=fmtMoney(total);
   var hint=document.getElementById('price-hint');
   if(hint){
     var s=fmtMoney(basePrice)+' size';
+    if(extra>0) s+=' + '+fmtMoney(extra)+' engraving';
     if(qty>1) s+=' · '+qty+'× '+fmtMoney(unit)+' = '+fmtMoney(total);
     hint.textContent=s;
+  }
+}
+
+function showEngravingGridView(){
+  var gv=document.getElementById('engraving-grid-view');
+  var dv=document.getElementById('engraving-detail-view');
+  if(gv) gv.style.display='';
+  if(dv) dv.style.display='none';
+}
+function showEngravingDetailView(){
+  var gv=document.getElementById('engraving-grid-view');
+  var dv=document.getElementById('engraving-detail-view');
+  if(gv) gv.style.display='none';
+  if(dv) dv.style.display='';
+}
+function renderEngravingGrid(){
+  var g=document.getElementById('engraving-card-grid');
+  if(!g) return;
+  g.innerHTML='';
+  engrCats.forEach(function(cat){
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='engraving-card'+(S.engrSel&&S.engrSel.slug===cat.slug?' selected':'');
+    var th=document.createElement('div');
+    th.className='engraving-card-thumb';
+    if(cat.icon){
+      var im=document.createElement('img');
+      im.src=cat.icon;
+      im.alt='';
+      im.referrerPolicy='no-referrer';
+      th.appendChild(im);
+    }else{
+      th.appendChild(document.createTextNode('✦'));
+    }
+    var bd=document.createElement('div');
+    bd.className='engraving-card-body';
+    var t=document.createElement('div');
+    t.className='engraving-card-title';
+    t.textContent=cat.name||'';
+    var pr=document.createElement('div');
+    pr.className='engraving-card-price';
+    pr.textContent=currency+Number(cat.price||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    bd.appendChild(t); bd.appendChild(pr);
+    var cv=document.createElement('span');
+    cv.className='engraving-card-chev'; cv.textContent='›';
+    btn.appendChild(th); btn.appendChild(bd); btn.appendChild(cv);
+    btn.addEventListener('click',function(){ openEngravingCategory(cat); });
+    g.appendChild(btn);
+  });
+}
+function openEngravingCategory(cat){
+  var tp=normEngraveType(cat.type);
+  if(tp==='simple'){
+    S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp};
+    renderEngravingGrid();
+    updatePrice();
+    showEngravingGridView();
+    return;
+  }
+  showEngravingDetailView();
+  var title=document.getElementById('engraving-detail-title');
+  var body=document.getElementById('engraving-detail-body');
+  if(title) title.textContent=cat.name||'';
+  if(!body) return;
+  body.innerHTML='';
+  if(tp==='text'){
+    var ta=document.createElement('textarea');
+    ta.className='engraving-textarea';
+    ta.rows=3;
+    ta.maxLength=engrMax;
+    ta.placeholder='Enter text for engraving';
+    ta.value=(S.engrSel&&S.engrSel.slug===cat.slug)?(S.engrSel.text||''):'';
+    var sub=document.createElement('button');
+    sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
+    sub.textContent='Save';
+    sub.addEventListener('click',function(){
+      var tx=String(ta.value||'').trim();
+      if(!tx){ alert('Please enter engraving text.'); return; }
+      S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:tx};
+      renderEngravingGrid();
+      updatePrice();
+      showEngravingGridView();
+    });
+    body.appendChild(ta); body.appendChild(sub);
+  }else if(tp==='upload'){
+    var uid='engr-upload-'+String(cat.slug||'x').replace(/[^a-z0-9\-]/gi,'');
+    var lab=document.createElement('label');
+    lab.className='engraving-upload-label';
+    lab.setAttribute('for',uid);
+    lab.textContent='Choose image file';
+    var inp=document.createElement('input');
+    inp.id=uid;
+    inp.type='file';
+    inp.className='engraving-file-input';
+    inp.accept='image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
+    var hint=document.createElement('p');
+    hint.className='engraving-hint';
+    hint.textContent='PNG, JPG, or WebP. Then tap “Use this image”.';
+    var sub=document.createElement('button');
+    sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
+    sub.textContent='Use this image';
+    sub.addEventListener('click',function(){
+      var f=inp.files&&inp.files[0];
+      if(!f){ alert('Choose an image file.'); return; }
+      var r=new FileReader();
+      r.onload=function(){
+        var d=String(r.result||'');
+        if(d.length>1400000){ alert('Image is too large.'); return; }
+        if(!/^data:image\//.test(d)){ alert('Invalid image.'); return; }
+        S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp,image_data:d};
+        renderEngravingGrid();
+        updatePrice();
+        showEngravingGridView();
+      };
+      r.readAsDataURL(f);
+    });
+    body.appendChild(hint); body.appendChild(lab); body.appendChild(inp); body.appendChild(sub);
   }
 }
 
@@ -456,14 +625,16 @@ function updateNavSteps(){
 }
 
 function goTo(s){
-  if(s<1||s>5) return;
+  if(s<1||s>maxStep) return;
   S.step=s;
   S.maxVisited=Math.max(S.maxVisited||1,s);
   document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('panel-'+s).classList.add('active');
+  var p=document.getElementById('panel-'+s);
+  if(p) p.classList.add('active');
   updateNavSteps();
   var rc=document.querySelector('.customize-page .right-col');
   if(rc) rc.scrollTop=0;
+  if(engrCatMode&&s===6) showEngravingGridView();
   renderAll();
 }
 
@@ -496,6 +667,12 @@ function startOverCustomize(){
     document.querySelectorAll('.size-card').forEach(function(c,i){ c.classList.toggle('selected',i===last); });
   }
   if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number') basePrice=sizes[S.sizeIdx].price;
+  var ech=document.getElementById('customize-engraving-check');
+  var eta=document.getElementById('customize-engraving-text');
+  if(ech){ ech.checked=false; }
+  if(eta){ eta.value=''; eta.disabled=true; }
+  S.engrSel=null;
+  if(engrCatMode){ renderEngravingGrid(); showEngravingGridView(); }
   renderAll();
   updatePrice();
   goTo(1);
@@ -547,7 +724,7 @@ function captureCustomizePreviewDataUrl(){
 
 function buildCustomizationPayload(){
   var sn=sizes[S.sizeIdx]?sizes[S.sizeIdx].name:'';
-  return{
+  var o={
     size_idx:S.sizeIdx,
     size_name:sn,
     product_title:productName,
@@ -559,13 +736,31 @@ function buildCustomizationPayload(){
       bottom_base:{name:bootColors[S.boIdx].name,hex:bootColors[S.boIdx].hex}
     }
   };
+  if(engrCatMode){
+    if(S.engrSel&&S.engrSel.slug){
+      o.engraving={
+        category_slug:S.engrSel.slug,
+        category_name:String(S.engrSel.name||'')
+      };
+      if(S.engrSel.text) o.engraving.text=S.engrSel.text;
+      if(S.engrSel.image_data) o.engraving.image_data=S.engrSel.image_data;
+    }
+  }else if(engrEnabled){
+    var ch=document.getElementById('customize-engraving-check');
+    var ta=document.getElementById('customize-engraving-text');
+    if(ch&&ch.checked&&ta&&!ta.disabled){
+      var et=String(ta.value||'').trim();
+      if(et) o.engraving_text=et;
+    }
+  }
+  return o;
 }
 
 function buildCustomizeCartPayload(){
   var pid=typeof cfg.cart_product_id==='number'?cfg.cart_product_id:parseInt(String(cfg.cart_product_id||''),10);
   if(!pid) return null;
   if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number') basePrice=sizes[S.sizeIdx].price;
-  var unit=basePrice;
+  var unit=basePrice+engravingUnitAdd();
   var qty=syncCustomizeQtyMinOne();
   var preview=captureCustomizePreviewDataUrl();
   var body={
@@ -579,6 +774,8 @@ function buildCustomizeCartPayload(){
 }
 
 function addToCart(){
+  var engrErr=validateEngravingSelection();
+  if(engrErr){ alert(engrErr); return; }
   var meta=buildCustomizeCartPayload();
   if(!meta){
     alert('Cart product is not set. Ensure an active catalog product exists with slug 1200ml-running-tumbler (run seeders).');
@@ -628,6 +825,8 @@ function addToCart(){
 }
 
 function buyItNow(){
+  var engrErr=validateEngravingSelection();
+  if(engrErr){ alert(engrErr); return; }
   var meta=buildCustomizeCartPayload();
   if(!meta){
     alert('Cart product is not set. Ensure an active catalog product exists with slug 1200ml-running-tumbler (run seeders).');
@@ -692,6 +891,22 @@ window.addEventListener('DOMContentLoaded',()=>{
   else if(selCard){ S.sizeIdx=parseInt(selCard.getAttribute('data-size-idx')||'0',10); }
   else { S.sizeIdx=Math.max(0,sizes.length-1); sc.forEach((c,i)=>{ if(i===S.sizeIdx)c.classList.add('selected'); }); }
   if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number'){ basePrice=sizes[S.sizeIdx].price; }
+  if(engrCatMode){
+    renderEngravingGrid();
+    var bk=document.getElementById('engraving-detail-back');
+    if(bk) bk.addEventListener('click',showEngravingGridView);
+  }else if(engrEnabled){
+    var ch=document.getElementById('customize-engraving-check');
+    var ta=document.getElementById('customize-engraving-text');
+    if(ch&&ta){
+      if(ta.getAttribute('maxlength')){ var mx=parseInt(ta.getAttribute('maxlength'),10); if(isFinite(mx)&&mx>0) ta.setAttribute('maxlength',Math.min(500,mx)); }
+      else { ta.setAttribute('maxlength',String(engrMax)); }
+      function syncEngrUi(){ ta.disabled=!ch.checked; if(!ch.checked) ta.value=''; updatePrice(); }
+      ch.addEventListener('change',syncEngrUi);
+      ta.addEventListener('input',function(){ updatePrice(); });
+      syncEngrUi();
+    }
+  }
   renderAll();
   updatePrice();
   initThree();
