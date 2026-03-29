@@ -16,10 +16,14 @@ class Cart extends Model
         'quantity',
         'size',
         'color',
+        'customization_json',
+        'customization_image',
+        'custom_unit_price',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
+        'custom_unit_price' => 'decimal:2',
     ];
 
     /**
@@ -43,6 +47,10 @@ class Cart extends Model
      */
     public function getUnitPriceAttribute()
     {
+        if ($this->custom_unit_price !== null && $this->custom_unit_price !== '') {
+            return (float) $this->custom_unit_price;
+        }
+
         $product = $this->product;
         if (!$product) {
             return 0;

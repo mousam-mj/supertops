@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\ColorSizeMasterController;
+use App\Http\Controllers\Admin\CustomizeSettingsController;
 use App\Http\Controllers\PolicyPageController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AddressController;
@@ -830,7 +831,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'update'])->name('inventory.update');
         Route::delete('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'destroy'])->name('inventory.destroy');
         
-        // Color & Size Master
+        // Product customizer (admin)
+        Route::get('/customizer', [CustomizeSettingsController::class, 'index'])->name('customize.index');
+        Route::put('/customizer', [CustomizeSettingsController::class, 'update'])->name('customize.update');
+
+        // Color & Size Master (inventory product options)
         Route::get('/color-size-master', [ColorSizeMasterController::class, 'index'])->name('color-size-master.index');
         Route::post('/color-size-master/colors', [ColorSizeMasterController::class, 'storeColor'])->name('color-size-master.store-color');
         Route::put('/color-size-master/colors/{color}', [ColorSizeMasterController::class, 'updateColor'])->name('color-size-master.update-color');

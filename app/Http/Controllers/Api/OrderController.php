@@ -397,7 +397,18 @@ class OrderController extends Controller
                 $product = $cartItem->product;
                 
                 // Check stock again before creating order
-                if ($cartItem->size || $cartItem->color) {
+                if ($cartItem->customization_json) {
+                    $availableStock = $product->stock_quantity ?? $product->stock ?? 0;
+                    if ($availableStock < $cartItem->quantity) {
+                        throw new \Exception("Insufficient stock for {$product->name}. Available: {$availableStock}, Requested: {$cartItem->quantity}");
+                    }
+                    if ($product->stock_quantity !== null) {
+                        $product->stock_quantity -= $cartItem->quantity;
+                    } else {
+                        $product->stock -= $cartItem->quantity;
+                    }
+                    $product->save();
+                } elseif ($cartItem->size || $cartItem->color) {
                     $stock = $product->getStockForColorSize($cartItem->color, $cartItem->size);
                     if ($stock < $cartItem->quantity) {
                         throw new \Exception("Insufficient stock for {$product->name}. Available: {$stock}, Requested: {$cartItem->quantity}");
@@ -425,7 +436,7 @@ class OrderController extends Controller
                     if ($availableStock < $cartItem->quantity) {
                         throw new \Exception("Insufficient stock for {$product->name}. Available: {$availableStock}, Requested: {$cartItem->quantity}");
                     }
-                    
+
                     // Update product stock
                     if ($product->stock_quantity !== null) {
                         $product->stock_quantity -= $cartItem->quantity;
@@ -442,6 +453,8 @@ class OrderController extends Controller
                     'price' => $cartItem->unit_price,
                     'size' => $cartItem->size,
                     'color' => $cartItem->color,
+                    'customization_json' => $cartItem->customization_json,
+                    'customization_image' => $cartItem->customization_image,
                     // Legacy fields
                     'product_name' => $product->name,
                     'product_sku' => $product->sku,

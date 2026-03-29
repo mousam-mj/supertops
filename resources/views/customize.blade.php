@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($product->name ?? 'Customize Tumbler') . ' | Perch')
+@section('title', ($config['product_name'] ?? 'Customize') . ' | Perch')
 
 @section('content')
 <style>
@@ -15,6 +15,12 @@
 .customize-page .nav-cart-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .customize-page .add-cart-btn{background:#161616;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer}
 .customize-page .add-cart-btn:hover{background:#2c2c2c}
+.customize-page .add-cart-btn:disabled{opacity:.65;cursor:not-allowed}
+.customize-page .customize-checkout-btn{font-size:13px;font-weight:600;color:#161616;text-decoration:none;padding:10px 16px;border:1px solid #161616;border-radius:10px;background:#fff;white-space:nowrap;display:inline-block}
+.customize-page .customize-checkout-btn:hover{background:#f0f0ee}
+.customize-page button.customize-checkout-btn{font:inherit;line-height:inherit;cursor:pointer}
+.customize-page .customize-checkout-btn:disabled{opacity:.65;cursor:not-allowed}
+.customize-page .nav-cart-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
 .customize-page .price-hint{font-size:11px;color:#8a8a8a;text-align:right}
 .customize-page .close-btn{width:34px;height:34px;border:1px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#777;background:#fff}
 .customize-page .close-btn:hover{color:#111;border-color:#bdbdbd}
@@ -42,6 +48,10 @@
 .customize-page .step-counter{font-size:12px;color:#8a8a8a;margin-top:3px}
 .customize-page .step-subtext{font-size:13px;color:#666;margin:8px 0 16px}
 .customize-page .size-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.customize-page .size-static-text{border:1px solid #e8e8e8;border-radius:12px;padding:14px 16px;background:#fafafa;margin-bottom:16px}
+.customize-page .size-static-text .static-size-name{font-size:15px;font-weight:700;margin:0 0 4px}
+.customize-page .size-static-text .static-size-desc{font-size:12px;color:#7c7c7c;margin:0}
+.customize-page .size-static-text .static-size-price{font-size:14px;font-weight:600;margin:8px 0 0}
 .customize-page .size-card{display:flex;align-items:center;gap:12px;border:1px solid #ddd;border-radius:12px;padding:12px;cursor:pointer;background:#fff;transition:.15s}
 .customize-page .size-card.selected{border-color:#161616;box-shadow:0 0 0 1px #161616 inset}
 .customize-page .option-card{display:flex;align-items:center;gap:12px;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff;margin-bottom:16px}
@@ -60,18 +70,6 @@
 .customize-page .swatch.out-of-stock{opacity:.55;cursor:not-allowed}
 .customize-page .swatch.out-of-stock::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,transparent 46%,#bdbdbd 46%,#bdbdbd 54%,transparent 54%)}
 .customize-page .color-name-label{font-size:12px;color:#777;margin:6px 0 4px;text-align:center;min-height:16px}
-.customize-page .engrave-skip-label{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;margin-bottom:10px;cursor:pointer}
-.customize-page .engrave-mode{display:flex;gap:16px;margin-bottom:14px;font-size:13px}
-.customize-page .engrave-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.customize-page .cat-btn{padding:6px 12px;border:1px solid #ccc;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}
-.customize-page .cat-btn.active{background:#161616;color:#fff;border-color:#161616}
-.customize-page .engrave-sel-label{font-size:12px;color:#666;margin-left:auto}
-.customize-page .engrave-sel-label span{font-weight:700;color:#111}
-.customize-page .engrave-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.customize-page .engrave-grid.engrave-off{opacity:.42;pointer-events:none}
-.customize-page .engrave-tile{aspect-ratio:1;border:1px solid #ddd;border-radius:8px;background:#fafafa;display:flex;align-items:center;justify-content:center;padding:5px;cursor:pointer}
-.customize-page .engrave-tile.selected{border-color:#161616;box-shadow:0 0 0 1px #161616 inset;background:#fff}
-.customize-page .engrave-tile svg{width:100%;height:100%}
 .customize-page .bottom-nav{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:14px}
 .customize-page .prev-btn,.customize-page .next-btn{border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer}
 .customize-page .prev-btn{background:#fff;border:1px solid #161616;color:#161616}
@@ -100,7 +98,10 @@
       </div>
       <div class="nav-right">
         <div class="nav-cart-wrap">
-          <button class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'] + ($config['has_engraving'] ? $config['engraving_price'] : 0), 2) }}</button>
+          <div class="nav-cart-actions">
+            <button type="button" class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</button>
+            <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
+          </div>
           <span class="price-hint" id="price-hint"></span>
         </div>
         <a href="{{ route('home') }}" class="close-btn" title="Close">✕</a>
@@ -108,7 +109,7 @@
     </div>
     <div class="content">
       <div class="left-col">
-        <div class="bottle-title">{{ $product->name }}</div>
+        <div class="bottle-title">{{ $config['product_name'] ?? 'Customize' }}</div>
         <div id="three-wrap">
           <div class="loading-msg" id="loading-msg">
             <div class="spinner"></div>
@@ -137,16 +138,35 @@
           <div class="step-counter">1 of 5</div>
           <div class="step-subtext">Main tumbler body ka color yahan set karein. Baaki marked parts next steps me milenge.</div>
           <div class="size-cards" id="size-cards">
-            @php $sz = $config['sizes'] ?? []; $lastIdx = count($sz) ? count($sz)-1 : 0; @endphp
-            @foreach($sz as $i => $size)
-            <div class="size-card {{ $i === $lastIdx ? 'selected' : '' }}" data-size-idx="{{ $i }}" onclick="selectSize({{ $i }})">
-              <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><rect x="6" y="14" width="18" height="38" rx="1" fill="#222"/><path d="M7 14 Q4 18 3 24 L27 24 Q26 18 23 14Z" fill="#444"/><rect x="9" y="8" width="12" height="8" rx="2" fill="#555"/></svg></div>
-              <div class="option-info"><div class="option-name">{{ $size['name'] ?? '40 oz' }}</div><div class="option-desc">{{ $size['desc'] ?? 'Large insulated tumbler with handle and straw.' }}</div></div>
-              @if(!empty($size['price']))
-              <div class="option-price">{{ $config['currency'] }}{{ number_format($size['price'], 2) }}</div>
-              @endif
-            </div>
-            @endforeach
+            @php
+              $sz = $config['sizes'] ?? [];
+              $sizeCount = count($sz);
+              $lastIdx = $sizeCount ? $sizeCount - 1 : 0;
+            @endphp
+            @if($sizeCount <= 1)
+              @php $s0 = $sz[0] ?? ['name' => '', 'desc' => '', 'price' => null]; @endphp
+              <div class="size-static-text" id="size-static-only" data-size-idx="0" aria-live="polite">
+                @if(!empty($s0['name']))
+                  <p class="static-size-name">{{ $s0['name'] }}</p>
+                @endif
+                @if(!empty($s0['desc']))
+                  <p class="static-size-desc">{{ $s0['desc'] }}</p>
+                @endif
+                @if(isset($s0['price']) && $s0['price'] !== '' && $s0['price'] !== null)
+                  <p class="static-size-price">{{ $config['currency'] }}{{ number_format((float) $s0['price'], 2) }}</p>
+                @endif
+              </div>
+            @else
+              @foreach($sz as $i => $size)
+              <div class="size-card {{ $i === $lastIdx ? 'selected' : '' }}" data-size-idx="{{ $i }}" onclick="selectSize({{ $i }})">
+                <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><rect x="6" y="14" width="18" height="38" rx="1" fill="#222"/><path d="M7 14 Q4 18 3 24 L27 24 Q26 18 23 14Z" fill="#444"/><rect x="9" y="8" width="12" height="8" rx="2" fill="#555"/></svg></div>
+                <div class="option-info"><div class="option-name">{{ $size['name'] ?? '40 oz' }}</div><div class="option-desc">{{ $size['desc'] ?? 'Large insulated tumbler with handle and straw.' }}</div></div>
+                @if(!empty($size['price']))
+                <div class="option-price">{{ $config['currency'] }}{{ number_format($size['price'], 2) }}</div>
+                @endif
+              </div>
+              @endforeach
+            @endif
           </div>
           <div class="color-label">Choose color for Body</div>
           <div class="color-row">
@@ -244,22 +264,14 @@
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(4)">Previous – Handle</button>
             <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-            <button class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'] + ($config['has_engraving'] ? $config['engraving_price'] : 0), 2) }}</span></button>
+            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
+            <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Hidden compatibility hooks for legacy engraving JS -->
-  <div style="display:none;">
-    <label><input type="checkbox" id="engrave-none-cb"> No engraving</label>
-    <label><input type="radio" name="engrave-side" value="single" checked></label>
-    <label><input type="radio" name="engrave-side" value="double"></label>
-    <button class="cat-btn active" type="button">All</button>
-    <div id="engrave-sel">None</div>
-    <div id="engrave-grid"></div>
-  </div>
 </div>
 @endsection
 
@@ -268,6 +280,7 @@
     $customizeAppPath = public_path('assets/js/customize-app.js');
     $customizeAppV = is_readable($customizeAppPath) ? filemtime($customizeAppPath) : (int) time();
 @endphp
+<script>window.CUSTOMIZE_CHECKOUT_URL = @json(route('checkout.index'));</script>
 <script>window.CUSTOMIZE_CONFIG = @json($config);</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="{{ route('customize.app.js', ['v' => $customizeAppV]) }}"></script>

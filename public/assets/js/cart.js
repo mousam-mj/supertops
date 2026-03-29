@@ -11,6 +11,10 @@
             const addCartBtn = e.target.closest('.add-cart-btn');
             if (!addCartBtn) return;
 
+            if (addCartBtn.closest('.customize-page')) {
+                return;
+            }
+
             // Skip only on product detail page (full page), not inside Quick View modal
             if (addCartBtn.closest('.product-infor') && !addCartBtn.closest('.modal-quickview-block')) {
                 return; // Let product detail page handler take care of it
@@ -573,7 +577,8 @@
             return base + '/' + path.replace(/^\/+/, '');
         }
         
-        const imageUrl = getImageUrl(item.product?.image);
+        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        const lineName = item.display_name || item.product?.name || 'Product';
         
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
@@ -581,10 +586,10 @@
         div.innerHTML = `
             <div class="infor flex items-center gap-5 w-full">
                 <div class="bg-img">
-                    <img src="${imageUrl}" alt="${item.product?.name || 'Product'}" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" />
+                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" />
                 </div>
                 <div class="flex-1">
-                    <div class="name text-button">${item.product?.name || 'Product'}</div>
+                    <div class="name text-button">${lineName}</div>
                     <div class="flex items-center gap-2 mt-2">
                         <div class="product-price text-title">₹${price.toFixed(2)}</div>
                         ${item.size ? `<span class="text-sm text-secondary2">Size: ${item.size}</span>` : ''}
@@ -698,6 +703,9 @@
                 // Also reload cart page if on cart page
                 if (document.querySelector('.list-product-main')) {
                     loadCartPageItems();
+                }
+                if (document.querySelector('.list-product-checkout')) {
+                    loadCheckoutCartItems();
                 }
                 showNotification('Item removed from cart', 'success');
             } else {
@@ -977,17 +985,20 @@
             return base + '/' + path.replace(/^\/+/, '');
         }
         
-        const imageUrl = getImageUrl(item.product?.image);
+        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        const lineName = item.display_name || item.product?.name || 'Product';
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
+        const custLabel = item.customization_label ? String(item.customization_label).replace(/</g, '&lt;').replace(/&/g, '&amp;') : '';
         
         row.innerHTML = `
             <div class="w-2/5 flex items-center gap-4">
                 <div class="bg-img">
-                    <img src="${imageUrl}" alt="${item.product?.name || 'Product'}" class="w-20 h-20 object-cover rounded-lg" />
+                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-20 h-20 object-cover rounded-lg" />
                 </div>
                 <div>
-                    <div class="name text-button font-semibold">${item.product?.name || 'Product'}</div>
+                    <div class="name text-button font-semibold">${lineName}</div>
+                    ${custLabel ? `<div class="text-sm text-secondary2 mt-1">${custLabel}</div>` : ''}
                     ${item.size || item.color ? `
                         <div class="text-sm text-secondary2 mt-1">
                             ${item.size ? `Size: ${item.size}` : ''}
@@ -1247,18 +1258,21 @@
             }
             return base + '/' + path.replace(/^\/+/, '');
         }
-        const imageUrl = getImageUrl(item.product?.image);
+        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        const lineName = item.display_name || item.product?.name || 'Product';
         
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
+        const custLabel = item.customization_label ? String(item.customization_label).replace(/</g, '&lt;').replace(/&/g, '&amp;') : '';
         
         div.innerHTML = `
             <div class="infor flex items-center gap-3">
                 <div class="bg-img">
-                    <img src="${imageUrl}" alt="${item.product?.name || 'Product'}" class="w-[60px] aspect-square flex-shrink-0 rounded-lg object-cover" />
+                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-[60px] aspect-square flex-shrink-0 rounded-lg object-cover" />
                 </div>
                 <div>
-                    <div class="name text-sm font-semibold">${item.product?.name || 'Product'}</div>
+                    <div class="name text-sm font-semibold">${lineName}</div>
+                    ${custLabel ? `<div class="text-xs text-secondary2 mt-1">${custLabel}</div>` : ''}
                     <div class="text-xs text-secondary2 mt-1">
                         ${item.size ? `Size: ${item.size} ` : ''}
                         ${item.color ? `Color: ${item.color}` : ''}
@@ -1385,6 +1399,7 @@
     window.updateCartCount = updateCartCount;
     window.loadCartItems = loadCartItems;
     window.loadCartPageItems = loadCartPageItems;
+    window.loadCheckoutCartItems = loadCheckoutCartItems;
     window.removeCartItem = removeCartItem;
     window.showNotification = showNotification;
     window.openQuickView = function(slug) { if(slug) loadQuickViewProductBySlug(slug); };

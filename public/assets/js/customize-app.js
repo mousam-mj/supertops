@@ -19,12 +19,10 @@ const bootColors=(cfg.boot_colors&&cfg.boot_colors.length)?cfg.boot_colors:((cfg
 const sizes=cfg.sizes&&cfg.sizes.length?cfg.sizes:[{name:'40 oz',price:cfg.base_price||45}];
 let basePrice=typeof cfg.base_price==='number'?cfg.base_price:45;
 if(sizes.length>0){ var last=sizes[sizes.length-1]; basePrice=typeof last.price==='number'?last.price:basePrice; }
-const engravingPrice=typeof cfg.engraving_price==='number'?cfg.engraving_price:6;
-const hasEngraving=cfg.has_engraving!==false;
-const productName=cfg.product_name||'1200ml Running Tumbler';
+const productName=cfg.product_name||'Customize';
 const currency=cfg.currency||'₹';
 
-const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,eIdx:0,hasE:true,wish:false,qty:1,maxVisited:1};
+const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1};
 const VIS=7;
 
 function normalizeHex(h){
@@ -44,7 +42,6 @@ const CX=48.5, CY=48.5, CZ=175.15, SCALE=230/350;
 // ── THREE.JS ──
 let scene,camera,renderer,flipGroup,group;
 const M={body:null,cap:null,handle:null,boot:null,straw:null};
-let engravePlane=null;
 let autoRot=true, mDown=false, mX=0, mY=0;
 
 function initThree(){
@@ -65,7 +62,7 @@ function initThree(){
   camera.position.set(0, 0, 390);
   camera.lookAt(0, 0, 0);
 
-  renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, preserveDrawingBuffer:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.shadowMap.enabled = false;
@@ -212,13 +209,6 @@ function makePartMaterial(key, hex){
 }
 
 function disposeModelParts(){
-  if(engravePlane){
-    if(engravePlane.parent) engravePlane.parent.remove(engravePlane);
-    engravePlane.geometry.dispose();
-    if(engravePlane.material.map) engravePlane.material.map.dispose();
-    engravePlane.material.dispose();
-    engravePlane=null;
-  }
   if(!group) return;
   while(group.children.length){
     var ch=group.children[0];
@@ -266,7 +256,6 @@ function loadAllParts(){
     }
     if(loadingEl) loadingEl.style.display='none';
     syncAllPartsFromState();
-    setupEngravePreview();
   }
   try{
     disposeModelParts();
@@ -323,7 +312,6 @@ function loadAllParts(){
     }
     if(loadingEl) loadingEl.style.display='none';
     syncAllPartsFromState();
-    setupEngravePreview();
     return Promise.resolve();
   }catch(e){
     console.error(e);
@@ -344,69 +332,6 @@ function syncAllPartsFromState(){
   if(sh) snapMatColor(M.straw, sh);
   if(hh) snapMatColor(M.handle, hh);
   if(boh) snapMatColor(M.boot, boh);
-}
-
-function setupEngravePreview(){
-  if(!M.body||!group) return;
-  if(engravePlane){
-    if(engravePlane.parent) engravePlane.parent.remove(engravePlane);
-    engravePlane.geometry.dispose();
-    if(engravePlane.material.map) engravePlane.material.map.dispose();
-    engravePlane.material.dispose();
-    engravePlane=null;
-  }
-  var g=new THREE.PlaneGeometry(24,24);
-  var mat=new THREE.MeshBasicMaterial({
-    transparent:true,
-    opacity:0.9,
-    depthWrite:false,
-    depthTest:true,
-    side:THREE.DoubleSide,
-    polygonOffset:true,
-    polygonOffsetFactor:-3,
-    polygonOffsetUnits:1,
-  });
-  engravePlane=new THREE.Mesh(g,mat);
-  engravePlane.renderOrder=40;
-  group.add(engravePlane);
-  M.body.updateMatrixWorld(true);
-  var box=new THREE.Box3().setFromObject(M.body);
-  var cent=new THREE.Vector3();
-  box.getCenter(cent);
-  engravePlane.position.set(cent.x, cent.y*0.68, box.max.z+2.2);
-  engravePlane.rotation.set(0,0,0);
-  updateEngravePreview();
-}
-
-var _engraveImgGen=0;
-function updateEngravePreview(){
-  if(!engravePlane) return;
-  if(!S.hasE||!hasEngraving||S.step!==5){
-    engravePlane.visible=false;
-    return;
-  }
-  engravePlane.visible=true;
-  var gen=++_engraveImgGen;
-  var svg=ENG[S.eIdx].svg;
-  var wrapped='<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 80 80">'+svg+'</svg>';
-  var url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(wrapped);
-  var img=new Image();
-  img.onload=function(){
-    if(gen!==_engraveImgGen||!engravePlane) return;
-    var c=document.createElement('canvas');
-    c.width=256; c.height=256;
-    var ctx=c.getContext('2d');
-    ctx.fillStyle='#ffffff';
-    ctx.fillRect(0,0,256,256);
-    try{ ctx.drawImage(img,0,0,256,256); }catch(err){ return; }
-    if(engravePlane.material.map) engravePlane.material.map.dispose();
-    var tex=new THREE.CanvasTexture(c);
-    tex.needsUpdate=true;
-    engravePlane.material.map=tex;
-    engravePlane.material.color=new THREE.Color(0xffffff);
-    engravePlane.material.needsUpdate=true;
-  };
-  img.src=url;
 }
 
 function animLoop(){
@@ -492,6 +417,7 @@ function renderAll(){
   renderSw('handle-swatches',handleColors,S.hIdx,S.hOff,'handle-color-label');
   renderSw('boot-swatches',bootColors,S.boIdx,S.boOff,'boot-color-label');
   syncAllPartsFromState();
+  updatePrice();
 }
 function selectSize(idx){
   S.sizeIdx=idx;
@@ -500,49 +426,15 @@ function selectSize(idx){
   syncAllPartsFromState();
 }
 
-// ── ENGRAVINGS ──
-const ENG=[
-  {name:'Love Volleyball',svg:'<svg viewBox="0 0 80 80"><text x="40" y="45" text-anchor="middle" font-size="24" font-weight="bold" fill="#1a1a1a">L</text><text x="52" y="45" text-anchor="middle" font-size="24" font-weight="bold" fill="#1a1a1a">VE</text><circle cx="40" cy="38" r="12" fill="none" stroke="#1a1a1a" stroke-width="2"/><path d="M35 35 Q40 30 45 35" stroke="#1a1a1a" fill="none" stroke-width="1.5"/></svg>'},
-  {name:'Palm Wave',svg:'<svg viewBox="0 0 80 80"><path d="M20 70 Q28 40 35 28 Q24 34 20 46 M35 28 Q38 14 52 9 Q43 20 36 37 M35 28 Q50 22 60 25 Q46 28 36 42 M35 28 L32 70"/><path d="M5 55 Q22 44 38 50 Q48 38 60 34 Q52 44 62 47"/></svg>'},
-  {name:'Ocean Wave',svg:'<svg viewBox="0 0 80 80"><path d="M5 38 Q15 24 25 34 Q35 44 45 29 Q55 14 65 27 Q70 34 75 28"/><path d="M5 54 Q15 41 25 49 Q35 57 45 44 Q55 31 65 42 Q70 49 75 43"/><circle cx="40" cy="18" r="8"/></svg>'},
-  {name:'Mountain',svg:'<svg viewBox="0 0 80 80"><path d="M10 65 L30 30 L43 48 L53 35 L70 65Z"/><circle cx="57" cy="24" r="10"/><path d="M57 9L57 4 M57 39L57 44 M42 24L37 24 M72 24L77 24"/></svg>'},
-  {name:'Sunglasses',svg:'<svg viewBox="0 0 80 80"><rect x="5" y="27" width="29" height="21" rx="10"/><rect x="46" y="27" width="29" height="21" rx="10"/><path d="M34 35L46 35"/><line x1="5" y1="35" x2="2" y2="30"/><line x1="75" y1="35" x2="78" y2="30"/></svg>'},
-  {name:'Beach, Please',svg:'<svg viewBox="0 0 80 80"><line x1="40" y1="16" x2="40" y2="52"/><path d="M40 26 Q24 18 16 10 Q30 15 38 29"/><path d="M40 31 Q56 23 64 14 Q51 19 41 33"/><path d="M40 40 Q21 35 11 26 Q28 32 40 44"/><circle cx="63" cy="16" r="9"/><text x="40" y="63" text-anchor="middle" font-size="10" font-family="Georgia,serif" font-style="italic" fill="#1a1a1a" stroke="none">Beach,</text><text x="40" y="76" text-anchor="middle" font-size="10" font-family="Georgia,serif" font-style="italic" fill="#1a1a1a" stroke="none">please</text></svg>'},
-  {name:'Twin Palms',svg:'<svg viewBox="0 0 80 80"><line x1="26" y1="72" x2="28" y2="28"/><path d="M28 28 Q14 20 9 11 Q22 17 27 32"/><path d="M28 33 Q42 26 48 18 Q36 22 27 37"/><line x1="54" y1="72" x2="52" y2="28"/><path d="M52 28 Q66 20 71 11 Q58 17 53 32"/><path d="M52 33 Q38 26 32 18 Q44 22 53 37"/></svg>'},
-  {name:'Lone Palm',svg:'<svg viewBox="0 0 80 80"><line x1="40" y1="72" x2="38" y2="24"/><path d="M38 24 Q21 16 13 6 Q27 13 37 27"/><path d="M39 29 Q55 22 63 13 Q50 19 38 34"/><circle cx="59" cy="24" r="7"/></svg>'},
-  {name:'Wave Curl',svg:'<svg viewBox="0 0 80 80"><path d="M65 14 Q72 30 60 46 Q48 60 33 64 Q18 68 8 58 Q20 70 40 67 Q60 62 70 46 Q80 30 65 14Z"/><path d="M65 14 Q54 7 47 13 Q55 9 62 20"/></svg>'},
-];
-
-function syncEngraveGridUi(){
-  var g=document.getElementById('engrave-grid');
-  if(g) g.classList.toggle('engrave-off',!S.hasE);
-}
-
-function renderEng(){
-  const g=document.getElementById('engrave-grid'); g.innerHTML='';
-  ENG.forEach((e,i)=>{
-    const t=document.createElement('div');
-    t.className='engrave-tile'+(i===S.eIdx?' selected':'');
-    t.innerHTML=e.svg;
-    t.onclick=()=>{
-      S.eIdx=i;S.hasE=true;
-      var skip=document.getElementById('engrave-none-cb');
-      if(skip) skip.checked=false;
-      var es=document.getElementById('engrave-sel'); if(es) es.textContent=e.name;
-      renderEng();updatePrice();updateEngravePreview();
-    };
-    g.appendChild(t);
-  });
-  syncEngraveGridUi();
-}
-function filterCat(btn){document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-
 function fmtMoney(n){
   return currency+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function updatePrice(){
+  if(sizes.length&&sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number'){
+    basePrice=sizes[S.sizeIdx].price;
+  }
   var qty=Math.max(1,S.qty||1);
-  var unit=basePrice+(S.hasE&&hasEngraving?engravingPrice:0);
+  var unit=basePrice;
   var total=unit*qty;
   var tb=document.getElementById('top-cart-btn');
   if(tb) tb.textContent='Add to Cart – '+fmtMoney(total);
@@ -550,8 +442,6 @@ function updatePrice(){
   var hint=document.getElementById('price-hint');
   if(hint){
     var s=fmtMoney(basePrice)+' size';
-    if(hasEngraving&&S.hasE) s+=' + '+fmtMoney(engravingPrice)+' engraving';
-    else if(hasEngraving) s+=' (engraving off)';
     if(qty>1) s+=' · '+qty+'× '+fmtMoney(unit)+' = '+fmtMoney(total);
     hint.textContent=s;
   }
@@ -575,8 +465,6 @@ function goTo(s){
   var rc=document.querySelector('.customize-page .right-col');
   if(rc) rc.scrollTop=0;
   renderAll();
-  updateEngravePreview();
-  if(s===5) syncEngraveGridUi();
 }
 
 function shareCustomizeDesign(){
@@ -595,64 +483,217 @@ function shareCustomizeDesign(){
 function startOverCustomize(){
   S.bIdx=S.cIdx=S.sIdx=S.hIdx=S.boIdx=0;
   S.bOff=S.cOff=S.sOff=S.hOff=S.boOff=0;
-  S.eIdx=0;
-  S.hasE=true;
   S.qty=1;
   S.maxVisited=1;
   var q=document.getElementById('customize-qty');
   if(q) q.value='1';
-  var skip=document.getElementById('engrave-none-cb');
-  if(skip) skip.checked=false;
-  var last=Math.max(0,sizes.length-1);
-  S.sizeIdx=last;
-  document.querySelectorAll('.size-card').forEach(function(c,i){ c.classList.toggle('selected',i===last); });
-  if(sizes[last]&&typeof sizes[last].price==='number') basePrice=sizes[last].price;
+  var staticSz=document.getElementById('size-static-only');
+  if(staticSz){
+    S.sizeIdx=parseInt(staticSz.getAttribute('data-size-idx')||'0',10);
+  }else{
+    var last=Math.max(0,sizes.length-1);
+    S.sizeIdx=last;
+    document.querySelectorAll('.size-card').forEach(function(c,i){ c.classList.toggle('selected',i===last); });
+  }
+  if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number') basePrice=sizes[S.sizeIdx].price;
   renderAll();
-  renderEng();
-  var es=document.getElementById('engrave-sel');
-  if(es&&ENG[S.eIdx]) es.textContent=ENG[S.eIdx].name;
   updatePrice();
   goTo(1);
   if(typeof resetCam==='function') resetCam();
 }
 
+function syncCustomizeQtyMinOne(){
+  var sel=document.getElementById('customize-qty');
+  var raw=sel?parseInt(sel.value,10):S.qty;
+  if(!isFinite(raw)||raw<1) raw=1;
+  var maxOpt=1;
+  if(sel){
+    sel.querySelectorAll('option').forEach(function(o){
+      var v=parseInt(o.value,10);
+      if(isFinite(v)&&v>maxOpt) maxOpt=v;
+    });
+    raw=Math.min(Math.max(1,raw),maxOpt);
+    sel.value=String(raw);
+  }
+  S.qty=raw;
+  return raw;
+}
+
 function onCustomizeQtyChange(sel){
-  S.qty=Math.max(1,parseInt(sel.value,10)||1);
+  if(!sel) return;
+  var n=parseInt(sel.value,10);
+  if(!isFinite(n)||n<1) n=1;
+  var maxOpt=1;
+  sel.querySelectorAll('option').forEach(function(o){
+    var v=parseInt(o.value,10);
+    if(isFinite(v)&&v>maxOpt) maxOpt=v;
+  });
+  n=Math.min(Math.max(1,n),maxOpt);
+  sel.value=String(n);
+  S.qty=n;
   updatePrice();
 }
 
+function captureCustomizePreviewDataUrl(){
+  if(!renderer||!scene||!camera) return null;
+  try{
+    renderer.render(scene,camera);
+    return renderer.domElement.toDataURL('image/png',0.92);
+  }catch(e){
+    console.warn(e);
+    return null;
+  }
+}
+
+function buildCustomizationPayload(){
+  var sn=sizes[S.sizeIdx]?sizes[S.sizeIdx].name:'';
+  return{
+    size_idx:S.sizeIdx,
+    size_name:sn,
+    product_title:productName,
+    colors:{
+      body:{name:bottleColors[S.bIdx].name,hex:bottleColors[S.bIdx].hex},
+      lid_ring:{name:capColors[S.cIdx].name,hex:capColors[S.cIdx].hex},
+      straw:{name:strapColors[S.sIdx].name,hex:strapColors[S.sIdx].hex},
+      handle:{name:handleColors[S.hIdx].name,hex:handleColors[S.hIdx].hex},
+      bottom_base:{name:bootColors[S.boIdx].name,hex:bootColors[S.boIdx].hex}
+    }
+  };
+}
+
+function buildCustomizeCartPayload(){
+  var pid=typeof cfg.cart_product_id==='number'?cfg.cart_product_id:parseInt(String(cfg.cart_product_id||''),10);
+  if(!pid) return null;
+  if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number') basePrice=sizes[S.sizeIdx].price;
+  var unit=basePrice;
+  var qty=syncCustomizeQtyMinOne();
+  var preview=captureCustomizePreviewDataUrl();
+  var body={
+    product_id:pid,
+    quantity:qty,
+    custom_unit_price:unit,
+    customization:buildCustomizationPayload()
+  };
+  if(preview) body.customization_image=preview;
+  return {body:body,unit:unit,qty:qty};
+}
+
 function addToCart(){
-  var unit=basePrice+(S.hasE&&hasEngraving?engravingPrice:0);
-  var t=unit*(S.qty||1);
-  var sizeName=sizes[S.sizeIdx]?sizes[S.sizeIdx].name:'40 oz';
-  alert('✅ Added!\n\n'+productName+' ('+sizeName+') × '+(S.qty||1)+'\nBody: '+bottleColors[S.bIdx].name+'\nLid Ring: '+capColors[S.cIdx].name+'\nStraw: '+strapColors[S.sIdx].name+'\nHandle: '+handleColors[S.hIdx].name+'\nBottom Base: '+bootColors[S.boIdx].name+'\n'+(S.qty>1?('Unit: '+currency+unit.toFixed(2)+'\n'):'')+'Total: '+currency+t.toFixed(2));
+  var meta=buildCustomizeCartPayload();
+  if(!meta){
+    alert('Cart product is not set. Ensure an active catalog product exists with slug 1200ml-running-tumbler (run seeders).');
+    return;
+  }
+  updatePrice();
+  var unit=meta.unit,qty=meta.qty,body=meta.body;
+
+  var tb=document.getElementById('top-cart-btn');
+  var ob=tb?tb.textContent:'';
+  if(tb){ tb.disabled=true; tb.textContent='Adding…'; }
+
+  var csrf=document.querySelector('meta[name="csrf-token"]');
+  var token=csrf?csrf.getAttribute('content'):'';
+  fetch('/api/cart/add',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Accept':'application/json',
+      'X-CSRF-TOKEN':token,
+      'X-Requested-With':'XMLHttpRequest'
+    },
+    credentials:'same-origin',
+    body:JSON.stringify(body)
+  }).then(function(r){
+    return r.json().then(function(d){ return {ok:r.ok,data:d}; });
+  }).then(function(res){
+    if(res.data&&res.data.success){
+      if(typeof window.updateCartCount==='function') window.updateCartCount();
+      if(typeof window.showNotification==='function'){
+        window.showNotification('Added to cart','success');
+      }else{
+        alert('Added to cart.');
+      }
+    }else{
+      var msg=(res.data&&res.data.message)?res.data.message:'Could not add to cart.';
+      if(typeof window.showNotification==='function') window.showNotification(msg,'error');
+      else alert(msg);
+    }
+  }).catch(function(){
+    if(typeof window.showNotification==='function') window.showNotification('Network error','error');
+    else alert('Network error. Please try again.');
+  }).finally(function(){
+    if(tb){ tb.disabled=false; tb.textContent=ob||('Add to Cart – '+fmtMoney(unit*qty)); }
+    updatePrice();
+  });
+}
+
+function buyItNow(){
+  var meta=buildCustomizeCartPayload();
+  if(!meta){
+    alert('Cart product is not set. Ensure an active catalog product exists with slug 1200ml-running-tumbler (run seeders).');
+    return;
+  }
+  updatePrice();
+  var checkoutUrl=(typeof window.CUSTOMIZE_CHECKOUT_URL==='string'&&window.CUSTOMIZE_CHECKOUT_URL)?window.CUSTOMIZE_CHECKOUT_URL:'/checkout';
+  var unit=meta.unit,qty=meta.qty,body=meta.body;
+  var btns=document.querySelectorAll('.customize-checkout-btn');
+  var prev=[];
+  btns.forEach(function(b){
+    prev.push(b.textContent);
+    b.disabled=true;
+    b.textContent='Please wait…';
+  });
+
+  var csrf=document.querySelector('meta[name="csrf-token"]');
+  var token=csrf?csrf.getAttribute('content'):'';
+  fetch('/api/cart/add',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Accept':'application/json',
+      'X-CSRF-TOKEN':token,
+      'X-Requested-With':'XMLHttpRequest'
+    },
+    credentials:'same-origin',
+    body:JSON.stringify(body)
+  }).then(function(r){
+    return r.json().then(function(d){ return {ok:r.ok,data:d}; });
+  }).then(function(res){
+    if(res.data&&res.data.success){
+      if(typeof window.updateCartCount==='function') window.updateCartCount();
+      window.location.href=checkoutUrl;
+      return;
+    }
+    var msg=(res.data&&res.data.message)?res.data.message:'Could not continue to checkout.';
+    if(typeof window.showNotification==='function') window.showNotification(msg,'error');
+    else alert(msg);
+  }).catch(function(){
+    if(typeof window.showNotification==='function') window.showNotification('Network error','error');
+    else alert('Network error. Please try again.');
+  }).finally(function(){
+    btns.forEach(function(b,i){
+      b.disabled=false;
+      b.textContent=prev[i]||'Buy it now';
+    });
+    updatePrice();
+  });
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
-  renderAll(); renderEng(); updatePrice();
   var bl=document.getElementById('bottle-color-label');if(bl)bl.textContent=bottleColors[S.bIdx].name;
   var cl=document.getElementById('cap-color-label');if(cl)cl.textContent=capColors[S.cIdx].name;
   var sl=document.getElementById('strap-color-label');if(sl)sl.textContent=strapColors[S.sIdx].name;
   var hdl=document.getElementById('handle-color-label');if(hdl)hdl.textContent=handleColors[S.hIdx].name;
   var bol=document.getElementById('boot-color-label');if(bol)bol.textContent=bootColors[S.boIdx].name;
-  var sc=document.querySelectorAll('.size-card'); 
+  var sc=document.querySelectorAll('.size-card');
+  var staticSz=document.getElementById('size-static-only');
   var selCard=document.querySelector('.size-card.selected');
-  if(selCard){ S.sizeIdx=parseInt(selCard.getAttribute('data-size-idx')||'0',10); }
+  if(staticSz){ S.sizeIdx=parseInt(staticSz.getAttribute('data-size-idx')||'0',10); }
+  else if(selCard){ S.sizeIdx=parseInt(selCard.getAttribute('data-size-idx')||'0',10); }
   else { S.sizeIdx=Math.max(0,sizes.length-1); sc.forEach((c,i)=>{ if(i===S.sizeIdx)c.classList.add('selected'); }); }
-  if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number'){ basePrice=sizes[S.sizeIdx].price; updatePrice(); }
+  if(sizes[S.sizeIdx]&&typeof sizes[S.sizeIdx].price==='number'){ basePrice=sizes[S.sizeIdx].price; }
+  renderAll();
+  updatePrice();
   initThree();
-  document.querySelectorAll('input[name="engrave-side"]').forEach(function(r){
-    r.addEventListener('change',function(){ updateEngravePreview(); });
-  });
-  var skipCb=document.getElementById('engrave-none-cb');
-  if(skipCb){
-    skipCb.checked=!S.hasE;
-    skipCb.addEventListener('change',function(){
-      S.hasE=!this.checked;
-      updatePrice();
-      updateEngravePreview();
-      renderEng();
-    });
-  }
   updateNavSteps();
 });

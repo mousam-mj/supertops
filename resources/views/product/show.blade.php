@@ -293,7 +293,7 @@
                                 </div>
 
                                 <div class="button-block mt-5 flex gap-3">
-                                    <a href="{{ route('customize.product', ['slug' => $product->slug]) }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline">Customize</a>
+                                    <a href="{{ route('customize') }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline">Customize</a>
                                     <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
                                 </div>
                             </div>

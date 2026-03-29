@@ -144,11 +144,40 @@
                         </thead>
                         <tbody>
                             @foreach($order->items as $item)
+                                @php
+                                    $colorLines = $item->adminCustomizationColorLines();
+                                    $sizeLabel = $item->adminDisplaySize();
+                                @endphp
                                 <tr>
-                                    <td>{{ $item->product_name }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ $item->adminDisplayProductTitle() }}</div>
+                                        @if($item->customization_json && $item->product_name && $item->adminDisplayProductTitle() !== $item->product_name)
+                                            <div class="small text-muted">Catalog: {{ $item->product_name }}</div>
+                                        @endif
+                                        @if($item->customization_image)
+                                            <div class="mt-2">
+                                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->customization_image) }}" alt="Customizer preview" class="rounded border" style="max-width:140px;height:auto;">
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td>{{ $item->product_sku ?? '—' }}</td>
-                                    <td>{{ $item->color ?: '—' }}</td>
-                                    <td>{{ $item->size ?: '—' }}</td>
+                                    <td>
+                                        @if(count($colorLines) > 0)
+                                            <ul class="list-unstyled small mb-0">
+                                                @foreach($colorLines as $line)
+                                                    <li class="d-flex align-items-center gap-2 py-1">
+                                                        @if(!empty($line['hex']))
+                                                            <span class="d-inline-block rounded border flex-shrink-0" style="width:16px;height:16px;background-color:{{ $line['hex'] }}"></span>
+                                                        @endif
+                                                        <span><span class="text-muted">{{ $line['label'] }}:</span> {{ $line['name'] !== '' ? $line['name'] : ($line['hex'] ?? '—') }}</span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            {{ $item->color ?: '—' }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $sizeLabel !== '' ? $sizeLabel : '—' }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ currency($item->price) }}</td>
                                     <td><strong>{{ currency($item->total) }}</strong></td>

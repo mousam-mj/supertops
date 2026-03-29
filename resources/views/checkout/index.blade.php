@@ -872,10 +872,13 @@ if (testBtn) {
                 window.currentShippingCharge = currentShippingCharge;
                 
                 updateTotalDisplay();
+                if (typeof window.loadCheckoutCartItems === 'function') {
+                    window.loadCheckoutCartItems();
+                }
                 
                 // Initialize payment button for Razorpay
                 setTimeout(() => {
-                    const finalTotal = (window.cartSubtotal || cartSubtotal || 100) + (window.currentShippingCharge || currentShippingCharge || 0);
+                    const finalTotal = (window.cartSubtotal || cartSubtotal || 0) + (window.currentShippingCharge || currentShippingCharge || 0);
                     updatePaymentButton('razorpay', finalTotal);
                     
                     // Ensure button elements are visible
@@ -915,7 +918,7 @@ if (testBtn) {
     // Update total display
     function updateTotalDisplay() {
         const totalElement = document.querySelector('.total-cart');
-        const finalTotal = (window.cartSubtotal || cartSubtotal || 100) + (window.currentShippingCharge || currentShippingCharge || 0); // No COD charges
+        const finalTotal = (window.cartSubtotal || cartSubtotal || 0) + (window.currentShippingCharge || currentShippingCharge || 0); // No COD charges
         
         if (totalElement) {
             totalElement.textContent = '₹' + finalTotal.toFixed(2);
@@ -1456,7 +1459,7 @@ if (testBtn) {
         let codCharge = 0; // No COD charges for online payment only
         
         // Use global variables with fallbacks
-        const currentCartSubtotal = window.cartSubtotal || cartSubtotal || 100; // Fallback to 100 if cart not loaded
+        const currentCartSubtotal = window.cartSubtotal || cartSubtotal || 0;
         const currentShipping = window.currentShippingCharge || currentShippingCharge || 0;
         const totalAmount = currentCartSubtotal + currentShipping;
         

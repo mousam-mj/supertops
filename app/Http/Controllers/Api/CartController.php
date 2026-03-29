@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Services\CustomizeConfigService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
@@ -49,10 +51,25 @@ class CartController extends Controller
      */
     public function count(Request $request)
     {
+        $sessionCookieValue = null;
+
         if ($request->user()) {
-            $cartItems = Cart::with('product')
+            $userItems = Cart::with('product')
                 ->where('user_id', $request->user()->id)
                 ->get();
+
+            $cookieSessionId = $request->cookie('cart_session_id');
+            $guestItems = collect();
+            if ($cookieSessionId) {
+                $this->consolidateGuestCart($cookieSessionId);
+                $guestItems = Cart::with('product')
+                    ->where('session_id', $cookieSessionId)
+                    ->whereNull('user_id')
+                    ->get();
+            }
+
+            $cartItems = $userItems->concat($guestItems)->unique('id')->values();
+            $sessionCookieValue = $cookieSessionId;
         } else {
             // First, find the best session ID (one with most items)
             $bestSession = Cart::whereNull('user_id')
@@ -80,6 +97,8 @@ class CartController extends Controller
                 ->where('session_id', $sessionId)
                 ->whereNull('user_id')
                 ->get();
+
+            $sessionCookieValue = $sessionId;
         }
         
         // Remove orphan cart items (deleted products) and filter
@@ -91,10 +110,16 @@ class CartController extends Controller
 
         $count = $cartItems->sum('quantity');
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'data' => ['count' => $count],
-        ])->cookie('cart_session_id', $sessionId, 60 * 24 * 30); // 30 days
+        ]);
+
+        if ($sessionCookieValue) {
+            return $response->cookie('cart_session_id', $sessionCookieValue, 60 * 24 * 30);
+        }
+
+        return $response;
     }
 
     /**
@@ -102,10 +127,25 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
+        $sessionCookieValue = null;
+
         if ($request->user()) {
-            $cartItems = Cart::with('product.category')
+            $userItems = Cart::with('product.category')
                 ->where('user_id', $request->user()->id)
                 ->get();
+
+            $cookieSessionId = $request->cookie('cart_session_id');
+            $guestItems = collect();
+            if ($cookieSessionId) {
+                $this->consolidateGuestCart($cookieSessionId);
+                $guestItems = Cart::with('product.category')
+                    ->where('session_id', $cookieSessionId)
+                    ->whereNull('user_id')
+                    ->get();
+            }
+
+            $cartItems = $userItems->concat($guestItems)->unique('id')->values();
+            $sessionCookieValue = $cookieSessionId;
         } else {
             // First, find the best session ID (one with most items)
             $bestSession = Cart::whereNull('user_id')
@@ -133,6 +173,8 @@ class CartController extends Controller
                 ->where('session_id', $sessionId)
                 ->whereNull('user_id')
                 ->get();
+
+            $sessionCookieValue = $sessionId;
         }
 
         // Remove cart items for deleted products (orphans) and filter
@@ -151,28 +193,33 @@ class CartController extends Controller
             }
             
             $product = $item->product;
-            $unitPrice = $product ? (float) ($product->sale_price ?? $product->price ?? 0) : 0;
-
-            // Use inventory (variant) price when cart item has color/size
-            if ($product && (($item->color !== null && $item->color !== '') || ($item->size !== null && $item->size !== ''))) {
-                $inventory = Inventory::where('product_id', $item->product_id)
-                    ->where('color', $item->color ?? '')
-                    ->where('size', $item->size ?? '')
-                    ->first();
-                if ($inventory) {
-                    $unitPrice = (float) ($inventory->sale_price ?? $inventory->price ?? $product->price ?? 0);
-                }
-            }
-
-            $subtotal = $item->quantity * $unitPrice;
+            $unitPrice = (float) $item->unit_price;
+            $subtotal = (float) $item->subtotal;
             $total += $subtotal;
             
+            $previewUrl = null;
+            if ($item->customization_image) {
+                $previewUrl = Storage::disk('public')->url($item->customization_image);
+            }
+
+            $decodedCustomization = $item->customization_json
+                ? json_decode($item->customization_json, true)
+                : null;
+            $displayName = (is_array($decodedCustomization) && ! empty($decodedCustomization['product_title']))
+                ? $decodedCustomization['product_title']
+                : ($product->name ?? '');
+
             return [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
                 'quantity' => $item->quantity,
                 'size' => $item->size,
                 'color' => $item->color,
+                'display_name' => $displayName,
+                'customization_image_url' => $previewUrl,
+                'customization_label' => $item->customization_json
+                    ? $this->customizationSummaryLabel($item->customization_json)
+                    : null,
                 'subtotal' => $subtotal,
                 'unit_price' => $unitPrice,
                 'product' => $product ? [
@@ -188,13 +235,19 @@ class CartController extends Controller
             ];
         });
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'data' => [
                 'items' => $items,
                 'total' => $total,
             ],
-        ])->cookie('cart_session_id', $this->getSessionId($request), 60 * 24 * 30);
+        ]);
+
+        if ($sessionCookieValue) {
+            return $response->cookie('cart_session_id', $sessionCookieValue, 60 * 24 * 30);
+        }
+
+        return $response;
     }
 
     /**
@@ -207,11 +260,14 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'size' => 'nullable|string',
             'color' => 'nullable|string',
+            'customization' => 'nullable|array',
+            'customization.size_idx' => 'nullable|integer|min:0',
+            'custom_unit_price' => 'nullable|numeric|min:0',
+            'customization_image' => 'nullable|string|max:6500000',
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
-        // Check if product is active
         if (!$product->is_active) {
             return response()->json([
                 'success' => false,
@@ -219,59 +275,124 @@ class CartController extends Controller
             ], 400);
         }
 
-        // Check stock availability
-        if ($request->size || $request->color) {
-            $stock = $product->getStockForColorSize($request->color, $request->size);
-            if ($stock < $request->quantity) {
+        $customizationPayload = $request->input('customization');
+        $isCustomizerLine = is_array($customizationPayload) && array_key_exists('size_idx', $customizationPayload);
+
+        $customizationJson = null;
+        $customizationImagePath = null;
+        $customUnitPrice = null;
+
+        if ($isCustomizerLine) {
+            $cartProductId = CustomizeConfigService::getCartProductId();
+            if (!$cartProductId || (int) $request->product_id !== $cartProductId) {
                 return response()->json([
                     'success' => false,
-                    'message' => $stock > 0 
-                        ? "Only {$stock} item(s) available in stock." 
-                        : 'This item is out of stock.',
-                ], 400);
+                    'message' => 'Invalid product for customizer checkout.',
+                ], 422);
             }
-        } else {
-            // Check main stock_quantity and in_stock flag
-            $availableStock = $product->stock_quantity ?? 0;
-            if (!$product->in_stock || $availableStock < $request->quantity) {
+
+            $sizeIdx = (int) $customizationPayload['size_idx'];
+            $expectedUnit = CustomizeConfigService::unitPriceForCustomizerSizeIndex($sizeIdx);
+            if ($expectedUnit === null) {
                 return response()->json([
                     'success' => false,
-                    'message' => $availableStock > 0 
-                        ? "Only {$availableStock} item(s) available in stock." 
-                        : 'This item is out of stock.',
-                ], 400);
+                    'message' => 'Invalid size selection.',
+                ], 422);
             }
+
+            $claimed = round((float) $request->input('custom_unit_price', -1), 2);
+            if (abs($claimed - $expectedUnit) > 0.02) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Price mismatch. Please refresh the customizer and try again.',
+                ], 422);
+            }
+
+            $customizationJson = json_encode($customizationPayload, JSON_UNESCAPED_UNICODE);
+            $customizationImagePath = $this->storeCustomizationImage($request->input('customization_image'));
+            $customUnitPrice = $expectedUnit;
         }
 
         $cartData = [
             'product_id' => $request->product_id,
             'quantity' => $request->quantity,
-            'size' => $request->size,
-            'color' => $request->color,
+            'size' => $isCustomizerLine ? null : $request->size,
+            'color' => $isCustomizerLine ? null : $request->color,
+            'customization_json' => $customizationJson,
+            'customization_image' => $customizationImagePath,
+            'custom_unit_price' => $customUnitPrice,
         ];
+
+        // Stock: customizer lines use main product stock only (no variant rows)
+        if ($isCustomizerLine) {
+            $availableStock = $product->stock_quantity ?? 0;
+            if (!$product->in_stock || $availableStock < $request->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $availableStock > 0
+                        ? "Only {$availableStock} item(s) available in stock."
+                        : 'This item is out of stock.',
+                ], 400);
+            }
+        } elseif ($request->size || $request->color) {
+            $stock = $product->getStockForColorSize($request->color, $request->size);
+            if ($stock < $request->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $stock > 0
+                        ? "Only {$stock} item(s) available in stock."
+                        : 'This item is out of stock.',
+                ], 400);
+            }
+        } else {
+            $availableStock = $product->stock_quantity ?? 0;
+            if (!$product->in_stock || $availableStock < $request->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $availableStock > 0
+                        ? "Only {$availableStock} item(s) available in stock."
+                        : 'This item is out of stock.',
+                ], 400);
+            }
+        }
 
         if ($request->user()) {
             $cartData['user_id'] = $request->user()->id;
             $cartData['session_id'] = null;
 
-            // Check if item already exists
-            $existingCart = Cart::where('user_id', $request->user()->id)
-                ->where('product_id', $request->product_id)
-                ->where('size', $request->size)
-                ->where('color', $request->color)
-                ->first();
+            if ($isCustomizerLine) {
+                $existingCart = Cart::where('user_id', $request->user()->id)
+                    ->where('product_id', $request->product_id)
+                    ->where('customization_json', $customizationJson)
+                    ->first();
+            } else {
+                $existingCart = Cart::where('user_id', $request->user()->id)
+                    ->where('product_id', $request->product_id)
+                    ->whereNull('customization_json')
+                    ->where('size', $request->size)
+                    ->where('color', $request->color)
+                    ->first();
+            }
 
             if ($existingCart) {
                 $newQuantity = $existingCart->quantity + $request->quantity;
-                
-                // Check stock before updating
-                if ($request->size || $request->color) {
+                if ($isCustomizerLine) {
+                    $availableStock = $product->stock_quantity ?? 0;
+                    if (!$product->in_stock || $availableStock < $newQuantity) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => $availableStock > 0
+                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                : 'This item is out of stock.',
+                        ], 400);
+                    }
+                } elseif ($request->size || $request->color) {
                     $stock = $product->getStockForColorSize($request->color, $request->size);
                     if ($stock < $newQuantity) {
                         return response()->json([
                             'success' => false,
-                            'message' => $stock > 0 
-                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart." 
+                            'message' => $stock > 0
+                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -280,15 +401,16 @@ class CartController extends Controller
                     if (!$product->in_stock || $availableStock < $newQuantity) {
                         return response()->json([
                             'success' => false,
-                            'message' => $availableStock > 0 
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart." 
+                            'message' => $availableStock > 0
+                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
                 }
-                
+
                 $existingCart->quantity = $newQuantity;
                 $existingCart->save();
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Item updated in cart',
@@ -299,25 +421,41 @@ class CartController extends Controller
             $sessionId = $this->getSessionId($request);
             $cartData['session_id'] = $sessionId;
 
-            // Check if item already exists
-            $existingCart = Cart::where('session_id', $sessionId)
-                ->whereNull('user_id')
-                ->where('product_id', $request->product_id)
-                ->where('size', $request->size)
-                ->where('color', $request->color)
-                ->first();
+            if ($isCustomizerLine) {
+                $existingCart = Cart::where('session_id', $sessionId)
+                    ->whereNull('user_id')
+                    ->where('product_id', $request->product_id)
+                    ->where('customization_json', $customizationJson)
+                    ->first();
+            } else {
+                $existingCart = Cart::where('session_id', $sessionId)
+                    ->whereNull('user_id')
+                    ->where('product_id', $request->product_id)
+                    ->whereNull('customization_json')
+                    ->where('size', $request->size)
+                    ->where('color', $request->color)
+                    ->first();
+            }
 
             if ($existingCart) {
                 $newQuantity = $existingCart->quantity + $request->quantity;
-                
-                // Check stock before updating
-                if ($request->size || $request->color) {
+                if ($isCustomizerLine) {
+                    $availableStock = $product->stock_quantity ?? 0;
+                    if (!$product->in_stock || $availableStock < $newQuantity) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => $availableStock > 0
+                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                : 'This item is out of stock.',
+                        ], 400);
+                    }
+                } elseif ($request->size || $request->color) {
                     $stock = $product->getStockForColorSize($request->color, $request->size);
                     if ($stock < $newQuantity) {
                         return response()->json([
                             'success' => false,
-                            'message' => $stock > 0 
-                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart." 
+                            'message' => $stock > 0
+                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -326,15 +464,16 @@ class CartController extends Controller
                     if (!$product->in_stock || $availableStock < $newQuantity) {
                         return response()->json([
                             'success' => false,
-                            'message' => $availableStock > 0 
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart." 
+                            'message' => $availableStock > 0
+                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
                 }
-                
+
                 $existingCart->quantity = $newQuantity;
                 $existingCart->save();
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Item updated in cart',
@@ -344,15 +483,20 @@ class CartController extends Controller
         }
 
         $cart = Cart::create($cartData);
-        
-        // Use the same session ID that was used to create the cart
-        $finalSessionId = $request->user() ? null : ($cartData['session_id'] ?? $this->getSessionId($request));
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'message' => 'Item added to cart',
             'data' => $cart->load('product'),
-        ], 201)->cookie('cart_session_id', $finalSessionId, 60 * 24 * 30);
+        ], 201);
+
+        if (!$request->user()) {
+            $sid = $cartData['session_id'] ?? $this->getSessionId($request);
+
+            return $response->cookie('cart_session_id', $sid, 60 * 24 * 30);
+        }
+
+        return $response;
     }
 
     /**
@@ -366,27 +510,26 @@ class CartController extends Controller
 
         $cart = Cart::findOrFail($id);
 
-        // Check authorization
-        if ($request->user()) {
-            if ($cart->user_id !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'This cart item does not belong to you. Please refresh the page.',
-                ], 403);
-            }
-        } else {
-            $sessionId = $this->getSessionId($request);
-            if ($cart->session_id !== $sessionId || $cart->user_id !== null) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your cart session changed. Please refresh the page and try again.',
-                ], 403);
-            }
+        if (!$this->cartItemAccessible($request, $cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This cart item does not belong to you. Please refresh the page.',
+            ], 403);
         }
 
         // Check stock
         $product = $cart->product;
-        if ($cart->size || $cart->color) {
+        if ($cart->customization_json) {
+            $availableStock = $product->stock_quantity ?? 0;
+            if (!$product->in_stock || $availableStock < $request->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $availableStock > 0
+                        ? "Only {$availableStock} item(s) available in stock."
+                        : 'This item is out of stock.',
+                ], 400);
+            }
+        } elseif ($cart->size || $cart->color) {
             $stock = $product->getStockForColorSize($cart->color, $cart->size);
             if ($stock < $request->quantity) {
                 return response()->json([
@@ -425,22 +568,11 @@ class CartController extends Controller
     {
         $cart = Cart::findOrFail($id);
 
-        // Check authorization
-        if ($request->user()) {
-            if ($cart->user_id !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'This cart item does not belong to you. Please refresh the page.',
-                ], 403);
-            }
-        } else {
-            $sessionId = $this->getSessionId($request);
-            if ($cart->session_id !== $sessionId || $cart->user_id !== null) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your cart session changed. Please refresh the page and try again.',
-                ], 403);
-            }
+        if (!$this->cartItemAccessible($request, $cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This cart item does not belong to you. Please refresh the page.',
+            ], 403);
         }
 
         $cart->delete();
@@ -503,9 +635,9 @@ class CartController extends Controller
             return;
         }
 
-        // Group by product_id, size, and color to merge duplicates
-        $grouped = $otherCarts->groupBy(function($item) {
-            return $item->product_id . '|' . ($item->size ?? '') . '|' . ($item->color ?? '');
+        // Group by product_id, variant, and customization fingerprint
+        $grouped = $otherCarts->groupBy(function ($item) {
+            return $item->product_id.'|'.($item->size ?? '').'|'.($item->color ?? '').'|'.($item->customization_json ?? '');
         });
 
         foreach ($grouped as $key => $items) {
@@ -518,12 +650,17 @@ class CartController extends Controller
             }
 
             // Check if item already exists in target session
-            $existing = Cart::where('session_id', $targetSessionId)
+            $existingQuery = Cart::where('session_id', $targetSessionId)
                 ->where('product_id', $firstItem->product_id)
                 ->where('size', $firstItem->size)
                 ->where('color', $firstItem->color)
-                ->whereNull('user_id')
-                ->first();
+                ->whereNull('user_id');
+            if ($firstItem->customization_json === null) {
+                $existingQuery->whereNull('customization_json');
+            } else {
+                $existingQuery->where('customization_json', $firstItem->customization_json);
+            }
+            $existing = $existingQuery->first();
 
             if ($existing) {
                 // Update quantity
@@ -537,6 +674,9 @@ class CartController extends Controller
                     'quantity' => $totalQuantity,
                     'size' => $firstItem->size,
                     'color' => $firstItem->color,
+                    'customization_json' => $firstItem->customization_json,
+                    'customization_image' => $firstItem->customization_image,
+                    'custom_unit_price' => $firstItem->custom_unit_price,
                 ]);
             }
 
@@ -545,6 +685,63 @@ class CartController extends Controller
                 $item->delete();
             }
         }
+    }
+
+    /**
+     * Row belongs to the requester if: (a) it has their user_id, or (b) it is a guest row for this browser's cart_session_id cookie.
+     */
+    private function cartItemAccessible(Request $request, Cart $cart): bool
+    {
+        $user = $request->user();
+
+        if ($cart->user_id !== null) {
+            return $user !== null && (int) $cart->user_id === (int) $user->id;
+        }
+
+        $cookieSessionId = $request->cookie('cart_session_id');
+
+        return $cookieSessionId !== null
+            && $cart->session_id !== null
+            && $cart->session_id === $cookieSessionId;
+    }
+
+    private function storeCustomizationImage(?string $dataUrl): ?string
+    {
+        if ($dataUrl === null || $dataUrl === '') {
+            return null;
+        }
+        if (!is_string($dataUrl) || !str_starts_with($dataUrl, 'data:image/')) {
+            return null;
+        }
+        if (!preg_match('#^data:image/(png|jpeg|jpg);base64,(.+)$#i', $dataUrl, $m)) {
+            return null;
+        }
+        $raw = base64_decode($m[2], true);
+        if ($raw === false || strlen($raw) > 2_500_000) {
+            return null;
+        }
+        $ext = strtolower($m[1]) === 'jpg' ? 'jpg' : 'png';
+        $relative = 'customize/'.Str::uuid().'.'.$ext;
+        Storage::disk('public')->put($relative, $raw);
+
+        return $relative;
+    }
+
+    private function customizationSummaryLabel(string $json): string
+    {
+        $d = json_decode($json, true);
+        if (!is_array($d)) {
+            return 'Customized';
+        }
+        $parts = [];
+        if (!empty($d['size_name']) && is_string($d['size_name'])) {
+            $parts[] = $d['size_name'];
+        } elseif (isset($d['size_idx'])) {
+            $parts[] = 'Size #'.((int) $d['size_idx'] + 1);
+        }
+        $parts[] = 'Custom colors';
+
+        return implode(' · ', $parts);
     }
 }
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Services\CustomizeConfigService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -48,31 +47,19 @@ class CustomizeController extends Controller
     }
 
     /**
-     * Show customize page for a product.
-     * /customize or /customize/{slug}
+     * Single public customizer at /customize (settings-driven, no catalog product).
+     * Old /customize/{slug} URLs redirect here.
      */
     public function show(?string $slug = null)
     {
-        if ($slug) {
-            $product = Product::where('slug', $slug)
-                ->where('is_active', true)
-                ->firstOrFail();
-        } else {
-            $product = Product::where('is_active', true)
-                ->orderBy('sort_order')
-                ->first();
-
-            if (!$product) {
-                abort(404, 'No product available for customization.');
-            }
-
-            return redirect()->route('customize.product', ['slug' => $product->slug]);
+        if ($slug !== null && $slug !== '') {
+            return redirect()->route('customize', [], 301);
         }
 
-        $config = CustomizeConfigService::getConfig($product);
+        $config = CustomizeConfigService::getStandaloneConfig();
 
         return view('customize', [
-            'product' => $product,
+            'product' => null,
             'config' => $config,
         ]);
     }

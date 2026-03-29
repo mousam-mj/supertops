@@ -79,14 +79,12 @@ class CustomizeProductSeeder extends Seeder
                 ['name' => 'Mermaid Green', 'hex' => '#4aab6a'],
                 ['name' => 'Dragonfruit', 'hex' => '#c4426a'],
             ],
-            'engraving_price' => 600,
-            'has_engraving' => true,
         ];
 
         $data = [
             'name' => '1200ml Running Tumbler',
-            'description' => 'Premium quality 1200ml Running Tumbler (mouth Ø 97mm). Customize tumbler, lid, straw, handle and engraving. Base boot matches handle color. Made with high-grade materials.',
-            'short_description' => 'Customizable insulated tumbler — tumbler, lid, straw, handle, engraving.',
+            'description' => 'Premium quality 1200ml Running Tumbler (mouth Ø 97mm). Customize tumbler, lid, straw, and handle. Base boot matches handle color. Made with high-grade materials.',
+            'short_description' => 'Customizable insulated tumbler — tumbler, lid, straw, and handle.',
             'category_id' => $category->id,
             'price' => 2500,
             'sale_price' => 2499,

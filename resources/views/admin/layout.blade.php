@@ -476,8 +476,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.customize.*') ? 'active' : '' }}" href="{{ route('admin.customize.index') }}">
+                                <i class="bi bi-sliders me-2"></i> Customize
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.color-size-master.*') ? 'active' : '' }}" href="{{ route('admin.color-size-master.index') }}">
-                                <i class="bi bi-palette2 me-2"></i> Color & Size
+                                <i class="bi bi-palette2 me-2"></i> Color &amp; Size
                             </a>
                         </li>
                         <li class="nav-item">

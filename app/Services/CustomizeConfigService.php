@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\Setting;
 
 class CustomizeConfigService
 {
+    public const SETTING_GLOBAL = 'customize_global';
+
     /** Color name to hex mapping for known Perch/Hydro Flask colors */
     protected static array $colorHexMap = [
         'Mermaid Green' => '#4aab6a',
@@ -106,12 +109,115 @@ class CustomizeConfigService
         ['name' => 'Neon Yellow', 'hex' => '#ffe000'],
     ];
 
+    /**
+     * Global customizer JSON from settings (title, colors, sizes, prices).
+     *
+     * @return array<string, mixed>
+     */
+    public static function getGlobalCustomizeConfig(): array
+    {
+        $raw = Setting::get(self::SETTING_GLOBAL);
+        if (!is_string($raw) || $raw === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Catalog product used for cart/checkout lines for /customize builds (slug from seeder).
+     */
+    public static function getCartProductId(): ?int
+    {
+        $id = Product::query()
+            ->where('slug', '1200ml-running-tumbler')
+            ->where('is_active', true)
+            ->value('id');
+
+        return $id ? (int) $id : null;
+    }
+
+    /**
+     * Size rows as on the public customizer (aligned with composeFrontendConfig defaults).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function effectiveCustomizerSizes(): array
+    {
+        $customizeConfig = self::getGlobalCustomizeConfig();
+
+        return $customizeConfig['sizes'] ?? [
+            ['name' => '24 oz', 'desc' => 'Insulated tumbler for life on the go.', 'price' => 3500],
+            ['name' => '32 oz', 'desc' => 'Medium insulated tumbler.', 'price' => 4000],
+            ['name' => '40 oz', 'desc' => 'Large insulated tumbler with handle and straw.', 'price' => 4500],
+        ];
+    }
+
+    public static function unitPriceForCustomizerSizeIndex(int $sizeIndex): ?float
+    {
+        $sizes = self::effectiveCustomizerSizes();
+        if ($sizeIndex < 0 || $sizeIndex >= count($sizes)) {
+            return null;
+        }
+        $row = $sizes[$sizeIndex];
+        if (!is_array($row) || !array_key_exists('price', $row)) {
+            return null;
+        }
+
+        return max(0, round((float) $row['price'], 2));
+    }
+
+    /**
+     * Merged palettes/sizes for admin form padding (no product color fallback).
+     *
+     * @param  array<string, mixed>  $stored
+     * @return array<string, mixed>
+     */
+    public static function mergedForAdminForm(array $stored): array
+    {
+        $stub = new Product(['customize_config' => $stored, 'colors' => null]);
+
+        return self::composeFrontendConfig($stored, $stub, false);
+    }
+
+    /**
+     * Public /customize page — settings only, not tied to a catalog product.
+     *
+     * @return array<string, mixed>
+     */
+    public static function getStandaloneConfig(): array
+    {
+        $customizeConfig = self::getGlobalCustomizeConfig();
+        $stub = new Product([
+            'slug' => 'customize',
+            'name' => 'Customize',
+            'price' => 0,
+            'sale_price' => null,
+            'colors' => null,
+            'customize_config' => null,
+        ]);
+
+        return self::composeFrontendConfig($customizeConfig, $stub, false);
+    }
+
     public static function getConfig(Product $product): array
     {
-        $customizeConfig = $product->customize_config ?? [];
+        $global = self::getGlobalCustomizeConfig();
+        $useGlobal = $global !== [];
+        $customizeConfig = $useGlobal ? $global : ($product->customize_config ?? []);
 
+        return self::composeFrontendConfig($customizeConfig, $product, !$useGlobal);
+    }
+
+    /**
+     * @param  array<string, mixed>  $customizeConfig
+     * @return array<string, mixed>
+     */
+    private static function composeFrontendConfig(array $customizeConfig, Product $product, bool $allowProductColorFallback): array
+    {
         $bottleColors = $customizeConfig['bottle_colors'] ?? $customizeConfig['tumbler_colors'] ?? null;
-        if (!$bottleColors && !empty($product->colors)) {
+        if (!$bottleColors && $allowProductColorFallback && !empty($product->colors)) {
             $bottleColors = self::colorsArrayToConfig($product->colors);
         }
         $bottleColors = $bottleColors ?: self::$defaultTumblerColors;
@@ -129,7 +235,6 @@ class CustomizeConfigService
 
         $lastSize = end($sizes);
         $basePrice = (float) ($lastSize['price'] ?? $product->sale_price ?? $product->price ?? 45);
-        $engravingPrice = (float) ($customizeConfig['engraving_price'] ?? 600);
 
         $defaultPartStlUrls = [
             'body' => route('customize.part.stl', ['part' => 'body']),
@@ -143,9 +248,14 @@ class CustomizeConfigService
             is_array($customizeConfig['part_stl_urls'] ?? null) ? $customizeConfig['part_stl_urls'] : []
         );
 
+        $displayName = isset($customizeConfig['display_name']) && $customizeConfig['display_name'] !== ''
+            ? (string) $customizeConfig['display_name']
+            : 'Customize';
+
         return [
             'product_id' => $product->id,
-            'product_name' => $product->name,
+            'cart_product_id' => self::getCartProductId(),
+            'product_name' => $displayName,
             'product_slug' => $product->slug,
             'stl_model_url' => asset('assets/models/perch-tumbler-1200ml.stl'),
             'part_stl_urls' => $partStlUrls,
@@ -156,8 +266,6 @@ class CustomizeConfigService
             'handle_colors' => $handleColors,
             'sizes' => $sizes,
             'base_price' => $basePrice,
-            'engraving_price' => $engravingPrice,
-            'has_engraving' => $customizeConfig['has_engraving'] ?? true,
             'currency' => '₹',
         ];
     }
