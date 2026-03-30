@@ -405,7 +405,19 @@ class CustomizeConfigService
             return false;
         }
 
-        return trim((string) ($e['category_slug'] ?? '')) !== '';
+        if (trim((string) ($e['category_slug'] ?? '')) !== '') {
+            return true; // legacy single
+        }
+        $top = isset($e['top']) && is_array($e['top']) ? $e['top'] : null;
+        $bottom = isset($e['bottom']) && is_array($e['bottom']) ? $e['bottom'] : null;
+        if ($top && trim((string) ($top['category_slug'] ?? '')) !== '') {
+            return true;
+        }
+        if ($bottom && trim((string) ($bottom['category_slug'] ?? '')) !== '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -419,8 +431,28 @@ class CustomizeConfigService
         if (! is_array($e)) {
             $e = [];
         }
-        $slug = trim((string) ($e['category_slug'] ?? ''));
-        if ($slug === '') {
+        $maxChars = self::engravingMaxChars();
+
+        // Legacy: single selection stored directly on engraving.*
+        $legacySlug = trim((string) ($e['category_slug'] ?? ''));
+        if ($legacySlug !== '') {
+            $e = ['top' => ['category_slug' => $legacySlug, 'text' => $e['text'] ?? null, 'image_data' => $e['image_data'] ?? null]];
+        }
+
+        $mode = strtolower(trim((string) ($e['mode'] ?? 'single')));
+        if (! in_array($mode, ['single', 'double'], true)) {
+            $mode = 'single';
+        }
+
+        $slots = [];
+        if (isset($e['top']) && is_array($e['top'])) {
+            $slots['top'] = $e['top'];
+        }
+        if ($mode === 'double' && isset($e['bottom']) && is_array($e['bottom'])) {
+            $slots['bottom'] = $e['bottom'];
+        }
+
+        if ($slots === []) {
             if (isset($customizationPayload['engraving_text']) && trim((string) $customizationPayload['engraving_text']) !== '') {
                 return ['ok' => false, 'message' => 'Please choose an engraving option on the Engraving step.'];
             }
@@ -428,38 +460,48 @@ class CustomizeConfigService
             return ['ok' => true, 'unit' => $baseUnit];
         }
 
-        $cat = null;
-        foreach ($categories as $c) {
-            if ($c['slug'] === $slug) {
-                $cat = $c;
-                break;
+        $addonSum = 0.0;
+        foreach ($slots as $slotKey => $slot) {
+            $slug = trim((string) ($slot['category_slug'] ?? ''));
+            if ($slug === '') {
+                continue;
             }
-        }
-        if ($cat === null) {
-            return ['ok' => false, 'message' => 'Invalid engraving selection.'];
+            $cat = null;
+            foreach ($categories as $c) {
+                if ($c['slug'] === $slug) {
+                    $cat = $c;
+                    break;
+                }
+            }
+            if ($cat === null) {
+                return ['ok' => false, 'message' => 'Invalid engraving selection.'];
+            }
+            $addonSum += (float) $cat['price'];
+
+            if ($cat['type'] === 'text') {
+                $text = isset($slot['text']) && is_string($slot['text']) ? trim($slot['text']) : '';
+                if ($text === '') {
+                    return ['ok' => false, 'message' => 'Please enter engraving text for this option.'];
+                }
+                if (mb_strlen($text) > $maxChars) {
+                    return ['ok' => false, 'message' => "Engraving text must be at most {$maxChars} characters."];
+                }
+            } elseif ($cat['type'] === 'upload') {
+                $img = isset($slot['image_data']) && is_string($slot['image_data']) ? trim($slot['image_data']) : '';
+                if ($img === '' || ! str_starts_with($img, 'data:image/')) {
+                    return ['ok' => false, 'message' => 'Please upload an image for this engraving option.'];
+                }
+                if (strlen($img) > 1_500_000) {
+                    return ['ok' => false, 'message' => 'Image is too large. Use a smaller file.'];
+                }
+            }
         }
 
-        $addon = $cat['price'];
-        $maxChars = self::engravingMaxChars();
-        if ($cat['type'] === 'text') {
-            $text = isset($e['text']) && is_string($e['text']) ? trim($e['text']) : '';
-            if ($text === '') {
-                return ['ok' => false, 'message' => 'Please enter engraving text for this option.'];
-            }
-            if (mb_strlen($text) > $maxChars) {
-                return ['ok' => false, 'message' => "Engraving text must be at most {$maxChars} characters."];
-            }
-        } elseif ($cat['type'] === 'upload') {
-            $img = isset($e['image_data']) && is_string($e['image_data']) ? trim($e['image_data']) : '';
-            if ($img === '' || ! str_starts_with($img, 'data:image/')) {
-                return ['ok' => false, 'message' => 'Please upload an image for this engraving option.'];
-            }
-            if (strlen($img) > 1_500_000) {
-                return ['ok' => false, 'message' => 'Image is too large. Use a smaller file.'];
-            }
+        if ($addonSum <= 0.0) {
+            return ['ok' => true, 'unit' => $baseUnit];
         }
 
-        return ['ok' => true, 'unit' => round($baseUnit + $addon, 2)];
+        return ['ok' => true, 'unit' => round($baseUnit + round($addonSum, 2), 2)];
     }
 
     public static function engravingEnabled(): bool

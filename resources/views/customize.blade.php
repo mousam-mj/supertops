@@ -105,6 +105,22 @@
 .customize-page .engraving-card-chev{color:#b0b0b0;font-size:20px;flex-shrink:0;font-weight:300;line-height:1}
 .customize-page .engraving-step .step-heading{font-size:22px;letter-spacing:-.02em}
 .customize-page .engraving-step .step-subtext{color:#6b6b6b;line-height:1.5;max-width:36rem}
+.customize-page .engraving-mode-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap}
+.customize-page .engraving-mode-row .mode-title{font-size:14px;font-weight:700;color:#161616}
+.customize-page .engraving-mode-toggles{display:flex;align-items:center;gap:16px}
+.customize-page .engraving-radio{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#161616;cursor:pointer;user-select:none}
+.customize-page .engraving-radio input{width:16px;height:16px;accent-color:#161616}
+.customize-page .engraving-slot-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.customize-page .engraving-slot-btn{flex:1;min-width:160px;display:flex;align-items:center;gap:10px;border:1px solid #e0e0e0;border-radius:12px;background:#fff;padding:12px 14px;cursor:pointer;font:inherit;transition:.15s}
+.customize-page .engraving-slot-btn:hover{background:#fafafa;border-color:#c8c8c8}
+.customize-page .engraving-slot-btn.active{border-color:#161616;box-shadow:0 0 0 1px #161616 inset}
+.customize-page .engraving-slot-dot{width:30px;height:30px;border-radius:999px;background:#f0f0ee;border:1px solid #e6e6e6;display:flex;align-items:center;justify-content:center;color:#666;font-weight:800;flex-shrink:0}
+.customize-page .engraving-slot-btn.active .engraving-slot-dot{background:#161616;color:#fff;border-color:#161616}
+.customize-page .engraving-slot-label{font-size:14px;font-weight:700;color:#161616}
+.customize-page .engraving-slot-sub{font-size:12px;color:#777;margin-top:2px}
+.customize-page .engraving-slot-text{display:flex;flex-direction:column;min-width:0}
+.customize-page .engraving-slot-summary{font-size:12px;color:#666;margin-top:8px}
+.customize-page .engraving-slot-summary strong{color:#161616}
 .customize-page .engraving-detail-back{background:none;border:none;padding:0;font-size:13px;color:#161616;text-decoration:underline;cursor:pointer;margin-bottom:12px}
 .customize-page .engraving-detail-title{font-size:16px;font-weight:700;margin-bottom:8px}
 .customize-page .engraving-file-input{display:block;width:100%;max-width:100%;margin:12px 0;padding:10px 12px;font-size:14px;border:1px solid #c8c8c8;border-radius:10px;background:#fff;box-sizing:border-box;min-height:46px;cursor:pointer}
@@ -324,6 +340,29 @@
           <div class="step-heading">{{ $config['engraving_label'] ?? 'Add Engraving' }}</div>
           <div class="step-counter">6 of {{ $stepTotal }}</div>
           <div class="step-subtext">Pick a style below. Each option has its own price and opens the next step when needed. You can skip engraving or go back to change colors.</div>
+          <div class="engraving-mode-row">
+            <div class="mode-title">Add Engraving</div>
+            <div class="engraving-mode-toggles" role="radiogroup" aria-label="Engraving mode">
+              <label class="engraving-radio"><input type="radio" name="engr_mode" id="engr-mode-single" value="single" checked> <span>Single</span></label>
+              <label class="engraving-radio"><input type="radio" name="engr_mode" id="engr-mode-double" value="double"> <span>Double</span></label>
+            </div>
+          </div>
+          <div class="engraving-slot-row">
+            <button type="button" class="engraving-slot-btn active" id="engr-slot-top" data-slot="top">
+              <span class="engraving-slot-dot">+</span>
+              <span class="engraving-slot-text">
+                <span class="engraving-slot-label">Top Box</span>
+                <span class="engraving-slot-sub" id="engr-slot-top-sub">Choose option</span>
+              </span>
+            </button>
+            <button type="button" class="engraving-slot-btn" id="engr-slot-bottom" data-slot="bottom" style="opacity:.55" disabled>
+              <span class="engraving-slot-dot">+</span>
+              <span class="engraving-slot-text">
+                <span class="engraving-slot-label">Bottom Box</span>
+                <span class="engraving-slot-sub" id="engr-slot-bottom-sub">Double mode only</span>
+              </span>
+            </button>
+          </div>
           <div id="engraving-grid-view">
             <div class="engraving-card-list" id="engraving-card-grid"></div>
           </div>
@@ -332,6 +371,7 @@
             <div class="engraving-detail-title" id="engraving-detail-title"></div>
             <div id="engraving-detail-body"></div>
           </div>
+          <div class="engraving-slot-summary" id="engraving-slot-summary" style="display:none"></div>
           <div class="bottom-nav">
             <button type="button" class="prev-btn" onclick="goTo(5)">Previous – Bottom Base</button>
             <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>

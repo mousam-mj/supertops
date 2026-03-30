@@ -267,6 +267,15 @@ class CartController extends Controller
             'customization.engraving.category_slug' => 'nullable|string|max:120',
             'customization.engraving.text' => 'nullable|string|max:2000',
             'customization.engraving.image_data' => 'nullable|string|max:1600000',
+            'customization.engraving.mode' => 'nullable|string|in:single,double',
+            'customization.engraving.top' => 'nullable|array',
+            'customization.engraving.top.category_slug' => 'nullable|string|max:120',
+            'customization.engraving.top.text' => 'nullable|string|max:2000',
+            'customization.engraving.top.image_data' => 'nullable|string|max:1600000',
+            'customization.engraving.bottom' => 'nullable|array',
+            'customization.engraving.bottom.category_slug' => 'nullable|string|max:120',
+            'customization.engraving.bottom.text' => 'nullable|string|max:2000',
+            'customization.engraving.bottom.image_data' => 'nullable|string|max:1600000',
             'custom_unit_price' => 'nullable|numeric|min:0',
             'customization_image' => 'nullable|string|max:6500000',
         ]);
@@ -323,12 +332,27 @@ class CartController extends Controller
             }
 
             if (isset($customizationPayload['engraving']) && is_array($customizationPayload['engraving'])) {
+                // Legacy single upload: engraving.image_data
                 $imgData = $customizationPayload['engraving']['image_data'] ?? null;
                 if (is_string($imgData) && $imgData !== '') {
                     $stored = $this->storeCustomizationImage($imgData);
                     unset($customizationPayload['engraving']['image_data']);
                     if ($stored) {
                         $customizationPayload['engraving']['engraving_image'] = $stored;
+                    }
+                }
+                // New double-slot upload: engraving.top.image_data / engraving.bottom.image_data
+                foreach (['top', 'bottom'] as $slot) {
+                    if (! isset($customizationPayload['engraving'][$slot]) || ! is_array($customizationPayload['engraving'][$slot])) {
+                        continue;
+                    }
+                    $slotImg = $customizationPayload['engraving'][$slot]['image_data'] ?? null;
+                    if (is_string($slotImg) && $slotImg !== '') {
+                        $stored = $this->storeCustomizationImage($slotImg);
+                        unset($customizationPayload['engraving'][$slot]['image_data']);
+                        if ($stored) {
+                            $customizationPayload['engraving'][$slot]['engraving_image'] = $stored;
+                        }
                     }
                 }
             }

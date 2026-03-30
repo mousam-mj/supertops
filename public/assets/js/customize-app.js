@@ -40,7 +40,7 @@ const engrCats=(Array.isArray(cfg.engraving_categories)?cfg.engraving_categories
 }).filter(function(c){ return c!==null; });
 const maxStep=typeof cfg.customize_max_step==='number'?cfg.customize_max_step:5;
 
-const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1,engrSel:null};
+const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1,engrMode:'single',engrSlot:'top',engrSlots:{top:null,bottom:null}};
 const VIS=7;
 
 function normalizeHex(h){
@@ -454,22 +454,85 @@ function engrCatBySlug(slug){
   }
   return null;
 }
+function activeEngrSel(){
+  var s=(S.engrSlot==='bottom')?'bottom':'top';
+  return S.engrSlots&&S.engrSlots[s]?S.engrSlots[s]:null;
+}
+function setActiveEngrSel(sel){
+  var s=(S.engrSlot==='bottom')?'bottom':'top';
+  if(!S.engrSlots) S.engrSlots={top:null,bottom:null};
+  S.engrSlots[s]=sel;
+  updateEngravingSlotUi();
+}
+function slotEnabled(slot){
+  if(slot==='bottom') return S.engrMode==='double';
+  return true;
+}
+function updateEngravingSlotUi(){
+  var topBtn=document.getElementById('engr-slot-top');
+  var botBtn=document.getElementById('engr-slot-bottom');
+  if(topBtn) topBtn.classList.toggle('active',S.engrSlot!=='bottom');
+  if(botBtn) botBtn.classList.toggle('active',S.engrSlot==='bottom');
+  if(botBtn){
+    var en=slotEnabled('bottom');
+    botBtn.disabled=!en;
+    botBtn.style.opacity=en?'1':'0.55';
+  }
+  function labelFor(sel){
+    if(!sel||!sel.slug) return '';
+    var c=engrCatBySlug(sel.slug);
+    var nm=String(sel.name|| (c?c.name:'') || '').trim();
+    var tp=c?normEngraveType(c.type):normEngraveType(sel.type);
+    if(tp==='text' && sel.text) return nm+' — "'+String(sel.text).trim()+'"';
+    if(tp==='upload') return nm+' — uploaded';
+    return nm;
+  }
+  var topSub=document.getElementById('engr-slot-top-sub');
+  var botSub=document.getElementById('engr-slot-bottom-sub');
+  var ts=labelFor(S.engrSlots.top);
+  var bs=labelFor(S.engrSlots.bottom);
+  if(topSub) topSub.textContent=ts?ts:'Choose option';
+  if(botSub) botSub.textContent=slotEnabled('bottom')?(bs?bs:'Choose option'):'Double mode only';
+  var sum=document.getElementById('engraving-slot-summary');
+  if(sum){
+    var lines=[];
+    if(ts) lines.push('<strong>Top:</strong> '+escapeHtml(ts));
+    if(slotEnabled('bottom')&&bs) lines.push('<strong>Bottom:</strong> '+escapeHtml(bs));
+    sum.innerHTML=lines.join(' · ');
+    sum.style.display=lines.length?'block':'none';
+  }
+}
+function escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 function validateEngravingSelection(){
   if(!engrCatMode||!engrEnabled) return null;
-  if(!S.engrSel||!S.engrSel.slug) return null;
-  var c=engrCatBySlug(S.engrSel.slug);
-  if(!c) return 'Invalid engraving selection.';
-  if(normEngraveType(c.type)==='text'&&!String(S.engrSel.text||'').trim()) return 'Please save your engraving text for "'+(c.name||'this option')+'".';
-  if(normEngraveType(c.type)==='upload'&&!(S.engrSel.image_data&&String(S.engrSel.image_data).length)) return 'Please upload an image for "'+(c.name||'this option')+'".';
+  var slots=['top'];
+  if(slotEnabled('bottom')) slots.push('bottom');
+  for(var i=0;i<slots.length;i++){
+    var sel=S.engrSlots&&S.engrSlots[slots[i]]?S.engrSlots[slots[i]]:null;
+    if(!sel||!sel.slug) continue;
+    var c=engrCatBySlug(sel.slug);
+    if(!c) return 'Invalid engraving selection.';
+    if(normEngraveType(c.type)==='text'&&!String(sel.text||'').trim()) return 'Please save your engraving text for "'+(c.name||'this option')+'".';
+    if(normEngraveType(c.type)==='upload'&&!(sel.image_data&&String(sel.image_data).length)) return 'Please upload an image for "'+(c.name||'this option')+'".';
+  }
   return null;
 }
 function engravingUnitAdd(){
   if(!engrEnabled) return 0;
   if(engrCatMode){
-    if(!S.engrSel||!S.engrSel.slug) return 0;
-    var c=engrCatBySlug(S.engrSel.slug);
-    if(!c) return 0;
-    return Math.round(Math.max(0,Number(c.price)||0)*100)/100;
+    var sum=0;
+    var slots=['top'];
+    if(slotEnabled('bottom')) slots.push('bottom');
+    for(var i=0;i<slots.length;i++){
+      var sel=S.engrSlots&&S.engrSlots[slots[i]]?S.engrSlots[slots[i]]:null;
+      if(!sel||!sel.slug) continue;
+      var c=engrCatBySlug(sel.slug);
+      if(!c) continue;
+      sum += Math.round(Math.max(0,Number(c.price)||0)*100)/100;
+    }
+    return Math.round(sum*100)/100;
   }
   var ch=document.getElementById('customize-engraving-check');
   var ta=document.getElementById('customize-engraving-text');
@@ -518,7 +581,8 @@ function renderEngravingGrid(){
   engrCats.forEach(function(cat){
     var btn=document.createElement('button');
     btn.type='button';
-    btn.className='engraving-card'+(S.engrSel&&S.engrSel.slug===cat.slug?' selected':'');
+    var sel=activeEngrSel();
+    btn.className='engraving-card'+(sel&&sel.slug===cat.slug?' selected':'');
     var th=document.createElement('div');
     th.className='engraving-card-thumb';
     if(cat.icon){
@@ -562,7 +626,7 @@ function renderEngravingGrid(){
 function openEngravingCategory(cat){
   var tp=normEngraveType(cat.type);
   if(tp==='simple'){
-    S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp};
+    setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp});
     renderEngravingGrid();
     updatePrice();
     showEngravingGridView();
@@ -580,14 +644,15 @@ function openEngravingCategory(cat){
     ta.rows=3;
     ta.maxLength=engrMax;
     ta.placeholder='Enter text for engraving';
-    ta.value=(S.engrSel&&S.engrSel.slug===cat.slug)?(S.engrSel.text||''):'';
+    var cur=activeEngrSel();
+    ta.value=(cur&&cur.slug===cat.slug)?(cur.text||''):'';
     var sub=document.createElement('button');
     sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
     sub.textContent='Save';
     sub.addEventListener('click',function(){
       var tx=String(ta.value||'').trim();
       if(!tx){ alert('Please enter engraving text.'); return; }
-      S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:tx};
+      setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:tx});
       renderEngravingGrid();
       updatePrice();
       showEngravingGridView();
@@ -618,7 +683,7 @@ function openEngravingCategory(cat){
         var d=String(r.result||'');
         if(d.length>1400000){ alert('Image is too large.'); return; }
         if(!/^data:image\//.test(d)){ alert('Invalid image.'); return; }
-        S.engrSel={slug:cat.slug,name:cat.name,price:cat.price,type:tp,image_data:d};
+        setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,image_data:d});
         renderEngravingGrid();
         updatePrice();
         showEngravingGridView();
@@ -684,8 +749,10 @@ function startOverCustomize(){
   var eta=document.getElementById('customize-engraving-text');
   if(ech){ ech.checked=false; }
   if(eta){ eta.value=''; eta.disabled=true; }
-  S.engrSel=null;
-  if(engrCatMode){ renderEngravingGrid(); showEngravingGridView(); }
+  S.engrMode='single';
+  S.engrSlot='top';
+  S.engrSlots={top:null,bottom:null};
+  if(engrCatMode){ renderEngravingGrid(); showEngravingGridView(); updateEngravingSlotUi(); }
   renderAll();
   updatePrice();
   goTo(1);
@@ -750,13 +817,20 @@ function buildCustomizationPayload(){
     }
   };
   if(engrCatMode){
-    if(S.engrSel&&S.engrSel.slug){
-      o.engraving={
-        category_slug:S.engrSel.slug,
-        category_name:String(S.engrSel.name||'')
-      };
-      if(S.engrSel.text) o.engraving.text=S.engrSel.text;
-      if(S.engrSel.image_data) o.engraving.image_data=S.engrSel.image_data;
+    var top=S.engrSlots&&S.engrSlots.top?S.engrSlots.top:null;
+    var bot=(S.engrMode==='double' && S.engrSlots&&S.engrSlots.bottom)?S.engrSlots.bottom:null;
+    if((top&&top.slug)||(bot&&bot.slug)){
+      o.engraving={ mode:(S.engrMode==='double'?'double':'single'), top:null, bottom:null };
+      if(top&&top.slug){
+        o.engraving.top={ category_slug:top.slug, category_name:String(top.name||'') };
+        if(top.text) o.engraving.top.text=top.text;
+        if(top.image_data) o.engraving.top.image_data=top.image_data;
+      }
+      if(bot&&bot.slug){
+        o.engraving.bottom={ category_slug:bot.slug, category_name:String(bot.name||'') };
+        if(bot.text) o.engraving.bottom.text=bot.text;
+        if(bot.image_data) o.engraving.bottom.image_data=bot.image_data;
+      }
     }
   }else if(engrEnabled){
     var ch=document.getElementById('customize-engraving-check');
@@ -908,6 +982,30 @@ window.addEventListener('DOMContentLoaded',()=>{
     renderEngravingGrid();
     var bk=document.getElementById('engraving-detail-back');
     if(bk) bk.addEventListener('click',showEngravingGridView);
+    var r1=document.getElementById('engr-mode-single');
+    var r2=document.getElementById('engr-mode-double');
+    var topBtn=document.getElementById('engr-slot-top');
+    var botBtn=document.getElementById('engr-slot-bottom');
+    function setMode(m){
+      S.engrMode=(m==='double')?'double':'single';
+      if(S.engrMode!=='double'){ S.engrSlot='top'; }
+      updateEngravingSlotUi();
+      renderEngravingGrid();
+      updatePrice();
+    }
+    function setSlot(s){
+      if(s==='bottom' && !slotEnabled('bottom')) return;
+      S.engrSlot=(s==='bottom')?'bottom':'top';
+      updateEngravingSlotUi();
+      renderEngravingGrid();
+    }
+    if(r1) r1.addEventListener('change',function(){ if(r1.checked) setMode('single'); });
+    if(r2) r2.addEventListener('change',function(){ if(r2.checked) setMode('double'); });
+    if(topBtn) topBtn.addEventListener('click',function(){ setSlot('top'); });
+    if(botBtn) botBtn.addEventListener('click',function(){ setSlot('bottom'); });
+    // init UI
+    if(r1) r1.checked=true;
+    updateEngravingSlotUi();
   }else if(engrEnabled){
     var ch=document.getElementById('customize-engraving-check');
     var ta=document.getElementById('customize-engraving-text');

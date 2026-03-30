@@ -151,6 +151,8 @@
                                     $engrText = is_array($custArr) && !empty($custArr['engraving_text']) && is_string($custArr['engraving_text']) ? trim($custArr['engraving_text']) : '';
                                     $engrObj = is_array($custArr) && isset($custArr['engraving']) && is_array($custArr['engraving']) ? $custArr['engraving'] : null;
                                     $engrArtPath = $engrObj && !empty($engrObj['engraving_image']) && is_string($engrObj['engraving_image']) ? trim($engrObj['engraving_image']) : '';
+                                    $engrTop = $engrObj && isset($engrObj['top']) && is_array($engrObj['top']) ? $engrObj['top'] : null;
+                                    $engrBottom = $engrObj && isset($engrObj['bottom']) && is_array($engrObj['bottom']) ? $engrObj['bottom'] : null;
                                 @endphp
                                 <tr>
                                     <td>
@@ -164,20 +166,47 @@
                                             </div>
                                         @endif
                                         @if($engrObj)
-                                            <div class="small mt-2">
-                                                <span class="text-muted fw-semibold">Engraving:</span>
-                                                {{ $engrObj['category_name'] ?? $engrObj['category_slug'] ?? '—' }}
-                                                @if(!empty($engrObj['text']) && is_string($engrObj['text']))
-                                                    <span class="text-muted"> — </span>{{ trim($engrObj['text']) }}
+                                            @php
+                                                $isDouble = !empty($engrObj['mode']) && is_string($engrObj['mode']) && strtolower(trim($engrObj['mode'])) === 'double';
+                                                $legacyName = $engrObj['category_name'] ?? $engrObj['category_slug'] ?? '—';
+                                                $legacyText = !empty($engrObj['text']) && is_string($engrObj['text']) ? trim($engrObj['text']) : '';
+                                                $renderSlot = function ($slot, string $label) {
+                                                    if (!is_array($slot)) { return ''; }
+                                                    $name = $slot['category_name'] ?? $slot['category_slug'] ?? '—';
+                                                    $text = !empty($slot['text']) && is_string($slot['text']) ? trim($slot['text']) : '';
+                                                    $img = !empty($slot['engraving_image']) && is_string($slot['engraving_image']) ? trim($slot['engraving_image']) : '';
+                                                    $html = '<div class="small mt-2"><span class="text-muted fw-semibold">'.e($label).':</span> '.e($name);
+                                                    if ($text !== '') { $html .= '<span class="text-muted"> — </span>'.e($text); }
+                                                    $html .= '</div>';
+                                                    if ($img !== '') {
+                                                        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($img);
+                                                        $html .= '<div class="small mt-1"><a href="'.e($url).'" target="_blank" rel="noopener">Engraving artwork</a></div>';
+                                                        $html .= '<div class="mt-1"><img src="'.e($url).'" alt="Engraving upload" class="rounded border" style="max-width:120px;height:auto;"></div>';
+                                                    }
+                                                    return $html;
+                                                };
+                                            @endphp
+                                            @if($engrTop || $engrBottom)
+                                                {!! $renderSlot($engrTop, 'Top') !!}
+                                                @if($isDouble)
+                                                    {!! $renderSlot($engrBottom, 'Bottom') !!}
                                                 @endif
-                                            </div>
-                                            @if($engrArtPath !== '')
-                                                <div class="small mt-1">
-                                                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" target="_blank" rel="noopener">Engraving artwork</a>
+                                            @else
+                                                <div class="small mt-2">
+                                                    <span class="text-muted fw-semibold">Engraving:</span>
+                                                    {{ $legacyName }}
+                                                    @if($legacyText !== '')
+                                                        <span class="text-muted"> — </span>{{ $legacyText }}
+                                                    @endif
                                                 </div>
-                                                <div class="mt-1">
-                                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" alt="Engraving upload" class="rounded border" style="max-width:120px;height:auto;">
-                                                </div>
+                                                @if($engrArtPath !== '')
+                                                    <div class="small mt-1">
+                                                        <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" target="_blank" rel="noopener">Engraving artwork</a>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($engrArtPath) }}" alt="Engraving upload" class="rounded border" style="max-width:120px;height:auto;">
+                                                    </div>
+                                                @endif
                                             @endif
                                         @elseif($engrText !== '')
                                             <div class="small mt-2"><span class="text-muted fw-semibold">Engraving:</span> {{ $engrText }}</div>
