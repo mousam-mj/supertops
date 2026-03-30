@@ -124,7 +124,8 @@ class CustomizeSettingsController extends Controller
                 'icon' => (string) ($row['icon'] ?? ''),
             ];
         }
-        while (count($out) < 10) {
+        // Only one empty row by default; more rows come from saved data or “Add category”.
+        while (count($out) < 1) {
             $out[] = ['name' => '', 'slug' => '', 'price' => '', 'type' => 'simple', 'icon' => ''];
         }
 

@@ -87,17 +87,24 @@
 .customize-page .engraving-check-wrap input{width:16px;height:16px;accent-color:#161616}
 .customize-page .engraving-textarea{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:52px;box-sizing:border-box}
 .customize-page .engraving-textarea:disabled{opacity:.55;background:#f0f0ee}
-.customize-page .engraving-card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
-@media(min-width:520px){.customize-page .engraving-card-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
-.customize-page .engraving-card{display:flex;align-items:center;gap:12px;border:1px solid #ddd;border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;text-align:left;transition:.15s;width:100%;font:inherit}
-.customize-page .engraving-card:hover{border-color:#161616;background:#fafafa}
-.customize-page .engraving-card.selected{border-color:#161616;box-shadow:0 0 0 1px #161616 inset}
-.customize-page .engraving-card-thumb{width:48px;height:48px;border-radius:10px;background:#f0f0ee;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+/* Hydro-style: single column list, full-width cards */
+.customize-page .engraving-card-list{display:flex;flex-direction:column;gap:12px;margin-top:12px;max-height:min(52vh,520px);overflow-y:auto;padding:2px 6px 8px 2px;scrollbar-width:thin}
+.customize-page .engraving-card-list::-webkit-scrollbar{width:6px}
+.customize-page .engraving-card-list::-webkit-scrollbar-thumb{background:#d8d8d8;border-radius:6px}
+.customize-page .engraving-card{display:flex;align-items:center;gap:16px;border:1px solid #e0e0e0;border-radius:14px;padding:14px 16px;background:#fff;cursor:pointer;text-align:left;transition:.15s .05s; width:100%;font:inherit;min-height:76px;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.customize-page .engraving-card:hover{border-color:#c8c8c8;background:#fafafa;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.customize-page .engraving-card.selected{border-color:#161616;background:#fff;box-shadow:0 0 0 1px #161616 inset,0 2px 8px rgba(0,0,0,.06)}
+.customize-page .engraving-card-thumb{width:56px;height:56px;border-radius:12px;background:#f3f3f1;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #ececec}
 .customize-page .engraving-card-thumb img{width:100%;height:100%;object-fit:cover}
-.customize-page .engraving-card-body{flex:1;min-width:0}
-.customize-page .engraving-card-title{font-size:14px;font-weight:700;color:#161616}
-.customize-page .engraving-card-price{font-size:13px;font-weight:600;color:#444;margin-top:2px}
-.customize-page .engraving-card-chev{color:#999;font-size:18px;flex-shrink:0}
+.customize-page .engraving-thumb-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;line-height:1.05;font-weight:800;font-size:7px;letter-spacing:.06em;color:#6a6a6a;background:linear-gradient(180deg,#ececea 0%,#e0e0dc 100%);width:100%;height:100%;border-radius:11px;box-sizing:border-box;padding:4px 2px;text-transform:uppercase;font-family:inherit}
+.customize-page .engraving-thumb-placeholder span{display:block}
+.customize-page .engraving-thumb-placeholder.is-simple{background:#f0f0ee;font-size:20px;color:#b5b5b5;letter-spacing:0}
+.customize-page .engraving-card-body{flex:1;min-width:0;padding-right:4px}
+.customize-page .engraving-card-title{font-size:15px;font-weight:700;color:#161616;line-height:1.25}
+.customize-page .engraving-card-price{font-size:14px;font-weight:600;color:#4a4a4a;margin-top:4px}
+.customize-page .engraving-card-chev{color:#b0b0b0;font-size:20px;flex-shrink:0;font-weight:300;line-height:1}
+.customize-page .engraving-step .step-heading{font-size:22px;letter-spacing:-.02em}
+.customize-page .engraving-step .step-subtext{color:#6b6b6b;line-height:1.5;max-width:36rem}
 .customize-page .engraving-detail-back{background:none;border:none;padding:0;font-size:13px;color:#161616;text-decoration:underline;cursor:pointer;margin-bottom:12px}
 .customize-page .engraving-detail-title{font-size:16px;font-weight:700;margin-bottom:8px}
 .customize-page .engraving-file-input{display:block;width:100%;max-width:100%;margin:12px 0;padding:10px 12px;font-size:14px;border:1px solid #c8c8c8;border-radius:10px;background:#fff;box-sizing:border-box;min-height:46px;cursor:pointer}
@@ -313,12 +320,12 @@
         </div>
 
         @if($engrOn && $engrCatMode)
-        <div class="step-panel" id="panel-6">
-          <div class="step-heading">{{ $config['engraving_label'] ?? 'Engraving' }}</div>
+        <div class="step-panel engraving-step" id="panel-6">
+          <div class="step-heading">{{ $config['engraving_label'] ?? 'Add Engraving' }}</div>
           <div class="step-counter">6 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Choose an option. Each card has its own price — added to your tumbler. Skip by leaving none selected, or go back to change colors.</div>
+          <div class="step-subtext">Pick a style below. Each option has its own price and opens the next step when needed. You can skip engraving or go back to change colors.</div>
           <div id="engraving-grid-view">
-            <div class="engraving-card-grid" id="engraving-card-grid"></div>
+            <div class="engraving-card-list" id="engraving-card-grid"></div>
           </div>
           <div id="engraving-detail-view" style="display:none">
             <button type="button" class="engraving-detail-back" id="engraving-detail-back">← Back to options</button>

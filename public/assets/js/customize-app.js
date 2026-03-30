@@ -528,7 +528,20 @@ function renderEngravingGrid(){
       im.referrerPolicy='no-referrer';
       th.appendChild(im);
     }else{
-      th.appendChild(document.createTextNode('✦'));
+      var tp=normEngraveType(cat.type);
+      var ph=document.createElement('div');
+      ph.className='engraving-thumb-placeholder';
+      if(tp==='upload'){
+        ph.classList.add('is-graphic');
+        ph.innerHTML='<span>YOUR</span><span>GRAPHIC</span><span>HERE</span>';
+      }else if(tp==='text'){
+        ph.classList.add('is-text');
+        ph.innerHTML='<span>YOUR</span><span>TEXT</span><span>HERE</span>';
+      }else{
+        ph.classList.add('is-simple');
+        ph.innerHTML='<span>\u2726</span>';
+      }
+      th.appendChild(ph);
     }
     var bd=document.createElement('div');
     bd.className='engraving-card-body';

@@ -186,7 +186,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 customize-add-row" data-tbody="customize-engraving-categories-tbody"><i class="bi bi-plus-lg me-1"></i>Add category</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 customize-add-row" data-tbody="customize-engraving-categories-tbody"><i class="bi bi-plus-lg me-1"></i>Add more</button>
                 </div>
 
                 @foreach($paletteMeta as $key => $meta)
