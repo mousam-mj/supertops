@@ -53,13 +53,24 @@ function normalizeHex(h){
   }
   return s;
 }
+function logoEngraveColorFromBodyHex(hex){
+  var b=new THREE.Color(normalizeHex(hex));
+  var lum=0.299*b.r+0.587*b.g+0.114*b.b;
+  if(lum<0.2){
+    return new THREE.Color('#3d3d42');
+  }
+  b.multiplyScalar(0.38);
+  return b;
+}
 
 // Perch 1200ml CAD space → Three.js (same as perch-customizer.html; parts stay aligned)
 const CX=48.5, CY=48.5, CZ=175.15, SCALE=230/350;
+const ENGR_PLANE_W=42, ENGR_PLANE_H=20, ENGR_PREVIEW_ORDER=18;
 
 // ── THREE.JS ──
 let scene,camera,renderer,flipGroup,group;
-const M={body:null,cap:null,handle:null,boot:null,straw:null};
+const M={body:null,logo:null,cap:null,handle:null,boot:null,straw:null};
+var engrSlotMeshes={top:null,bottom:null};
 let autoRot=true, mDown=false, mX=0, mY=0;
 
 function initThree(){
@@ -208,6 +219,22 @@ function parseSTLMesh(buf){
 
 function makePartMaterial(key, hex){
   const h=normalizeHex(hex);
+  if(key==='logo'){
+    const c=logoEngraveColorFromBodyHex(h);
+    const mat=new THREE.MeshStandardMaterial({
+      color:c,
+      metalness:0.1,
+      roughness:0.78,
+      envMapIntensity:0.55,
+      side:THREE.FrontSide,
+    });
+    mat.polygonOffset=true;
+    mat.polygonOffsetFactor=-2;
+    mat.polygonOffsetUnits=-1;
+    mat._cur=c.clone();
+    mat._tgt=c.clone();
+    return mat;
+  }
   const thin=key==='handle'||key==='boot'||key==='straw'||key==='cap';
   const mat=new THREE.MeshStandardMaterial({
     color:new THREE.Color(h),
@@ -237,7 +264,8 @@ function disposeModelParts(){
       ch.material.dispose();
     }
   }
-  M.body=M.cap=M.handle=M.boot=M.straw=null;
+  M.body=M.logo=M.cap=M.handle=M.boot=M.straw=null;
+  engrSlotMeshes.top=engrSlotMeshes.bottom=null;
 }
 
 function partStlUrlsReady(){
@@ -259,12 +287,13 @@ function loadAllParts(){
   function addPartMeshes(geos){
     var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
     var hexMap={body:hb,cap:hc,handle:hh,boot:hbo,straw:hs};
-    var drawOrder={body:0,boot:1,handle:2,cap:3,straw:15};
-    var keys=['body','cap','handle','boot','straw'];
+    var drawOrder={body:0,logo:0.5,boot:1,handle:2,cap:3,straw:15};
+    var keys=['body','logo','cap','handle','boot','straw'];
     for(var i=0;i<keys.length;i++){
       var key=keys[i];
       var geo=geos[key];
-      var mat=makePartMaterial(key, hexMap[key]);
+      if(!geo) continue;
+      var mat=key==='logo'?makePartMaterial('logo', hb):makePartMaterial(key, hexMap[key]);
       var mesh=new THREE.Mesh(geo, mat);
       mesh.castShadow=false;
       mesh.receiveShadow=false;
@@ -274,26 +303,32 @@ function loadAllParts(){
     }
     if(loadingEl) loadingEl.style.display='none';
     syncAllPartsFromState();
+    syncEngraving3dPreview();
   }
   try{
     disposeModelParts();
     var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
     if(partStlUrlsReady()){
       var u=cfg.part_stl_urls;
+      var logoUrl=u.logo&&String(u.logo).trim()?String(u.logo).trim():'';
+      var logoP=logoUrl?fetchStlBuffer(logoUrl).catch(function(err){ console.warn('Logo STL skipped:', err&&err.message?err.message:err); return null; }):Promise.resolve(null);
       return Promise.all([
         fetchStlBuffer(u.body),
         fetchStlBuffer(u.cap),
         fetchStlBuffer(u.handle),
         fetchStlBuffer(u.boot),
-        fetchStlBuffer(u.straw)
+        fetchStlBuffer(u.straw),
+        logoP
       ]).then(function(bufs){
-        addPartMeshes({
+        var geos={
           body: parseSTLMesh(bufs[0]),
           cap: parseSTLMesh(bufs[1]),
           handle: parseSTLMesh(bufs[2]),
           boot: parseSTLMesh(bufs[3]),
           straw: parseSTLMesh(bufs[4])
-        });
+        };
+        if(bufs[5]&&bufs[5].byteLength) geos.logo=parseSTLMesh(bufs[5]);
+        addPartMeshes(geos);
       }).catch(function(e){
         console.warn('Part STL fetch failed, using embedded meshes:', e);
         try{
@@ -316,7 +351,7 @@ function loadAllParts(){
       ['boot',CAP_B64,hbo],
       ['straw',STRAP_B64,hs],
     ];
-    var drawOrder={body:0,boot:1,handle:2,cap:3,straw:15};
+    var drawOrder={body:0,logo:0.5,boot:1,handle:2,cap:3,straw:15};
     for(var i=0;i<parts.length;i++){
       var key=parts[i][0], b64=parts[i][1], hex=parts[i][2];
       var geo=parseSTLMesh(b64ToArrayBuffer(b64));
@@ -328,8 +363,10 @@ function loadAllParts(){
       group.add(mesh);
       M[key]=mesh;
     }
+    M.logo=null;
     if(loadingEl) loadingEl.style.display='none';
     syncAllPartsFromState();
+    syncEngraving3dPreview();
     return Promise.resolve();
   }catch(e){
     console.error(e);
@@ -346,6 +383,13 @@ function syncAllPartsFromState(){
   var hh=handleColors[S.hIdx]&&handleColors[S.hIdx].hex;
   var boh=bootColors[S.boIdx]&&bootColors[S.boIdx].hex;
   if(bh) snapMatColor(M.body, bh);
+  if(M.logo&&M.logo.material&&bh){
+    var lc=logoEngraveColorFromBodyHex(bh);
+    M.logo.material._tgt.copy(lc);
+    M.logo.material._cur.copy(lc);
+    M.logo.material.color.copy(lc);
+    M.logo.material.needsUpdate=true;
+  }
   if(ch) snapMatColor(M.cap, ch);
   if(sh) snapMatColor(M.straw, sh);
   if(hh) snapMatColor(M.handle, hh);
@@ -355,7 +399,7 @@ function syncAllPartsFromState(){
 function animLoop(){
   requestAnimationFrame(animLoop);
   if(autoRot) group.rotation.y += 0.005;
-  ['body','cap','straw','handle','boot'].forEach(function(k){
+  ['body','logo','cap','straw','handle','boot'].forEach(function(k){
     const mesh=M[k];
     if(!mesh||!mesh.material._cur) return;
     mesh.material._cur.lerp(mesh.material._tgt, 0.1);
@@ -447,6 +491,254 @@ function selectSize(idx){
 function fmtMoney(n){
   return currency+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
+function removeEngraveSlotPreview(slot){
+  var m=engrSlotMeshes[slot];
+  if(m&&group){
+    group.remove(m);
+    if(m.geometry) m.geometry.dispose();
+    if(m.material){
+      if(m.material.map) m.material.map.dispose();
+      m.material.dispose();
+    }
+  }
+  engrSlotMeshes[slot]=null;
+}
+function wrapEngraveCanvasText(ctx, text, cx, cy, maxWidth, baseFontSize){
+  var words=String(text||'').split(/\s+/).filter(function(w){ return w.length; });
+  var lines=[];
+  var line='';
+  ctx.font='700 '+baseFontSize+"px 'Inter',system-ui,sans-serif";
+  for(var i=0;i<words.length;i++){
+    var test=line?line+' '+words[i]:words[i];
+    if(ctx.measureText(test).width>maxWidth&&line){
+      lines.push(line);
+      line=words[i];
+    }else line=test;
+  }
+  if(line) lines.push(line);
+  var lh=baseFontSize*1.18;
+  var startY=cy-(lines.length-1)*lh/2;
+  for(var j=0;j<lines.length;j++){
+    ctx.fillText(lines[j], cx, startY+j*lh);
+  }
+}
+function drawEngraveSimplePreview(ctx, w, h, sel, cat){
+  ctx.fillStyle='rgba(255,255,255,0.16)';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#141414';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.font='600 22px system-ui,sans-serif';
+  var nm=(cat&&cat.name)||sel.name||'Custom';
+  ctx.fillText(nm, w/2, h/2-8);
+  ctx.font='300 40px serif';
+  ctx.fillText('\u2726', w/2, h/2+28);
+  return true;
+}
+function drawEngraveTextPreview(ctx, w, h, sel, cat){
+  ctx.fillStyle='rgba(255,255,255,0.14)';
+  ctx.fillRect(0,0,w,h);
+  var tx=String(sel.text||'').trim();
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  if(tx){
+    ctx.fillStyle='#141414';
+    var size=Math.min(56, Math.floor(w/Math.max(8, tx.length*0.52)));
+    size=Math.max(20, Math.min(size, 52));
+    wrapEngraveCanvasText(ctx, tx, w/2, h/2, w-36, size);
+  }else{
+    ctx.strokeStyle='rgba(0,0,0,0.22)';
+    ctx.setLineDash([8,6]);
+    ctx.strokeRect(16,16,w-32,h-32);
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(0,0,0,0.38)';
+    ctx.font='600 21px system-ui,sans-serif';
+    ctx.fillText('Type to preview', w/2, h/2-10);
+    ctx.font='500 15px system-ui,sans-serif';
+    ctx.fillStyle='rgba(0,0,0,0.28)';
+    var nm=(cat&&cat.name)||sel.name||'';
+    ctx.fillText(nm||'Text', w/2, h/2+16);
+  }
+  return true;
+}
+function drawEngraveUploadPlaceholder(ctx, w, h, sel, cat){
+  ctx.fillStyle='rgba(255,255,255,0.12)';
+  ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(0,0,0,0.2)';
+  ctx.setLineDash([6,5]);
+  ctx.strokeRect(16,16,w-32,h-32);
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(0,0,0,0.34)';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.font='600 20px system-ui,sans-serif';
+  ctx.fillText('Upload image', w/2, h/2-6);
+  ctx.font='500 14px system-ui,sans-serif';
+  ctx.fillStyle='rgba(0,0,0,0.26)';
+  var nm=(cat&&cat.name)||sel.name||'';
+  if(nm) ctx.fillText(nm, w/2, h/2+18);
+  return true;
+}
+function makeEngravePreviewMesh(canvas){
+  var tex=new THREE.CanvasTexture(canvas);
+  tex.flipY=false;
+  tex.needsUpdate=true;
+  var mat=new THREE.MeshBasicMaterial({
+    map:tex,
+    transparent:true,
+    opacity:0.97,
+    depthWrite:false,
+    side:THREE.DoubleSide,
+  });
+  mat.polygonOffset=true;
+  mat.polygonOffsetFactor=-4;
+  mat.polygonOffsetUnits=-2;
+  var geo=new THREE.PlaneGeometry(ENGR_PLANE_W, ENGR_PLANE_H);
+  var mesh=new THREE.Mesh(geo,mat);
+  mesh.renderOrder=ENGR_PREVIEW_ORDER;
+  mesh.castShadow=false;
+  mesh.receiveShadow=false;
+  return mesh;
+}
+function placeEngravePreviewMesh(mesh, yLocal){
+  mesh.position.set(0, yLocal, 54);
+  mesh.rotation.set(0, Math.PI, 0);
+}
+function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
+  removeEngraveSlotPreview(slot);
+  var canvas=document.createElement('canvas');
+  canvas.width=512;
+  canvas.height=256;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(255,255,255,0.1)';
+  ctx.fillRect(0,0,512,256);
+  var mesh=makeEngravePreviewMesh(canvas);
+  placeEngravePreviewMesh(mesh, yLocal);
+  group.add(mesh);
+  engrSlotMeshes[slot]=mesh;
+  var img=new Image();
+  img.onload=function(){
+    if(engrSlotMeshes[slot]!==mesh) return;
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.fillRect(0,0,512,256);
+    var pad=14;
+    var cw=512-pad*2, ch=256-pad*2;
+    var scale=Math.min(cw/img.width, ch/img.height);
+    var w=img.width*scale, h=img.height*scale;
+    ctx.drawImage(img,(512-w)/2,(256-h)/2,w,h);
+    if(mesh.material.map) mesh.material.map.dispose();
+    var nt=new THREE.CanvasTexture(canvas);
+    nt.flipY=false;
+    mesh.material.map=nt;
+    mesh.material.map.needsUpdate=true;
+    mesh.material.needsUpdate=true;
+  };
+  img.onerror=function(){};
+  img.src=dataUrl;
+}
+function engrCategoryIconUrl(cat){
+  if(!cat||!cat.icon) return '';
+  var u=String(cat.icon).trim();
+  if(!u) return '';
+  if(/^https?:\/\//i.test(u)||u.indexOf('data:image/')===0||u.charAt(0)==='/') return u;
+  return '';
+}
+function loadEngraveIconToMesh(slot, iconUrl, yLocal, sel, cat){
+  removeEngraveSlotPreview(slot);
+  var canvas=document.createElement('canvas');
+  canvas.width=512;
+  canvas.height=256;
+  var ctx=canvas.getContext('2d');
+  drawEngraveSimplePreview(ctx,512,256,sel,cat);
+  var mesh=makeEngravePreviewMesh(canvas);
+  placeEngravePreviewMesh(mesh, yLocal);
+  group.add(mesh);
+  engrSlotMeshes[slot]=mesh;
+  var img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=function(){
+    if(engrSlotMeshes[slot]!==mesh) return;
+    ctx.fillStyle='rgba(255,255,255,0.14)';
+    ctx.fillRect(0,0,512,256);
+    var pad=18;
+    var cw=512-pad*2, ch=256-pad*2;
+    var scale=Math.min(cw/Math.max(1,img.width), ch/Math.max(1,img.height));
+    var w=img.width*scale, h=img.height*scale;
+    ctx.drawImage(img,(512-w)/2,(256-h)/2,w,h);
+    if(mesh.material.map) mesh.material.map.dispose();
+    var nt=new THREE.CanvasTexture(canvas);
+    nt.flipY=false;
+    mesh.material.map=nt;
+    mesh.material.map.needsUpdate=true;
+    mesh.material.needsUpdate=true;
+  };
+  img.onerror=function(){};
+  img.src=iconUrl;
+}
+function syncEngraveSlotPlane(slot, sel, yLocal){
+  removeEngraveSlotPreview(slot);
+  if(!sel||!sel.slug||!group||!M.body) return;
+  var cat=engrCatBySlug(sel.slug);
+  var tp=cat?normEngraveType(cat.type):normEngraveType(sel.type);
+  var canvas=document.createElement('canvas');
+  canvas.width=512;
+  canvas.height=256;
+  var ctx=canvas.getContext('2d');
+  if(tp==='upload'&&sel.image_data&&String(sel.image_data).length>30){
+    loadEngraveUploadToMesh(slot, sel.image_data, yLocal);
+    return;
+  }
+  if(tp==='simple'){
+    var iu=engrCategoryIconUrl(cat);
+    if(iu){
+      loadEngraveIconToMesh(slot, iu, yLocal, sel, cat);
+      return;
+    }
+  }
+  var ok=false;
+  if(tp==='simple') ok=drawEngraveSimplePreview(ctx,512,256,sel,cat);
+  else if(tp==='text') ok=drawEngraveTextPreview(ctx,512,256,sel,cat);
+  else if(tp==='upload') ok=drawEngraveUploadPlaceholder(ctx,512,256,sel,cat);
+  if(!ok) return;
+  var mesh=makeEngravePreviewMesh(canvas);
+  placeEngravePreviewMesh(mesh, yLocal);
+  group.add(mesh);
+  engrSlotMeshes[slot]=mesh;
+}
+function syncEngraveLegacyTextPlane(text){
+  removeEngraveSlotPreview('top');
+  if(!group||!M.body||!text) return;
+  var canvas=document.createElement('canvas');
+  canvas.width=512;
+  canvas.height=256;
+  var ctx=canvas.getContext('2d');
+  drawEngraveTextPreview(ctx,512,256,{text:text,type:'text'},null);
+  var mesh=makeEngravePreviewMesh(canvas);
+  placeEngravePreviewMesh(mesh, -12);
+  group.add(mesh);
+  engrSlotMeshes.top=mesh;
+}
+function syncEngraving3dPreview(){
+  if(typeof THREE==='undefined'||!group) return;
+  if(!engrEnabled||!M.body){
+    removeEngraveSlotPreview('top');
+    removeEngraveSlotPreview('bottom');
+    return;
+  }
+  if(engrCatMode){
+    // flipGroup.rotation.x = π inverts vertical screen sense: smaller group Y sits higher on the tumbler
+    syncEngraveSlotPlane('top', S.engrSlots&&S.engrSlots.top, -12);
+    if(slotEnabled('bottom')) syncEngraveSlotPlane('bottom', S.engrSlots&&S.engrSlots.bottom, 18);
+    else removeEngraveSlotPreview('bottom');
+    return;
+  }
+  removeEngraveSlotPreview('bottom');
+  var ch=document.getElementById('customize-engraving-check');
+  var ta=document.getElementById('customize-engraving-text');
+  var on=ch&&ch.checked, tx=ta?String(ta.value||'').trim():'';
+  if(on&&tx) syncEngraveLegacyTextPlane(tx);
+  else removeEngraveSlotPreview('top');
+}
 function engrCatBySlug(slug){
   if(!slug) return null;
   for(var i=0;i<engrCats.length;i++){
@@ -501,6 +793,7 @@ function updateEngravingSlotUi(){
     sum.innerHTML=lines.join(' · ');
     sum.style.display=lines.length?'block':'none';
   }
+  syncEngraving3dPreview();
 }
 function escapeHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -530,6 +823,9 @@ function engravingUnitAdd(){
       if(!sel||!sel.slug) continue;
       var c=engrCatBySlug(sel.slug);
       if(!c) continue;
+      var tpn=normEngraveType(c.type);
+      if(tpn==='text'&&!String(sel.text||'').trim()) continue;
+      if(tpn==='upload'&&!(sel.image_data&&String(sel.image_data).length)) continue;
       sum += Math.round(Math.max(0,Number(c.price)||0)*100)/100;
     }
     return Math.round(sum*100)/100;
@@ -633,6 +929,13 @@ function openEngravingCategory(cat){
     return;
   }
   showEngravingDetailView();
+  if(tp==='text'){
+    var pre=activeEngrSel();
+    setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:(pre&&pre.slug===cat.slug)?String(pre.text||''):''});
+  }else if(tp==='upload'){
+    var preU=activeEngrSel();
+    setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,image_data:(preU&&preU.slug===cat.slug)?String(preU.image_data||''):''});
+  }
   var title=document.getElementById('engraving-detail-title');
   var body=document.getElementById('engraving-detail-body');
   if(title) title.textContent=cat.name||'';
@@ -646,6 +949,15 @@ function openEngravingCategory(cat){
     ta.placeholder='Enter text for engraving';
     var cur=activeEngrSel();
     ta.value=(cur&&cur.slug===cat.slug)?(cur.text||''):'';
+    ta.addEventListener('input',function(){
+      var s=(S.engrSlot==='bottom')?'bottom':'top';
+      if(!S.engrSlots) S.engrSlots={top:null,bottom:null};
+      var row=S.engrSlots[s];
+      if(row&&row.slug===cat.slug){
+        row.text=ta.value;
+        syncEngraving3dPreview();
+      }
+    });
     var sub=document.createElement('button');
     sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
     sub.textContent='Save';
@@ -669,6 +981,24 @@ function openEngravingCategory(cat){
     inp.type='file';
     inp.className='engraving-file-input';
     inp.accept='image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
+    inp.addEventListener('change',function(){
+      var f=inp.files&&inp.files[0];
+      if(!f) return;
+      var r=new FileReader();
+      r.onload=function(){
+        var d=String(r.result||'');
+        if(d.length>1400000||!/^data:image\//.test(d)) return;
+        var s=(S.engrSlot==='bottom')?'bottom':'top';
+        if(!S.engrSlots) S.engrSlots={top:null,bottom:null};
+        var row=S.engrSlots[s];
+        if(row&&row.slug===cat.slug){
+          row.image_data=d;
+          updatePrice();
+          syncEngraving3dPreview();
+        }
+      };
+      r.readAsDataURL(f);
+    });
     var hint=document.createElement('p');
     hint.className='engraving-hint';
     hint.textContent='PNG, JPG, or WebP. Then tap “Use this image”.';
@@ -713,6 +1043,7 @@ function goTo(s){
   var rc=document.querySelector('.customize-page .right-col');
   if(rc) rc.scrollTop=0;
   if(engrCatMode&&s===6) showEngravingGridView();
+  if(engrCatMode&&s===6) syncEngraving3dPreview();
   renderAll();
 }
 
@@ -1012,9 +1343,9 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(ch&&ta){
       if(ta.getAttribute('maxlength')){ var mx=parseInt(ta.getAttribute('maxlength'),10); if(isFinite(mx)&&mx>0) ta.setAttribute('maxlength',Math.min(500,mx)); }
       else { ta.setAttribute('maxlength',String(engrMax)); }
-      function syncEngrUi(){ ta.disabled=!ch.checked; if(!ch.checked) ta.value=''; updatePrice(); }
+      function syncEngrUi(){ ta.disabled=!ch.checked; if(!ch.checked) ta.value=''; updatePrice(); syncEngraving3dPreview(); }
       ch.addEventListener('change',syncEngrUi);
-      ta.addEventListener('input',function(){ updatePrice(); });
+      ta.addEventListener('input',function(){ updatePrice(); syncEngraving3dPreview(); });
       syncEngrUi();
     }
   }

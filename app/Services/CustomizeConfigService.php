@@ -239,6 +239,7 @@ class CustomizeConfigService
 
         $defaultPartStlUrls = [
             'body' => route('customize.part.stl', ['part' => 'body']),
+            'logo' => route('customize.part.stl', ['part' => 'logo']),
             'cap' => route('customize.part.stl', ['part' => 'cap']),
             'straw' => route('customize.part.stl', ['part' => 'straw']),
             'handle' => route('customize.part.stl', ['part' => 'handle']),

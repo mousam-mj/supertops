@@ -30,6 +30,7 @@ class CustomizeController extends Controller
     {
         $map = [
             'body' => 'assets/models/tumbler-1200ml-parts/body.stl',
+            'logo' => 'assets/models/tumbler-1200ml-parts/logo.stl',
             'cap' => 'assets/models/tumbler-1200ml-parts/cover.stl',
             'straw' => 'assets/models/tumbler-1200ml-parts/straw.stl',
             'handle' => 'assets/models/tumbler-1200ml-parts/handle.stl',
