@@ -15,6 +15,15 @@
     <!-- Razorpay Checkout Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
+        .quantity-block input.quantity[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .quantity-block input.quantity[type="number"]::-webkit-outer-spin-button,
+        .quantity-block input.quantity[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
         /* Cart, Wishlist & Search icons - ensure clickable */
         .header-menu .cart-icon,
         .header-menu .wishlist-icon,
@@ -294,7 +303,7 @@
                             <div class="choose-quantity flex items-center gap-5 mt-3">
                                 <div class="quantity-block md:p-3 flex items-center justify-between rounded-lg border border-line sm:w-[180px] w-[120px] flex-shrink-0">
                                     <i class="ph-bold ph-minus cursor-pointer body1 quantity-decrease-qv"></i>
-                                    <div class="quantity body1 font-semibold">1</div>
+                                    <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                     <i class="ph-bold ph-plus cursor-pointer body1 quantity-increase-qv"></i>
                                 </div>
                                 <div class="add-cart-btn button-main w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="">Add To Cart</div>

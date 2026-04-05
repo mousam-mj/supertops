@@ -253,7 +253,7 @@ if (listSearchResults) {
   const queryValue = urlParams.get("query") || urlParams.get("q");
   // Only run if using old ?query= param and no server-rendered products
   if (queryValue && listProductResult && listProductResult.children.length === 0) {
-    fetch("/assets/data/Product.json")
+    fetch("./assets/data/Product.json")
       .then((response) => response.json())
       .then((products) => {
         const filterPrd = products.filter(
@@ -429,119 +429,89 @@ const handleItemModalWishlist = () => {
   if (items.length === 0) {
     listItemWishlist.innerHTML = `<p class='mt-1'>No product in wishlist</p>`;
   } else {
-    const defaultImg = (typeof window.location !== "undefined" ? window.location.origin : "") + "/assets/images/product/perch-bottal.webp";
-    const apiBase = typeof window.location !== "undefined" ? window.location.origin + "/api" : "";
+    items.forEach((item) => {
+      const prdItem = document.createElement("div");
+      prdItem.setAttribute("data-item", item.id);
+      prdItem.classList.add(
+        "item",
+        "py-5",
+        "flex",
+        "items-center",
+        "justify-between",
+        "gap-3",
+        "border-b",
+        "border-line"
+      );
+      const modalImgSrc = (item.thumbImage && item.thumbImage[0]) ? item.thumbImage[0] : (typeof window.location !== 'undefined' ? window.location.origin : '') + '/assets/images/product/perch-bottal.webp';
+      const modalImgAlt = (item.name || 'product').replace(/'/g, '&#39;');
+      prdItem.innerHTML = `
+                <div class="infor flex items-center gap-5">
+                    <div class="bg-img">
+                        <img src="${modalImgSrc}" alt="${modalImgAlt}"
+                            class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=(window.location.origin||'')+'/assets/images/product/perch-bottal.webp'" />
+                    </div>
+                    <div class=''>
+                        <div class="name text-button">${item.name || 'Product'}</div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="product-price text-title">₹${(item.price != null ? Number(item.price).toFixed(2) : '0.00')}</div>
+                            ${item.originPrice != null ? `<div class="product-origin-price text-title text-secondary2"><del>₹${Number(item.originPrice).toFixed(2)}</del></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="remove-wishlist-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">
+                    Remove
+                </div>
+            `;
 
-    // Always use same source as product list: fetch each product from API, then render (no localStorage images)
-    function renderModalItems(products) {
-      listItemWishlist.innerHTML = "";
-      (products || []).forEach((item) => {
-        const prdItem = document.createElement("div");
-        prdItem.setAttribute("data-item", item.id);
-        prdItem.classList.add("item", "py-5", "flex", "items-center", "justify-between", "gap-3", "border-b", "border-line");
-        var imgSrc = defaultImg;
-        if (item.thumbImage && Array.isArray(item.thumbImage) && item.thumbImage.length > 0 && item.thumbImage[0]) {
-          imgSrc = item.thumbImage[0];
-        } else if (item.image && typeof item.image === "string") {
-          imgSrc = item.image;
-        }
-        var modalImgAlt = (item.name || "product").replace(/'/g, "&#39;");
-        prdItem.innerHTML =
-          '<div class="infor flex items-center gap-5">' +
-          '<div class="bg-img"><img src="' + imgSrc + '" alt="' + modalImgAlt + '" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" onerror="this.src=\'' + defaultImg + '\'" /></div>' +
-          "<div class=''><div class=\"name text-button\">" + (item.name || "Product") + "</div>" +
-          '<div class="flex items-center gap-2 mt-2"><div class="product-price text-title">₹' + (item.price != null ? Number(item.price).toFixed(2) : "0.00") + "</div>" +
-          (item.originPrice != null ? '<div class="product-origin-price text-title text-secondary2"><del>₹' + Number(item.originPrice).toFixed(2) + "</del></div>" : "") +
-          "</div></div></div>" +
-          '<div class="remove-wishlist-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">Remove</div>';
-        listItemWishlist.appendChild(prdItem);
-      });
-    }
-
-    if (apiBase) {
-      listItemWishlist.innerHTML = "<p class='mt-1 text-secondary2'>Loading…</p>";
-      var promises = items.map(function (item) {
-        var id = item.id;
-        if (!id) return Promise.resolve(null);
-        return fetch(apiBase + "/products/by-id/" + encodeURIComponent(id), {
-          headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-          credentials: "same-origin",
-        })
-          .then(function (r) { return r.json(); })
-          .then(function (res) { return res.success && res.data ? res.data : null; })
-          .catch(function () { return null; });
-      });
-      Promise.all(promises).then(function (results) {
-        var products = results.filter(Boolean);
-        if (products.length === 0) {
-          listItemWishlist.innerHTML = "<p class='mt-1'>No product in wishlist</p>";
-        } else {
-          renderModalItems(products);
-          var stored = localStorage.getItem("wishlistStore");
-          var current = stored ? JSON.parse(stored) : [];
-          if (Array.isArray(current)) {
-            var updated = current.map(function (oldItem) {
-              var fresh = products.find(function (p) { return String(p.id) === String(oldItem.id); });
-              return fresh ? { ...oldItem, thumbImage: fresh.thumbImage, name: fresh.name, price: fresh.price, originPrice: fresh.originPrice } : oldItem;
-            });
-            localStorage.setItem("wishlistStore", JSON.stringify(updated));
-          }
-          attachWishlistRemoveHandlers();
-        }
-      });
-    } else {
-      renderModalItems(items);
-    }
-  }
-
-  function attachWishlistRemoveHandlers() {
-    var prdItems = listItemWishlist.querySelectorAll(".item");
-    prdItems.forEach(function (prd) {
-      var removeWishlistBtn = prd.querySelector(".remove-wishlist-btn");
-      if (!removeWishlistBtn) return;
-      removeWishlistBtn.onclick = function () {
-        var prdId = prd.getAttribute("data-item");
-        var stored = localStorage.getItem("wishlistStore");
-        var current = stored ? JSON.parse(stored) : [];
-        var newArray = (Array.isArray(current) ? current : []).filter(function (item) { return String(item.id) !== String(prdId); });
-        localStorage.setItem("wishlistStore", JSON.stringify(newArray));
-        handleItemModalWishlist();
-        if (typeof updateWishlistIcons === "function") updateWishlistIcons();
-      };
+      listItemWishlist.appendChild(prdItem);
     });
   }
 
-  if (listItemWishlist.querySelectorAll(".item").length > 0) {
-    attachWishlistRemoveHandlers();
-  }
+  const prdItems = listItemWishlist.querySelectorAll(".item");
+  prdItems.forEach((prd) => {
+    const removeWishlistBtn = prd.querySelector(".remove-wishlist-btn");
+    removeWishlistBtn.addEventListener("click", () => {
+      const prdId = removeWishlistBtn
+        .closest(".item")
+        .getAttribute("data-item");
+      const stored = localStorage.getItem("wishlistStore");
+      const current = stored ? JSON.parse(stored) : [];
+      const newArray = (Array.isArray(current) ? current : []).filter(
+        (item) => item.id !== prdId
+      );
+      localStorage.setItem("wishlistStore", JSON.stringify(newArray));
+      handleItemModalWishlist();
+      updateWishlistIcons();
+    });
+  });
 };
 
 const updateWishlistIcons = () => {
-  const wishlistStore = localStorage.getItem("wishlistStore")
-    ? JSON.parse(localStorage.getItem("wishlistStore"))
-    : [];
   const wishlistIcons = document.querySelectorAll(".add-wishlist-btn");
   wishlistIcons.forEach((wishlistIcon) => {
-    const productId = wishlistIcon.closest(".product-item")?.getAttribute("data-item")
-      || wishlistIcon.getAttribute("data-product-id");
-    if (!productId) return;
+    const productId = wishlistIcon
+      .closest(".product-item")
+      ?.getAttribute("data-item");
+    const wishlistStore = localStorage.getItem("wishlistStore")
+      ? JSON.parse(localStorage.getItem("wishlistStore"))
+      : [];
     const isProductInWishlist = wishlistStore.some(
-      (item) => String(item.id) === String(productId)
+      (item) => item.id === productId
     );
-    const icon = wishlistIcon.querySelector("i");
     if (isProductInWishlist) {
       wishlistIcon.classList.add("active");
-      if (icon) { icon.classList.remove("ph"); icon.classList.add("ph-fill"); }
+      wishlistIcon.querySelector("i").classList.remove("ph");
+      wishlistIcon.querySelector("i").classList.add("ph-fill");
     } else {
       wishlistIcon.classList.remove("active");
-      if (icon) { icon.classList.add("ph"); icon.classList.remove("ph-fill"); }
+      wishlistIcon.querySelector("i").classList.add("ph");
+      wishlistIcon.querySelector("i").classList.remove("ph-fill");
     }
   });
 };
-window.updateWishlistIcons = updateWishlistIcons;
 
 handleItemModalWishlist();
-updateWishlistIcons();
 
 // Modal Cart - use last modal (layout's) when duplicates exist (e.g. home page)
 const cartIcon = document.querySelector(".cart-icon");
@@ -580,18 +550,19 @@ const closeModalCart = () => {
   }
 };
 
-// Add-to-cart is handled by cart.js (API add + then open modal on success).
-// Do not open modal on add-cart-btn click here, so category/shop cards add via API first.
+if (addCartBtns && addCartBtns.length > 0) {
+  addCartBtns.forEach((item) => {
+    item.addEventListener("click", () => {
+      openModalCart();
+    });
+  });
+}
 
 if (cartIcon) {
   cartIcon.addEventListener("click", openModalCart);
 }
 if (modalCart) {
-  modalCart.addEventListener("click", function(e) {
-    // Only close when clicking the backdrop (outside .modal-cart-main), not when clicking Remove or content inside
-    if (e.target.closest(".modal-cart-main")) return;
-    closeModalCart();
-  });
+  modalCart.addEventListener("click", closeModalCart);
 }
 if (closeCartIcon) {
   closeCartIcon.addEventListener("click", closeModalCart);
@@ -1200,7 +1171,7 @@ if (document.querySelector(".swiper-list-three-product")) {
 const lookbookUnderwear = document.querySelector('.lookbook-underwear')
 
 if (lookbookUnderwear) {
-  fetch("/assets/data/Product.json")
+  fetch("./assets/data/Product.json")
     .then((response) => response.json())
     .then((products) => {
       const itemDot = lookbookUnderwear.querySelector('.list-img .item .dots')
@@ -1517,7 +1488,7 @@ const updateCompareIcons = () => {
   });
 };
 
-if (document.querySelector(".modal-compare-block")) handleItemModalCompare();
+handleItemModalCompare();
 
 // Modal Quickview
 const modalQuickview = document.querySelector(".modal-quickview-block");
@@ -1816,14 +1787,10 @@ const createProductItem = (product) => {
     productTags += `<div class="product-tag text-button-uppercase text-white bg-red px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">Sale</div>`;
   }
 
-  // Use same primary image as product card: thumbImage[0] or default (never empty/broken)
-  const defaultProductImg = (typeof window !== "undefined" && window.location && window.location.origin)
-    ? window.location.origin + "/assets/images/product/perch-bottal.webp"
-    : "";
-  const mainImgSrc = (product.thumbImage && Array.isArray(product.thumbImage) && product.thumbImage[0])
-    ? product.thumbImage[0]
-    : defaultProductImg;
-  const productImages = `<img class="w-full h-full object-cover duration-700 absolute inset-0" src="${mainImgSrc}" alt="${(product.name || "Product").replace(/"/g, "&quot;")}" onerror="this.src='${defaultProductImg}'">`;
+  let productImages = "";
+  product.thumbImage.forEach((img, index) => {
+    productImages += `<img key="${index}" class="w-full h-full object-cover duration-700" src="${img}" alt="img">`;
+  });
 
   productItem.innerHTML = `
         <div class="product-main cursor-pointer block" data-item="${product.id
@@ -1845,7 +1812,7 @@ const createProductItem = (product) => {
                         <i class="ph ph-check-circle text-lg checked-icon"></i>
                     </div>
                 </div>
-                <div class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
+                <div class="product-img w-full h-full aspect-[3/4]">
                     ${productImages}
                 </div>
                 ${product.sale ? (`
@@ -2275,7 +2242,7 @@ const handleActiveColorChange = () => {
 const filterProductImg = document.querySelector('.filter-product-img')
 
 if (filterProductImg) {
-  fetch('/assets/data/Product.json')
+  fetch('./assets/data/Product.json')
     .then(response => response.json())
     .then(data => {
       const prdId = filterProductImg.querySelector('.product-infor').getAttribute('data-item')
@@ -2359,7 +2326,7 @@ const listThreeProduct = document.querySelectorAll(
 );
 
 // Fetch products from JSON file (assuming products.json)
-fetch("/assets/data/Product.json")
+fetch("./assets/data/Product.json")
   .then((response) => response.json())
   .then((products) => {
     // Display the first 4 products
@@ -2843,7 +2810,7 @@ const createProductItemMarketplace = (product) => {
 
 // fetch product in marketplace
 if (document.querySelector('.tab-features-block.style-marketplace')) {
-  fetch("/assets/data/Product.json")
+  fetch("./assets/data/Product.json")
     .then((response) => response.json())
     .then((products) => {
       // Display the first 4 products
@@ -2909,29 +2876,45 @@ const handleQuantity = () => {
     const minus = item.querySelector(".ph-minus");
     const plus = item.querySelector(".ph-plus");
     const quantity = item.querySelector(".quantity");
-
-    if (Number(quantity.textContent) < 2) {
-      minus.classList.add("disabled");
+    if (!minus || !plus || !quantity) return;
+    if (quantity.tagName === "INPUT" && (quantity.disabled || quantity.readOnly)) {
+      return;
     }
 
+    const readQty = () => {
+      const raw =
+        quantity.tagName === "INPUT"
+          ? quantity.value
+          : quantity.textContent;
+      let n = parseInt(String(raw).trim(), 10);
+      if (isNaN(n) || n < 1) n = 1;
+      return Math.min(n, 9999);
+    };
+
+    const writeQty = (n) => {
+      n = Math.max(1, Math.min(parseInt(n, 10) || 1, 9999));
+      if (quantity.tagName === "INPUT") quantity.value = String(n);
+      else quantity.textContent = String(n);
+      if (readQty() <= 1) minus.classList.add("disabled");
+      else minus.classList.remove("disabled");
+    };
+
+    writeQty(readQty());
+
     minus.addEventListener("click", (e) => {
-      e.stopPropagation()
-      if (Number(quantity.textContent) > 2) {
-        quantity.innerHTML = Number(quantity.innerHTML) - 1;
-        minus.classList.remove("disabled");
-      } else {
-        quantity.innerHTML = "1";
-        minus.classList.add("disabled");
-      }
+      e.stopPropagation();
+      writeQty(readQty() - 1);
     });
 
     plus.addEventListener("click", (e) => {
-      e.stopPropagation()
-      quantity.innerHTML = Number(quantity.innerHTML) + 1;
-      if (Number(quantity.textContent) >= 2) {
-        minus.classList.remove("disabled");
-      }
+      e.stopPropagation();
+      writeQty(readQty() + 1);
     });
+
+    if (quantity.tagName === "INPUT") {
+      quantity.addEventListener("change", () => writeQty(readQty()));
+      quantity.addEventListener("blur", () => writeQty(readQty()));
+    }
   });
 };
 
@@ -3666,7 +3649,7 @@ const handleInforCart = () => {
                     <div
                         class="quantity-block bg-surface md:p-3 p-2 flex items-center justify-between rounded-lg border border-line md:w-[100px] flex-shrink-0 w-20">
                         <i class="ph-bold ph-minus cursor-pointer text-base max-md:text-sm"></i>
-                        <div class="text-button quantity">${product.quantityPurchase}</div>
+                        <input type="number" min="1" max="9999" step="1" value="${product.quantityPurchase}" inputmode="numeric" aria-label="Quantity" class="text-button quantity w-10 min-w-[2.25rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                         <i class="ph-bold ph-plus cursor-pointer text-base max-md:text-sm"></i>
                     </div>
                 </div>
@@ -3686,29 +3669,46 @@ const handleInforCart = () => {
         ".total-price .text-title"
       );
 
-      quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
-        product.quantityPurchase++;
-        quantityProduct.textContent = product.quantityPurchase;
-        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price
-          }.00`;
-        updateTotalCart();
+      const syncLineTotal = () => {
+        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price}.00`;
+      };
 
-        // Update quantity localStorage
+      quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
+        product.quantityPurchase = Math.min(9999, product.quantityPurchase + 1);
+        if (quantityProduct.tagName === "INPUT")
+          quantityProduct.value = String(product.quantityPurchase);
+        else quantityProduct.textContent = product.quantityPurchase;
+        syncLineTotal();
+        updateTotalCart();
         localStorage.setItem("cartStore", JSON.stringify(cartStore));
       });
 
       quantityBlock.querySelector(".ph-minus").addEventListener("click", () => {
         if (product.quantityPurchase > 1) {
           product.quantityPurchase--;
-          quantityProduct.textContent = product.quantityPurchase;
-          totalPriceProduct.textContent = `$${product.quantityPurchase * product.price
-            }.00`;
+          if (quantityProduct.tagName === "INPUT")
+            quantityProduct.value = String(product.quantityPurchase);
+          else quantityProduct.textContent = product.quantityPurchase;
+          syncLineTotal();
           updateTotalCart();
-
-          // Update quantity localStorage
           localStorage.setItem("cartStore", JSON.stringify(cartStore));
         }
       });
+
+      if (quantityProduct.tagName === "INPUT") {
+        const commitQty = () => {
+          let n = parseInt(quantityProduct.value, 10);
+          if (isNaN(n) || n < 1) n = 1;
+          n = Math.min(n, 9999);
+          product.quantityPurchase = n;
+          quantityProduct.value = String(n);
+          syncLineTotal();
+          updateTotalCart();
+          localStorage.setItem("cartStore", JSON.stringify(cartStore));
+        };
+        quantityProduct.addEventListener("change", commitQty);
+        quantityProduct.addEventListener("blur", commitQty);
+      }
 
       listProductCart.appendChild(productElement);
       totalCart += calculateProductTotal();

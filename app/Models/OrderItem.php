@@ -113,7 +113,7 @@ class OrderItem extends Model
 
         $labels = [
             'body' => 'Body',
-            'lid_ring' => 'Lid ring',
+            'lid_ring' => 'Cap',
             'straw' => 'Straw',
             'handle' => 'Handle',
             'bottom_base' => 'Bottom base',

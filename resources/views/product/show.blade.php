@@ -263,7 +263,7 @@
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1"></i>
-                                        <div class="quantity body1 font-semibold">1</div>
+                                        <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                     </div>
                                     <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
@@ -816,9 +816,21 @@
             }
         });
         
-        // Quantity controls
+        function readProductQty(el) {
+            if (!el) return 1;
+            const raw = el.tagName === 'INPUT' ? el.value : el.textContent;
+            let n = parseInt(String(raw).trim(), 10);
+            if (isNaN(n) || n < 1) n = 1;
+            return Math.min(n, 9999);
+        }
+        function writeProductQty(el, n) {
+            if (!el) return;
+            n = Math.max(1, Math.min(parseInt(n, 10) || 1, 9999));
+            if (el.tagName === 'INPUT') el.value = String(n);
+            else el.textContent = String(n);
+        }
+        // Quantity controls (+/- only; typing handled on blur/change)
         document.addEventListener('click', function(e) {
-            // Check if clicked on plus or minus icon within quantity-block
             const quantityBlock = e.target.closest('.quantity-block');
             if (!quantityBlock) return;
             
@@ -826,26 +838,30 @@
             const plusIcon = e.target.closest('.ph-plus');
             const quantityElement = quantityBlock.querySelector('.quantity');
             
-            if (!quantityElement) return;
+            if (!quantityElement || quantityElement.readOnly || quantityElement.disabled) return;
             
             if (minusIcon) {
                 e.preventDefault();
                 e.stopPropagation();
-                let qty = parseInt(quantityElement.textContent) || 1;
-                if (qty > 1) {
-                    qty--;
-                    quantityElement.textContent = qty;
-                }
+                writeProductQty(quantityElement, readProductQty(quantityElement) - 1);
             }
             
             if (plusIcon) {
                 e.preventDefault();
                 e.stopPropagation();
-                let qty = parseInt(quantityElement.textContent) || 1;
-                qty++;
-                quantityElement.textContent = qty;
+                writeProductQty(quantityElement, readProductQty(quantityElement) + 1);
             }
         });
+        document.addEventListener('change', function(e) {
+            const q = e.target.closest('.product-infor .quantity-block .quantity');
+            if (!q || q.tagName !== 'INPUT') return;
+            writeProductQty(q, readProductQty(q));
+        });
+        document.addEventListener('blur', function(e) {
+            const q = e.target.closest('.product-infor .quantity-block .quantity');
+            if (!q || q.tagName !== 'INPUT') return;
+            writeProductQty(q, readProductQty(q));
+        }, true);
         
         // Add to cart from product detail page
         let isAddingToCart = false; // Prevent double clicks
@@ -883,9 +899,7 @@
             // Get quantity from the quantity element, ensure it's at least 1
             let quantity = 1;
             if (quantityElement) {
-                const qtyText = quantityElement.textContent.trim();
-                quantity = parseInt(qtyText) || 1;
-                if (quantity < 1) quantity = 1;
+                quantity = readProductQty(quantityElement);
             }
             
             // Show loading state
@@ -1001,7 +1015,10 @@
                 credentials: 'same-origin',
                 body: JSON.stringify({
                     product_id: parseInt(productId),
-                    quantity: 1,
+                    quantity: (function() {
+                        const qEl = productInfor.querySelector('.quantity-block .quantity');
+                        return qEl ? readProductQty(qEl) : 1;
+                    })(),
                     size: size,
                     color: color
                 })

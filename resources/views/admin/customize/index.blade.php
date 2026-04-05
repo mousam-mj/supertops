@@ -37,7 +37,7 @@
     @php
         $paletteMeta = [
             'bottle' => ['id' => 'tab-body', 'label' => 'Body', 'field' => 'palette_bottle', 'icon' => 'bi-circle'],
-            'cap' => ['id' => 'tab-lid', 'label' => 'Lid ring', 'field' => 'palette_cap', 'icon' => 'bi-record-circle'],
+            'cap' => ['id' => 'tab-lid', 'label' => 'Cap', 'field' => 'palette_cap', 'icon' => 'bi-record-circle'],
             'strap' => ['id' => 'tab-straw', 'label' => 'Straw', 'field' => 'palette_strap', 'icon' => 'bi-droplet'],
             'handle' => ['id' => 'tab-handle', 'label' => 'Handle', 'field' => 'palette_handle', 'icon' => 'bi-grip-vertical'],
             'boot' => ['id' => 'tab-base', 'label' => 'Bottom base', 'field' => 'palette_boot', 'icon' => 'bi-disc'],

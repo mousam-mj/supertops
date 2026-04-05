@@ -32,6 +32,7 @@ class CustomizeController extends Controller
             'body' => 'assets/models/tumbler-1200ml-parts/body.stl',
             'logo' => 'assets/models/tumbler-1200ml-parts/logo.stl',
             'cap' => 'assets/models/tumbler-1200ml-parts/cover.stl',
+            'ring' => 'assets/models/tumbler-1200ml-parts/ring.stl',
             'straw' => 'assets/models/tumbler-1200ml-parts/straw.stl',
             'handle' => 'assets/models/tumbler-1200ml-parts/handle.stl',
             'boot' => 'assets/models/tumbler-1200ml-parts/base.stl',

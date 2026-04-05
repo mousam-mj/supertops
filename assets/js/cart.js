@@ -2,6 +2,20 @@
 (function() {
     'use strict';
 
+    function readQtyControl(el) {
+        if (!el) return 1;
+        var raw = el.tagName === 'INPUT' ? el.value : el.textContent;
+        var n = parseInt(String(raw).trim(), 10);
+        if (isNaN(n) || n < 1) return 1;
+        return Math.min(n, 9999);
+    }
+    function writeQtyControl(el, n) {
+        if (!el) return;
+        n = Math.max(1, Math.min(parseInt(n, 10) || 1, 9999));
+        if (el.tagName === 'INPUT') el.value = String(n);
+        else el.textContent = String(n);
+    }
+
     // Add to cart functionality
     let isAddingToCart = false; // Prevent double clicks
     
@@ -56,8 +70,7 @@
             var qvModal = addCartBtn.closest('.modal-quickview-main');
             if (qvModal) {
                 var qtyEl = qvModal.querySelector('.choose-quantity .quantity');
-                if (qtyEl) quantity = parseInt(qtyEl.textContent, 10) || 1;
-                quantity = Math.max(1, Math.min(quantity, 999));
+                if (qtyEl) quantity = readQtyControl(qtyEl);
             }
 
             // Show loading state
@@ -130,27 +143,6 @@
                 isAddingToCart = false;
             });
         }, true); // capture phase: run before modal's stopPropagation so Quick View Add to Cart works
-    }
-
-    // Quick View modal: quantity +/- buttons
-    function initQuickViewQuantity() {
-        document.addEventListener('click', function(e) {
-            var target = e.target.closest('.quantity-decrease-qv, .quantity-increase-qv');
-            if (!target) return;
-            var block = target.closest('.modal-quickview-main .quantity-block');
-            if (!block) return;
-            var qtyEl = block.querySelector('.quantity');
-            if (!qtyEl) return;
-            e.preventDefault();
-            e.stopPropagation();
-            var n = parseInt(qtyEl.textContent, 10) || 1;
-            if (target.classList.contains('quantity-decrease-qv')) {
-                n = Math.max(1, n - 1);
-            } else {
-                n = Math.min(999, n + 1);
-            }
-            qtyEl.textContent = n;
-        });
     }
 
     // Quick View modal: size and color selection (toggle .active)
@@ -269,7 +261,10 @@
 
         // Reset quantity to 1 when switching to another product
         const qtyEl = main.querySelector('.choose-quantity .quantity');
-        if (qtyEl) qtyEl.textContent = '1';
+        if (qtyEl) {
+            if (qtyEl.tagName === 'INPUT') qtyEl.value = '1';
+            else qtyEl.textContent = '1';
+        }
 
         const allImages = [];
         if (product.image) allImages.push(product.image);
@@ -598,7 +593,7 @@
                     <div class="flex items-center gap-3 mt-3">
                         <div class="quantity-block flex items-center gap-2 border border-line rounded-lg px-2 py-1">
                             <i class="ph-bold ph-minus cursor-pointer text-sm quantity-decrease text-secondary2 hover:text-black" data-cart-id="${item.id}"></i>
-                            <div class="quantity text-button font-semibold min-w-[30px] text-center">${item.quantity}</div>
+                            <input type="number" min="1" max="9999" step="1" value="${item.quantity}" inputmode="numeric" aria-label="Quantity" class="quantity text-button font-semibold min-w-[2.5rem] w-12 text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" data-cart-id="${item.id}" />
                             <i class="ph-bold ph-plus cursor-pointer text-sm quantity-increase text-secondary2 hover:text-black" data-cart-id="${item.id}"></i>
                         </div>
                         <div class="text-sm text-secondary2 item-total-price">= ₹${totalPrice.toFixed(2)}</div>
@@ -620,7 +615,7 @@
             decreaseBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                let qty = parseInt(quantityElement.textContent) || 1;
+                let qty = readQtyControl(quantityElement);
                 if (qty > 1) {
                     qty--;
                     updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
@@ -632,8 +627,14 @@
             increaseBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                let qty = parseInt(quantityElement.textContent) || 1;
-                qty++;
+                let qty = readQtyControl(quantityElement) + 1;
+                updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
+            });
+        }
+
+        if (quantityElement && quantityElement.tagName === 'INPUT') {
+            quantityElement.addEventListener('change', function() {
+                var qty = readQtyControl(quantityElement);
                 updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
             });
         }
@@ -659,7 +660,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                quantityElement.textContent = quantity;
+                writeQtyControl(quantityElement, quantity);
                 const totalPrice = unitPrice * quantity;
                 if (totalPriceElement) {
                     totalPriceElement.textContent = `= ₹${totalPrice.toFixed(2)}`;
@@ -1014,7 +1015,7 @@
             <div class="w-1/6 flex items-center justify-center">
                 <div class="quantity-block flex items-center gap-3 border border-line rounded-lg px-3 py-2">
                     <i class="ph-bold ph-minus cursor-pointer text-lg quantity-decrease" data-cart-id="${item.id}"></i>
-                    <div class="quantity text-button font-semibold">${item.quantity}</div>
+                    <input type="number" min="1" max="9999" step="1" value="${item.quantity}" inputmode="numeric" aria-label="Quantity" class="quantity text-button font-semibold w-12 min-w-[2.5rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" data-cart-id="${item.id}" />
                     <i class="ph-bold ph-plus cursor-pointer text-lg quantity-increase" data-cart-id="${item.id}"></i>
                 </div>
             </div>
@@ -1039,7 +1040,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 const cartId = this.getAttribute('data-cart-id');
-                let qty = parseInt(quantityElement.textContent) || 1;
+                let qty = readQtyControl(quantityElement);
                 if (qty > 1) {
                     qty--;
                     updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
@@ -1052,8 +1053,15 @@
                 e.preventDefault();
                 e.stopPropagation();
                 const cartId = this.getAttribute('data-cart-id');
-                let qty = parseInt(quantityElement.textContent) || 1;
-                qty++;
+                let qty = readQtyControl(quantityElement) + 1;
+                updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
+            });
+        }
+
+        if (quantityElement && quantityElement.tagName === 'INPUT') {
+            quantityElement.addEventListener('change', function() {
+                const cartId = quantityElement.getAttribute('data-cart-id');
+                var qty = readQtyControl(quantityElement);
                 updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
             });
         }
@@ -1092,7 +1100,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                quantityElement.textContent = quantity;
+                writeQtyControl(quantityElement, quantity);
                 const totalPrice = unitPrice * quantity;
                 totalPriceElement.textContent = '₹' + totalPrice.toFixed(2);
                 updateCartCount();
@@ -1354,7 +1362,6 @@
     function init() {
         initAddToCart();
         initQuickView();
-        initQuickViewQuantity();
         initQuickViewSizeColor();
         initWishlistBtn();
         initQuickShop();

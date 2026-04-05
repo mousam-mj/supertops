@@ -656,7 +656,7 @@
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1 disabled"></i>
-                                        <div class="quantity body1 font-semibold">0</div>
+                                        <input type="number" min="0" max="0" step="1" value="0" readonly tabindex="-1" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 opacity-60 cursor-not-allowed" />
                                         <i class="ph-bold ph-plus cursor-pointer body1 disabled"></i>
                                     </div>
                                     <div class="button-main whitespace-nowrap w-full text-center bg-white text-black border border-black">Add To Cart</div>

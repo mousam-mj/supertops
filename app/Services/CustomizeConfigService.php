@@ -241,6 +241,7 @@ class CustomizeConfigService
             'body' => route('customize.part.stl', ['part' => 'body']),
             'logo' => route('customize.part.stl', ['part' => 'logo']),
             'cap' => route('customize.part.stl', ['part' => 'cap']),
+            'ring' => route('customize.part.stl', ['part' => 'ring']),
             'straw' => route('customize.part.stl', ['part' => 'straw']),
             'handle' => route('customize.part.stl', ['part' => 'handle']),
             'boot' => route('customize.part.stl', ['part' => 'boot']),

@@ -56,11 +56,10 @@ function normalizeHex(h){
 function logoEngraveColorFromBodyHex(hex){
   var b=new THREE.Color(normalizeHex(hex));
   var lum=0.299*b.r+0.587*b.g+0.114*b.b;
-  if(lum<0.2){
-    return new THREE.Color('#3d3d42');
+  if(lum<=0.42){
+    return new THREE.Color('#ececf2');
   }
-  b.multiplyScalar(0.38);
-  return b;
+  return new THREE.Color('#141418');
 }
 
 // Perch 1200ml CAD space → Three.js (same as perch-customizer.html; parts stay aligned)
@@ -69,7 +68,7 @@ const ENGR_PLANE_W=42, ENGR_PLANE_H=20, ENGR_PREVIEW_ORDER=18;
 
 // ── THREE.JS ──
 let scene,camera,renderer,flipGroup,group;
-const M={body:null,logo:null,cap:null,handle:null,boot:null,straw:null};
+const M={body:null,logo:null,cap:null,ring:null,handle:null,boot:null,straw:null};
 var engrSlotMeshes={top:null,bottom:null};
 let autoRot=true, mDown=false, mX=0, mY=0;
 
@@ -217,25 +216,47 @@ function parseSTLMesh(buf){
   return parseBinaryStl(buf);
 }
 
+/** Some toolcut ring slices are paper-thin in one axis; after parse a +Z camera can see them edge-on. Rotate about centroid so the band faces the viewer. Skip full-size caps (restored cover.stl). */
+function needsToolcutLidOrientation(geo){
+  geo.computeBoundingBox();
+  var b=geo.boundingBox;
+  var ex=b.max.x-b.min.x, ey=b.max.y-b.min.y, ez=b.max.z-b.min.z;
+  var mx=Math.max(ex,ey,ez);
+  var mn=Math.min(ex,ey,ez);
+  if(mx<1e-5) return false;
+  return mn/mx<0.08&&mx<42;
+}
+function orientToolcutLidGeometry(geo){
+  geo.computeBoundingBox();
+  var b=geo.boundingBox;
+  var cx=(b.min.x+b.max.x)*0.5;
+  var cy=(b.min.y+b.max.y)*0.5;
+  var cz=(b.min.z+b.max.z)*0.5;
+  geo.translate(-cx,-cy,-cz);
+  geo.rotateX(Math.PI/2);
+  geo.translate(cx,cy,cz);
+  geo.computeVertexNormals();
+}
+
 function makePartMaterial(key, hex){
   const h=normalizeHex(hex);
   if(key==='logo'){
     const c=logoEngraveColorFromBodyHex(h);
     const mat=new THREE.MeshStandardMaterial({
       color:c,
-      metalness:0.1,
-      roughness:0.78,
-      envMapIntensity:0.55,
-      side:THREE.FrontSide,
+      metalness:0.22,
+      roughness:0.42,
+      envMapIntensity:0.95,
+      side:THREE.DoubleSide,
     });
     mat.polygonOffset=true;
-    mat.polygonOffsetFactor=-2;
-    mat.polygonOffsetUnits=-1;
+    mat.polygonOffsetFactor=-4;
+    mat.polygonOffsetUnits=-2;
     mat._cur=c.clone();
     mat._tgt=c.clone();
     return mat;
   }
-  const thin=key==='handle'||key==='boot'||key==='straw'||key==='cap';
+  const thin=key==='handle'||key==='boot'||key==='straw'||key==='cap'||key==='ring';
   const mat=new THREE.MeshStandardMaterial({
     color:new THREE.Color(h),
     metalness:0.04,
@@ -245,7 +266,7 @@ function makePartMaterial(key, hex){
   });
   if(thin){
     mat.polygonOffset=true;
-    mat.polygonOffsetFactor=key==='straw'?-1.5:(key==='cap'?2:(key==='boot'?2:1));
+    mat.polygonOffsetFactor=key==='straw'?-1.5:((key==='cap'||key==='ring')?2:(key==='boot'?2:1));
     mat.polygonOffsetUnits=key==='straw'?-1:1;
   }
   mat._cur=new THREE.Color(h);
@@ -264,13 +285,13 @@ function disposeModelParts(){
       ch.material.dispose();
     }
   }
-  M.body=M.logo=M.cap=M.handle=M.boot=M.straw=null;
+  M.body=M.logo=M.cap=M.ring=M.handle=M.boot=M.straw=null;
   engrSlotMeshes.top=engrSlotMeshes.bottom=null;
 }
 
 function partStlUrlsReady(){
   var u=cfg.part_stl_urls;
-  return !!(u&&u.body&&u.cap&&u.straw&&u.handle&&u.boot);
+  return !!(u&&u.body&&u.cap&&u.ring&&u.straw&&u.handle&&u.boot);
 }
 function fetchStlBuffer(url){
   return fetch(url,{credentials:'same-origin'}).then(function(r){
@@ -284,11 +305,16 @@ function loadAllParts(){
     console.error(msg);
     if(loadingEl) loadingEl.innerHTML='<div style="color:#e04;font-size:13px;padding:20px;text-align:center;">'+String(msg)+'</div>';
   }
-  function addPartMeshes(geos){
+  function addPartMeshes(geos, lidOrientFix){
+    if(lidOrientFix){
+      if(geos.cap&&needsToolcutLidOrientation(geos.cap)) orientToolcutLidGeometry(geos.cap);
+      if(geos.ring&&needsToolcutLidOrientation(geos.ring)) orientToolcutLidGeometry(geos.ring);
+      if(geos.logo&&needsToolcutLidOrientation(geos.logo)) orientToolcutLidGeometry(geos.logo);
+    }
     var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
-    var hexMap={body:hb,cap:hc,handle:hh,boot:hbo,straw:hs};
-    var drawOrder={body:0,logo:0.5,boot:1,handle:2,cap:3,straw:15};
-    var keys=['body','logo','cap','handle','boot','straw'];
+    var hexMap={body:hb,cap:hc,ring:hc,handle:hh,boot:hbo,straw:hs};
+    var drawOrder={body:0,logo:1.2,boot:1,handle:2,ring:2.6,cap:3,straw:15};
+    var keys=['body','logo','ring','cap','handle','boot','straw'];
     for(var i=0;i<keys.length;i++){
       var key=keys[i];
       var geo=geos[key];
@@ -298,6 +324,7 @@ function loadAllParts(){
       mesh.castShadow=false;
       mesh.receiveShadow=false;
       mesh.renderOrder=drawOrder[key]!==undefined?drawOrder[key]:0;
+      if(key==='logo') mesh.position.z+=0.45;
       group.add(mesh);
       M[key]=mesh;
     }
@@ -315,6 +342,7 @@ function loadAllParts(){
       return Promise.all([
         fetchStlBuffer(u.body),
         fetchStlBuffer(u.cap),
+        fetchStlBuffer(u.ring),
         fetchStlBuffer(u.handle),
         fetchStlBuffer(u.boot),
         fetchStlBuffer(u.straw),
@@ -323,12 +351,13 @@ function loadAllParts(){
         var geos={
           body: parseSTLMesh(bufs[0]),
           cap: parseSTLMesh(bufs[1]),
-          handle: parseSTLMesh(bufs[2]),
-          boot: parseSTLMesh(bufs[3]),
-          straw: parseSTLMesh(bufs[4])
+          ring: parseSTLMesh(bufs[2]),
+          handle: parseSTLMesh(bufs[3]),
+          boot: parseSTLMesh(bufs[4]),
+          straw: parseSTLMesh(bufs[5])
         };
-        if(bufs[5]&&bufs[5].byteLength) geos.logo=parseSTLMesh(bufs[5]);
-        addPartMeshes(geos);
+        if(bufs[6]&&bufs[6].byteLength) geos.logo=parseSTLMesh(bufs[6]);
+        addPartMeshes(geos,true);
       }).catch(function(e){
         console.warn('Part STL fetch failed, using embedded meshes:', e);
         try{
@@ -351,7 +380,7 @@ function loadAllParts(){
       ['boot',CAP_B64,hbo],
       ['straw',STRAP_B64,hs],
     ];
-    var drawOrder={body:0,logo:0.5,boot:1,handle:2,cap:3,straw:15};
+    var drawOrder={body:0,logo:1.2,boot:1,handle:2,cap:3,straw:15};
     for(var i=0;i<parts.length;i++){
       var key=parts[i][0], b64=parts[i][1], hex=parts[i][2];
       var geo=parseSTLMesh(b64ToArrayBuffer(b64));
@@ -390,7 +419,7 @@ function syncAllPartsFromState(){
     M.logo.material.color.copy(lc);
     M.logo.material.needsUpdate=true;
   }
-  if(ch) snapMatColor(M.cap, ch);
+  if(ch){ snapMatColor(M.cap, ch); if(M.ring) snapMatColor(M.ring, ch); }
   if(sh) snapMatColor(M.straw, sh);
   if(hh) snapMatColor(M.handle, hh);
   if(boh) snapMatColor(M.boot, boh);
@@ -399,7 +428,7 @@ function syncAllPartsFromState(){
 function animLoop(){
   requestAnimationFrame(animLoop);
   if(autoRot) group.rotation.y += 0.005;
-  ['body','logo','cap','straw','handle','boot'].forEach(function(k){
+  ['body','logo','cap','ring','straw','handle','boot'].forEach(function(k){
     const mesh=M[k];
     if(!mesh||!mesh.material._cur) return;
     mesh.material._cur.lerp(mesh.material._tgt, 0.1);
@@ -423,7 +452,7 @@ function snapMatColor(mesh, hex){
   mesh.material.needsUpdate=true;
 }
 function setBodyColor(hex){ snapMatColor(M.body, hex); }
-function setCapColor(hex){ snapMatColor(M.cap, hex); }
+function setCapColor(hex){ snapMatColor(M.cap, hex); if(M.ring) snapMatColor(M.ring, hex); }
 function setStrapColor(hex){
   snapMatColor(M.straw, normalizeHex(hex));
 }

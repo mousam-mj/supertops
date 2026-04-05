@@ -2876,29 +2876,45 @@ const handleQuantity = () => {
     const minus = item.querySelector(".ph-minus");
     const plus = item.querySelector(".ph-plus");
     const quantity = item.querySelector(".quantity");
-
-    if (Number(quantity.textContent) < 2) {
-      minus.classList.add("disabled");
+    if (!minus || !plus || !quantity) return;
+    if (quantity.tagName === "INPUT" && (quantity.disabled || quantity.readOnly)) {
+      return;
     }
 
+    const readQty = () => {
+      const raw =
+        quantity.tagName === "INPUT"
+          ? quantity.value
+          : quantity.textContent;
+      let n = parseInt(String(raw).trim(), 10);
+      if (isNaN(n) || n < 1) n = 1;
+      return Math.min(n, 9999);
+    };
+
+    const writeQty = (n) => {
+      n = Math.max(1, Math.min(parseInt(n, 10) || 1, 9999));
+      if (quantity.tagName === "INPUT") quantity.value = String(n);
+      else quantity.textContent = String(n);
+      if (readQty() <= 1) minus.classList.add("disabled");
+      else minus.classList.remove("disabled");
+    };
+
+    writeQty(readQty());
+
     minus.addEventListener("click", (e) => {
-      e.stopPropagation()
-      if (Number(quantity.textContent) > 2) {
-        quantity.innerHTML = Number(quantity.innerHTML) - 1;
-        minus.classList.remove("disabled");
-      } else {
-        quantity.innerHTML = "1";
-        minus.classList.add("disabled");
-      }
+      e.stopPropagation();
+      writeQty(readQty() - 1);
     });
 
     plus.addEventListener("click", (e) => {
-      e.stopPropagation()
-      quantity.innerHTML = Number(quantity.innerHTML) + 1;
-      if (Number(quantity.textContent) >= 2) {
-        minus.classList.remove("disabled");
-      }
+      e.stopPropagation();
+      writeQty(readQty() + 1);
     });
+
+    if (quantity.tagName === "INPUT") {
+      quantity.addEventListener("change", () => writeQty(readQty()));
+      quantity.addEventListener("blur", () => writeQty(readQty()));
+    }
   });
 };
 
@@ -3633,7 +3649,7 @@ const handleInforCart = () => {
                     <div
                         class="quantity-block bg-surface md:p-3 p-2 flex items-center justify-between rounded-lg border border-line md:w-[100px] flex-shrink-0 w-20">
                         <i class="ph-bold ph-minus cursor-pointer text-base max-md:text-sm"></i>
-                        <div class="text-button quantity">${product.quantityPurchase}</div>
+                        <input type="number" min="1" max="9999" step="1" value="${product.quantityPurchase}" inputmode="numeric" aria-label="Quantity" class="text-button quantity w-10 min-w-[2.25rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                         <i class="ph-bold ph-plus cursor-pointer text-base max-md:text-sm"></i>
                     </div>
                 </div>
@@ -3653,29 +3669,46 @@ const handleInforCart = () => {
         ".total-price .text-title"
       );
 
-      quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
-        product.quantityPurchase++;
-        quantityProduct.textContent = product.quantityPurchase;
-        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price
-          }.00`;
-        updateTotalCart();
+      const syncLineTotal = () => {
+        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price}.00`;
+      };
 
-        // Update quantity localStorage
+      quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
+        product.quantityPurchase = Math.min(9999, product.quantityPurchase + 1);
+        if (quantityProduct.tagName === "INPUT")
+          quantityProduct.value = String(product.quantityPurchase);
+        else quantityProduct.textContent = product.quantityPurchase;
+        syncLineTotal();
+        updateTotalCart();
         localStorage.setItem("cartStore", JSON.stringify(cartStore));
       });
 
       quantityBlock.querySelector(".ph-minus").addEventListener("click", () => {
         if (product.quantityPurchase > 1) {
           product.quantityPurchase--;
-          quantityProduct.textContent = product.quantityPurchase;
-          totalPriceProduct.textContent = `$${product.quantityPurchase * product.price
-            }.00`;
+          if (quantityProduct.tagName === "INPUT")
+            quantityProduct.value = String(product.quantityPurchase);
+          else quantityProduct.textContent = product.quantityPurchase;
+          syncLineTotal();
           updateTotalCart();
-
-          // Update quantity localStorage
           localStorage.setItem("cartStore", JSON.stringify(cartStore));
         }
       });
+
+      if (quantityProduct.tagName === "INPUT") {
+        const commitQty = () => {
+          let n = parseInt(quantityProduct.value, 10);
+          if (isNaN(n) || n < 1) n = 1;
+          n = Math.min(n, 9999);
+          product.quantityPurchase = n;
+          quantityProduct.value = String(n);
+          syncLineTotal();
+          updateTotalCart();
+          localStorage.setItem("cartStore", JSON.stringify(cartStore));
+        };
+        quantityProduct.addEventListener("change", commitQty);
+        quantityProduct.addEventListener("blur", commitQty);
+      }
 
       listProductCart.appendChild(productElement);
       totalCart += calculateProductTotal();

@@ -141,7 +141,7 @@
     <div class="top-nav">
       <div class="nav-steps">
         <div class="nav-step active" data-step="1" onclick="goTo(1)">Body</div>
-        <div class="nav-step" data-step="2" onclick="goTo(2)">Lid Ring</div>
+        <div class="nav-step" data-step="2" onclick="goTo(2)">Cap</div>
         <div class="nav-step" data-step="3" onclick="goTo(3)">Straw</div>
         <div class="nav-step" data-step="4" onclick="goTo(4)">Handle</div>
         <div class="nav-step" data-step="5" onclick="goTo(5)">Bottom Base</div>
@@ -228,20 +228,20 @@
             <button class="color-arrow" onclick="shiftS('bottle',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
-          <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – Lid Ring</button></div>
+          <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – Cap</button></div>
           <p class="flow-hint">Tip: complete each step left to right, or jump using the tabs above. Your 3D preview updates live.</p>
         </div>
 
-        <!-- Step 2: Lid -->
+        <!-- Step 2: Cap -->
         <div class="step-panel" id="panel-2">
-          <div class="step-heading">Lid Ring</div>
+          <div class="step-heading">Cap</div>
           <div class="step-counter">2 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Top ring/lid section ka color select karein.</div>
+          <div class="step-subtext">Top cap aur uske neeche wale ring dono ka color yahan set hota hai.</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="11" stroke="#222" stroke-width="2"/><path d="M15 4 Q22 4 22 12" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
-            <div class="option-info"><div class="option-name">Top Lid Ring</div><div class="option-desc">Straw opening ke around wala upper part.</div></div>
+            <div class="option-info"><div class="option-name">Cap</div><div class="option-desc">Straw opening ke around upper cap; neeche wala ring bhi isi color me match hoga.</div></div>
           </div>
-          <div class="color-label">Choose color for Lid Ring</div>
+          <div class="color-label">Choose color for Cap</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('cap',-1)">&#8249;</button>
             <div class="swatches-track" id="cap-swatches"></div>
@@ -271,7 +271,7 @@
           </div>
           <div class="color-name-label" id="strap-color-label">{{ ($config['strap_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(2)">Previous – Lid Ring</button>
+            <button class="prev-btn" onclick="goTo(2)">Previous – Cap</button>
             <button class="next-btn" onclick="goTo(4)">Next – Handle</button>
           </div>
         </div>

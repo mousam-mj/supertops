@@ -653,7 +653,7 @@
                                     <div class="right">
                                         <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line md:w-[140px] sm:w-[120px] w-[90px] flex-shrink-0">
                                             <i class="ph-bold ph-minus cursor-pointer body1"></i>
-                                            <div class="quantity body1 font-semibold">1</div>
+                                            <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                             <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                         </div>
                                     </div>
@@ -682,7 +682,7 @@
                                     <div class="right">
                                         <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line md:w-[140px] sm:w-[120px] w-[90px] flex-shrink-0">
                                             <i class="ph-bold ph-minus cursor-pointer body1"></i>
-                                            <div class="quantity body1 font-semibold">1</div>
+                                            <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                             <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                         </div>
                                     </div>
@@ -711,7 +711,7 @@
                                     <div class="right">
                                         <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line md:w-[140px] sm:w-[120px] w-[90px] flex-shrink-0">
                                             <i class="ph-bold ph-minus cursor-pointer body1"></i>
-                                            <div class="quantity body1 font-semibold">1</div>
+                                            <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                             <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                         </div>
                                     </div>
