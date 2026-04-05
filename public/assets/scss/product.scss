@@ -160,19 +160,32 @@
 
             @media(max-width: 1024px) {
                 display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
                 align-items: center;
                 justify-content: center;
-                gap: 8px;
-                bottom: 12px;
+                gap: 6px;
+                padding-left: 8px;
+                padding-right: 8px;
+                bottom: 10px;
 
                 .quick-view-btn,
+                .quick-shop-btn,
                 .add-cart-btn {
-                    width: 32px;
-                    height: 32px;
+                    width: 36px;
+                    height: 36px;
+                    min-width: 36px;
+                    flex: 0 0 36px;
+                    box-sizing: border-box;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 6px;
+                    border-radius: 10px;
+                    padding: 0 !important;
+                }
+
+                .quick-shop-btn {
+                    white-space: nowrap;
                 }
             }
         }
@@ -307,29 +320,30 @@
         }
     }
 
-    &:hover {
-        &.grid-type {
-            @media (min-width: 1024px) {
-                .product-main {
-                    .product-infor {
-                        .product-name {
-                            opacity: 0;
-                            visibility: hidden;
-                        }
+    /* Hide title on hover only when color swatches exist (theme swap); avoids empty gap when there are no colors */
+    &.grid-type:hover:has(.product-infor .list-color) {
+        @media (min-width: 1024px) {
+            .product-main {
+                .product-infor {
+                    .product-name {
+                        opacity: 0;
+                        visibility: hidden;
+                    }
 
-                        .list-color,
-                        .list-color-image {
-                            opacity: 1;
-                        }
+                    .list-color,
+                    .list-color-image {
+                        opacity: 1;
+                    }
 
-                        .product-price-block {
-                            transform: translateY(28px);
-                        }
+                    .product-price-block {
+                        transform: translateY(28px);
                     }
                 }
             }
         }
+    }
 
+    &:hover {
         &.style-2,
         &.style-4 {
             .list-size-blur {

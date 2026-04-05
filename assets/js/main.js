@@ -123,7 +123,7 @@ let SwiperTop = new Swiper(".marquee-block", {
   disableOnInteraction: true,
 });
 
-// Menu mobile
+// Menu slide panel: full width on small screens, narrow sidebar on lg+ (see header.scss)
 const menuMobileIcon = document.querySelector(".menu-mobile-icon");
 const menuMobileBlock = document.querySelector("#menu-mobile");
 const closeMenuMobileIcon = document.querySelector(
@@ -131,15 +131,24 @@ const closeMenuMobileIcon = document.querySelector(
 );
 
 const openMenuMobile = () => {
+  if (!menuMobileBlock) return;
   menuMobileBlock.classList.add("open");
+  document.body.style.overflow = "hidden";
 };
 
 const closeMenuMobile = () => {
+  if (!menuMobileBlock) return;
   menuMobileBlock.classList.remove("open");
+  document.body.style.overflow = "";
 };
 
-if (menuMobileIcon) {
-  menuMobileIcon.addEventListener("click", openMenuMobile);
+if (menuMobileIcon && menuMobileBlock) {
+  menuMobileIcon.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;
+    openMenuMobile();
+  });
+}
+if (closeMenuMobileIcon && menuMobileBlock) {
   closeMenuMobileIcon.addEventListener("click", closeMenuMobile);
 }
 

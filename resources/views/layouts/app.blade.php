@@ -67,6 +67,137 @@
         .compare-btn {
             display: none !important;
         }
+        /* Mobile bottom tab bar — override global span/body line-height so labels don’t stack/overlap */
+        .mobile-app-nav {
+            box-sizing: border-box;
+            /* Above main/footer; below modals (101) and slide menu (#menu-mobile 102) */
+            z-index: 99 !important;
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            margin: 0 !important;
+            background-color: #fff !important;
+            border-top: 1px solid var(--line, #e9e9e9);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            isolation: isolate;
+            touch-action: manipulation;
+        }
+        .mobile-app-nav__grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            align-items: stretch;
+            min-height: 3.5rem;
+            padding-top: 0.35rem;
+            padding-bottom: 0.35rem;
+            width: 100%;
+            max-width: 100%;
+        }
+        .mobile-app-nav__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.125rem;
+            min-width: 0;
+            padding-left: 0.0625rem;
+            padding-right: 0.0625rem;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1 !important;
+            font-size: inherit;
+            touch-action: manipulation;
+        }
+        .mobile-app-nav__link i {
+            display: block;
+            line-height: 1 !important;
+            font-size: 1.25rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        @media (min-width: 400px) {
+            .mobile-app-nav__link i {
+                font-size: 1.375rem;
+                width: 1.375rem;
+                height: 1.375rem;
+            }
+        }
+        .mobile-app-nav__icon-slot {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            flex-shrink: 0;
+        }
+        .mobile-app-nav__label {
+            display: block;
+            width: 100%;
+            font-size: 0.5rem;
+            line-height: 1.1 !important;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+        @media (min-width: 360px) {
+            .mobile-app-nav__label {
+                font-size: 0.5625rem;
+            }
+        }
+        @media (min-width: 400px) {
+            .mobile-app-nav__label {
+                font-size: 0.625rem;
+                letter-spacing: -0.02em;
+            }
+        }
+        .mobile-app-nav .cart-quantity.mobile-app-nav__badge {
+            position: absolute;
+            top: -2px;
+            right: -6px;
+            min-width: 15px;
+            height: 15px;
+            padding: 0 3px;
+            font-size: 9px;
+            line-height: 15px !important;
+            font-weight: 700;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Space above fixed bottom tab bar so grids / prices aren’t covered (matches lg:hidden breakpoint) */
+        @media (max-width: 1023.98px) {
+            #main-content {
+                padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px) + 28px);
+            }
+            #footer.footer {
+                padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px) + 24px);
+            }
+            /* Keep product text/CTA under the tab bar in compositor order */
+            #main-content .product-item .product-infor,
+            #main-content .product-item .product-price-block {
+                position: relative;
+                z-index: 0 !important;
+            }
+            #main-content .product-item .product-thumb .list-action {
+                z-index: 1 !important;
+            }
+        }
     </style>
     </head>
 
@@ -93,10 +224,17 @@
             var main = document.querySelector('.modal-search-block .modal-search-main');
             if (main) { main.classList.add('open'); document.body.style.overflow='hidden'; }
         }
+        function openMobileMenuFromBottom() {
+            var mm = document.getElementById('menu-mobile');
+            if (mm) { mm.classList.add('open'); document.body.style.overflow='hidden'; }
+        }
         document.addEventListener('click', function(e) {
             if (e.target.closest('.cart-icon')) { e.preventDefault(); e.stopPropagation(); openCart(); }
+            else if (e.target.closest('[data-open-cart-modal]')) { e.preventDefault(); e.stopPropagation(); openCart(); }
             else if (e.target.closest('.wishlist-icon')) { e.preventDefault(); e.stopPropagation(); openWishlist(); }
             else if (e.target.closest('.search-icon')) { e.preventDefault(); e.stopPropagation(); openSearch(); }
+            else if (e.target.closest('[data-open-search-modal]')) { e.preventDefault(); e.stopPropagation(); openSearch(); }
+            else if (e.target.closest('[data-open-mobile-menu]')) { e.preventDefault(); e.stopPropagation(); openMobileMenuFromBottom(); }
         }, true);
     })();
     </script>
@@ -180,6 +318,7 @@
     </main>
 
     @include('partials.footer')
+    @include('partials.mobile-bottom-nav')
     
     <!-- Search Modal - Dynamic live search -->
     <div class="modal-search-block">
@@ -373,25 +512,8 @@
     <script>
         // Header interactions
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
-            const menuMobileIcon = document.querySelector('.menu-mobile-icon');
-            const menuMobile = document.getElementById('menu-mobile');
-            const closeMenuBtn = document.querySelector('.close-menu-mobile-btn');
-            
-            if (menuMobileIcon && menuMobile) {
-                menuMobileIcon.addEventListener('click', function() {
-                    menuMobile.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            if (closeMenuBtn && menuMobile) {
-                closeMenuBtn.addEventListener('click', function() {
-                    menuMobile.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
-            }
-            
+            // Mobile menu: .open class handled in assets/js/main.js (avoid duplicate .active handlers)
+
             // Close search modal (backdrop click + ESC)
             const searchModal = document.querySelector('.modal-search-block');
             const searchModalMain = document.querySelector('.modal-search-block .modal-search-main');

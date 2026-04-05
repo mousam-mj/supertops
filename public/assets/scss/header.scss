@@ -349,6 +349,15 @@
     }
 }
 
+/* Web (lg+): left sidebar width; mobile keeps full-width #menu-mobile.open above */
+@media (min-width: 1024px) {
+    #menu-mobile.open {
+        width: min(380px, 92vw) !important;
+        max-width: 380px;
+        box-shadow: 8px 0 40px rgba(0, 0, 0, 0.12);
+    }
+}
+
 /* menu_bar */
 .menu_bar {
     box-shadow: 0px 5px 18px 5px rgba(64, 72, 87, 0.2);

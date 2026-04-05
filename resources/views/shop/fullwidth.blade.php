@@ -530,31 +530,7 @@
                 </div>
             </div>
 
-            <!-- Menu bar -->
-            <div class="menu_bar fixed bg-white bottom-0 left-0 w-full h-[70px] sm:hidden z-[101]">
-                <div class="menu_bar-inner grid grid-cols-4 items-center h-full">
-                    <a href="{{ route('home') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-house text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Home</span>
-                    </a>
-                    <a href="{{ route('shop') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-list text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Category</span>
-                    </a>
-                    <a href="{{ route('search') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
-                        <span class="menu_bar-title caption2 font-semibold">Search</span>
-                    </a>
-                    <a href="{{ route('cart.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                        <div class="cart-icon relative">
-                            <span class="ph-bold ph-handbag text-2xl block"></span>
-                            <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                        </div>
-                        <span class="menu_bar-title caption2 font-semibold">Cart</span>
-                    </a>
-                </div>
             </div>
-        </div>
 
         <div class="breadcrumb-block style-img">
             <div class="breadcrumb-main bg-linear overflow-hidden">

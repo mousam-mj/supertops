@@ -521,16 +521,16 @@ function renderProducts(page, products = []) {
                             <div class="product-img w-full h-full aspect-[3/4]">
                                 ${productImages}
                             </div>
-                            <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 max-lg:hidden">
+                            <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5">
                                 <div
-                                    class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white">
+                                    class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white flex items-center justify-center">
                                     <span class="max-lg:hidden">Quick View</span>
                                     <i class="ph ph-eye lg:hidden text-xl"></i>
                                 </div>
                                     ${product.action === 'add to cart' ? (
                     `
                                         <div
-                                            class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white"
+                                            class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white flex items-center justify-center"
                                             >
                                             <span class="max-lg:hidden">Add To Cart</span>
                                             <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
@@ -539,10 +539,10 @@ function renderProducts(page, products = []) {
                 ) : (
                     `
                                         <div
-                                            class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white max-lg:hidden">
-                                            Quick Shop</div>
+                                            class="quick-shop-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white flex items-center justify-center">
+                                            <span class="max-lg:hidden">Quick Shop</span><i class="ph ph-storefront lg:hidden text-xl" aria-hidden="true"></i></div>
                                         <div
-                                            class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden"
+                                            class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden flex items-center justify-center"
                                             >
                                             <span class="max-lg:hidden">Add To Cart</span>
                                             <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>

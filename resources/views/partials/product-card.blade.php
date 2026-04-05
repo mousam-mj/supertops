@@ -39,12 +39,12 @@
             </a>
             
             <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 opacity-0 group-hover:opacity-100 max-md:opacity-100 max-md:group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-auto">
-                <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer select-none" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}">
+                <div class="quick-view-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}">
                     <span class="max-lg:hidden">Quick View</span>
                     <i class="ph ph-eye lg:hidden text-xl"></i>
                 </div>
-                <div class="quick-shop-btn text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white cursor-pointer select-none" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}" role="button" tabindex="0" onclick="event.preventDefault();event.stopPropagation();var s=this.getAttribute('data-product-slug');if(s&&window.openQuickView){window.openQuickView(s)}">Quick Shop</div>
-                <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden cursor-pointer" data-product-id="{{ $product->id ?? '' }}">
+                <div class="quick-shop-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center" title="Quick Shop" data-product-id="{{ $product->id ?? '' }}" data-product-slug="{{ $product->slug ?? '' }}" role="button" tabindex="0" onclick="event.preventDefault();event.stopPropagation();var s=this.getAttribute('data-product-slug');if(s&&window.openQuickView){window.openQuickView(s)}"><span class="max-lg:hidden">Quick Shop</span><i class="ph ph-storefront lg:hidden text-xl" aria-hidden="true"></i></div>
+                <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white lg:hidden cursor-pointer flex items-center justify-center" data-product-id="{{ $product->id ?? '' }}">
                     <span class="max-lg:hidden">Add To Cart</span>
                     <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
                 </div>

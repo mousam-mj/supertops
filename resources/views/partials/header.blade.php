@@ -23,8 +23,8 @@
             <div class="header-menu style-one relative  w-full md:h-[74px] h-[56px]">
                 <div class="container mx-auto h-full">
                     <div class="header-main flex justify-between h-full">
-                        <div class="menu-mobile-icon  flex items-center">
-                            <i class="icon-category text-2xl"></i>
+                        <div class="menu-mobile-icon flex items-center">
+                            <i class="icon-category text-2xl flex-shrink-0 cursor-pointer" aria-hidden="true" title="Menu"></i>
                             <a href="{{{ route('home') }}}" class="flex items-center px-10">
                                 @php $logo = \App\Models\Setting::get('site_logo'); @endphp
                                 <img src="{{ $logo ? storage_asset($logo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-8 md:h-10 object-contain" />

@@ -449,7 +449,11 @@
                     cartCountElements.forEach(el => {
                         el.textContent = count;
                         if (el.style) {
-                            el.style.display = count > 0 ? 'block' : 'none';
+                            if (count > 0) {
+                                el.style.display = (el.classList && el.classList.contains('mobile-app-nav__badge')) ? 'flex' : 'block';
+                            } else {
+                                el.style.display = 'none';
+                            }
                         }
                     });
                 }
