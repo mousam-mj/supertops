@@ -75,8 +75,8 @@
 /* Home hero: show full banner art on small screens (no side crop) */
 #home-content .slider-block.style-two {
     @media (max-width: 767.98px) {
-        min-height: 340px;
-        height: clamp(340px, 85vw, 480px) !important;
+        min-height: 220px;
+        height: clamp(220px, 45vw, 320px) !important;
 
         .slider-main,
         .swiper.swiper-slider,
@@ -89,19 +89,33 @@
 
         .sub-img {
             background-color: #fde047;
+            background-size: contain;
+            background-position: center top;
+            background-repeat: no-repeat;
         }
 
         .sub-img img {
             object-fit: contain;
-            object-position: center center;
+            object-position: center top;
             width: 100%;
             height: 100%;
+            max-width: 100%;
         }
 
         .swiper-slide-active .sub-img img {
             animation: none;
             transform: none;
         }
+    }
+
+    @media (max-width: 420px) {
+        height: clamp(200px, 50vw, 300px) !important;
+        min-height: 200px;
+    }
+
+    @media (max-width: 360px) {
+        height: clamp(180px, 55vw, 280px) !important;
+        min-height: 180px;
     }
 }
 

@@ -7,6 +7,25 @@
     /* Contact - compact breadcrumb, same as checkout */
     .contact-page-content .contact-breadcrumb { min-height: unset !important; }
     .contact-page-content .contact-breadcrumb .breadcrumb-main { min-height: unset !important; }
+    
+    /* Contact page spacing improvements */
+    .contact-block { margin-bottom: 2rem; }
+    .contact-us { padding-bottom: 2rem !important; }
+    .contact-us .heading4 { margin-bottom: 1.5rem !important; }
+    .contact-us .item { margin-bottom: 2rem; }
+    .contact-us .item:last-child { margin-bottom: 0; }
+    .contact-us .form-block { margin-bottom: 2rem; }
+    .contact-us .map { margin-top: 3rem; }
+    
+    /* Mobile spacing improvements */
+    @media (max-width: 767.98px) {
+        .contact-block { margin-bottom: 1.5rem; }
+        .contact-us { padding-bottom: 1.5rem !important; }
+        .contact-us .heading4 { margin-bottom: 1.25rem !important; }
+        .contact-us .item { margin-bottom: 1.5rem; }
+        .contact-us .form-block { margin-bottom: 1.5rem; }
+        .contact-us .map { margin-top: 2rem; }
+    }
 </style>
 <div class="page-content contact-page-content">
     <div id="menu-mobile" class="">
