@@ -2479,28 +2479,14 @@ input[type=file]::-webkit-file-upload-button {
   animation: animateY 1.5s ease;
 }
 
-/* Home hero: show full banner art on small screens (no side crop) */
+/* Home hero: mobile — ensure image visible and properly sized */
 @media (max-width: 767.98px) {
-  #home-content .slider-block.style-two {
-    min-height: 340px;
-    height: clamp(340px, 85vw, 480px) !important;
-  }
-  #home-content .slider-block.style-two .slider-main,
-  #home-content .slider-block.style-two .swiper.swiper-slider,
-  #home-content .slider-block.style-two .swiper-wrapper,
-  #home-content .slider-block.style-two .swiper-slide,
-  #home-content .slider-block.style-two .swiper-slide .slider-item {
-    height: 100% !important;
-    min-height: 100%;
-  }
   #home-content .slider-block.style-two .sub-img {
-    background-color: #fde047;
+    z-index: 0;
   }
   #home-content .slider-block.style-two .sub-img img {
-    object-fit: contain;
+    object-fit: cover;
     object-position: center center;
-    width: 100%;
-    height: 100%;
   }
   #home-content .slider-block.style-two .swiper-slide-active .sub-img img {
     animation: none;
@@ -2662,6 +2648,23 @@ input[type=file]::-webkit-file-upload-button {
   fill: var(--white);
 }
 
+/* Mobile footer gap fix */
+@media (max-width: 767.98px) {
+  .footer {
+    margin-bottom: 0 !important;
+    padding-bottom: 80px !important; /* Added space for bottom navigation */
+  }
+  .footer-main {
+    padding-bottom: 0 !important;
+  }
+  .footer-bottom {
+    padding-bottom: 20px !important;
+    margin-bottom: 0 !important;
+  }
+  .content-footer {
+    padding-bottom: 1rem !important;
+  }
+}
 /* Product Item */
 .product-item {
   display: block;

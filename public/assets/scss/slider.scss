@@ -72,25 +72,16 @@
     }
 }
 
-/* Home hero: show full banner art on small screens (no side crop) */
+/* Home hero: mobile — ensure image visible and properly sized */
 #home-content .slider-block.style-two {
     @media (max-width: 767.98px) {
-        min-height: 340px;
-        height: clamp(340px, 85vw, 480px) !important;
-
-        .slider-main,
-        .swiper.swiper-slider,
-        .swiper-wrapper,
-        .swiper-slide {
-            height: 100% !important;
-            min-height: 100%;
+        .sub-img {
+            z-index: 0;
         }
 
         .sub-img img {
-            object-fit: contain;
+            object-fit: cover;
             object-position: center center;
-            width: 100%;
-            height: 100%;
         }
 
         .swiper-slide-active .sub-img img {

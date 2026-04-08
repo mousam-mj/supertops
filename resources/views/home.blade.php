@@ -14,7 +14,7 @@
                                     <div class="slider-item h-full w-full relative overflow-hidden">
                                         <div class=" w-full h-full relative">
                                             
-                                            <div class="sub-img absolute left-0 top-0 w-full h-full z-[-1]">
+                                            <div class="sub-img absolute inset-0 w-full h-full">
                                                 @if($banner->banner_image)
                                                     <img src="{{ storage_asset($banner->banner_image) }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
                                                 @else
@@ -28,7 +28,7 @@
                                 <div class="swiper-slide">
                                     <div class="slider-item h-full w-full relative overflow-hidden">
                                         <div class="container w-full h-full">
-                                            <div class="sub-img absolute left-0 top-0 w-full h-full z-[-1]">
+                                            <div class="sub-img absolute inset-0 w-full h-full">
                                                 <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="Hero" class="w-full h-full object-cover" />
                                             </div>
                                         </div>
