@@ -2479,13 +2479,31 @@ input[type=file]::-webkit-file-upload-button {
   animation: animateY 1.5s ease;
 }
 
-/* Home hero: mobile — ensure image visible and properly sized */
-@media (max-width: 767.98px) {
+/* Home hero: mobile — show full image without cropping */
+@media (max-width: 1023px) {
+  #home-content .slider-block.style-two {
+    height: auto !important;
+    min-height: unset !important;
+  }
+  #home-content .slider-block.style-two .slider-main,
+  #home-content .slider-block.style-two .swiper.swiper-slider,
+  #home-content .slider-block.style-two .swiper-wrapper,
+  #home-content .slider-block.style-two .swiper-slide,
+  #home-content .slider-block.style-two .swiper-slide .slider-item,
+  #home-content .slider-block.style-two .swiper-slide .slider-item > div {
+    height: auto !important;
+    min-height: unset !important;
+  }
   #home-content .slider-block.style-two .sub-img {
-    z-index: 0;
+    position: relative !important;
+    width: 100%;
+    height: auto !important;
   }
   #home-content .slider-block.style-two .sub-img img {
-    object-fit: cover;
+    position: relative !important;
+    width: 100%;
+    height: auto !important;
+    object-fit: contain;
     object-position: center center;
   }
   #home-content .slider-block.style-two .swiper-slide-active .sub-img img {

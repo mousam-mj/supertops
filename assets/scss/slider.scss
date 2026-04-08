@@ -72,15 +72,33 @@
     }
 }
 
-/* Home hero: mobile — ensure image visible and properly sized */
+/* Home hero: mobile — show full image without cropping */
 #home-content .slider-block.style-two {
-    @media (max-width: 767.98px) {
+    @media (max-width: 1023px) {
+        height: auto !important;
+        min-height: unset !important;
+
+        .slider-main,
+        .swiper.swiper-slider,
+        .swiper-wrapper,
+        .swiper-slide,
+        .swiper-slide .slider-item,
+        .swiper-slide .slider-item > div {
+            height: auto !important;
+            min-height: unset !important;
+        }
+
         .sub-img {
-            z-index: 0;
+            position: relative !important;
+            width: 100%;
+            height: auto !important;
         }
 
         .sub-img img {
-            object-fit: cover;
+            position: relative !important;
+            width: 100%;
+            height: auto !important;
+            object-fit: contain;
             object-position: center center;
         }
 
