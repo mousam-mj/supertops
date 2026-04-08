@@ -630,7 +630,8 @@ function makeEngravePreviewMesh(canvas){
   return mesh;
 }
 function placeEngravePreviewMesh(mesh, yLocal){
-  mesh.position.set(0, yLocal, 54);
+  // Z ~32 hugs the body surface (radius ~31 in scaled coords); 54 was too far out
+  mesh.position.set(0, yLocal, 32.5);
   mesh.rotation.set(0, Math.PI, 0);
 }
 function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
