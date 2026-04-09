@@ -783,34 +783,59 @@ class CartController extends Controller
             return 'Customized';
         }
         $parts = [];
+
+        // Size
         if (!empty($d['size_name']) && is_string($d['size_name'])) {
-            $parts[] = $d['size_name'];
+            $parts[] = 'Size: ' . $d['size_name'];
         } elseif (isset($d['size_idx'])) {
             $parts[] = 'Size #'.((int) $d['size_idx'] + 1);
         }
-        $parts[] = 'Custom colors';
+
+        // Colors - show each part's color name from nested 'colors' object
+        $colorParts = [];
+        if (!empty($d['colors']) && is_array($d['colors'])) {
+            $colorLabels = [
+                'body' => 'Body',
+                'lid_ring' => 'Cap',
+                'straw' => 'Straw',
+                'handle' => 'Handle',
+                'bottom_base' => 'Base',
+            ];
+            foreach ($colorLabels as $key => $label) {
+                if (!empty($d['colors'][$key]['name']) && is_string($d['colors'][$key]['name'])) {
+                    $colorParts[] = $label . ': ' . $d['colors'][$key]['name'];
+                }
+            }
+        }
+        if (!empty($colorParts)) {
+            $parts[] = implode(', ', $colorParts);
+        } else {
+            $parts[] = 'Custom colors';
+        }
+
+        // Engraving
         if (! empty($d['engraving']) && is_array($d['engraving'])) {
             $eg = $d['engraving'];
             $cn = isset($eg['category_name']) && is_string($eg['category_name']) ? trim($eg['category_name']) : '';
             $slug = isset($eg['category_slug']) && is_string($eg['category_slug']) ? trim($eg['category_slug']) : '';
             $line = $cn !== '' ? $cn : ($slug !== '' ? $slug : 'Engraving');
             if (! empty($eg['text']) && is_string($eg['text']) && trim($eg['text']) !== '') {
-                $parts[] = $line.': '.trim($eg['text']);
+                $parts[] = $line.': "'.trim($eg['text']).'"';
             } elseif (! empty($eg['engraving_image']) && is_string($eg['engraving_image'])) {
-                $parts[] = $line.' (image)';
+                $parts[] = $line.' (uploaded image)';
             } elseif (! empty($eg['image_data']) && is_string($eg['image_data']) && str_starts_with(trim($eg['image_data']), 'data:image/')) {
-                $parts[] = $line.' (image)';
+                $parts[] = $line.' (uploaded image)';
             } else {
                 $parts[] = $line;
             }
         } elseif (! empty($d['engraving_text']) && is_string($d['engraving_text'])) {
             $et = trim($d['engraving_text']);
             if ($et !== '') {
-                $parts[] = 'Engraving: '.$et;
+                $parts[] = 'Engraving: "'.$et.'"';
             }
         }
 
-        return implode(' · ', $parts);
+        return implode(' | ', $parts);
     }
 }
 

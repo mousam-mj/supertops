@@ -131,6 +131,16 @@
   .customize-page .content{flex-direction:column}
   .customize-page .left-col{flex:0 0 auto;border-right:none;border-bottom:1px solid #ececec}
   .customize-page #three-wrap{min-height:320px}
+  .customize-page .top-nav{flex-wrap:wrap;gap:10px;padding:12px 14px}
+  .customize-page .nav-steps{order:2;width:100%;flex:none;padding-bottom:4px}
+  .customize-page .nav-right{order:1;width:100%;justify-content:space-between}
+  .customize-page .nav-cart-wrap{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}
+  .customize-page .nav-cart-actions{width:100%}
+  .customize-page .add-cart-btn,.customize-page .customize-checkout-btn{flex:1;text-align:center}
+}
+@media(max-width:480px){
+  .customize-page .nav-step{font-size:11px;padding:6px 10px}
+  .customize-page .add-cart-btn,.customize-page .customize-checkout-btn{font-size:12px;padding:8px 12px}
 }
 </style>
 

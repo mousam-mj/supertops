@@ -197,11 +197,11 @@
                                                             <li>
                                 <a href="{{{ route('contact') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Contact Us</a>
                                                             </li>
-                                                            <li class="px-4 mt-2">
-                                <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white">Customize</a>
-                                                            </li>
                                                             <li>
                                 <a href="{{{ route('faqs') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">FAQs</a>
+                                                            </li>
+                                                            <li class="px-4 mt-2">
+                                <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white">Customize</a>
                                                             </li>
                                                         </ul>
                                                     </div>
