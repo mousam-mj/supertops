@@ -1,45 +1,68 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\ColorSizeMasterController;
 use App\Http\Controllers\Admin\CustomizeSettingsController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\HeroBannerController;
+use App\Http\Controllers\Admin\InstagramReelController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomizeController;
 use App\Http\Controllers\PolicyPageController;
-use App\Http\Controllers\ShopController;
-use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductReviewController;
+use App\Http\Controllers\ShopController;
+use App\Models\Address;
+use App\Models\Category;
+use App\Models\Coupon;
+use App\Models\FaqCategory;
+use App\Models\HeroBanner;
+use App\Models\MainCategory;
+use App\Models\MasterColor;
+use App\Models\MasterSize;
+use App\Models\Order;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 Route::get('/', function () {
-    $categories = \App\Models\Category::whereNull('parent_id')
+    $categories = Category::whereNull('parent_id')
         ->with(['children.children'])
         ->where('is_active', true)
         ->orderBy('sort_order')
         ->get();
-    
+
     // Get top 3 categories for home page banners
-    $homeCategories = \App\Models\Category::whereNull('parent_id')
+    $homeCategories = Category::whereNull('parent_id')
         ->where('is_active', true)
         ->orderBy('sort_order')
         ->limit(3)
         ->get();
-    
+
     // Get hero banners
-    $heroBanners = \App\Models\HeroBanner::where('is_active', true)
+    $heroBanners = HeroBanner::where('is_active', true)
         ->orderBy('priority', 'asc')
         ->orderBy('created_at', 'desc')
         ->get();
-    
+
     // Get featured products for "What's New" section (with main category for filtering)
-    $featuredProducts = \App\Models\Product::where('is_active', true)
+    $featuredProducts = Product::where('is_active', true)
         ->where('is_featured', true)
         ->with('category.mainCategory')
         ->orderBy('sort_order')
@@ -47,35 +70,35 @@ Route::get('/', function () {
         ->get();
 
     // Main categories for What's New tabs and header
-    $mainCategories = \App\Models\MainCategory::where('is_active', true)
+    $mainCategories = MainCategory::where('is_active', true)
         ->orderBy('sort_order')
         ->get();
-    
+
     // Get new arrivals
-    $newArrivals = \App\Models\Product::where('is_active', true)
+    $newArrivals = Product::where('is_active', true)
         ->where('is_new_arrival', true)
         ->with('category')
         ->orderBy('created_at', 'desc')
         ->limit(8)
         ->get();
-    
+
     // Get best sellers (top selling products - using featured for now, can be updated with actual sales data later)
-    $bestSellers = \App\Models\Product::where('is_active', true)
+    $bestSellers = Product::where('is_active', true)
         ->where('is_featured', true)
         ->with('category')
         ->orderBy('sort_order')
         ->limit(8)
         ->get();
-    
+
     // Get products on sale (products with sale_price)
-    $onSaleProducts = \App\Models\Product::where('is_active', true)
+    $onSaleProducts = Product::where('is_active', true)
         ->whereNotNull('sale_price')
         ->whereColumn('sale_price', '<', 'price')
         ->with('category')
         ->orderBy('sort_order')
         ->limit(8)
         ->get();
-    
+
     return view('home', compact('categories', 'homeCategories', 'heroBanners', 'featuredProducts', 'newArrivals', 'bestSellers', 'onSaleProducts', 'mainCategories'));
 })->name('home');
 
@@ -88,13 +111,14 @@ Route::get('/login.html', function () {
     return view('auth.login');
 });
 
-Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 
 // Logout Route
-Route::post('/logout', function (\Illuminate\Http\Request $request) {
+Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
+
     return redirect()->route('home')->with('success', 'You have been logged out successfully.');
 })->name('logout');
 
@@ -103,26 +127,27 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->name('register.submit');
+Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 // Email verification routes
-Route::get('/email/verify/{token}', [App\Http\Controllers\Auth\RegisterController::class, 'verifyEmail'])->name('email.verify');
-Route::post('/email/resend-verification', [App\Http\Controllers\Auth\RegisterController::class, 'resendVerification'])->name('email.resend');
+Route::get('/email/verify/{token}', [RegisterController::class, 'verifyEmail'])->name('email.verify');
+Route::post('/email/resend-verification', [RegisterController::class, 'resendVerification'])->name('email.resend');
 
 // Test email route (remove in production)
-Route::get('/test-email', function() {
+Route::get('/test-email', function () {
     try {
         Mail::raw('This is a test email from Laravel', function ($message) {
             $message->to('work@coderpoint.in')
-                ->subject('Test Email - ' . config('app.name'));
+                ->subject('Test Email - '.config('app.name'));
         });
+
         return response()->json(['success' => true, 'message' => 'Test email sent! Check work@coderpoint.in']);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         return response()->json([
-            'success' => false, 
+            'success' => false,
             'error' => $e->getMessage(),
             'class' => get_class($e),
-            'file' => $e->getFile() . ':' . $e->getLine()
+            'file' => $e->getFile().':'.$e->getLine(),
         ], 500);
     }
 })->name('test.email');
@@ -130,15 +155,16 @@ Route::get('/test-email', function() {
 // Serve storage files via PHP when symlink returns 403 (shared hosting often blocks /storage or symlinks)
 $serveStorage = function (string $path) {
     $path = preg_replace('#\.\./#', '', $path);
-    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+    if (! Storage::disk('public')->exists($path)) {
         abort(404);
     }
-    $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+    $fullPath = Storage::disk('public')->path($path);
     $realPath = realpath($fullPath);
     $storageRoot = realpath(storage_path('app/public'));
-    if (!$realPath || !$storageRoot || strpos($realPath, $storageRoot) !== 0) {
+    if (! $realPath || ! $storageRoot || strpos($realPath, $storageRoot) !== 0) {
         abort(404);
     }
+
     return response()->file($realPath);
 };
 Route::get('/storage/{path}', $serveStorage)->where('path', '.*')->name('storage.serve');
@@ -152,28 +178,28 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.sh
 Route::post('/product/{product}/review', [ProductReviewController::class, 'store'])->name('product.review.store');
 
 // Cart & Checkout Routes
-Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
-Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/place-order', [App\Http\Controllers\Api\OrderController::class, 'store'])->name('place-order');
 
 // Test Route
-Route::get('/test/hello', function() {
+Route::get('/test/hello', function () {
     return view('test.hello');
 })->name('test.hello');
 
 // Order Success Route
-Route::get('/order-success/{id}', function($id) {
-    $order = \App\Models\Order::with('items')->findOrFail($id);
-    
+Route::get('/order-success/{id}', function ($id) {
+    $order = Order::with('items')->findOrFail($id);
+
     // Calculate order breakdown
-    $subtotal = $order->items->sum(function($item) {
+    $subtotal = $order->items->sum(function ($item) {
         return $item->price * $item->quantity;
     });
     $shippingCharge = $order->shipping_charge ?? 0;
     $codCharge = $order->cod_charge ?? 0;
     $couponDiscount = $order->coupon_discount ?? 0;
     $totalAmount = $order->total_amount;
-    
+
     return view('order.success', compact('order', 'subtotal', 'shippingCharge', 'codCharge', 'couponDiscount', 'totalAmount'));
 })->name('order.success');
 
@@ -190,22 +216,24 @@ Route::get('/reset-password', function () {
 // Order Tracking Route
 Route::get('/order-tracking', function () {
     $order = null;
-    if(request()->has('order_id') && request()->has('email')) {
-        $order = \App\Models\Order::where('id', request()->get('order_id'))
+    if (request()->has('order_id') && request()->has('email')) {
+        $order = Order::where('id', request()->get('order_id'))
             ->where('customer_email', request()->get('email'))
             ->first();
     }
+
     return view('order-tracking', compact('order'));
 })->name('order-tracking');
 
 // Wishlist Route
 Route::get('/wishlist', function () {
     $wishlistItems = [];
-    if(auth()->check()) {
+    if (auth()->check()) {
         // Get user's wishlist items - you'll need to implement wishlist functionality
         $wishlistItems = collect([]);
     }
-    $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+    $categories = Category::where('is_active', true)->orderBy('name')->get();
+
     return view('wishlist', compact('wishlistItems', 'categories'));
 })->name('wishlist');
 
@@ -214,17 +242,18 @@ Route::get('/search', function () {
     $query = request()->get('q', '');
     $products = collect([]);
     if ($query) {
-        $products = \App\Models\Product::where('is_active', true)
+        $products = Product::where('is_active', true)
             ->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%')
-                    ->orWhere('short_description', 'like', '%' . $query . '%')
-                    ->orWhere('sku', 'like', '%' . $query . '%');
+                $q->where('name', 'like', '%'.$query.'%')
+                    ->orWhere('description', 'like', '%'.$query.'%')
+                    ->orWhere('short_description', 'like', '%'.$query.'%')
+                    ->orWhere('sku', 'like', '%'.$query.'%');
             })
             ->with('category')
             ->paginate(20)
             ->withQueryString();
     }
+
     return view('search-result', compact('products', 'query'));
 })->name('search');
 
@@ -233,17 +262,18 @@ Route::get('/search/ajax', function () {
     $query = request()->get('q', '');
     $products = collect([]);
     if ($query && strlen(trim($query)) >= 2) {
-        $products = \App\Models\Product::where('is_active', true)
+        $products = Product::where('is_active', true)
             ->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%')
-                    ->orWhere('short_description', 'like', '%' . $query . '%')
-                    ->orWhere('sku', 'like', '%' . $query . '%');
+                $q->where('name', 'like', '%'.$query.'%')
+                    ->orWhere('description', 'like', '%'.$query.'%')
+                    ->orWhere('short_description', 'like', '%'.$query.'%')
+                    ->orWhere('sku', 'like', '%'.$query.'%');
             })
             ->with('category')
             ->limit(8)
             ->get();
     }
+
     return response()->view('partials.search-results', ['products' => $products, 'query' => $query]);
 })->name('search.ajax');
 
@@ -252,7 +282,7 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Route::post('/contact', function (\Illuminate\Http\Request $request) {
+Route::post('/contact', function (Request $request) {
     $validated = $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
@@ -269,10 +299,11 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 
 // FAQs Route (dynamic from admin)
 Route::get('/faqs', function () {
-    $faqCategories = \App\Models\FaqCategory::where('is_active', true)
+    $faqCategories = FaqCategory::where('is_active', true)
         ->with(['activeItems'])
         ->orderBy('sort_order')
         ->get();
+
     return view('faqs', compact('faqCategories'));
 })->name('faqs');
 
@@ -285,12 +316,12 @@ Route::get('/about-us', function () {
 })->name('about-us');
 
 // Customize Tumbler (product-specific)
-Route::get('/customize-assets/app.js', [App\Http\Controllers\CustomizeController::class, 'appJs'])->name('customize.app.js');
-Route::get('/customize-assets/stl/{part}', [App\Http\Controllers\CustomizeController::class, 'partStl'])
+Route::get('/customize-assets/app.js', [CustomizeController::class, 'appJs'])->name('customize.app.js');
+Route::get('/customize-assets/stl/{part}', [CustomizeController::class, 'partStl'])
     ->where('part', 'body|logo|cap|ring|straw|handle|boot')
     ->name('customize.part.stl');
-Route::get('/customize', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize');
-Route::get('/customize/{slug}', [App\Http\Controllers\CustomizeController::class, 'show'])->name('customize.product');
+Route::get('/customize', [CustomizeController::class, 'show'])->name('customize');
+Route::get('/customize/{slug}', [CustomizeController::class, 'show'])->name('customize.product');
 
 // Policy & content pages (Terms, Privacy, Return & Refund, Cancellation) - dynamic from admin
 Route::get('/terms-and-conditions', [PolicyPageController::class, 'show'])->defaults('slug', 'terms-and-conditions')->name('terms-and-conditions');
@@ -299,11 +330,11 @@ Route::get('/return-and-refund', [PolicyPageController::class, 'show'])->default
 Route::get('/cancellation-policy', [PolicyPageController::class, 'show'])->defaults('slug', 'cancellation-policy')->name('cancellation-policy');
 
 // Newsletter Subscription Route
-Route::post('/newsletter/subscribe', function (\Illuminate\Http\Request $request) {
+Route::post('/newsletter/subscribe', function (Request $request) {
     $validated = $request->validate([
         'email' => 'required|email|max:255',
     ]);
-    
+
     // Here you can save to database or send to email service
     // For now, just return success message
     return redirect()->back()->with('success', 'Thank you for subscribing to our newsletter!');
@@ -311,55 +342,56 @@ Route::post('/newsletter/subscribe', function (\Illuminate\Http\Request $request
 
 // My Account Route (requires authentication)
 Route::get('/my-account', function () {
-    if (!auth()->check()) {
+    if (! auth()->check()) {
         return redirect()->route('login')->with('error', 'Please login to access your account.');
     }
     $user = auth()->user();
-    $orders = \App\Models\Order::where('user_id', $user->id)
+    $orders = Order::where('user_id', $user->id)
         ->orWhere('customer_email', $user->email)
         ->with(['items.product.category'])
         ->orderBy('created_at', 'desc')
         ->limit(10)
         ->get();
-    $addresses = \App\Models\Address::where('user_id', $user->id)->get();
-    
+    $addresses = Address::where('user_id', $user->id)->get();
+
     // Get order statistics
-    $awaitingPickup = \App\Models\Order::where(function($q) use ($user) {
+    $awaitingPickup = Order::where(function ($q) use ($user) {
         $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->where('status', 'processing')->count();
-    $cancelledOrders = \App\Models\Order::where(function($q) use ($user) {
+    $cancelledOrders = Order::where(function ($q) use ($user) {
         $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->where('status', 'cancelled')->count();
-    $totalOrders = \App\Models\Order::where(function($q) use ($user) {
+    $totalOrders = Order::where(function ($q) use ($user) {
         $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
     })->count();
-    
+
     return view('my-account', compact('user', 'orders', 'addresses', 'awaitingPickup', 'cancelledOrders', 'totalOrders'));
 })->middleware('auth')->name('my-account');
 
 // Account: view single order details (must be own order)
 Route::get('/account/orders/{id}', function ($id) {
-    if (!auth()->check()) {
+    if (! auth()->check()) {
         return redirect()->route('login')->with('error', 'Please login to view your orders.');
     }
     $user = auth()->user();
-    $order = \App\Models\Order::with(['items.product'])
+    $order = Order::with(['items.product'])
         ->where(function ($q) use ($user) {
             $q->where('user_id', $user->id)->orWhere('customer_email', $user->email);
         })
         ->find($id);
-    if (!$order) {
+    if (! $order) {
         abort(404);
     }
+
     return view('order.show', compact('order'));
 })->middleware('auth')->name('account.orders.show');
 
 // POST /my-account – save address (same URL as page, so cookies always match)
-Route::post('/my-account', function (\Illuminate\Http\Request $request) {
-    if (!auth()->check()) {
+Route::post('/my-account', function (Request $request) {
+    if (! auth()->check()) {
         return redirect()->route('login')->with('error', 'Please login to access your account.');
     }
-    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+    $validator = Validator::make($request->all(), [
         'label' => 'nullable|string|max:255',
         'full_name' => 'required|string|max:255',
         'phone' => 'required|string|max:20',
@@ -371,7 +403,7 @@ Route::post('/my-account', function (\Illuminate\Http\Request $request) {
         'is_default' => 'nullable',
     ]);
     if ($validator->fails()) {
-        return redirect()->to('/my-account?tab=address' . ($request->input('address_id') ? '&edit=' . $request->input('address_id') : ''))
+        return redirect()->to('/my-account?tab=address'.($request->input('address_id') ? '&edit='.$request->input('address_id') : ''))
             ->withErrors($validator)
             ->withInput();
     }
@@ -379,15 +411,15 @@ Route::post('/my-account', function (\Illuminate\Http\Request $request) {
     $isDefault = $request->has('is_default') && in_array($request->input('is_default'), ['1', 1, true], true);
     $uid = auth()->id();
     $id = $request->input('address_id');
-    
+
     try {
         if ($id) {
-            $addr = \App\Models\Address::where('user_id', $uid)->find((int) $id);
-            if (!$addr) {
+            $addr = Address::where('user_id', $uid)->find((int) $id);
+            if (! $addr) {
                 return redirect()->to('/my-account?tab=address')->withErrors(['error' => 'Address not found.'])->withInput();
             }
             if ($isDefault) {
-                \App\Models\Address::where('user_id', $uid)->where('id', '!=', $id)->update(['is_default' => false]);
+                Address::where('user_id', $uid)->where('id', '!=', $id)->update(['is_default' => false]);
             }
             $addr->update([
                 'label' => $validated['label'] ?? 'Home',
@@ -403,9 +435,9 @@ Route::post('/my-account', function (\Illuminate\Http\Request $request) {
             $msg = 'Address updated successfully!';
         } else {
             if ($isDefault) {
-                \App\Models\Address::where('user_id', $uid)->update(['is_default' => false]);
+                Address::where('user_id', $uid)->update(['is_default' => false]);
             }
-            \App\Models\Address::create([
+            Address::create([
                 'user_id' => $uid,
                 'label' => $validated['label'] ?? 'Home',
                 'full_name' => $validated['full_name'],
@@ -419,68 +451,71 @@ Route::post('/my-account', function (\Illuminate\Http\Request $request) {
             ]);
             $msg = 'Address added successfully!';
         }
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error('Address save error: ' . $e->getMessage());
-        return redirect()->to('/my-account?tab=address' . ($id ? '&edit=' . $id : ''))
+    } catch (Throwable $e) {
+        Illuminate\Support\Facades\Log::error('Address save error: '.$e->getMessage());
+
+        return redirect()->to('/my-account?tab=address'.($id ? '&edit='.$id : ''))
             ->withErrors(['error' => 'Failed to save address. Please try again.'])
             ->withInput();
     }
+
     return redirect()->to('/my-account?tab=address')->with('success', $msg);
 })->middleware('auth')->name('my-account.address.save');
 
 // Update My Account Settings
-Route::put('/my-account/settings', function (\Illuminate\Http\Request $request) {
-    if (!auth()->check()) {
+Route::put('/my-account/settings', function (Request $request) {
+    if (! auth()->check()) {
         return redirect()->route('login')->with('error', 'Please login to access your account.');
     }
-    
+
     $user = auth()->user();
-    
-    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+    $validator = Validator::make($request->all(), [
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'phone' => 'required|string|max:20',
-        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        'email' => 'required|email|max:255|unique:users,email,'.$user->id,
         'gender' => 'nullable|in:Male,Female,Other',
         'date_of_birth' => 'nullable|date',
         'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
-    
+
     if ($validator->fails()) {
         return redirect()->to('/my-account?tab=setting')
             ->withErrors($validator)
             ->withInput();
     }
-    
+
     $validated = $validator->validated();
-    
+
     try {
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
-            if ($user->avatar && !str_starts_with($user->avatar, 'assets/')) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            if ($user->avatar && ! str_starts_with($user->avatar, 'assets/')) {
+                Storage::disk('public')->delete($user->avatar);
             }
-            
+
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $validated['avatar'] = $avatarPath;
         }
-        
+
         // Update user (date_of_birth is optional)
         $user->update([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
-            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+            'name' => $validated['first_name'].' '.$validated['last_name'],
             'phone' => $validated['phone'],
             'email' => $validated['email'],
-            'gender' => !empty($validated['gender']) ? $validated['gender'] : null,
-            'date_of_birth' => !empty($validated['date_of_birth']) ? $validated['date_of_birth'] : null,
+            'gender' => ! empty($validated['gender']) ? $validated['gender'] : null,
+            'date_of_birth' => ! empty($validated['date_of_birth']) ? $validated['date_of_birth'] : null,
             'avatar' => $validated['avatar'] ?? $user->avatar,
         ]);
-        
+
         return redirect()->to('/my-account?tab=setting')->with('settings_success', 'Settings updated successfully!');
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error('Settings update error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+        Illuminate\Support\Facades\Log::error('Settings update error: '.$e->getMessage());
+
         return redirect()->to('/my-account?tab=setting')
             ->withErrors(['error' => 'Failed to update settings. Please try again.'])
             ->withInput();
@@ -488,36 +523,37 @@ Route::put('/my-account/settings', function (\Illuminate\Http\Request $request) 
 })->middleware('auth')->name('my-account.settings.update');
 
 // Change Password
-Route::put('/my-account/password', function (\Illuminate\Http\Request $request) {
-    if (!auth()->check()) {
+Route::put('/my-account/password', function (Request $request) {
+    if (! auth()->check()) {
         return redirect()->route('login')->with('error', 'Please login to access your account.');
     }
-    
+
     $user = auth()->user();
-    
-    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+    $validator = Validator::make($request->all(), [
         'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
-            if (!\Illuminate\Support\Facades\Hash::check($value, $user->password)) {
+            if (! Hash::check($value, $user->password)) {
                 $fail('The current password is incorrect.');
             }
         }],
         'new_password' => 'required|string|min:8|confirmed',
     ]);
-    
+
     if ($validator->fails()) {
         return redirect()->to('/my-account?tab=change-password')
             ->withErrors($validator)
             ->withInput();
     }
-    
+
     try {
         $user->update([
-            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
+            'password' => Hash::make($request->new_password),
         ]);
-        
+
         return redirect()->to('/my-account?tab=change-password')->with('password_success', 'Password changed successfully!');
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error('Password change error: ' . $e->getMessage());
+    } catch (Throwable $e) {
+        Illuminate\Support\Facades\Log::error('Password change error: '.$e->getMessage());
+
         return redirect()->to('/my-account?tab=change-password')
             ->withErrors(['error' => 'Failed to change password. Please try again.'])
             ->withInput();
@@ -526,12 +562,13 @@ Route::put('/my-account/password', function (\Illuminate\Http\Request $request) 
 
 // Address Management Routes - Using Controller
 // Test route to check if middleware is working
-Route::get('/test-auth', function() {
-    \Log::info('Test auth route hit', [
+Route::get('/test-auth', function () {
+    Log::info('Test auth route hit', [
         'authenticated' => auth()->check(),
         'user_id' => auth()->id(),
         'session_id' => session()->getId(),
     ]);
+
     return response()->json([
         'authenticated' => auth()->check(),
         'user_id' => auth()->id(),
@@ -557,7 +594,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
-        
+
         // Report Downloads
         Route::get('/dashboard/reports/inventory', [DashboardController::class, 'downloadInventoryReport'])->name('dashboard.reports.inventory');
         Route::get('/dashboard/reports/orders', [DashboardController::class, 'downloadOrdersReport'])->name('dashboard.reports.orders');
@@ -567,7 +604,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Reports hub (all downloads in one place)
         Route::get('/reports', [DashboardController::class, 'reportsIndex'])->name('reports.index');
-        
+
         // Resource Routes
         Route::resource('users', UserController::class);
         Route::resource('products', ProductController::class);
@@ -579,47 +616,54 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
+        Route::get('/instagram-reels', [InstagramReelController::class, 'index'])->name('instagram-reels.index');
+        Route::post('/instagram-reels', [InstagramReelController::class, 'store'])->name('instagram-reels.store');
+        Route::put('/instagram-reels/sort', [InstagramReelController::class, 'updateSort'])->name('instagram-reels.sort');
+        Route::delete('/instagram-reels/{instagram_reel}', [InstagramReelController::class, 'destroy'])->name('instagram-reels.destroy');
+
         // Policy Pages (Terms, Privacy, Return & Refund, Cancellation)
         Route::get('/policy-pages', [AdminPolicyPageController::class, 'index'])->name('policy-pages.index');
         Route::get('/policy-pages/{policy_page}/edit', [AdminPolicyPageController::class, 'edit'])->name('policy-pages.edit');
         Route::put('/policy-pages/{policy_page}', [AdminPolicyPageController::class, 'update'])->name('policy-pages.update');
 
         // FAQs
-        Route::get('/faqs', [App\Http\Controllers\Admin\FaqController::class, 'index'])->name('faqs.index');
-        Route::get('/faqs/category/create', [App\Http\Controllers\Admin\FaqController::class, 'createCategory'])->name('faqs.create-category');
-        Route::post('/faqs/category', [App\Http\Controllers\Admin\FaqController::class, 'storeCategory'])->name('faqs.store-category');
-        Route::get('/faqs/category/{faq}/edit', [App\Http\Controllers\Admin\FaqController::class, 'editCategory'])->name('faqs.edit-category');
-        Route::put('/faqs/category/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'updateCategory'])->name('faqs.update-category');
-        Route::delete('/faqs/category/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'destroyCategory'])->name('faqs.destroy-category');
-        Route::get('/faqs/category/{faq}/items', [App\Http\Controllers\Admin\FaqController::class, 'items'])->name('faqs.items');
-        Route::get('/faqs/category/{faq}/items/create', [App\Http\Controllers\Admin\FaqController::class, 'createItem'])->name('faqs.create-item');
-        Route::post('/faqs/category/{faq}/items', [App\Http\Controllers\Admin\FaqController::class, 'storeItem'])->name('faqs.store-item');
-        Route::get('/faqs/category/{faq}/items/{item}/edit', [App\Http\Controllers\Admin\FaqController::class, 'editItem'])->name('faqs.edit-item');
-        Route::put('/faqs/category/{faq}/items/{item}', [App\Http\Controllers\Admin\FaqController::class, 'updateItem'])->name('faqs.update-item');
-        Route::delete('/faqs/category/{faq}/items/{item}', [App\Http\Controllers\Admin\FaqController::class, 'destroyItem'])->name('faqs.destroy-item');
+        Route::get('/faqs', [FaqController::class, 'index'])->name('faqs.index');
+        Route::get('/faqs/category/create', [FaqController::class, 'createCategory'])->name('faqs.create-category');
+        Route::post('/faqs/category', [FaqController::class, 'storeCategory'])->name('faqs.store-category');
+        Route::get('/faqs/category/{faq}/edit', [FaqController::class, 'editCategory'])->name('faqs.edit-category');
+        Route::put('/faqs/category/{faq}', [FaqController::class, 'updateCategory'])->name('faqs.update-category');
+        Route::delete('/faqs/category/{faq}', [FaqController::class, 'destroyCategory'])->name('faqs.destroy-category');
+        Route::get('/faqs/category/{faq}/items', [FaqController::class, 'items'])->name('faqs.items');
+        Route::get('/faqs/category/{faq}/items/create', [FaqController::class, 'createItem'])->name('faqs.create-item');
+        Route::post('/faqs/category/{faq}/items', [FaqController::class, 'storeItem'])->name('faqs.store-item');
+        Route::get('/faqs/category/{faq}/items/{item}/edit', [FaqController::class, 'editItem'])->name('faqs.edit-item');
+        Route::put('/faqs/category/{faq}/items/{item}', [FaqController::class, 'updateItem'])->name('faqs.update-item');
+        Route::delete('/faqs/category/{faq}/items/{item}', [FaqController::class, 'destroyItem'])->name('faqs.destroy-item');
 
         // Product reviews (list & delete)
         Route::get('/reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
         Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])->name('reviews.destroy');
-        
+
         // Additional Admin Routes
-        Route::get('/alerts', function() {
-            $lowStockCount = \App\Models\Product::where('stock_quantity', '<', 10)->where('is_active', true)->count();
-            $pendingOrdersCount = \App\Models\Order::where('status', 'pending')->count();
+        Route::get('/alerts', function () {
+            $lowStockCount = Product::where('stock_quantity', '<', 10)->where('is_active', true)->count();
+            $pendingOrdersCount = Order::where('status', 'pending')->count();
+
             return view('admin.alerts.index', compact('lowStockCount', 'pendingOrdersCount'));
         })->name('alerts.index');
-        
+
         // Main Categories Routes
-        Route::get('/main-categories', function() {
-            $mainCategories = \App\Models\MainCategory::with('categories')->orderBy('sort_order')->get();
+        Route::get('/main-categories', function () {
+            $mainCategories = MainCategory::with('categories')->orderBy('sort_order')->get();
+
             return view('admin.main-categories.index', compact('mainCategories'));
         })->name('main-categories.index');
-        
-        Route::get('/main-categories/create', function() {
+
+        Route::get('/main-categories/create', function () {
             return view('admin.main-categories.create');
         })->name('main-categories.create');
-        
-        Route::post('/main-categories', function(\Illuminate\Http\Request $request) {
+
+        Route::post('/main-categories', function (Request $request) {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'slug' => 'nullable|string|unique:main_categories,slug',
@@ -639,20 +683,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'additional_banner_image' => 'nullable|image|max:5120',
                 'additional_banner_text' => 'nullable|string|max:255',
             ]);
-            
+
             if (empty($validated['slug'])) {
-                $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+                $validated['slug'] = Str::slug($validated['name']);
             }
-            
+
             if ($request->hasFile('image')) {
                 $validated['image'] = $request->file('image')->store('main-categories', 'public');
             }
-            
+
             // Handle hero image
             if ($request->hasFile('hero_image')) {
                 $validated['hero_image'] = $request->file('hero_image')->store('main-categories/hero', 'public');
             }
-            
+
             // Handle banner images
             $bannerImages = [];
             if ($request->has('banner_images')) {
@@ -662,43 +706,46 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     }
                 }
             }
-            $validated['banner_images'] = !empty($bannerImages) ? array_values($bannerImages) : null;
-            
+            $validated['banner_images'] = ! empty($bannerImages) ? array_values($bannerImages) : null;
+
             // Handle banner texts
             if ($request->has('banner_texts')) {
                 $validated['banner_texts'] = array_filter($request->banner_texts ?? []);
-                $validated['banner_texts'] = !empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
+                $validated['banner_texts'] = ! empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
             }
-            
+
             // Handle bottom banner image
             if ($request->hasFile('bottom_banner_image')) {
                 $validated['bottom_banner_image'] = $request->file('bottom_banner_image')->store('main-categories/bottom-banner', 'public');
             }
-            
+
             // Handle additional banner image
             if ($request->hasFile('additional_banner_image')) {
                 $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('main-categories/additional-banner', 'public');
             }
-            
-            \App\Models\MainCategory::create($validated);
+
+            MainCategory::create($validated);
+
             return redirect()->route('admin.main-categories.index')->with('success', 'Main category created successfully!');
         })->name('main-categories.store');
-        
-        Route::get('/main-categories/{id}', function($id) {
-            $category = \App\Models\MainCategory::with('categories')->findOrFail($id);
+
+        Route::get('/main-categories/{id}', function ($id) {
+            $category = MainCategory::with('categories')->findOrFail($id);
+
             return view('admin.main-categories.show', compact('category'));
         })->name('main-categories.show');
-        
-        Route::get('/main-categories/{id}/edit', function($id) {
-            $category = \App\Models\MainCategory::findOrFail($id);
+
+        Route::get('/main-categories/{id}/edit', function ($id) {
+            $category = MainCategory::findOrFail($id);
+
             return view('admin.main-categories.edit', compact('category'));
         })->name('main-categories.edit');
-        
-        Route::put('/main-categories/{id}', function(\Illuminate\Http\Request $request, $id) {
-            $category = \App\Models\MainCategory::findOrFail($id);
+
+        Route::put('/main-categories/{id}', function (Request $request, $id) {
+            $category = MainCategory::findOrFail($id);
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'slug' => 'nullable|string|unique:main_categories,slug,' . $id,
+                'slug' => 'nullable|string|unique:main_categories,slug,'.$id,
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -720,117 +767,120 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'remove_additional_banner_image' => 'nullable|boolean',
                 'additional_banner_text' => 'nullable|string|max:255',
             ]);
-            
+
             // Handle image removal
             if ($request->filled('remove_image') && $request->remove_image == '1') {
                 if ($category->image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->image);
+                    Storage::disk('public')->delete($category->image);
                 }
                 $validated['image'] = null;
             } elseif ($request->hasFile('image')) {
                 if ($category->image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->image);
+                    Storage::disk('public')->delete($category->image);
                 }
                 $validated['image'] = $request->file('image')->store('main-categories', 'public');
             }
-            
+
             // Handle hero image
             if ($request->filled('remove_hero_image') && $request->remove_hero_image == '1') {
                 if ($category->hero_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->hero_image);
+                    Storage::disk('public')->delete($category->hero_image);
                 }
                 $validated['hero_image'] = null;
             } elseif ($request->hasFile('hero_image')) {
                 if ($category->hero_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->hero_image);
+                    Storage::disk('public')->delete($category->hero_image);
                 }
                 $validated['hero_image'] = $request->file('hero_image')->store('main-categories/hero', 'public');
             }
-            
+
             // Handle banner images
             $bannerImages = is_array($category->banner_images) ? $category->banner_images : [];
             $removeBannerImages = $request->input('remove_banner_image', []);
-            
+
             if ($request->has('banner_images')) {
                 foreach ($request->file('banner_images') as $index => $file) {
                     if ($file && $file->isValid()) {
                         // Remove old image if exists
                         if (isset($bannerImages[$index])) {
-                            \Illuminate\Support\Facades\Storage::disk('public')->delete($bannerImages[$index]);
+                            Storage::disk('public')->delete($bannerImages[$index]);
                         }
                         $bannerImages[$index] = $file->store('main-categories/banners', 'public');
                     }
                 }
             }
-            
+
             // Remove banners marked for deletion
             foreach ($removeBannerImages as $index => $remove) {
                 if ($remove == '1' && isset($bannerImages[$index])) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($bannerImages[$index]);
+                    Storage::disk('public')->delete($bannerImages[$index]);
                     unset($bannerImages[$index]);
                 }
             }
-            
-            $validated['banner_images'] = !empty($bannerImages) ? array_values($bannerImages) : null;
-            
+
+            $validated['banner_images'] = ! empty($bannerImages) ? array_values($bannerImages) : null;
+
             // Handle banner texts
             if ($request->has('banner_texts')) {
                 $validated['banner_texts'] = array_filter($request->banner_texts ?? []);
-                $validated['banner_texts'] = !empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
+                $validated['banner_texts'] = ! empty($validated['banner_texts']) ? array_values($validated['banner_texts']) : null;
             }
-            
+
             // Handle bottom banner image
             if ($request->filled('remove_bottom_banner_image') && $request->remove_bottom_banner_image == '1') {
                 if ($category->bottom_banner_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->bottom_banner_image);
+                    Storage::disk('public')->delete($category->bottom_banner_image);
                 }
                 $validated['bottom_banner_image'] = null;
             } elseif ($request->hasFile('bottom_banner_image')) {
                 if ($category->bottom_banner_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->bottom_banner_image);
+                    Storage::disk('public')->delete($category->bottom_banner_image);
                 }
                 $validated['bottom_banner_image'] = $request->file('bottom_banner_image')->store('main-categories/bottom-banner', 'public');
             }
-            
+
             // Handle additional banner image
             if ($request->filled('remove_additional_banner_image') && $request->remove_additional_banner_image == '1') {
                 if ($category->additional_banner_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->additional_banner_image);
+                    Storage::disk('public')->delete($category->additional_banner_image);
                 }
                 $validated['additional_banner_image'] = null;
             } elseif ($request->hasFile('additional_banner_image')) {
                 if ($category->additional_banner_image) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($category->additional_banner_image);
+                    Storage::disk('public')->delete($category->additional_banner_image);
                 }
                 $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('main-categories/additional-banner', 'public');
             }
-            
+
             // Remove remove flags from validated
             unset($validated['remove_image'], $validated['remove_hero_image'], $validated['remove_bottom_banner_image'], $validated['remove_additional_banner_image'], $validated['remove_banner_image']);
-            
+
             $category->update($validated);
+
             return redirect()->route('admin.main-categories.index')->with('success', 'Main category updated successfully!');
         })->name('main-categories.update');
-        
-        Route::delete('/main-categories/{id}', function($id) {
-            $category = \App\Models\MainCategory::findOrFail($id);
+
+        Route::delete('/main-categories/{id}', function ($id) {
+            $category = MainCategory::findOrFail($id);
             $category->delete();
+
             return redirect()->route('admin.main-categories.index')->with('success', 'Main category deleted successfully!');
         })->name('main-categories.destroy');
-        
+
         // Inventory Routes
-        Route::get('/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
-        Route::get('/inventory/product/{id}', function($id) {
-            $product = \App\Models\Product::with(['category', 'inventories'])->findOrFail($id);
-            $masterColors = \App\Models\MasterColor::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
-            $masterSizes = \App\Models\MasterSize::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
+        Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('/inventory/product/{id}', function ($id) {
+            $product = Product::with(['category', 'inventories'])->findOrFail($id);
+            $masterColors = MasterColor::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
+            $masterSizes = MasterSize::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray();
+
             return view('admin.inventory.product', compact('product', 'masterColors', 'masterSizes'));
         })->name('inventory.product');
-        Route::post('/inventory/product/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'store'])->name('inventory.store');
-        Route::post('/inventory/product/{id}/bulk', [\App\Http\Controllers\Admin\InventoryController::class, 'bulkStore'])->name('inventory.bulk.store');
-        Route::put('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'update'])->name('inventory.update');
-        Route::delete('/inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'destroy'])->name('inventory.destroy');
-        
+        Route::post('/inventory/product/{id}', [InventoryController::class, 'store'])->name('inventory.store');
+        Route::post('/inventory/product/{id}/bulk', [InventoryController::class, 'bulkStore'])->name('inventory.bulk.store');
+        Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update');
+        Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
+
         // Product customizer (admin)
         Route::get('/customizer', [CustomizeSettingsController::class, 'index'])->name('customize.index');
         Route::put('/customizer', [CustomizeSettingsController::class, 'update'])->name('customize.update');
@@ -843,25 +893,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/color-size-master/sizes', [ColorSizeMasterController::class, 'storeSize'])->name('color-size-master.store-size');
         Route::put('/color-size-master/sizes/{size}', [ColorSizeMasterController::class, 'updateSize'])->name('color-size-master.update-size');
         Route::delete('/color-size-master/sizes/{size}', [ColorSizeMasterController::class, 'destroySize'])->name('color-size-master.destroy-size');
-        
+
         // Payments Route
-        Route::get('/payments', function() {
-            $payments = \App\Models\Order::where('payment_status', 'paid')->orderBy('created_at', 'desc')->paginate(20);
+        Route::get('/payments', function () {
+            $payments = Order::where('payment_status', 'paid')->orderBy('created_at', 'desc')->paginate(20);
+
             return view('admin.payments.index', compact('payments'));
         })->name('payments.index');
-        
+
         // Coupons Routes
-        Route::get('/coupons', function() {
-            $coupons = \App\Models\Coupon::with('usages')->orderBy('created_at', 'desc')->get();
+        Route::get('/coupons', function () {
+            $coupons = Coupon::with('usages')->orderBy('created_at', 'desc')->get();
+
             return view('admin.coupons.index', compact('coupons'));
         })->name('coupons.index');
-        
-        Route::get('/coupons/create', function() {
-            $mainCategories = \App\Models\MainCategory::where('is_active', true)->orderBy('name')->get();
+
+        Route::get('/coupons/create', function () {
+            $mainCategories = MainCategory::where('is_active', true)->orderBy('name')->get();
+
             return view('admin.coupons.create', compact('mainCategories'));
         })->name('coupons.create');
-        
-        Route::post('/coupons', function(\Illuminate\Http\Request $request) {
+
+        Route::post('/coupons', function (Request $request) {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'code' => 'required|string|unique:coupons,code',
@@ -875,27 +928,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'usage_limit' => 'nullable|integer|min:1',
                 'minimum_order_amount' => 'nullable|numeric|min:0',
             ]);
-            
-            \App\Models\Coupon::create($validated);
+
+            Coupon::create($validated);
+
             return redirect()->route('admin.coupons.index')->with('success', 'Coupon created successfully!');
         })->name('coupons.store');
-        
-        Route::get('/coupons/{id}', function($id) {
-            $coupon = \App\Models\Coupon::with(['usages.user', 'usages.order'])->findOrFail($id);
+
+        Route::get('/coupons/{id}', function ($id) {
+            $coupon = Coupon::with(['usages.user', 'usages.order'])->findOrFail($id);
+
             return view('admin.coupons.show', compact('coupon'));
         })->name('coupons.show');
-        
-        Route::get('/coupons/{id}/edit', function($id) {
-            $coupon = \App\Models\Coupon::findOrFail($id);
-            $mainCategories = \App\Models\MainCategory::where('is_active', true)->orderBy('name')->get();
+
+        Route::get('/coupons/{id}/edit', function ($id) {
+            $coupon = Coupon::findOrFail($id);
+            $mainCategories = MainCategory::where('is_active', true)->orderBy('name')->get();
+
             return view('admin.coupons.edit', compact('coupon', 'mainCategories'));
         })->name('coupons.edit');
-        
-        Route::put('/coupons/{id}', function(\Illuminate\Http\Request $request, $id) {
-            $coupon = \App\Models\Coupon::findOrFail($id);
+
+        Route::put('/coupons/{id}', function (Request $request, $id) {
+            $coupon = Coupon::findOrFail($id);
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'code' => 'required|string|unique:coupons,code,' . $id,
+                'code' => 'required|string|unique:coupons,code,'.$id,
                 'description' => 'nullable|string',
                 'main_category_ids' => 'nullable|array',
                 'discount_type' => 'required|in:percentage,fixed',
@@ -906,17 +962,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'usage_limit' => 'nullable|integer|min:1',
                 'minimum_order_amount' => 'nullable|numeric|min:0',
             ]);
-            
+
             $coupon->update($validated);
+
             return redirect()->route('admin.coupons.index')->with('success', 'Coupon updated successfully!');
         })->name('coupons.update');
-        
-        Route::delete('/coupons/{id}', function($id) {
-            $coupon = \App\Models\Coupon::findOrFail($id);
+
+        Route::delete('/coupons/{id}', function ($id) {
+            $coupon = Coupon::findOrFail($id);
             if ($coupon->usages()->count() > 0) {
                 return redirect()->route('admin.coupons.index')->with('error', 'Cannot delete coupon with usage history!');
             }
             $coupon->delete();
+
             return redirect()->route('admin.coupons.index')->with('success', 'Coupon deleted successfully!');
         })->name('coupons.destroy');
     });

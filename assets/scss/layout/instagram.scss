@@ -39,5 +39,10 @@
                 visibility: visible;
             }
         }
+
+        /* Reel/post iframes: ::before sat on top and ate all clicks (play button dead) */
+        &--embed::before {
+            display: none;
+        }
     }
 }

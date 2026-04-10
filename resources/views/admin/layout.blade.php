@@ -443,6 +443,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.instagram-reels.*') ? 'active' : '' }}" href="{{ route('admin.instagram-reels.index') }}">
+                                <i class="bi bi-instagram me-2"></i> Instagram Reels
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.alerts.*') ? 'active' : '' }}" href="{{ route('admin.alerts.index') }}">
                                 <i class="bi bi-bell me-2"></i> Alerts
                                 @if(isset($alertsCount) && $alertsCount > 0)

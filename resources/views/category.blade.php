@@ -521,68 +521,7 @@
     </div>
 </div>
 
-        <div class="instagram-block md:pt-20 pt-10">
-            <div class="container">
-                <div class="heading">
-                    <div class="heading3 text-center">Perch On Instagram</div>
-                    <div class="text-center mt-3">#perch.bottle</div>
-                </div>
-                <div class="list-instagram md:mt-10 mt-6">
-                    <div class="swiper swiper-list-instagram">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(1).webp') }}" alt="0" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(2).webp') }}" alt="1" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(3).webp') }}" alt="2" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(4).webp') }}" alt="3" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(5).webp') }}" alt="4" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" class="item relative block rounded-[32px] overflow-hidden">
-                                    <img src="{{ asset('assets/images/instagram/p1(1).webp') }}" alt="5" class="h-full w-full duration-500 relative" />
-                                    <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                                        <div class="icon-instagram text-2xl text-black"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('partials.instagram-feed-slider')
 
 @endsection
 
@@ -640,20 +579,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     1280: {
                         slidesPerView: 6,
                     },
-                },
-            });
-        }
-        
-        // Initialize Instagram swiper if exists
-        const instagramSwiper = document.querySelector('.swiper-list-instagram');
-        if (instagramSwiper) {
-            new Swiper('.swiper-list-instagram', {
-                slidesPerView: 'auto',
-                spaceBetween: 20,
-                loop: true,
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
                 },
             });
         }

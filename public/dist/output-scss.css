@@ -4519,6 +4519,9 @@ input[type=file]::-webkit-file-upload-button {
   opacity: 1;
   visibility: visible;
 }
+.list-instagram .item--embed::before {
+  display: none;
+}
 
 /* Benefit watch */
 .bg-black.style-watch .benefit-block .benefit-item i {

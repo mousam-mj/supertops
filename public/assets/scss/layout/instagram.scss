@@ -39,5 +39,9 @@
                 visibility: visible;
             }
         }
+
+        &--embed::before {
+            display: none;
+        }
     }
 }

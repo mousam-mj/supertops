@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\InstagramReel;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,13 +27,23 @@ class AppServiceProvider extends ServiceProvider
     {
         // Share alerts count with all views
         view()->composer('admin.layout', function ($view) {
-            $lowStockCount = \App\Models\Product::where('stock_quantity', '<', 10)
+            $lowStockCount = Product::where('stock_quantity', '<', 10)
                 ->where('is_active', true)
                 ->count();
-            $pendingOrdersCount = \App\Models\Order::where('status', 'pending')->count();
+            $pendingOrdersCount = Order::where('status', 'pending')->count();
             $alertsCount = $lowStockCount + $pendingOrdersCount;
-            
+
             $view->with('alertsCount', $alertsCount);
         });
+
+        view()->composer(
+            ['home', 'category', 'shop.category'],
+            function ($view) {
+                $view->with(
+                    'instagramReels',
+                    InstagramReel::ordered()->get()
+                );
+            }
+        );
     }
 }

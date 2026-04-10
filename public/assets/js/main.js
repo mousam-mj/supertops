@@ -3065,10 +3065,13 @@ if (document.querySelector(".list-testimonial-yoga")) {
   });
 }
 
-// list-instagram
+// list-instagram (touchStartPreventDefault off so Instagram iframe gets taps / play)
 var swiperListInstagram = new Swiper(".swiper-list-instagram", {
   pagination: { clickable: true, el: ".swiper-pagination" },
   loop: true,
+  touchStartPreventDefault: false,
+  preventClicks: false,
+  preventClicksPropagation: false,
   autoplay: {
     delay: 4000,
     disableOnInteraction: false,
