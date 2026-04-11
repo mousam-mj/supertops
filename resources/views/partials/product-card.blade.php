@@ -21,25 +21,12 @@
             
             <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
                 @php
-                    $getImageUrl = function($path) {
-                        if (!$path) return asset('assets/images/product/perch-bottal.webp');
-                        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
-                            return asset($path);
-                        }
-                        return asset('storage/' . $path);
-                    };
-                    
-                    $mainImage = $getImageUrl($product->image ?? null);
-                    $hoverImage = null;
-                    if (isset($product->images) && is_array($product->images) && count($product->images) > 0) {
-                        $hoverImage = $getImageUrl($product->images[0]);
-                    } else {
-                        $hoverImage = $mainImage;
-                    }
+                    $placeholderImg = \App\Models\Product::placeholderImageUrl();
+                    $mainImage = $product->display_image_url ?? $placeholderImg;
+                    $hoverImage = $product->hover_image_url ?? $mainImage;
                 @endphp
-                
-                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" />
-                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
+                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" loading="lazy" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
             
             @if(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
@@ -107,18 +94,18 @@
 
             @if(isset($product->colors) && is_array($product->colors) && count($product->colors) > 0)
                 <div class="list-color {{ isset($product->images) && is_array($product->images) && count($product->images) > 0 ? 'list-color-image' : '' }} max-md:hidden flex items-center gap-3 flex-wrap duration-500 py-2">
-                    @foreach($product->colors->take(3) as $index => $color)
+                    @foreach(array_slice($product->colors, 0, 3) as $index => $color)
                         @php
                             $colorImage = null;
                             if (isset($product->images) && is_array($product->images) && isset($product->images[$index])) {
-                                $colorImage = $getImageUrl($product->images[$index]);
+                                $colorImage = \App\Models\Product::imageUrlForPath(is_string($product->images[$index]) ? $product->images[$index] : null);
                             }
                         @endphp
                         <div class="color-item {{ $colorImage ? 'w-12 h-12 rounded-xl' : 'w-8 h-8 rounded-full' }} duration-300 relative cursor-pointer" 
                              style="{{ !$colorImage ? 'background-color: ' . $color . ';' : '' }}"
                              data-color="{{ $color }}">
                             @if($colorImage)
-                                <img src="{{ $colorImage }}" alt="{{ $color }}" class="rounded-xl w-full h-full object-cover" />
+                                <img src="{{ $colorImage }}" alt="{{ $color }}" class="rounded-xl w-full h-full object-cover" onerror="this.onerror=null; this.style.display='none';" />
                             @endif
                             <div class="tag-action bg-black text-white caption2 capitalize px-1.5 py-0.5 rounded-sm opacity-0 hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $color }}</div>
                         </div>

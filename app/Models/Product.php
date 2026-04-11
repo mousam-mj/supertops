@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -145,6 +146,62 @@ class Product extends Model
         }
         
         return $query->sum('quantity');
+    }
+
+    /**
+     * Fallback when product has no image (or image fails to load in browser).
+     */
+    public static function placeholderImageUrl(): string
+    {
+        return asset('assets/images/product/perch-bottal.webp');
+    }
+
+    /**
+     * Public URL for a path on the public disk, external URL, or assets path.
+     */
+    public static function imageUrlForPath(?string $path): string
+    {
+        if (! $path || trim($path) === '') {
+            return self::placeholderImageUrl();
+        }
+        $path = trim($path);
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
+            return asset(ltrim($path, '/'));
+        }
+
+        return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Main image URL for listings (main field, else first gallery image).
+     */
+    public function getDisplayImageUrlAttribute(): string
+    {
+        if ($this->image && trim((string) $this->image) !== '') {
+            return self::imageUrlForPath($this->image);
+        }
+        $images = $this->images;
+        if (is_array($images) && count($images) > 0 && ! empty($images[0]) && is_string($images[0])) {
+            return self::imageUrlForPath($images[0]);
+        }
+
+        return self::placeholderImageUrl();
+    }
+
+    /**
+     * Second thumb / hover: first gallery or same as display.
+     */
+    public function getHoverImageUrlAttribute(): string
+    {
+        $images = $this->images;
+        if (is_array($images) && count($images) > 0 && ! empty($images[0])) {
+            return self::imageUrlForPath(is_string($images[0]) ? $images[0] : null);
+        }
+
+        return $this->display_image_url;
     }
 }
 
