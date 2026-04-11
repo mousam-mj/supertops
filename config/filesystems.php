@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Must be false: default /storage URL would serve private disk and break
+            // product uploads (they live on the "public" disk under storage/app/public).
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -43,6 +45,8 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
+            // Serve /storage/* from storage/app/public (works without symlink on server).
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -148,8 +149,7 @@ class Product extends Model
     }
 
     /**
-     * Default placeholder image URL – use when product has no image or image fails to load.
-     * Neutral "no image" graphic only; not a product image.
+     * Default placeholder when product has no image or image fails to load.
      */
     public static function placeholderImageUrl(): string
     {
@@ -157,12 +157,11 @@ class Product extends Model
     }
 
     /**
-     * Resolve full image URL from path (http/https, assets/, or storage/).
-     * Returns placeholder URL if path is null or empty.
+     * Public URL for a path on the public disk, external URL, or assets path.
      */
     public static function imageUrlForPath(?string $path): string
     {
-        if (!$path || trim($path) === '') {
+        if (! $path || trim($path) === '') {
             return self::placeholderImageUrl();
         }
         $path = trim($path);
@@ -172,12 +171,12 @@ class Product extends Model
         if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) {
             return asset(ltrim($path, '/'));
         }
-        return asset('storage/' . $path);
+
+        return Storage::disk('public')->url($path);
     }
 
     /**
-     * Main product image URL (or placeholder).
-     * Uses main image; if missing, uses first gallery image so uploads in gallery still show.
+     * Main image URL for listings (main field, else first gallery image).
      */
     public function getDisplayImageUrlAttribute(): string
     {
@@ -185,21 +184,23 @@ class Product extends Model
             return self::imageUrlForPath($this->image);
         }
         $images = $this->images;
-        if (is_array($images) && count($images) > 0 && !empty($images[0]) && is_string($images[0])) {
+        if (is_array($images) && count($images) > 0 && ! empty($images[0]) && is_string($images[0])) {
             return self::imageUrlForPath($images[0]);
         }
+
         return self::placeholderImageUrl();
     }
 
     /**
-     * First image from images array (for hover/second thumb), or main image.
+     * Second thumb / hover: first gallery or same as display.
      */
     public function getHoverImageUrlAttribute(): string
     {
         $images = $this->images;
-        if (is_array($images) && count($images) > 0 && !empty($images[0])) {
+        if (is_array($images) && count($images) > 0 && ! empty($images[0])) {
             return self::imageUrlForPath(is_string($images[0]) ? $images[0] : null);
         }
+
         return $this->display_image_url;
     }
 }
