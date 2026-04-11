@@ -4,6 +4,13 @@
 @section('page-title', 'Order Details: ' . $order->order_number)
 
 @section('content')
+<div class="row mb-3">
+    <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+        <a href="{{ route('admin.orders.invoice', $order) }}" class="btn btn-sm btn-outline-light" target="_blank" rel="noopener">
+            <i class="bi bi-receipt me-1"></i> Invoice / Print
+        </a>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-8">
         <div class="card mb-4">

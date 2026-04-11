@@ -58,7 +58,18 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'items.product']);
+
         return view('admin.orders.show', compact('order'));
+    }
+
+    /**
+     * Printable invoice (admin only).
+     */
+    public function invoice(Order $order)
+    {
+        $order->load(['user', 'items.product', 'coupon']);
+
+        return view('admin.orders.invoice', compact('order'));
     }
 
     /**
@@ -67,6 +78,7 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         $order->load(['user', 'items.product']);
+
         return view('admin.orders.edit', compact('order'));
     }
 

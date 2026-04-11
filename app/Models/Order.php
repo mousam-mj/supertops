@@ -64,14 +64,14 @@ class Order extends Model
         static::creating(function ($order) {
             if (empty($order->order_number)) {
                 // Generate order number: ORD-YYYYMMDD-XXXXXX
-                $order->order_number = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+                $order->order_number = 'ORD-'.date('Ymd').'-'.strtoupper(Str::random(6));
             }
-            
+
             // Set total_amount from total if not set
-            if (empty($order->total_amount) && !empty($order->total)) {
+            if (empty($order->total_amount) && ! empty($order->total)) {
                 $order->total_amount = $order->total;
             }
-            
+
             // Set shipping_charge from shipping if not set
             if (empty($order->shipping_charge) && isset($order->shipping)) {
                 $order->shipping_charge = $order->shipping;
@@ -110,7 +110,7 @@ class Order extends Model
 
     public function getStatusBadgeClassAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'warning',
             'processing' => 'info',
             'shipped' => 'primary',
@@ -122,12 +122,80 @@ class Order extends Model
 
     public function getPaymentStatusBadgeClassAttribute()
     {
-        return match($this->payment_status) {
+        return match ($this->payment_status) {
             'pending' => 'warning',
             'paid' => 'success',
             'failed' => 'danger',
             'refunded' => 'secondary',
             default => 'secondary',
         };
+    }
+
+    /**
+     * Human-readable shipping address for invoices / PDFs.
+     */
+    public function formattedShippingAddress(): string
+    {
+        return self::formatAddressBlock($this->shipping_address);
+    }
+
+    /**
+     * Human-readable billing address for invoices / PDFs.
+     */
+    public function formattedBillingAddress(): string
+    {
+        $bill = $this->billing_address;
+        $text = self::formatAddressBlock($bill);
+        if ($text !== '') {
+            return $text;
+        }
+
+        $lines = array_filter([
+            $this->customer_name,
+            $this->customer_email,
+            $this->customer_phone ? 'Phone: '.$this->customer_phone : null,
+        ]);
+
+        return implode("\n", $lines);
+    }
+
+    protected static function formatAddressBlock(mixed $address): string
+    {
+        if (empty($address)) {
+            return '';
+        }
+        if (is_string($address)) {
+            return trim($address);
+        }
+        if (! is_array($address)) {
+            return '';
+        }
+        $lines = [];
+        $name = $address['full_name'] ?? trim(($address['first_name'] ?? '').' '.($address['last_name'] ?? ''));
+        if ($name !== '') {
+            $lines[] = $name;
+        }
+        if (! empty($address['email'])) {
+            $lines[] = $address['email'];
+        }
+        if (! empty($address['phone'])) {
+            $lines[] = 'Phone: '.$address['phone'];
+        }
+        if (! empty($address['address_line_1'])) {
+            $lines[] = $address['address_line_1'];
+        }
+        if (! empty($address['address_line_2'])) {
+            $lines[] = $address['address_line_2'];
+        }
+        $cityLine = trim(implode(', ', array_filter([
+            $address['city'] ?? '',
+            $address['state'] ?? '',
+            $address['pincode'] ?? '',
+        ])));
+        if ($cityLine !== '') {
+            $lines[] = $cityLine;
+        }
+
+        return implode("\n", $lines);
     }
 }

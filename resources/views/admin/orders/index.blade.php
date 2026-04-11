@@ -102,6 +102,13 @@
                                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
+                                            <a href="{{ route('admin.orders.invoice', $order) }}"
+                                               class="btn btn-sm btn-outline-secondary"
+                                               title="Invoice"
+                                               target="_blank"
+                                               rel="noopener">
+                                                <i class="bi bi-receipt"></i>
+                                            </a>
                                             <a href="{{{ route('admin.orders.show', $order) }}}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
