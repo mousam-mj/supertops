@@ -3,13 +3,13 @@
 @section('title', 'About Us - Perch Bottle')
 
 @section('content')
-<div class="slider-block style-one  xl:py-[100px] px-4 md:py-20 py-14 w-full">
-            <div class="bg-img absolute top-0 left-0 w-full h-full z-[-1]">
-                <img src="./assets/images/banner/bg-feature-pet1.png" alt="bg-img" class="w-full h-full object-cover">
+<div class="slider-block style-one about-page-hero relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full">
+            <div class="bg-img pointer-events-none absolute inset-0 z-0">
+                <img src="{{ asset('assets/images/banner/bg-feature-pet1.png') }}" alt="" class="w-full h-full object-cover object-center" aria-hidden="true">
             </div>
-                <div class="slider-main h-full w-full flex items-center justify-center gap-10">
+                <div class="slider-main relative z-[1] h-full w-full flex items-center justify-center gap-10">
                     <div class="sub-img w-[440px] max-md:w-1/2 rounded-b-full overflow-hidden max-md:hidden">
-                        <img src="./assets/images/product/Bottle-1.webp" alt="bg-underwear1" class="w-full">
+                        <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="" class="w-full">
                     </div>
                     <div class="text-content w-fit">
                         <div class="text-sub-display text-center">Welcome to Perch.</div>
@@ -17,11 +17,11 @@
                         
                     </div>
                     <div class="sub-img w-[440px] max-md:w-1/2 rounded-t-full overflow-hidden">
-                        <img src="./assets/images/product/Bottle-4.webp" alt="bg-underwear2" class="w-full">
+                        <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="" class="w-full">
                     </div>
                 </div>
         </div>
-        <div class="about md:pt-20 pt-10">
+        <div class="about bg-white relative z-[1] md:pt-20 pt-10">
             <div class="about-us-block">
                 <div class="container">
                     <div class="text flex items-center justify-center">

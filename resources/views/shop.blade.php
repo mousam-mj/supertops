@@ -599,7 +599,7 @@
 
         <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
             <div class="container">
-                <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
+                <div class="flex max-md:flex-wrap max-md:flex-col gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
                         @if(request()->hasAny(['category', 'size', 'color', 'min_price', 'max_price', 'search']))
                         <a href="{{ route('shop') }}" class="btn-clear-filters mb-6 shop-filter-link">Clear all filters</a>

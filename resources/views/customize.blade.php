@@ -70,7 +70,7 @@
 .customize-page .color-row{display:flex;align-items:center;gap:8px}
 .customize-page .color-arrow{width:30px;height:30px;border:1px solid #ddd;border-radius:50%;background:#fff;color:#777;cursor:pointer}
 .customize-page .swatches-track{display:flex;gap:8px;align-items:center;overflow:hidden;flex:1;padding:5px}
-.customize-page .swatch{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative}
+.customize-page .swatch{width:34px;height:34px;min-width:34px;min-height:34px;aspect-ratio:1;flex-shrink:0;align-self:center;box-sizing:border-box;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative}
 .customize-page .swatch.selected{border-color:#161616}
 .customize-page .swatch.out-of-stock{opacity:.55;cursor:not-allowed}
 .customize-page .swatch.out-of-stock::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,transparent 46%,#bdbdbd 46%,#bdbdbd 54%,transparent 54%)}

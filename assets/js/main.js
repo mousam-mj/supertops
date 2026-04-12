@@ -636,8 +636,8 @@ const handleItemModalCart = () => {
                         <img src=${item.thumbImage[0]} alt='product'
                             class='w-full h-full' />
                     </div>
-                    <div class='w-full'>
-                        <div class="flex items-center justify-between w-full">
+                    <div class='w-full cart-line-details'>
+                        <div class="cart-line-title-row">
                             <div class="name text-button">${item.name}</div>
                             <div
                                 class="remove-cart-btn remove-btn caption1 font-semibold text-red underline cursor-pointer">

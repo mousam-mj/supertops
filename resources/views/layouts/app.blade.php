@@ -180,13 +180,13 @@
             align-items: center;
             justify-content: center;
         }
-        /* Space above fixed bottom tab bar so grids / prices aren’t covered (matches lg:hidden breakpoint) */
+        /* Mobile tab bar: pad the footer only so last content isn’t hidden — main padding here created a large empty gap above the footer on every page */
         @media (max-width: 1023.98px) {
             #main-content {
-                padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px) + 28px);
+                padding-bottom: 0;
             }
             #footer.footer {
-                padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px) + 24px);
+                padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px) + 16px);
             }
             /* Keep product text/CTA under the tab bar in compositor order */
             #main-content .product-item .product-infor,
@@ -196,6 +196,104 @@
             }
             #main-content .product-item .product-thumb .list-action {
                 z-index: 1 !important;
+            }
+        }
+        /* Shopping cart drawer uses .list-cart (not .list-product); thumb size + object-fit */
+        .modal-cart-block .modal-cart-main .list-product .item,
+        .modal-cart-block .modal-cart-main .list-cart .item {
+            align-items: flex-start;
+        }
+        .modal-cart-block .modal-cart-main .list-product .item .infor,
+        .modal-cart-block .modal-cart-main .list-cart .item .infor {
+            align-items: flex-start;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        /* Full product title — no single-line ellipsis in cart drawer */
+        .modal-cart-block .modal-cart-main .list-cart .item .name,
+        .modal-cart-block .modal-cart-main .list-product .item .name {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            word-break: break-word;
+            hyphens: auto;
+            line-height: 1.35;
+            max-width: 100%;
+        }
+        .modal-cart-block .modal-cart-main .cart-line-details {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+        .modal-cart-block .modal-cart-main .cart-line-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+        }
+        .modal-cart-block .modal-cart-main .cart-line-title-row .name {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .modal-cart-block .modal-cart-main .cart-line-title-row .remove-cart-btn {
+            flex-shrink: 0;
+        }
+        /* Narrow screens: remove button below row so title uses full width */
+        @media (max-width: 767.98px) {
+            .modal-cart-block .modal-cart-main .list-cart .item.product-item,
+            .modal-cart-block .modal-cart-main .list-product .item.product-item {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.75rem !important;
+            }
+            .modal-cart-block .modal-cart-main .list-cart .item .infor,
+            .modal-cart-block .modal-cart-main .list-product .item .infor {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .modal-cart-block .modal-cart-main .list-cart .item .remove-cart-item,
+            .modal-cart-block .modal-cart-main .list-product .item .remove-cart-item {
+                align-self: flex-end;
+            }
+            /* localStorage cart (main.js): title + “Remove” were on one squeezed row */
+            .modal-cart-block .modal-cart-main .cart-line-title-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px !important;
+            }
+            .modal-cart-block .modal-cart-main .cart-line-title-row .remove-cart-btn {
+                align-self: flex-end;
+            }
+        }
+        .modal-cart-block .modal-cart-main .list-product .item .bg-img,
+        .modal-cart-block .modal-cart-main .list-cart .item .bg-img {
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
+            height: 120px !important;
+            min-height: 120px !important;
+            flex-shrink: 0 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .modal-cart-block .modal-cart-main .list-product .item .bg-img img,
+        .modal-cart-block .modal-cart-main .list-cart .item .bg-img img {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            max-height: none !important;
+            object-fit: cover !important;
+            display: block !important;
+        }
+        @media (max-width: 575.98px) {
+            .modal-cart-block .modal-cart-main .list-cart .item .bg-img,
+            .modal-cart-block .modal-cart-main .list-product .item .bg-img {
+                width: 112px !important;
+                min-width: 112px !important;
+                max-width: 112px !important;
+                height: 112px !important;
+                min-height: 112px !important;
             }
         }
     </style>
@@ -313,7 +411,7 @@
     
     {{-- Email Verification Notice - Disabled --}}
 
-    <main id="main-content" class="min-h-[50vh]">
+    <main id="main-content">
         @yield('content')
     </main>
 

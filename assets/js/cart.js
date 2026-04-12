@@ -247,7 +247,7 @@
         return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
     }
     function getImageUrl(path) {
-        if (!path) return '/assets/images/product/perch-bottal.webp';
+        if (!path) return '/assets/images/product/placeholder.svg';
         if (path.startsWith('http')) return path;
         if (path.startsWith('assets/') || path.startsWith('/assets/')) return path.startsWith('/') ? path : '/' + path;
         var base = getStorageBase();
@@ -556,7 +556,7 @@
         
         // Get image URL - match Laravel asset() helper logic
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             
             // Full URL
             if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -576,7 +576,17 @@
             return base + '/' + path.replace(/^\/+/, '');
         }
         
-        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        function firstProductImagePath(product) {
+            if (!product) return null;
+            if (product.image) return product.image;
+            if (Array.isArray(product.images) && product.images.length > 0) {
+                var first = product.images[0];
+                return typeof first === 'string' ? first : null;
+            }
+            return null;
+        }
+        const imagePath = item.customization_image_url || firstProductImagePath(item.product);
+        const imageUrl = getImageUrl(imagePath);
         const lineName = item.display_name || item.product?.name || 'Product';
         
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
@@ -584,10 +594,10 @@
         
         div.innerHTML = `
             <div class="infor flex items-center gap-5 w-full">
-                <div class="bg-img">
-                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-[100px] aspect-square flex-shrink-0 rounded-lg object-cover" />
+                <div class="bg-img cart-modal-line-thumb" style="width:120px;min-width:120px;max-width:120px;height:120px;min-height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;">
+                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="cart-modal-line-thumb__img" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src='/assets/images/product/placeholder.svg';" />
                 </div>
-                <div class="flex-1">
+                <div class="flex-1 cart-line-details">
                     <div class="name text-button">${lineName}</div>
                     <div class="flex items-center gap-2 mt-2">
                         <div class="product-price text-title">₹${price.toFixed(2)}</div>
@@ -978,7 +988,7 @@
             return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
         }
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;
@@ -1259,7 +1269,7 @@
             return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
         }
         function getImageUrl(path) {
-            if (!path) return '/assets/images/product/perch-bottal.webp';
+            if (!path) return '/assets/images/product/placeholder.svg';
             if (path.startsWith('http://') || path.startsWith('https://')) return path;
             if (path.startsWith('assets/') || path.startsWith('/assets/')) {
                 return path.startsWith('/') ? path : '/' + path;
@@ -1278,9 +1288,9 @@
         const custLabel = item.customization_label ? String(item.customization_label).replace(/</g, '&lt;').replace(/&/g, '&amp;') : '';
         
         div.innerHTML = `
-            <div class="infor flex items-center gap-3">
-                <div class="bg-img">
-                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-[60px] aspect-square flex-shrink-0 rounded-lg object-cover" />
+            <div class="infor flex items-center gap-3 min-w-0">
+                <div class="bg-img flex-shrink-0 overflow-hidden rounded-2xl border border-line bg-surface" style="width:88px;height:88px;min-width:88px;min-height:88px;">
+                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="checkout-line-thumb w-full h-full object-cover" style="width:100%;height:100%;object-fit:cover;display:block;" />
                 </div>
                 <div>
                     <div class="name text-sm font-semibold">${lineName}</div>

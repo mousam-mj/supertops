@@ -59,9 +59,9 @@
             $additionalBannerImage = $category->additional_banner_image ?? ($mainCategory->additional_banner_image ?? null);
             $additionalBannerText = $category->additional_banner_text ?? ($mainCategory->additional_banner_text ?? null);
         @endphp
-        <div class="banner-block relative">
+        <div class="banner-block relative mt-6 sm:mt-8">
             <div class="list-banner">
-                <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block overflow-hidden duration-500">
+                <a href="{{ route('category', $category->slug) }}" class="banner-item relative bg-surface block overflow-hidden duration-500 rounded-t-2xl sm:rounded-t-3xl">
                     <div class="banner-img w-full">
                         @if($additionalBannerImage)
                             <img src="{{ storage_asset($additionalBannerImage) }}" alt="{{ $additionalBannerText ?? $category->name }}" class="w-full duration-500">
@@ -212,9 +212,9 @@
             $bottomBannerImage = $category->bottom_banner_image ?? ($mainCategory->bottom_banner_image ?? null);
             $bottomBannerText = $category->bottom_banner_text ?? ($mainCategory->bottom_banner_text ?? null);
         @endphp
-        <div class="banner-block style-toys-kids">
+        <div class="banner-block style-toys-kids mt-8 sm:mt-10 md:mt-12">
             <div class="container">
-                <div class="content md:rounded-[28px] rounded-2xl overflow-hidden relative">
+                <div class="content md:rounded-[28px] rounded-2xl overflow-hidden relative isolate">
                     @if($bottomBannerImage)
                         <img src="{{ storage_asset($bottomBannerImage) }}" alt="{{ $category->name }}" class="absolute top-0 left-0 w-full h-full object-cover z-[-1]">
                     @else

@@ -1,4 +1,4 @@
-<div id="footer" class="footer mt-8" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both;">
+<div id="footer" class="footer mt-4 md:mt-8" style="position: relative; z-index: 10; display: block !important; visibility: visible !important; width: 100%; clear: both;">
     <div class="footer-main bg-surface">
         <div class="container">
             <div class="content-footer md:py-[60px] py-10 flex justify-between flex-wrap gap-y-8">
