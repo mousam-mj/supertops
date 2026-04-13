@@ -3,25 +3,66 @@
 @section('title', 'About Us - Perch Bottle')
 
 @section('content')
-<div class="slider-block style-one about-page-hero relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full">
-            <div class="bg-img pointer-events-none absolute inset-0 z-0">
-                <img src="{{ asset('assets/images/banner/bg-feature-pet1.png') }}" alt="" class="w-full h-full object-cover object-center" aria-hidden="true">
+<style>
+    /* About hero: PNG may have transparent / uneven bottom — solid base matches texture so content never sits on “white holes” */
+    .about-page-hero {
+        background-color: #6f7f92;
+        isolation: isolate;
+    }
+    .about-page-hero .about-hero-bg-img img {
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        object-fit: cover;
+        object-position: center top;
+    }
+    @media (max-width: 767.98px) {
+        .about-page-hero .slider-main {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .about-page-hero .about-hero-text {
+            width: 100%;
+            max-width: 22rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+        .about-page-hero .about-hero-heading {
+            font-size: clamp(1.2rem, 4.8vw, 1.65rem);
+            line-height: 1.25;
+        }
+        .about-page-hero .about-hero-bottle {
+            width: 100%;
+            max-width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+</style>
+<div class="slider-block style-one about-page-hero relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:px-6 md:py-20 py-10 pb-12 md:pb-20 w-full">
+            <div class="bg-img about-hero-bg-img pointer-events-none absolute inset-0 z-0 min-h-full">
+                <img src="{{ asset('assets/images/banner/bg-feature-pet1.png') }}" alt="" aria-hidden="true">
             </div>
-                <div class="slider-main relative z-[1] h-full w-full flex items-center justify-center gap-10">
-                    <div class="sub-img w-[440px] max-md:w-1/2 rounded-b-full overflow-hidden max-md:hidden">
+                <div class="slider-main relative z-[1] w-full flex md:flex-row flex-col items-center justify-center md:gap-10 gap-5">
+                    <div class="sub-img w-[440px] max-md:hidden rounded-b-full overflow-hidden flex-shrink-0">
                         <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="" class="w-full">
                     </div>
-                    <div class="text-content w-fit">
+                    <div class="text-content about-hero-text w-fit max-md:w-full md:max-w-none order-1 md:order-none">
                         <div class="text-sub-display text-center">Welcome to Perch.</div>
-                        <div class="heading2 text-center md:mt-4 mt-2">Everyday lifestyle essentials. Thoughtfully designed.</div>
-                        
+                        <div class="heading2 about-hero-heading text-center md:mt-4 mt-3 max-md:px-1">
+                            <span class="block md:inline">Everyday lifestyle essentials.</span>
+                            <span class="block md:inline md:ml-1">Thoughtfully designed.</span>
+                        </div>
                     </div>
-                    <div class="sub-img w-[440px] max-md:w-1/2 rounded-t-full overflow-hidden">
-                        <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="" class="w-full">
+                    <div class="sub-img about-hero-bottle w-[440px] md:max-w-[440px] rounded-t-full overflow-hidden flex-shrink-0 order-2 md:order-none max-md:max-h-[220px] max-md:w-auto">
+                        <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="" class="w-full h-full object-cover object-center">
                     </div>
                 </div>
         </div>
-        <div class="about bg-white relative z-[1] md:pt-20 pt-10">
+        <div class="about bg-white relative z-[1] md:pt-20 pt-8 mt-1">
             <div class="about-us-block">
                 <div class="container">
                     <div class="text flex items-center justify-center">

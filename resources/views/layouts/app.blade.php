@@ -180,11 +180,12 @@
             align-items: center;
             justify-content: center;
         }
-        /* Mobile tab bar: pad the footer only so last content isn’t hidden — main padding here created a large empty gap above the footer on every page */
+        /* Breathing room before footer (avoids content flush against grey footer band) */
+        #main-content {
+            padding-bottom: 30px;
+        }
+        /* Mobile tab bar: footer bottom padding clears fixed nav — keep main padding modest */
         @media (max-width: 1023.98px) {
-            #main-content {
-                padding-bottom: 0;
-            }
             #footer.footer {
                 padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px) + 16px);
             }

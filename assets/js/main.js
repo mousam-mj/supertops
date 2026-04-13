@@ -3605,6 +3605,10 @@ let listProductCart = document.querySelector(".cart-block .list-product-main");
 
 const handleInforCart = () => {
   if (listProductCart) {
+    // Real cart page loads rows from /api/cart (cart.js). Do not overwrite with theme demo localStorage.
+    if (listProductCart.closest(".cart-page-content")) {
+      return;
+    }
     let cartStore = localStorage.getItem("cartStore");
     cartStore = cartStore ? JSON.parse(cartStore) : [];
 

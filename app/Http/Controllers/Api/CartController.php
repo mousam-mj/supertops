@@ -199,7 +199,13 @@ class CartController extends Controller
             
             $previewUrl = null;
             if ($item->customization_image) {
-                $previewUrl = Storage::disk('public')->url($item->customization_image);
+                $p = trim((string) $item->customization_image);
+                if ($p !== '') {
+                    // Root-relative URL avoids wrong host/scheme from Storage::url vs live domain
+                    $previewUrl = (str_starts_with($p, 'http://') || str_starts_with($p, 'https://'))
+                        ? $p
+                        : '/storage/'.ltrim(preg_replace('#^/?storage/#', '', $p), '/');
+                }
             }
 
             $decodedCustomization = $item->customization_json

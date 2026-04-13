@@ -7,6 +7,37 @@
     /* Checkout - compact breadcrumb, reduce gap */
     .checkout-page-content .checkout-breadcrumb { min-height: unset !important; }
     .checkout-page-content .checkout-breadcrumb .breadcrumb-main { min-height: unset !important; }
+    /* Your Order — large thumbs (same ballpark as cart page / drawer); beats stray .bg-img rules */
+    .checkout-page-content .list-product-checkout .product-item-checkout .checkout-thumb-wrap {
+        width: 120px !important;
+        height: 120px !important;
+        min-width: 120px !important;
+        min-height: 120px !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
+        flex-shrink: 0 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        background: #f4f4f2 !important;
+        border: 1px solid var(--line, #e9e9e9) !important;
+        box-sizing: border-box !important;
+    }
+    .checkout-page-content .list-product-checkout .product-item-checkout .checkout-thumb-wrap .checkout-line-thumb {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+    .checkout-page-content .list-product-checkout .product-item-checkout .infor {
+        align-items: flex-start !important;
+    }
+    @media (max-width: 1023.98px) {
+        .checkout-page-content .right .checkout-block .total-cart-block {
+            padding-bottom: 2rem;
+        }
+    }
     
     /* Payment Section Styling */
     .payment-card {

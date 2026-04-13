@@ -999,23 +999,29 @@
             }
             return base + '/' + path.replace(/^\/+/, '');
         }
-        
-        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        var placeholderImg = '/assets/images/product/placeholder.svg';
+        var rawCust = item.customization_image_url;
+        var imageUrl = placeholderImg;
+        if (rawCust && String(rawCust).trim()) {
+            imageUrl = String(rawCust).trim();
+        } else {
+            imageUrl = getImageUrl(item.product && item.product.image);
+        }
         const lineName = item.display_name || item.product?.name || 'Product';
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
         const totalPrice = price * item.quantity;
         const custLabel = item.customization_label ? String(item.customization_label).replace(/</g, '&lt;').replace(/&/g, '&amp;') : '';
         
         row.innerHTML = `
-            <div class="w-2/5 flex items-center gap-4">
-                <div class="bg-img">
-                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="w-20 h-20 object-cover rounded-lg" />
+            <div class="w-2/5 flex items-start gap-3 min-w-0">
+                <div class="bg-img cart-page-thumb-wrap">
+                    <img src="${imageUrl.replace(/"/g, '&quot;')}" alt="${lineName.replace(/"/g, '&quot;')}" class="cart-page-thumb-img" width="80" height="80" decoding="async" style="width:80px;height:80px;object-fit:cover;display:block;" />
                 </div>
-                <div>
+                <div class="cart-page-line-meta min-w-0 flex-1">
                     <div class="name text-button font-semibold">${lineName}</div>
-                    ${custLabel ? `<div class="text-sm text-secondary2 mt-1">${custLabel}</div>` : ''}
+                    ${custLabel ? `<div class="text-sm text-secondary2 mt-1 cart-page-cust-label">${custLabel}</div>` : ''}
                     ${item.size || item.color ? `
-                        <div class="text-sm text-secondary2 mt-1">
+                        <div class="text-sm text-secondary2 mt-1 cart-page-cust-label">
                             ${item.size ? `Size: ${item.size}` : ''}
                             ${item.size && item.color ? ' | ' : ''}
                             ${item.color ? `Color: ${item.color}` : ''}
@@ -1042,6 +1048,15 @@
                 </button>
             </div>
         `;
+        var thumbEl = row.querySelector('.cart-page-thumb-img');
+        if (thumbEl) {
+            thumbEl.addEventListener('error', function onCartThumbErr() {
+                thumbEl.removeEventListener('error', onCartThumbErr);
+                if (thumbEl.getAttribute('src') !== placeholderImg) {
+                    thumbEl.setAttribute('src', placeholderImg);
+                }
+            });
+        }
         
         // Add quantity update handlers
         const decreaseBtn = row.querySelector('.quantity-decrease');
@@ -1280,7 +1295,14 @@
             }
             return base + '/' + path.replace(/^\/+/, '');
         }
-        const imageUrl = item.customization_image_url ? item.customization_image_url : getImageUrl(item.product?.image);
+        var coPlaceholder = '/assets/images/product/placeholder.svg';
+        var rawCo = item.customization_image_url;
+        var imageUrl = coPlaceholder;
+        if (rawCo && String(rawCo).trim()) {
+            imageUrl = String(rawCo).trim();
+        } else {
+            imageUrl = getImageUrl(item.product && item.product.image);
+        }
         const lineName = item.display_name || item.product?.name || 'Product';
         
         const price = parseFloat(item.unit_price ?? item.product?.sale_price ?? item.product?.price ?? 0);
@@ -1288,13 +1310,13 @@
         const custLabel = item.customization_label ? String(item.customization_label).replace(/</g, '&lt;').replace(/&/g, '&amp;') : '';
         
         div.innerHTML = `
-            <div class="infor flex items-center gap-3 min-w-0">
-                <div class="bg-img flex-shrink-0 overflow-hidden rounded-2xl border border-line bg-surface" style="width:88px;height:88px;min-width:88px;min-height:88px;">
-                    <img src="${imageUrl}" alt="${lineName.replace(/"/g, '&quot;')}" class="checkout-line-thumb w-full h-full object-cover" style="width:100%;height:100%;object-fit:cover;display:block;" />
+            <div class="infor flex items-start gap-3 min-w-0">
+                <div class="bg-img checkout-thumb-wrap flex-shrink-0 overflow-hidden rounded-xl border border-line bg-surface" style="width:120px;height:120px;min-width:120px;min-height:120px;">
+                    <img src="${imageUrl.replace(/"/g, '&quot;')}" alt="${lineName.replace(/"/g, '&quot;')}" class="checkout-line-thumb" width="120" height="120" decoding="async" style="width:120px;height:120px;object-fit:cover;display:block;" />
                 </div>
-                <div>
+                <div class="min-w-0 flex-1">
                     <div class="name text-sm font-semibold">${lineName}</div>
-                    ${custLabel ? `<div class="text-xs text-secondary2 mt-1">${custLabel}</div>` : ''}
+                    ${custLabel ? `<div class="text-xs text-secondary2 mt-1" style="white-space:normal;word-break:break-word;">${custLabel}</div>` : ''}
                     <div class="text-xs text-secondary2 mt-1">
                         ${item.size ? `Size: ${item.size} ` : ''}
                         ${item.color ? `Color: ${item.color}` : ''}
@@ -1302,8 +1324,17 @@
                     <div class="text-xs text-secondary2 mt-1">Qty: ${item.quantity}</div>
                 </div>
             </div>
-            <div class="text-title">₹${totalPrice.toFixed(2)}</div>
+            <div class="text-title flex-shrink-0">₹${totalPrice.toFixed(2)}</div>
         `;
+        var coThumb = div.querySelector('.checkout-line-thumb');
+        if (coThumb) {
+            coThumb.addEventListener('error', function onCoErr() {
+                coThumb.removeEventListener('error', onCoErr);
+                if (coThumb.getAttribute('src') !== coPlaceholder) {
+                    coThumb.setAttribute('src', coPlaceholder);
+                }
+            });
+        }
         
         return div;
     }

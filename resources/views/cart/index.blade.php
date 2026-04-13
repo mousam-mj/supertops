@@ -7,6 +7,34 @@
     /* Cart - compact breadcrumb, reduce gap */
     .cart-page-content .cart-breadcrumb { min-height: unset !important; }
     .cart-page-content .cart-breadcrumb .breadcrumb-main { min-height: unset !important; }
+    /* Server-rendered cart lines (cart.js): fixed thumb + full customization text */
+    .cart-page-content .product-item-cart .cart-page-thumb-wrap {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        min-height: 80px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f4f4f2;
+        border: 1px solid var(--line, #e9e9e9);
+    }
+    .cart-page-content .product-item-cart .cart-page-thumb-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .cart-page-content .product-item-cart .cart-page-line-meta {
+        min-width: 0;
+        flex: 1;
+    }
+    .cart-page-content .product-item-cart .cart-page-cust-label {
+        white-space: normal;
+        word-break: break-word;
+        overflow: visible;
+        line-height: 1.4;
+    }
 </style>
 <div class="page-content cart-page-content">
     <!-- Menu bar (mobile) -->
