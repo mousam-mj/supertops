@@ -4,16 +4,39 @@
 @section('page-title', 'Product Management')
 
 @section('content')
+@if(session('import_errors') && is_array(session('import_errors')) && count(session('import_errors')) > 0)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Import notes</strong> (first rows):
+        <ul class="mb-0 mt-2 small">
+            @foreach(session('import_errors') as $err)
+                <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Products</h4>
                 <p class="text-muted mb-0">Manage your product inventory</p>
             </div>
-            <a href="{{{ route('admin.products.create') }}}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add New Product
-            </a>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <a href="{{{ route('admin.products.import.template') }}}" class="btn btn-outline-secondary">
+                    <i class="bi bi-download me-2"></i>CSV template
+                </a>
+                <form action="{{{ route('admin.products.import') }}}" method="POST" enctype="multipart/form-data" class="d-flex flex-wrap align-items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" accept=".csv,.txt,text/csv" class="form-control form-control-sm" style="max-width: 220px;" required title="UTF-8 CSV">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-upload me-1"></i>Import CSV
+                    </button>
+                </form>
+                <a href="{{{ route('admin.products.create') }}}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Product
+                </a>
+            </div>
         </div>
         
         <!-- Search and Filter Form -->

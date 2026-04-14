@@ -607,6 +607,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Resource Routes
         Route::resource('users', UserController::class);
+        Route::get('products/import/template', [ProductController::class, 'importTemplate'])->name('products.import.template');
+        Route::post('products/import', [ProductController::class, 'importCsv'])->name('products.import');
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);

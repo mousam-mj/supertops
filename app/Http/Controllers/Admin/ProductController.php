@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,6 +58,235 @@ class ProductController extends Controller
         $products = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         
         return view('admin.products.index', compact('products'));
+    }
+
+    /**
+     * Download a sample CSV template for bulk product import.
+     */
+    public function importTemplate()
+    {
+        $headers = [
+            'name',
+            'price',
+            'sale_price',
+            'sku',
+            'category_slug',
+            'stock_quantity',
+            'short_description',
+            'description',
+            'is_active',
+            'is_featured',
+            'is_new_arrival',
+            'in_stock',
+            'sort_order',
+        ];
+        $sample = [
+            'Example Bottle 500ml',
+            '499.00',
+            '449.00',
+            'CSV-EXAMPLE-1',
+            '',
+            '50',
+            'Short summary for listings',
+            'Optional longer description (use quotes in CSV if it contains commas).',
+            '1',
+            '0',
+            '0',
+            '1',
+            '0',
+        ];
+
+        return response()->streamDownload(function () use ($headers, $sample) {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($out, $headers);
+            fputcsv($out, $sample);
+            fclose($out);
+        }, 'product-import-template.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Import products from a UTF-8 CSV file (first row = column headers).
+     */
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:10240',
+        ]);
+
+        $path = $request->file('file')->getRealPath();
+        if ($path === false || ! is_readable($path)) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Could not read the uploaded file.');
+        }
+
+        $handle = fopen($path, 'r');
+        if ($handle === false) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Could not open the uploaded file.');
+        }
+
+        $first = fgets($handle);
+        if ($first === false) {
+            fclose($handle);
+
+            return redirect()->route('admin.products.index')
+                ->with('error', 'The CSV file is empty.');
+        }
+        rewind($handle);
+        if (str_starts_with($first, "\xEF\xBB\xBF")) {
+            fread($handle, 3);
+        }
+
+        $headerRow = fgetcsv($handle);
+        if ($headerRow === false || count(array_filter($headerRow, fn ($c) => $c !== null && trim((string) $c) !== '')) === 0) {
+            fclose($handle);
+
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Missing or invalid header row in CSV.');
+        }
+
+        $headers = [];
+        foreach ($headerRow as $i => $col) {
+            $headers[$i] = strtolower(trim((string) $col));
+        }
+
+        $imported = 0;
+        $errors = [];
+        $lineNo = 1;
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $lineNo++;
+            if ($row === null || count(array_filter($row, fn ($c) => $c !== null && trim((string) $c) !== '')) === 0) {
+                continue;
+            }
+
+            $data = [];
+            foreach ($headers as $i => $key) {
+                if ($key === '') {
+                    continue;
+                }
+                $data[$key] = isset($row[$i]) ? trim((string) $row[$i]) : '';
+            }
+
+            $name = $data['name'] ?? '';
+            if ($name === '') {
+                $errors[] = "Line {$lineNo}: name is required.";
+
+                continue;
+            }
+
+            $priceRaw = $data['price'] ?? '';
+            if ($priceRaw === '' || ! is_numeric(str_replace(',', '', $priceRaw))) {
+                $errors[] = "Line {$lineNo}: valid price is required.";
+
+                continue;
+            }
+            $price = (float) str_replace(',', '', $priceRaw);
+
+            $saleRaw = $data['sale_price'] ?? '';
+            $salePrice = ($saleRaw !== '' && is_numeric(str_replace(',', '', $saleRaw)))
+                ? (float) str_replace(',', '', $saleRaw)
+                : null;
+
+            $categoryId = null;
+            $slugCat = $data['category_slug'] ?? '';
+            if ($slugCat !== '') {
+                $cat = Category::where('slug', $slugCat)->where('is_active', true)->first();
+                if ($cat) {
+                    $categoryId = $cat->id;
+                }
+            }
+
+            $stockQty = isset($data['stock_quantity']) && $data['stock_quantity'] !== '' && is_numeric($data['stock_quantity'])
+                ? (int) $data['stock_quantity']
+                : 0;
+
+            $sku = $data['sku'] ?? null;
+            if ($sku === '') {
+                $sku = null;
+            }
+            if ($sku !== null && Product::where('sku', $sku)->exists()) {
+                do {
+                    $sku = 'IMP-'.strtoupper(Str::random(8));
+                } while (Product::where('sku', $sku)->exists());
+            }
+
+            $slug = $this->uniqueImportSlug(Str::slug($name));
+
+            try {
+                DB::beginTransaction();
+                Product::create([
+                    'name' => $name,
+                    'slug' => $slug,
+                    'description' => ($data['description'] ?? '') !== '' ? $data['description'] : null,
+                    'short_description' => ($data['short_description'] ?? '') !== '' ? $data['short_description'] : null,
+                    'category_id' => $categoryId,
+                    'price' => $price,
+                    'sale_price' => $salePrice,
+                    'sku' => $sku,
+                    'stock_quantity' => max(0, $stockQty),
+                    'stock' => max(0, $stockQty),
+                    'in_stock' => $this->csvBool($data['in_stock'] ?? '1', true),
+                    'is_active' => $this->csvBool($data['is_active'] ?? '1', true),
+                    'is_featured' => $this->csvBool($data['is_featured'] ?? '0', false),
+                    'is_new_arrival' => $this->csvBool($data['is_new_arrival'] ?? '0', false),
+                    'sort_order' => isset($data['sort_order']) && $data['sort_order'] !== '' && is_numeric($data['sort_order'])
+                        ? (int) $data['sort_order']
+                        : 0,
+                    'sizes' => [],
+                    'colors' => [],
+                    'images' => null,
+                    'specifications' => null,
+                ]);
+                DB::commit();
+                $imported++;
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                $errors[] = "Line {$lineNo}: ".$e->getMessage();
+            }
+        }
+
+        fclose($handle);
+
+        $msg = $imported > 0
+            ? "Successfully imported {$imported} product(s)."
+            : 'No products were imported.';
+
+        return redirect()->route('admin.products.index')
+            ->with($imported > 0 ? 'success' : 'warning', $msg)
+            ->with('import_errors', array_slice($errors, 0, 30));
+    }
+
+    private function csvBool(string $value, bool $default): bool
+    {
+        $v = strtolower(trim($value));
+        if ($v === '') {
+            return $default;
+        }
+        if (in_array($v, ['1', 'true', 'yes', 'y', 'on'], true)) {
+            return true;
+        }
+        if (in_array($v, ['0', 'false', 'no', 'n', 'off'], true)) {
+            return false;
+        }
+
+        return $default;
+    }
+
+    private function uniqueImportSlug(string $baseSlug): string
+    {
+        $slug = $baseSlug !== '' ? $baseSlug : 'product';
+        $original = $slug;
+        $counter = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $original.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**
