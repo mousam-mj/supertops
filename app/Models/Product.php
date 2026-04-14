@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -64,7 +66,7 @@ class Product extends Model
                 $product->slug = Str::slug($product->name);
             }
             if (empty($product->sku)) {
-                $product->sku = 'PROD-' . strtoupper(Str::random(8));
+                $product->sku = 'PROD-'.strtoupper(Str::random(8));
             }
         });
     }
@@ -72,6 +74,21 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Limit to products under the Bearings main category (edx-bearing HTML catalog).
+     */
+    public function scopeEdxBearingsCatalog(Builder $query): Builder
+    {
+        $id = MainCategory::bearingsCatalogId();
+        if ($id === null) {
+            return $query;
+        }
+
+        return $query->whereHas('category', function (Builder $q) use ($id) {
+            $q->where('main_category_id', $id);
+        });
     }
 
     /**
@@ -138,6 +155,7 @@ class Product extends Model
         if ($this->sale_price && $this->price > $this->sale_price) {
             return round((($this->price - $this->sale_price) / $this->price) * 100);
         }
+
         return 0;
     }
 
@@ -167,15 +185,15 @@ class Product extends Model
     public function getStockForColorSize($color = null, $size = null)
     {
         $query = $this->inventories();
-        
+
         if ($color) {
             $query->where('color', $color);
         }
-        
+
         if ($size) {
             $query->where('size', $size);
         }
-        
+
         return $query->sum('quantity');
     }
 
@@ -184,7 +202,7 @@ class Product extends Model
      */
     public function getImageForColor($color)
     {
-        if (!$color) {
+        if (! $color) {
             return $this->image;
         }
         $colorImages = $this->color_images ?? [];
@@ -192,10 +210,47 @@ class Product extends Model
         if (isset($colorImages[$key]) && $colorImages[$key]) {
             return $colorImages[$key];
         }
+
         return $this->image;
     }
+
+    /**
+     * Public URL for a stored image path (uploads under storage/app/public, or static files under public/).
+     */
+    public static function publicUrlForPath(?string $path): string
+    {
+        $fallback = asset('assets/images/PhotoshopExtension_Image-1.webp');
+
+        if ($path === null || $path === '') {
+            return $fallback;
+        }
+
+        $path = ltrim($path, '/');
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        if (str_starts_with($path, 'assets/')) {
+            return is_file(public_path($path)) ? asset($path) : $fallback;
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return asset('storage/'.$path);
+        }
+
+        if (is_file(public_path($path))) {
+            return asset($path);
+        }
+
+        return $fallback;
+    }
+
+    /**
+     * Resolved main image URL for Blade / JSON (never points at wrong /storage/... for public assets).
+     */
+    public function getImageUrlAttribute(): string
+    {
+        return self::publicUrlForPath($this->attributes['image'] ?? null);
+    }
 }
-
-
-
-

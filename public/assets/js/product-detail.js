@@ -48,8 +48,8 @@ const productDetail = document.querySelector('.product-detail')
 let currentIndex;
 
 // Href
-let classes = productDetail ? productDetail.className.split(' ') : [];
-let typePage = classes[1] || '';
+let classes = productDetail.className.split(' ');
+let typePage = classes[1];
 
 
 if (productDetail) {
@@ -300,16 +300,14 @@ if (productDetail) {
 }
 
 
-// desc-tab — make Description, Specifications, Review tabs clickable
-function initDescTabs() {
-    const descTab = document.querySelector('.product-detail .desc-tab')
-    if (!descTab) return
-    const descTabItem = descTab.querySelectorAll('.tab-item')
-    const descItem = descTab.querySelectorAll('.desc-block .desc-item')
-    if (!descTabItem.length || !descItem.length) return
+// desc-tab
+const descTabItem = document.querySelectorAll('.desc-tab .tab-item')
+const descItem = document.querySelectorAll('.desc-tab .desc-block .desc-item')
 
-    function openDescTabByDataItem(dataItem) {
-        if (!dataItem) return
+descTabItem.forEach(tabItems => {
+    const handleOpen = () => {
+        let dataItem = tabItems.innerHTML.replace(/\s+/g, '')
+
         descItem.forEach(item => {
             if (item.getAttribute('data-item') === dataItem) {
                 item.classList.add('open')
@@ -317,43 +315,14 @@ function initDescTabs() {
                 item.classList.remove('open')
             }
         })
-        descTabItem.forEach(t => {
-            t.classList.remove('active')
-            if (t.getAttribute('data-item') === dataItem) t.classList.add('active')
-        })
     }
 
-    descTabItem.forEach(tabEl => {
-        tabEl.setAttribute('role', 'button')
-        tabEl.setAttribute('tabindex', '0')
-        tabEl.style.cursor = 'pointer'
-        const handleOpen = (e) => {
-            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return
-            if (e.type === 'keydown') e.preventDefault()
-            const dataItem = tabEl.getAttribute('data-item') || tabEl.textContent.replace(/\s+/g, '').trim()
-            if (!dataItem) return
-            openDescTabByDataItem(dataItem)
-        }
-        tabEl.addEventListener('click', handleOpen)
-        tabEl.addEventListener('keydown', handleOpen)
-        if (tabEl.classList.contains('active')) {
-            openDescTabByDataItem(tabEl.getAttribute('data-item'))
-        }
-    })
-
-    if (window.location.hash === '#form-review') {
-        openDescTabByDataItem('Review')
+    if (tabItems.classList.contains('active')) {
+        handleOpen()
     }
-    window.addEventListener('hashchange', function () {
-        if (window.location.hash === '#form-review') openDescTabByDataItem('Review')
-    })
-}
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDescTabs)
-} else {
-    initDescTabs()
-}
+    tabItems.addEventListener('click', handleOpen)
+})
 
 
 // list-img on-sale

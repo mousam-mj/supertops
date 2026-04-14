@@ -23,7 +23,7 @@ class ProductController extends Controller
 
         // Filter by main category (through category)
         if ($request->has('main_category_id')) {
-            $query->whereHas('category', function($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request) {
                 $q->where('main_category_id', $request->main_category_id);
             });
         }
@@ -40,22 +40,22 @@ class ProductController extends Controller
 
         // Filter by price range
         if ($request->has('min_price')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('sale_price', '>=', $request->min_price)
-                  ->orWhere(function($q2) use ($request) {
-                      $q2->whereNull('sale_price')
-                         ->where('price', '>=', $request->min_price);
-                  });
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->whereNull('sale_price')
+                            ->where('price', '>=', $request->min_price);
+                    });
             });
         }
 
         if ($request->has('max_price')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('sale_price', '<=', $request->max_price)
-                  ->orWhere(function($q2) use ($request) {
-                      $q2->whereNull('sale_price')
-                         ->where('price', '<=', $request->max_price);
-                  });
+                    ->orWhere(function ($q2) use ($request) {
+                        $q2->whereNull('sale_price')
+                            ->where('price', '<=', $request->max_price);
+                    });
             });
         }
 
@@ -89,11 +89,11 @@ class ProductController extends Controller
         }
 
         $products = Product::where('is_active', true)
-            ->where(function($q) use ($query) {
-                $q->where('name', 'LIKE', '%' . $query . '%')
-                  ->orWhere('description', 'LIKE', '%' . $query . '%')
-                  ->orWhere('short_description', 'LIKE', '%' . $query . '%')
-                  ->orWhere('sku', 'LIKE', '%' . $query . '%');
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', '%'.$query.'%')
+                    ->orWhere('description', 'LIKE', '%'.$query.'%')
+                    ->orWhere('short_description', 'LIKE', '%'.$query.'%')
+                    ->orWhere('sku', 'LIKE', '%'.$query.'%');
             })
             ->with('category')
             ->limit($limit)
@@ -115,17 +115,11 @@ class ProductController extends Controller
             ->with('category')
             ->first();
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['success' => false, 'data' => null, 'message' => 'Product not found'], 404);
         }
 
-        $baseUrl = rtrim($request->getSchemeAndHttpHost() ?: config('app.url'), '/');
-        $toFullUrl = function ($path) use ($baseUrl) {
-            if (! $path || ! is_string($path)) {
-                return $baseUrl . '/assets/images/product/perch-bottal.webp';
-            }
-            return str_starts_with($path, 'http') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($path, '/'));
-        };
+        $toFullUrl = fn ($path) => Product::publicUrlForPath(is_string($path) ? $path : null);
         $primaryImage = $product->image ?? null;
         if (! $primaryImage && $product->images && is_array($product->images) && count($product->images) > 0) {
             $primaryImage = $product->images[0];
@@ -166,23 +160,25 @@ class ProductController extends Controller
 
         $data = $product->toArray();
 
-        // Resolve image paths to full URLs (fixes wrong/cached images on live)
-        $data['image'] = $data['image'] ? storage_asset($data['image']) : null;
+        // Resolve image paths (public/assets/* vs storage/app/public/*)
+        $data['image'] = Product::publicUrlForPath($data['image'] ?? null);
         if (! empty($data['images']) && is_array($data['images'])) {
-            $data['images'] = array_map(fn ($p) => $p ? storage_asset($p) : null, array_values($data['images']));
-            $data['images'] = array_values(array_filter($data['images']));
+            $data['images'] = array_values(array_map(
+                fn ($p) => Product::publicUrlForPath(is_string($p) ? $p : null),
+                $data['images']
+            ));
         }
         if (! empty($data['color_images']) && is_array($data['color_images'])) {
             $resolved = [];
             foreach ($data['color_images'] as $key => $path) {
-                $resolved[$key] = $path ? storage_asset($path) : null;
+                $resolved[$key] = Product::publicUrlForPath(is_string($path) ? $path : null);
             }
             $data['color_images'] = $resolved;
         }
         if (! empty($data['inventories'])) {
             foreach ($data['inventories'] as $i => $inv) {
                 if (! empty($inv['image'])) {
-                    $data['inventories'][$i]['image'] = storage_asset($inv['image']);
+                    $data['inventories'][$i]['image'] = Product::publicUrlForPath($inv['image']);
                 }
             }
         }
@@ -193,7 +189,3 @@ class ProductController extends Controller
         ]);
     }
 }
-
-
-
-

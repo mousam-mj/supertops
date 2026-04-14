@@ -64,8 +64,12 @@ class MainCategory extends Model
     {
         return $this->hasMany(Category::class, 'main_category_id')->where('is_active', true);
     }
+
+    /**
+     * Main category id for the EDX bearing shop (slug: bearings).
+     */
+    public static function bearingsCatalogId(): ?int
+    {
+        return self::where('slug', 'bearings')->value('id');
+    }
 }
-
-
-
-

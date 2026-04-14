@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             CustomizeProductSeeder::class,
             OrderSeeder::class,
             PolicyPageSeeder::class,
+            BearingSeeder::class,
         ]);
     }
 }
