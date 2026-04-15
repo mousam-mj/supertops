@@ -561,6 +561,10 @@ const closeModalCart = () => {
 
 if (addCartBtns && addCartBtns.length > 0) {
   addCartBtns.forEach((item) => {
+    // Customizer uses its own /api/cart/add flow; opening the drawer here races before the line exists.
+    if (item.closest(".customize-page")) {
+      return;
+    }
     item.addEventListener("click", () => {
       openModalCart();
     });
@@ -587,8 +591,13 @@ if (modalCartMain) {
 }
 
 
-// Set cart length
+// Set cart length (legacy theme used localStorage cartStore; Laravel cart uses cart.js + /api/cart)
 const handleItemModalCart = () => {
+  if (typeof window.loadCartItems === "function") {
+    window.loadCartItems();
+    return;
+  }
+
   cartStore = localStorage.getItem("cartStore");
   cartStore = cartStore ? JSON.parse(cartStore) : [];
 
@@ -694,8 +703,6 @@ const handleItemModalCart = () => {
     });
   });
 };
-
-handleItemModalCart();
 
 // Countdown cart
 let timeLeft = 600;

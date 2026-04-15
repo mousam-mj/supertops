@@ -919,10 +919,12 @@
                         alert('Product added to cart!');
                     }
                     
-                    // Open cart modal if exists
-                    const cartModal = document.querySelector('.modal-cart-block');
-                    if (cartModal) {
-                        cartModal.classList.add('open');
+                    // Open cart drawer (CSS uses :has(.modal-cart-main.open), not .modal-cart-block.open)
+                    const cartModalMains = document.querySelectorAll('.modal-cart-block .modal-cart-main');
+                    const cartModalMain = cartModalMains.length ? cartModalMains[cartModalMains.length - 1] : null;
+                    if (cartModalMain) {
+                        cartModalMain.classList.add('open');
+                        document.body.style.overflow = 'hidden';
                         if (typeof window.loadCartItems === 'function') {
                             window.loadCartItems();
                         }

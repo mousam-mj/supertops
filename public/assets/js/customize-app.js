@@ -1253,6 +1253,13 @@ function addToCart(){
   }).then(function(res){
     if(res.data&&res.data.success){
       if(typeof window.updateCartCount==='function') window.updateCartCount();
+      var allCart=document.querySelectorAll('.modal-cart-block .modal-cart-main');
+      var cartModalMain=allCart.length?allCart[allCart.length-1]:null;
+      if(cartModalMain){
+        cartModalMain.classList.add('open');
+        document.body.style.overflow='hidden';
+      }
+      if(typeof window.loadCartItems==='function') window.loadCartItems();
       if(typeof window.showNotification==='function'){
         window.showNotification('Added to cart','success');
       }else{

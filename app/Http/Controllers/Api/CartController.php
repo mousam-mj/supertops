@@ -8,6 +8,7 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Services\CustomizeConfigService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -201,10 +202,13 @@ class CartController extends Controller
             if ($item->customization_image) {
                 $p = trim((string) $item->customization_image);
                 if ($p !== '') {
-                    // Root-relative URL avoids wrong host/scheme from Storage::url vs live domain
+                    // Same URL rules as catalog images (STORAGE_PUBLIC_PATH / CDN via disk public url)
                     $previewUrl = (str_starts_with($p, 'http://') || str_starts_with($p, 'https://'))
                         ? $p
-                        : '/storage/'.ltrim(preg_replace('#^/?storage/#', '', $p), '/');
+                        : Storage::disk('public')->url(ltrim($p, '/'));
+                    if ($previewUrl === '') {
+                        $previewUrl = null;
+                    }
                 }
             }
 
@@ -768,16 +772,31 @@ class CartController extends Controller
         if (!is_string($dataUrl) || !str_starts_with($dataUrl, 'data:image/')) {
             return null;
         }
-        if (!preg_match('#^data:image/(png|jpeg|jpg);base64,(.+)$#i', $dataUrl, $m)) {
+        if (!preg_match('#^data:image/(png|jpeg|jpg|webp);base64,(.+)$#i', $dataUrl, $m)) {
             return null;
         }
         $raw = base64_decode($m[2], true);
         if ($raw === false || strlen($raw) > 2_500_000) {
             return null;
         }
-        $ext = strtolower($m[1]) === 'jpg' ? 'jpg' : 'png';
+        $mime = strtolower($m[1]);
+        $ext = match ($mime) {
+            'jpg', 'jpeg' => 'jpg',
+            'webp' => 'webp',
+            default => 'png',
+        };
         $relative = 'customize/'.Str::uuid().'.'.$ext;
-        Storage::disk('public')->put($relative, $raw);
+        try {
+            if (! Storage::disk('public')->put($relative, $raw)) {
+                Log::warning('Customizer preview image could not be written', ['path' => $relative]);
+
+                return null;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Customizer preview image write exception: '.$e->getMessage(), ['path' => $relative]);
+
+            return null;
+        }
 
         return $relative;
     }

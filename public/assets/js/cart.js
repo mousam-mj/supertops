@@ -1003,7 +1003,7 @@
         var rawCust = item.customization_image_url;
         var imageUrl = placeholderImg;
         if (rawCust && String(rawCust).trim()) {
-            imageUrl = String(rawCust).trim();
+            imageUrl = getImageUrl(String(rawCust).trim());
         } else {
             imageUrl = getImageUrl(item.product && item.product.image);
         }
@@ -1299,7 +1299,7 @@
         var rawCo = item.customization_image_url;
         var imageUrl = coPlaceholder;
         if (rawCo && String(rawCo).trim()) {
-            imageUrl = String(rawCo).trim();
+            imageUrl = getImageUrl(String(rawCo).trim());
         } else {
             imageUrl = getImageUrl(item.product && item.product.image);
         }

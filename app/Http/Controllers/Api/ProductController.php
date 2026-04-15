@@ -167,22 +167,22 @@ class ProductController extends Controller
         $data = $product->toArray();
 
         // Resolve image paths to full URLs (fixes wrong/cached images on live)
-        $data['image'] = $data['image'] ? storage_asset($data['image']) : null;
+        $data['image'] = $data['image'] ? \storage_asset($data['image']) : null;
         if (! empty($data['images']) && is_array($data['images'])) {
-            $data['images'] = array_map(fn ($p) => $p ? storage_asset($p) : null, array_values($data['images']));
+            $data['images'] = array_map(fn ($p) => $p ? \storage_asset($p) : null, array_values($data['images']));
             $data['images'] = array_values(array_filter($data['images']));
         }
         if (! empty($data['color_images']) && is_array($data['color_images'])) {
             $resolved = [];
             foreach ($data['color_images'] as $key => $path) {
-                $resolved[$key] = $path ? storage_asset($path) : null;
+                $resolved[$key] = $path ? \storage_asset($path) : null;
             }
             $data['color_images'] = $resolved;
         }
         if (! empty($data['inventories'])) {
             foreach ($data['inventories'] as $i => $inv) {
                 if (! empty($inv['image'])) {
-                    $data['inventories'][$i]['image'] = storage_asset($inv['image']);
+                    $data['inventories'][$i]['image'] = \storage_asset($inv['image']);
                 }
             }
         }
