@@ -203,6 +203,58 @@
             background-color: #22c55e !important;
             color: #fff !important;
         }
+
+        /* Quota list count badge (explicit CSS — Tailwind build does not scan Blade files) */
+        .header-menu .list-action,
+        .header-menu .quota-bag-link,
+        .menu_bar .cart-icon {
+            overflow: visible;
+        }
+        .quota-bag-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 14px 6px 6px;
+        }
+        .cart-quota-badge {
+            position: absolute;
+            top: -2px;
+            right: 2px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: #fff;
+            background-color: #ec2127;
+            border-radius: 999px;
+            box-shadow: 0 0 0 2px #fff;
+            z-index: 2;
+            pointer-events: none;
+            font-variant-numeric: tabular-nums;
+        }
+        .cart-quota-badge.cart-quota-badge--empty {
+            background-color: #1f1f1f;
+            opacity: 0.55;
+        }
+        .menu_bar .cart-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding-right: 12px;
+        }
+        .menu_bar .cart-quota-badge {
+            top: -4px;
+            right: -4px;
+        }
     </style>
     
     @yield('styles')
@@ -245,6 +297,89 @@
     <script src="{{ asset('assets/js/phosphor-icons.js') }}"></script>
     <script src="{{ asset('assets/js/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script>
+    (function () {
+        function csrfToken() {
+            var el = document.querySelector('meta[name="csrf-token"]');
+            return el ? el.getAttribute('content') : '';
+        }
+        function setQuotaBadge(count) {
+            var raw = Math.max(0, parseInt(count, 10) || 0);
+            var label = raw > 99 ? '99+' : String(raw);
+            document.querySelectorAll('.cart-quota-badge').forEach(function (badge) {
+                badge.textContent = label;
+                badge.classList.toggle('cart-quota-badge--empty', raw === 0);
+            });
+        }
+        function refreshQuotaBadge() {
+            fetch('{{ route('frontend.quota-list.count') }}', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                if (data && typeof data.count !== 'undefined') {
+                    setQuotaBadge(data.count);
+                }
+            }).catch(function () {});
+        }
+        document.addEventListener('DOMContentLoaded', refreshQuotaBadge);
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.edx-add-quota-btn');
+            if (!btn) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            var productId = btn.getAttribute('data-product-id');
+            if (!productId) {
+                return;
+            }
+            var scope = btn.closest('.product-item') || btn.closest('.product-detail');
+            var qtyEl = scope ? scope.querySelector('#qty-value') : document.getElementById('qty-value');
+            var qty = 1;
+            if (qtyEl) {
+                qty = parseInt(qtyEl.textContent || qtyEl.innerText, 10) || 1;
+            }
+            var prev = btn.textContent;
+            btn.disabled = true;
+            fetch('{{ route('frontend.quota-list.add') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ product_id: parseInt(productId, 10), quantity: qty })
+            }).then(function (res) {
+                return res.json().then(function (body) {
+                    return { ok: res.ok, body: body };
+                });
+            }).then(function (result) {
+                if (result.body && typeof result.body.count !== 'undefined') {
+                    setQuotaBadge(result.body.count);
+                }
+                if (result.ok) {
+                    btn.textContent = 'Added';
+                    setTimeout(function () {
+                        btn.textContent = prev;
+                    }, 1600);
+                } else {
+                    var errMsg = (result.body && result.body.message) ? result.body.message : 'Could not add to quota list.';
+                    if (result.body && result.body.errors) {
+                        var keys = Object.keys(result.body.errors);
+                        if (keys.length && result.body.errors[keys[0]][0]) {
+                            errMsg = result.body.errors[keys[0]][0];
+                        }
+                    }
+                    window.alert(errMsg);
+                }
+            }).catch(function () {
+                window.alert('Could not add to quota list. Please try again.');
+            }).finally(function () {
+                btn.disabled = false;
+            });
+        });
+    })();
+    </script>
     
     @yield('scripts')
 </body>

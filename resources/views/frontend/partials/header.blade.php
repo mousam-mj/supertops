@@ -39,10 +39,10 @@
                         <div class="line absolute bg-line w-px h-6 -right-6"></div>
                     </div>
                     <div class="list-action flex items-center gap-4">
-                        <div class="max-md:hidden cart-icon flex items-center relative cursor-pointer">
-                            <i class="ph-bold ph-handbag text-2xl"></i>
-                            <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
-                        </div>
+                        <a href="{{ route('frontend.quota-list.index') }}" class="max-md:hidden cart-icon quota-bag-link cursor-pointer no-underline text-inherit" title="Quota list">
+                            <i class="ph-bold ph-handbag text-2xl" aria-hidden="true"></i>
+                            <span class="cart-quota-badge cart-quota-badge--empty" aria-label="Items in quota list">0</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -109,12 +109,12 @@
                 <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                 <span class="menu_bar-title caption2 font-semibold">Search</span>
             </a>
-            <a href="{{ route('frontend.contact') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                <div class="cart-icon relative">
-                    <span class="ph-bold ph-handbag text-2xl block"></span>
-                    <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
+            <a href="{{ route('frontend.quota-list.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
+                <div class="cart-icon">
+                    <span class="ph-bold ph-handbag text-2xl block" aria-hidden="true"></span>
+                    <span class="cart-quota-badge cart-quota-badge--empty" aria-label="Items in quota list">0</span>
                 </div>
-                <span class="menu_bar-title caption2 font-semibold">Cart</span>
+                <span class="menu_bar-title caption2 font-semibold">Quota</span>
             </a>
         </div>
     </div>

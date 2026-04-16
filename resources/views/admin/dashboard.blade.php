@@ -110,6 +110,65 @@
     </div>
 </div>
 
+<!-- Quota requests -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <a href="{{ route('admin.quota-requests.index', ['status' => 'pending']) }}" class="text-decoration-none text-reset">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small mb-1">Pending quota requests</div>
+                            <h3 class="mb-0 fw-bold">{{ $stats['pending_quota_requests'] ?? 0 }}</h3>
+                        </div>
+                        <div style="font-size: 2.5rem; opacity: 0.3;">
+                            <i class="bi bi-clipboard-data"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Recent quota requests</h5>
+                <a href="{{ route('admin.quota-requests.index') }}" class="btn btn-sm btn-outline-primary">View all</a>
+            </div>
+            <div class="card-body py-2">
+                @if(($recent_quota_requests ?? collect())->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Contact</th>
+                                    <th>Lines</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($recent_quota_requests as $qr)
+                                <tr>
+                                    <td><a href="{{ route('admin.quota-requests.show', $qr) }}">{{ $qr->reference }}</a></td>
+                                    <td>{{ $qr->contact_name }}</td>
+                                    <td>{{ $qr->items_count }}</td>
+                                    <td><span class="badge bg-{{ $qr->status_badge_class }}">{{ ucfirst(str_replace('_', ' ', $qr->status)) }}</span></td>
+                                    <td>{{ $qr->created_at->format('M d, Y') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-muted mb-0">No quota requests yet.</p>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Section -->
 <div class="row">
     <!-- Revenue Chart -->

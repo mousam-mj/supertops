@@ -61,7 +61,7 @@
                             <div class="quantity body1 font-semibold" id="qty-value">1</div>
                             <i class="ph-bold ph-plus cursor-pointer body1" id="qty-plus"></i>
                         </div>
-                        <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black">Add To Quota List</div>
+                        <button type="button" class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black edx-add-quota-btn cursor-pointer" data-product-id="{{ $product->id }}">Add To Quota List</button>
                         <div class="product-category caption2 text-secondary font-semibold uppercase">{{ $product->stock_quantity > 0 ? 'Available in stock' : 'Contact for availability' }}</div>
                     </div>
 
@@ -289,25 +289,26 @@
             </div>
             <div class="list-product flex flex-col gap-8">
                 @foreach($relatedProducts as $relatedProduct)
-                <div class="product-item list-type edxpro bg-white">
-                    <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="product-main cursor-pointer flex lg:items-center sm:justify-between gap-7 max-lg:gap-5 p-4">
-                        <div class="product-thumb bg-white relative overflow-hidden rounded-2xl block max-sm:w-1/2">
-                            <div class="product-img w-full rounded-2xl overflow-hidden">
-                                <img class="w-full duration-700" src="{{ $relatedProduct->image_url }}" alt="{{ $relatedProduct->name }}" style="width: 200px;">
+                <div class="product-item list-type edxpro bg-white" data-product-id="{{ $relatedProduct->id }}">
+                    <div class="product-main flex lg:items-center sm:justify-between gap-7 max-lg:gap-5 p-4">
+                        <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="flex sm:items-center gap-7 max-lg:gap-4 max-lg:flex-wrap lg:w-2/3 lg:flex-shrink-0 max-lg:w-full max-sm:flex-col max-sm:w-1/2 flex-1 min-w-0 no-underline text-inherit">
+                            <div class="product-thumb bg-white relative overflow-hidden rounded-2xl block max-sm:w-1/2">
+                                <div class="product-img w-full rounded-2xl overflow-hidden">
+                                    <img class="w-full duration-700" src="{{ $relatedProduct->image_url }}" alt="{{ $relatedProduct->name }}" style="width: 200px;">
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex sm:items-center gap-7 max-lg:gap-4 max-lg:flex-wrap lg:w-2/3 lg:flex-shrink-0 max-lg:w-full max-sm:flex-col max-sm:w-1/2">
                             <div class="product-infor max-sm:w-full">
                                 <div class="product-name heading6 inline-block duration-300">{{ $relatedProduct->sku ?? $relatedProduct->name }}</div>
                                 <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
                                     <div class="product-price text-title bg-green px-3 py-0.5 inline-block rounded-full">{{ $relatedProduct->category->name ?? 'Bearing' }}</div>
                                 </div>
                             </div>
-                            <div class="action w-fit flex flex-col items-center justify-center">
-                                <span class="quick-shop-btn button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white">View Details</span>
-                            </div>
+                        </a>
+                        <div class="action w-fit flex flex-col items-center justify-center gap-2 flex-shrink-0">
+                            <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="quick-shop-btn button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white text-center no-underline">View details</a>
+                            <button type="button" class="quick-shop-btn button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $relatedProduct->id }}">Add to quota list</button>
                         </div>
-                    </a>
+                    </div>
                 </div>
                 @endforeach
             </div>

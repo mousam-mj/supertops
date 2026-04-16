@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Product;
 use App\Models\Order;
-use App\Models\Category;
+use App\Models\Product;
+use App\Models\QuotaRequest;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,27 +20,28 @@ class DashboardController extends Controller
     {
         // Calculate today's date range for "today" stats
         $today = now()->startOfDay();
-        
+
         // Revenue stats - use total_amount if available, otherwise total
         $totalRevenue = Order::where('payment_status', 'paid')
             ->sum(DB::raw('COALESCE(total_amount, total, 0)')) ?? 0;
         $todayRevenue = Order::where('payment_status', 'paid')
             ->whereDate('created_at', $today)
             ->sum(DB::raw('COALESCE(total_amount, total, 0)')) ?? 0;
-        
+
         // Orders stats
         $totalOrders = Order::count();
         $todayOrders = Order::whereDate('created_at', $today)->count();
-        
+
         // Products stats
         $totalProducts = Product::count();
-        
+
         // Customers stats
         $totalCustomers = User::where('is_admin', false)->orWhereNull('is_admin')->count();
-        
+
         // Get last 7 days data for charts
         $last7Days = collect(range(6, 0))->map(function ($daysAgo) {
             $date = now()->subDays($daysAgo)->startOfDay();
+
             return [
                 'date' => $date->format('M d'),
                 'date_full' => $date->format('Y-m-d'),
@@ -49,7 +51,7 @@ class DashboardController extends Controller
                 'orders' => Order::whereDate('created_at', $date)->count(),
             ];
         });
-        
+
         // Orders by status
         $ordersByStatus = [
             'pending' => Order::where('status', 'pending')->count(),
@@ -58,13 +60,15 @@ class DashboardController extends Controller
             'delivered' => Order::where('status', 'delivered')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
         ];
-        
+
         // Alerts count (low stock + pending orders)
         $lowStockCount = Product::where('stock_quantity', '<', 10)
             ->where('is_active', true)
             ->count();
         $pendingOrdersCount = Order::where('status', 'pending')->count();
         $alertsCount = $lowStockCount + $pendingOrdersCount;
+
+        $pendingQuotaRequests = QuotaRequest::where('status', 'pending')->count();
 
         $stats = [
             'total_revenue' => $totalRevenue,
@@ -74,10 +78,17 @@ class DashboardController extends Controller
             'total_products' => $totalProducts,
             'total_customers' => $totalCustomers,
             'alerts_count' => $alertsCount,
+            'pending_quota_requests' => $pendingQuotaRequests,
         ];
 
         $recent_orders = Order::with('user')
             ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $recent_quota_requests = QuotaRequest::query()
+            ->withCount('items')
+            ->orderByDesc('created_at')
             ->limit(5)
             ->get();
 
@@ -86,10 +97,11 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'stats', 
-            'recent_orders', 
-            'top_products', 
-            'last7Days', 
+            'stats',
+            'recent_orders',
+            'recent_quota_requests',
+            'top_products',
+            'last7Days',
             'ordersByStatus'
         ));
     }
@@ -118,8 +130,8 @@ class DashboardController extends Controller
 
         if ($request->has('start_date') && $request->has('end_date')) {
             // Custom date range
-            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
             $days = $startDate->diffInDays($endDate) + 1;
         } elseif ($request->has('days')) {
             // Fixed days (7, 15, 30)
@@ -134,7 +146,7 @@ class DashboardController extends Controller
         // Generate date range
         $chartData = collect();
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate->lte($endDate)) {
             $chartData->push([
                 'date' => $currentDate->format('M d'),
@@ -153,8 +165,8 @@ class DashboardController extends Controller
             'range' => [
                 'start' => $startDate->format('Y-m-d'),
                 'end' => $endDate->format('Y-m-d'),
-                'days' => $days
-            ]
+                'days' => $days,
+            ],
         ]);
     }
 
@@ -167,19 +179,19 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get();
 
-        $filename = 'inventory_report_' . now()->format('Y-m-d_His') . '.csv';
-        
+        $filename = 'inventory_report_'.now()->format('Y-m-d_His').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($products) {
+        $callback = function () use ($products) {
             $file = fopen('php://output', 'w');
-            
+
             // BOM for UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+
             // Headers
             fputcsv($file, [
                 'Product ID',
@@ -191,7 +203,7 @@ class DashboardController extends Controller
                 'Stock Quantity',
                 'Low Stock Alert',
                 'Status',
-                'Created At'
+                'Created At',
             ]);
 
             // Data rows
@@ -206,7 +218,7 @@ class DashboardController extends Controller
                     $product->stock_quantity ?? 0,
                     ($product->stock_quantity ?? 0) < 10 ? 'Yes' : 'No',
                     $product->is_active ? 'Active' : 'Inactive',
-                    $product->created_at->format('Y-m-d H:i:s')
+                    $product->created_at->format('Y-m-d H:i:s'),
                 ]);
             }
 
@@ -221,29 +233,29 @@ class DashboardController extends Controller
      */
     public function downloadOrdersReport(Request $request)
     {
-        $startDate = $request->get('start_date') ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : null;
-        $endDate = $request->get('end_date') ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
+        $startDate = $request->get('start_date') ? Carbon::parse($request->start_date)->startOfDay() : null;
+        $endDate = $request->get('end_date') ? Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
 
         $orders = Order::with('user')
-            ->when($startDate, function($query) use ($startDate, $endDate) {
+            ->when($startDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereBetween('created_at', [$startDate, $endDate]);
             })
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $filename = 'orders_report_' . now()->format('Y-m-d_His') . '.csv';
-        
+        $filename = 'orders_report_'.now()->format('Y-m-d_His').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($orders) {
+        $callback = function () use ($orders) {
             $file = fopen('php://output', 'w');
-            
+
             // BOM for UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+
             // Headers
             fputcsv($file, [
                 'Order ID',
@@ -257,7 +269,7 @@ class DashboardController extends Controller
                 'Status',
                 'Payment Status',
                 'Payment Method',
-                'Created At'
+                'Created At',
             ]);
 
             // Data rows
@@ -274,7 +286,7 @@ class DashboardController extends Controller
                     ucfirst($order->status ?? 'Pending'),
                     ucfirst($order->payment_status ?? 'Pending'),
                     $order->payment_method ?? 'N/A',
-                    $order->created_at->format('Y-m-d H:i:s')
+                    $order->created_at->format('Y-m-d H:i:s'),
                 ]);
             }
 
@@ -289,8 +301,8 @@ class DashboardController extends Controller
      */
     public function downloadRevenueReport(Request $request)
     {
-        $startDate = $request->get('start_date') ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : now()->startOfMonth();
-        $endDate = $request->get('end_date') ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
+        $startDate = $request->get('start_date') ? Carbon::parse($request->start_date)->startOfDay() : now()->startOfMonth();
+        $endDate = $request->get('end_date') ? Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
 
         // Daily revenue breakdown
         $dailyRevenue = Order::where('payment_status', 'paid')
@@ -307,25 +319,25 @@ class DashboardController extends Controller
             ->orderBy('date')
             ->get();
 
-        $filename = 'revenue_report_' . now()->format('Y-m-d_His') . '.csv';
-        
+        $filename = 'revenue_report_'.now()->format('Y-m-d_His').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($dailyRevenue, $startDate, $endDate) {
+        $callback = function () use ($dailyRevenue, $startDate, $endDate) {
             $file = fopen('php://output', 'w');
-            
+
             // BOM for UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+
             // Summary header
             fputcsv($file, ['Revenue Report']);
-            fputcsv($file, ['Period: ' . $startDate->format('Y-m-d') . ' to ' . $endDate->format('Y-m-d')]);
-            fputcsv($file, ['Generated: ' . now()->format('Y-m-d H:i:s')]);
+            fputcsv($file, ['Period: '.$startDate->format('Y-m-d').' to '.$endDate->format('Y-m-d')]);
+            fputcsv($file, ['Generated: '.now()->format('Y-m-d H:i:s')]);
             fputcsv($file, []); // Empty row
-            
+
             // Headers
             fputcsv($file, [
                 'Date',
@@ -333,7 +345,7 @@ class DashboardController extends Controller
                 'Revenue',
                 'Subtotal',
                 'Tax',
-                'Shipping'
+                'Shipping',
             ]);
 
             // Data rows
@@ -344,7 +356,7 @@ class DashboardController extends Controller
                     number_format($day->revenue ?? 0, 2),
                     number_format($day->subtotal ?? 0, 2),
                     number_format($day->tax ?? 0, 2),
-                    number_format($day->shipping ?? 0, 2)
+                    number_format($day->shipping ?? 0, 2),
                 ]);
             }
 
@@ -356,7 +368,7 @@ class DashboardController extends Controller
                 number_format($dailyRevenue->sum('revenue'), 2),
                 number_format($dailyRevenue->sum('subtotal'), 2),
                 number_format($dailyRevenue->sum('tax'), 2),
-                number_format($dailyRevenue->sum('shipping'), 2)
+                number_format($dailyRevenue->sum('shipping'), 2),
             ]);
 
             fclose($file);
@@ -370,21 +382,21 @@ class DashboardController extends Controller
      */
     public function downloadCustomersReport(Request $request)
     {
-        $startDate = $request->get('start_date') ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : null;
-        $endDate = $request->get('end_date') ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
+        $startDate = $request->get('start_date') ? Carbon::parse($request->start_date)->startOfDay() : null;
+        $endDate = $request->get('end_date') ? Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
 
-        $customers = User::where(function($query) {
-                $query->where('is_admin', false)->orWhereNull('is_admin');
-            })
-            ->when($startDate, function($query) use ($startDate, $endDate) {
+        $customers = User::where(function ($query) {
+            $query->where('is_admin', false)->orWhereNull('is_admin');
+        })
+            ->when($startDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereBetween('created_at', [$startDate, $endDate]);
             })
-            ->withCount(['orders' => function($query) {
+            ->withCount(['orders' => function ($query) {
                 $query->where('payment_status', 'paid');
             }])
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         // Calculate total spent for each customer
         foreach ($customers as $customer) {
             $customer->total_spent = Order::where('user_id', $customer->id)
@@ -392,19 +404,19 @@ class DashboardController extends Controller
                 ->sum(DB::raw('COALESCE(total_amount, total, 0)')) ?? 0;
         }
 
-        $filename = 'customers_report_' . now()->format('Y-m-d_His') . '.csv';
-        
+        $filename = 'customers_report_'.now()->format('Y-m-d_His').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($customers) {
+        $callback = function () use ($customers) {
             $file = fopen('php://output', 'w');
-            
+
             // BOM for UTF-8
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+
             // Headers
             fputcsv($file, [
                 'Customer ID',
@@ -415,7 +427,7 @@ class DashboardController extends Controller
                 'Total Spent',
                 'Average Order Value',
                 'Registered At',
-                'Last Order Date'
+                'Last Order Date',
             ]);
 
             // Data rows
@@ -423,7 +435,7 @@ class DashboardController extends Controller
                 $lastOrder = Order::where('user_id', $customer->id)
                     ->orderBy('created_at', 'desc')
                     ->first();
-                
+
                 $totalSpent = $customer->total_spent ?? 0;
                 $orderCount = $customer->orders_count ?? 0;
                 $avgOrderValue = $orderCount > 0 ? ($totalSpent / $orderCount) : 0;
@@ -437,7 +449,7 @@ class DashboardController extends Controller
                     number_format($totalSpent, 2),
                     number_format($avgOrderValue, 2),
                     $customer->created_at->format('Y-m-d H:i:s'),
-                    $lastOrder ? $lastOrder->created_at->format('Y-m-d H:i:s') : 'N/A'
+                    $lastOrder ? $lastOrder->created_at->format('Y-m-d H:i:s') : 'N/A',
                 ]);
             }
 
@@ -456,16 +468,16 @@ class DashboardController extends Controller
             ->orderBy('sku')
             ->get();
 
-        $filename = 'skus_report_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'skus_report_'.now()->format('Y-m-d_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
         $callback = function () use ($products) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, [
                 'SKU',
                 'Product ID',

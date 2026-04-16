@@ -496,6 +496,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.quota-requests.*') ? 'active' : '' }}" href="{{ route('admin.quota-requests.index') }}">
+                                <i class="bi bi-clipboard-data me-2"></i> Quota requests
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
                                 <i class="bi bi-credit-card me-2"></i> Payments History
                             </a>

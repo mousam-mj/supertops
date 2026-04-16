@@ -13,9 +13,11 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\Admin\QuotaRequestController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Frontend\ProductPdfController;
+use App\Http\Controllers\Frontend\QuotaListController;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\MainCategory;
@@ -166,6 +168,17 @@ Route::post('/contact', function (Request $request) {
     return redirect()->route('frontend.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
 })->name('frontend.contact.submit');
 
+// Quota list (session) + quotation request submissions
+Route::prefix('quota-list')->name('frontend.quota-list.')->group(function () {
+    Route::get('/', [QuotaListController::class, 'index'])->name('index');
+    Route::get('/count', [QuotaListController::class, 'count'])->name('count');
+    Route::post('/add', [QuotaListController::class, 'add'])->name('add');
+    Route::post('/update', [QuotaListController::class, 'updateLine'])->name('update');
+    Route::post('/remove', [QuotaListController::class, 'remove'])->name('remove');
+    Route::post('/clear', [QuotaListController::class, 'clear'])->name('clear');
+    Route::post('/submit', [QuotaListController::class, 'submit'])->name('submit');
+});
+
 // Serve storage files via PHP when symlink returns 403
 $serveStorage = function (string $path) {
     $path = preg_replace('#\.\./#', '', $path);
@@ -217,6 +230,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);
+
+        Route::get('/quota-requests', [QuotaRequestController::class, 'index'])->name('quota-requests.index');
+        Route::get('/quota-requests/{quotaRequest}', [QuotaRequestController::class, 'show'])->name('quota-requests.show');
+        Route::put('/quota-requests/{quotaRequest}', [QuotaRequestController::class, 'update'])->name('quota-requests.update');
+        Route::delete('/quota-requests/{quotaRequest}', [QuotaRequestController::class, 'destroy'])->name('quota-requests.destroy');
         Route::resource('hero-banners', HeroBannerController::class)->except(['show']);
 
         // Settings
