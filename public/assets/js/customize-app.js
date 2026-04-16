@@ -10,6 +10,7 @@ var cfg=window.CUSTOMIZE_CONFIG||{};
 const DEFAULT_BOTTLE=[{name:'Lavender',hex:'#c4b8e8'},{name:'Mermaid Green',hex:'#4aab6a'},{name:'Dragonfruit',hex:'#c4426a'},{name:'Pacific',hex:'#3b78c4'},{name:'Lava',hex:'#c94b2f'},{name:'Slate',hex:'#5e7080'},{name:'Tan',hex:'#c2a97d'},{name:'Carnation',hex:'#e8a29a'},{name:'Birch',hex:'#b8b0a0'},{name:'Black',hex:'#1a1a1a'},{name:'White',hex:'#f0f0ee'},{name:'Lupine',hex:'#5b4ea8'},{name:'Agave',hex:'#5aaa7a'}];
 const DEFAULT_CAP=[{name:'Lavender',hex:'#c4b8e8'},{name:'Stone',hex:'#6b6b6b'},{name:'Black',hex:'#1a1a1a'},{name:'White',hex:'#f0f0ee'},{name:'Pacific',hex:'#3b78c4'},{name:'Neon Yellow',hex:'#ffe000'},{name:'Green',hex:'#3aaa5a'},{name:'Camellia',hex:'#e87aaa'}];
 const DEFAULT_STRAP=[{name:'Lavender',hex:'#c4b8e8'},{name:'Stone',hex:'#6b6b6b'},{name:'Black',hex:'#1a1a1a'},{name:'Pacific',hex:'#3b78c4'},{name:'Camellia',hex:'#e87aaa'},{name:'Neon Yellow',hex:'#ffe000'}];
+const DEFAULT_RING_COLOR='#4f535d';
 const bottleColors=cfg.bottle_colors&&cfg.bottle_colors.length?cfg.bottle_colors:DEFAULT_BOTTLE;
 const capColors=cfg.cap_colors&&cfg.cap_colors.length?cfg.cap_colors:DEFAULT_CAP;
 const strapColors=cfg.strap_colors&&cfg.strap_colors.length?cfg.strap_colors:DEFAULT_STRAP;
@@ -238,6 +239,22 @@ function orientToolcutLidGeometry(geo){
   geo.computeVertexNormals();
 }
 
+function pushGeometryOutwardRadially(geo, amount){
+  if(!geo||!amount) return;
+  var pos=geo.getAttribute('position');
+  if(!pos) return;
+  for(var i=0;i<pos.count;i++){
+    var x=pos.getX(i);
+    var z=pos.getZ(i);
+    var r=Math.sqrt(x*x+z*z);
+    if(r<1e-6) continue;
+    pos.setXYZ(i, x+(x/r)*amount, pos.getY(i), z+(z/r)*amount);
+  }
+  pos.needsUpdate=true;
+  geo.computeBoundingBox();
+  geo.computeVertexNormals();
+}
+
 function makePartMaterial(key, hex){
   const h=normalizeHex(hex);
   if(key==='logo'){
@@ -309,10 +326,10 @@ function loadAllParts(){
     if(lidOrientFix){
       if(geos.cap&&needsToolcutLidOrientation(geos.cap)) orientToolcutLidGeometry(geos.cap);
       if(geos.ring&&needsToolcutLidOrientation(geos.ring)) orientToolcutLidGeometry(geos.ring);
-      if(geos.logo&&needsToolcutLidOrientation(geos.logo)) orientToolcutLidGeometry(geos.logo);
     }
+    if(geos.ring) pushGeometryOutwardRadially(geos.ring, 0.75);
     var hb=bottleColors[S.bIdx].hex, hc=capColors[S.cIdx].hex, hs=strapColors[S.sIdx].hex, hh=handleColors[S.hIdx].hex, hbo=bootColors[S.boIdx].hex;
-    var hexMap={body:hb,cap:hc,ring:hc,handle:hh,boot:hbo,straw:hs};
+    var hexMap={body:hb,cap:hc,ring:DEFAULT_RING_COLOR,handle:hh,boot:hbo,straw:hs};
     var drawOrder={body:0,logo:1.2,boot:1,handle:2,ring:2.6,cap:3,straw:15};
     var keys=['body','logo','ring','cap','handle','boot','straw'];
     for(var i=0;i<keys.length;i++){
@@ -419,7 +436,8 @@ function syncAllPartsFromState(){
     M.logo.material.color.copy(lc);
     M.logo.material.needsUpdate=true;
   }
-  if(ch){ snapMatColor(M.cap, ch); if(M.ring) snapMatColor(M.ring, ch); }
+  if(ch) snapMatColor(M.cap, ch);
+  if(M.ring) snapMatColor(M.ring, DEFAULT_RING_COLOR);
   if(sh) snapMatColor(M.straw, sh);
   if(hh) snapMatColor(M.handle, hh);
   if(boh) snapMatColor(M.boot, boh);
@@ -452,7 +470,7 @@ function snapMatColor(mesh, hex){
   mesh.material.needsUpdate=true;
 }
 function setBodyColor(hex){ snapMatColor(M.body, hex); }
-function setCapColor(hex){ snapMatColor(M.cap, hex); if(M.ring) snapMatColor(M.ring, hex); }
+function setCapColor(hex){ snapMatColor(M.cap, hex); if(M.ring) snapMatColor(M.ring, DEFAULT_RING_COLOR); }
 function setStrapColor(hex){
   snapMatColor(M.straw, normalizeHex(hex));
 }
