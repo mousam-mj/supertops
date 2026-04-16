@@ -11,15 +11,32 @@
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Products</h4>
                 <p class="text-muted mb-0">Manage your product inventory</p>
             </div>
-            <a href="{{{ route('admin.products.create') }}}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add New Product
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bearingImportModal">
+                    <i class="bi bi-upload me-2"></i>Import bearings (CSV / Excel)
+                </button>
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Product
+                </a>
+            </div>
         </div>
+
+        @if(session('import_errors'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Import notes</strong>
+                <ul class="mb-0 small">
+                    @foreach(session('import_errors') as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
         
         <!-- Search and Filter Form -->
         <div class="card mb-3">
             <div class="card-body">
-                <form method="GET" action="{{{ route('admin.products.index') }}}" class="row g-3">
+                <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
                     <div class="col-md-4">
                         <label for="search" class="form-label">Search</label>
                         <div class="input-group">
@@ -56,7 +73,7 @@
                                 <i class="bi bi-search me-1"></i>Search
                             </button>
                             @if(request()->hasAny(['search', 'status', 'stock']))
-                                <a href="{{{ route('admin.products.index') }}}" class="btn btn-outline-secondary">
+                                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
                                     <i class="bi bi-x-lg"></i>
                                 </a>
                             @endif
@@ -165,17 +182,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{{ route('admin.products.show', $product) }}}" 
+                                            <a href="{{ route('admin.products.show', $product) }}" 
                                                class="btn btn-sm btn-outline-info" 
                                                title="View">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a href="{{{ route('admin.products.edit', $product) }}}" 
+                                            <a href="{{ route('admin.products.edit', $product) }}" 
                                                class="btn btn-sm btn-outline-primary" 
                                                title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <form action="{{{ route('admin.products.destroy', $product) }}}" 
+                                            <form action="{{ route('admin.products.destroy', $product) }}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to delete this product?');">
@@ -194,7 +211,7 @@
                                 <tr>
                                     <td colspan="8" class="text-center py-4">
                                         <p class="text-muted mb-0">No products found.</p>
-                                        <a href="{{{ route('admin.products.create') }}}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{ route('admin.products.create') }}" class="btn btn-sm btn-primary mt-2">
                                             Create First Product
                                         </a>
                                     </td>
@@ -209,6 +226,46 @@
                     {{ $products->links() }}
                 </div>
             @endif
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bearingImportModal" tabindex="-1" aria-labelledby="bearingImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bearingImportModalLabel">Import bearing catalog</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('admin.products.bearing-import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">
+                        Upload exports in the same shape as WordPress <strong>DGBB</strong>, <strong>SRB</strong>, or <strong>CRB</strong> files
+                        (pipe-separated <code>Image URL</code>s, <code>bearing_no</code> as SKU, <code>Bearing Category</code> / <code>bearing_category</code> must match a seeded bearing category).
+                    </p>
+                    <div class="mb-3">
+                        <label for="import_file" class="form-label">File (.csv, .txt, .xlsx, .xls — max 20&nbsp;MB)</label>
+                        <input type="file" class="form-control" name="import_file" id="import_file" accept=".csv,.txt,.xlsx,.xls" required>
+                    </div>
+                    <p class="mb-2">
+                        <a href="{{ route('admin.products.bearing-import.sample') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-download me-1"></i>Download sample header (DGBB-style)
+                        </a>
+                    </p>
+                    <details class="small text-muted mt-3">
+                        <summary class="fw-semibold text-secondary mb-2">Expected columns (reference)</summary>
+                        <p class="mb-2"><strong>DGBB / SRB-style</strong> (first row headers): <code>ID</code>, <code>Title</code>, <code>Post Type</code>, <code>Image URL</code> (optional, multiple URLs with <code>|</code>), <code>Bearing Category</code>, <code>bearing_no</code>, <code>bore_diameter</code>, <code>outside_diameter</code>, <code>width</code>, <code>basic_dynamic_load_rating</code>, <code>basic_static_load_rating</code>, <code>limiting_speed_grease</code>, <code>limiting_speed_oil</code>, <code>number_of_rows</code>, <code>radial_internal_clearance</code>, <code>tolerance_class_for_dimensions</code>, <code>cage</code>, <code>bore_type</code>, equivalents <code>skf</code>, <code>fag</code>, <code>ntn</code>, <code>timken</code>, suffix fields, <code>bearing_category</code>, and optionally <code>bearing_description</code>, <code>product_net_weight</code>.</p>
+                        <p class="mb-0"><strong>CRB-style</strong>: same bearing columns; uses a single <code>limiting_speed</code> column (mapped to both grease and oil in specs). Category from <code>bearing_category</code> / title context.</p>
+                    </details>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-cloud-upload me-1"></i>Run import
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

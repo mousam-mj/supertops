@@ -4,34 +4,78 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
+use App\Services\BearingCatalogImportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
+    /**
+     * Sample CSV header row matching DGBB / SRB WordPress export shape (CRB uses the same bearing_* columns without the leading ID/Content columns).
+     */
+    public function bearingImportSample(): StreamedResponse
+    {
+        $header = 'ID,Title,Content,Excerpt,Post Type,Image URL,Image Title,Image Caption,Image Description,Image Alt Text,Image Featured,Attachment URL,Bearing Category,bearing_no,bore_diameter,outside_diameter,width,basic_dynamic_load_rating,basic_static_load_rating,limiting_speed_grease,limiting_speed_oil,number_of_rows,radial_internal_clearance,tolerance_class_for_dimensions,cage,bore_type,skf,fag,ntn,timken,suffix_name,suffix_desc,suffix,suffix_type,bearing_image,bearing_category';
+
+        return response()->streamDownload(function () use ($header) {
+            echo "\xEF\xBB\xBF";
+            echo $header."\n";
+        }, 'bearing-import-sample-dgbb-header.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function importBearings(Request $request, BearingCatalogImportService $importer)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:csv,txt,xlsx,xls|max:20480',
+        ]);
+
+        $result = $importer->import($request->file('import_file'));
+        $message = sprintf(
+            'Bearing import finished: %d created, %d updated, %d rows skipped.',
+            $result['created'],
+            $result['updated'],
+            $result['skipped'],
+        );
+
+        if ($result['errors'] !== []) {
+            return redirect()
+                ->route('admin.products.index')
+                ->with('warning', $message)
+                ->with('import_errors', $result['errors']);
+        }
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', $message);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $query = Product::with('category');
-        
+
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('category', function($categoryQuery) use ($search) {
-                      $categoryQuery->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                        $categoryQuery->where('name', 'like', "%{$search}%");
+                    });
             });
         }
-        
+
         // Filter by status
         if ($request->filled('status')) {
             if ($request->status === 'active') {
@@ -40,22 +84,22 @@ class ProductController extends Controller
                 $query->where('is_active', false);
             }
         }
-        
+
         // Filter by stock
         if ($request->filled('stock')) {
             if ($request->stock === 'in_stock') {
                 $query->where('in_stock', true)->where('stock_quantity', '>', 0);
             } elseif ($request->stock === 'out_of_stock') {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('in_stock', false)->orWhere('stock_quantity', '<=', 0);
                 });
             } elseif ($request->stock === 'low_stock') {
                 $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 10);
             }
         }
-        
+
         $products = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
-        
+
         return view('admin.products.index', compact('products'));
     }
 
@@ -67,7 +111,7 @@ class ProductController extends Controller
         $categories = Category::where('is_active', true)
             ->orderBy('name')
             ->get();
-        
+
         return view('admin.products.create', compact('categories'));
     }
 
@@ -103,23 +147,23 @@ class ProductController extends Controller
         $validated['in_stock'] = false;
         $validated['price'] = 0;
         $validated['sale_price'] = null;
-        
+
         // Process specifications
         $specifications = [];
         if ($request->has('specifications') && is_array($request->specifications)) {
             foreach ($request->specifications as $spec) {
-                if (!empty($spec['key']) && !empty($spec['value'])) {
+                if (! empty($spec['key']) && ! empty($spec['value'])) {
                     $specifications[trim($spec['key'])] = trim($spec['value']);
                 }
             }
         }
-        $validated['specifications'] = !empty($specifications) ? $specifications : null;
-        
+        $validated['specifications'] = ! empty($specifications) ? $specifications : null;
+
         // Ensure slug is unique
         $originalSlug = $validated['slug'];
         $counter = 1;
         while (Product::where('slug', $validated['slug'])->exists()) {
-            $validated['slug'] = $originalSlug . '-' . $counter;
+            $validated['slug'] = $originalSlug.'-'.$counter;
             $counter++;
         }
 
@@ -134,7 +178,7 @@ class ProductController extends Controller
                 $galleryPaths[] = $file->store('products/gallery', 'public');
             }
         }
-        if (!empty($galleryPaths)) {
+        if (! empty($galleryPaths)) {
             $validated['images'] = $galleryPaths;
         }
 
@@ -155,6 +199,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load('category');
+
         return view('admin.products.show', compact('product'));
     }
 
@@ -166,7 +211,7 @@ class ProductController extends Controller
         $categories = Category::where('is_active', true)
             ->orderBy('name')
             ->get();
-        
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -180,7 +225,7 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'nullable|exists:categories,id',
-            'sku' => ['nullable', 'string', \Illuminate\Validation\Rule::unique('products', 'sku')->ignore($product->id)],
+            'sku' => ['nullable', 'string', Rule::unique('products', 'sku')->ignore($product->id)],
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -194,27 +239,27 @@ class ProductController extends Controller
             'specifications.*.key' => 'nullable|string|max:255',
             'specifications.*.value' => 'nullable|string|max:500',
         ]);
-        
+
         // Process specifications
         $specifications = [];
         if ($request->has('specifications') && is_array($request->specifications)) {
             foreach ($request->specifications as $spec) {
-                if (!empty($spec['key']) && !empty($spec['value'])) {
+                if (! empty($spec['key']) && ! empty($spec['value'])) {
                     $specifications[trim($spec['key'])] = trim($spec['value']);
                 }
             }
         }
-        $validated['specifications'] = !empty($specifications) ? $specifications : null;
+        $validated['specifications'] = ! empty($specifications) ? $specifications : null;
 
         // Update slug if name changed
         if ($validated['name'] != $product->name) {
             $validated['slug'] = Str::slug($validated['name']);
-            
+
             // Ensure slug is unique
             $originalSlug = $validated['slug'];
             $counter = 1;
             while (Product::where('slug', $validated['slug'])->where('id', '!=', $product->id)->exists()) {
-                $validated['slug'] = $originalSlug . '-' . $counter;
+                $validated['slug'] = $originalSlug.'-'.$counter;
                 $counter++;
             }
         }
@@ -235,15 +280,15 @@ class ProductController extends Controller
 
         // Handle remove_gallery_images
         $removeGalleryPaths = $request->input('remove_gallery_images', []);
-        if (!is_array($removeGalleryPaths)) {
+        if (! is_array($removeGalleryPaths)) {
             $removeGalleryPaths = array_filter([$removeGalleryPaths]);
         }
         $existingImages = is_array($product->images) ? $product->images : [];
-        if (!empty($removeGalleryPaths)) {
+        if (! empty($removeGalleryPaths)) {
             foreach ($removeGalleryPaths as $path) {
                 if (in_array($path, $existingImages)) {
                     Storage::disk('public')->delete($path);
-                    $existingImages = array_values(array_filter($existingImages, fn($img) => $img !== $path));
+                    $existingImages = array_values(array_filter($existingImages, fn ($img) => $img !== $path));
                 }
             }
         }

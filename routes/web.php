@@ -210,6 +210,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Resource Routes
         Route::resource('users', UserController::class);
+        Route::get('products/bearing-import/sample', [ProductController::class, 'bearingImportSample'])
+            ->name('products.bearing-import.sample');
+        Route::post('products/bearing-import', [ProductController::class, 'importBearings'])
+            ->name('products.bearing-import');
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);
