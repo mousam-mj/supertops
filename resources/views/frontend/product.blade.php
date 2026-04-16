@@ -87,8 +87,9 @@
                     </div>
                 </div>
 
-                <div class="button-block mt-5">
-                    <a href="{{ route('frontend.product.pdf', $product->slug) }}" class="button-main w-full text-center">Download PDF</a>
+                <div class="button-block mt-5 flex flex-col sm:flex-row gap-3">
+                    <a href="{{ route('frontend.product.pdf.preview', $product->slug) }}" target="_blank" rel="noopener noreferrer" class="button-main flex-1 text-center">Preview PDF</a>
+                    <a href="{{ route('frontend.product.pdf.download', $product->slug) }}" class="button-main bg-black flex-1 text-center">Download PDF</a>
                 </div>
             </div>
         </div>

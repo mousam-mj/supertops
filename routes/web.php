@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Frontend\ProductPdfController;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\MainCategory;
@@ -64,7 +65,7 @@ Route::get('/product/{slug}', function ($slug) {
     return view('frontend.product', compact('product', 'relatedProducts'));
 })->name('frontend.product');
 
-// Product PDF page (matches edxx/edx-product-pdf.html layout)
+// Product PDF hub (site layout + embedded preview + links)
 Route::get('/product/{slug}/pdf', function ($slug) {
     $product = Product::edxBearingsCatalog()
         ->where('slug', $slug)
@@ -74,6 +75,11 @@ Route::get('/product/{slug}/pdf', function ($slug) {
 
     return view('frontend.product-pdf', compact('product'));
 })->name('frontend.product.pdf');
+
+Route::get('/product/{slug}/pdf/preview', [ProductPdfController::class, 'preview'])
+    ->name('frontend.product.pdf.preview');
+Route::get('/product/{slug}/pdf/download', [ProductPdfController::class, 'download'])
+    ->name('frontend.product.pdf.download');
 
 // Product Range / Shop Page
 Route::get('/range', function (Request $request) {
