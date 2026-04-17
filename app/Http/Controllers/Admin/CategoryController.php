@@ -4,21 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\MainCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * When ?sub_only=1 (e.g. from "Sub Categories" nav), show only sub-categories (has parent).
+     * By default only categories under the bearing main category; ?show_all=1 lists everything.
+     * ?sub_only=1 limits to rows that have a parent (sub-categories).
      */
     public function index()
     {
+        $showAll = request()->boolean('show_all');
+
         $query = Category::with(['parent', 'children'])
+            ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('name');
+
+        if (! $showAll) {
+            $query->forBearingsCatalog();
+        }
 
         if (request()->boolean('sub_only')) {
             $query->whereNotNull('parent_id');
@@ -29,6 +39,8 @@ class CategoryController extends Controller
         return view('admin.categories.index', [
             'categories' => $categories,
             'subOnly' => request()->boolean('sub_only'),
+            'showAll' => $showAll,
+            'bearingCatalogOnly' => ! $showAll && MainCategory::bearingsCatalogId() !== null,
         ]);
     }
 
@@ -37,11 +49,13 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        $parentCategories = Category::whereNull('parent_id')
+        $parentCategories = Category::query()
+            ->whereNull('parent_id')
             ->where('is_active', true)
+            ->forBearingsCatalog()
             ->orderBy('name')
             ->get();
-        
+
         return view('admin.categories.create', compact('parentCategories'));
     }
 
@@ -66,18 +80,37 @@ class CategoryController extends Controller
             'testimonial_text' => 'nullable|string|max:1000',
             'additional_banner_image' => 'nullable|image|max:5120',
             'additional_banner_text' => 'nullable|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => [
+                'nullable',
+                Rule::exists('categories', 'id')->where(function ($q) {
+                    $q->whereNull('parent_id')->where('is_active', true);
+                    $bid = MainCategory::bearingsCatalogId();
+                    if ($bid) {
+                        $q->where('main_category_id', $bid);
+                    }
+                }),
+            ],
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
+        $bearingsId = MainCategory::bearingsCatalogId();
+        if ($bearingsId) {
+            if (! empty($validated['parent_id'])) {
+                $parent = Category::find($validated['parent_id']);
+                $validated['main_category_id'] = $parent?->main_category_id ?? $bearingsId;
+            } else {
+                $validated['main_category_id'] = $bearingsId;
+            }
+        }
+
         // Ensure slug is unique
         $originalSlug = $validated['slug'];
         $counter = 1;
         while (Category::where('slug', $validated['slug'])->exists()) {
-            $validated['slug'] = $originalSlug . '-' . $counter;
+            $validated['slug'] = $originalSlug.'-'.$counter;
             $counter++;
         }
 
@@ -99,7 +132,7 @@ class CategoryController extends Controller
                 }
             }
         }
-        if (!empty($bannerImagePaths)) {
+        if (! empty($bannerImagePaths)) {
             $validated['banner_images'] = $bannerImagePaths;
         }
 
@@ -130,6 +163,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         $category->load(['parent', 'children']);
+
         return view('admin.categories.show', compact('category'));
     }
 
@@ -138,12 +172,14 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        $parentCategories = Category::whereNull('parent_id')
+        $parentCategories = Category::query()
+            ->whereNull('parent_id')
             ->where('is_active', true)
             ->where('id', '!=', $category->id)
+            ->forBearingsCatalog()
             ->orderBy('name')
             ->get();
-        
+
         return view('admin.categories.edit', compact('category', 'parentCategories'));
     }
 
@@ -173,7 +209,18 @@ class CategoryController extends Controller
             'additional_banner_image' => 'nullable|image|max:5120',
             'remove_additional_banner_image' => 'nullable|boolean',
             'additional_banner_text' => 'nullable|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id|different:id',
+            'parent_id' => [
+                'nullable',
+                Rule::exists('categories', 'id')->where(function ($q) use ($category) {
+                    $q->whereNull('parent_id')
+                        ->where('is_active', true)
+                        ->where('id', '!=', $category->id);
+                    $bid = MainCategory::bearingsCatalogId();
+                    if ($bid) {
+                        $q->where('main_category_id', $bid);
+                    }
+                }),
+            ],
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
@@ -191,15 +238,25 @@ class CategoryController extends Controller
             }
         }
 
+        $bearingsId = MainCategory::bearingsCatalogId();
+        if ($bearingsId) {
+            if (! empty($validated['parent_id'])) {
+                $p = Category::find($validated['parent_id']);
+                $validated['main_category_id'] = $p?->main_category_id ?? $bearingsId;
+            } else {
+                $validated['main_category_id'] = $bearingsId;
+            }
+        }
+
         // Update slug if name changed
         if ($validated['name'] != $category->name) {
             $validated['slug'] = Str::slug($validated['name']);
-            
+
             // Ensure slug is unique
             $originalSlug = $validated['slug'];
             $counter = 1;
             while (Category::where('slug', $validated['slug'])->where('id', '!=', $category->id)->exists()) {
-                $validated['slug'] = $originalSlug . '-' . $counter;
+                $validated['slug'] = $originalSlug.'-'.$counter;
                 $counter++;
             }
         }
@@ -234,7 +291,7 @@ class CategoryController extends Controller
         // Handle banner images
         $existingBannerImages = is_array($category->banner_images) ? $category->banner_images : [];
         $removeBannerImages = $request->input('remove_banner_image', []);
-        
+
         if ($request->hasFile('banner_images')) {
             $newBannerPaths = [];
             foreach ($request->file('banner_images') as $index => $file) {
@@ -244,7 +301,7 @@ class CategoryController extends Controller
                         Storage::disk('public')->delete($existingBannerImages[$index]);
                     }
                     $newBannerPaths[$index] = $file->store('categories/banners', 'public');
-                } elseif (isset($existingBannerImages[$index]) && !isset($removeBannerImages[$index])) {
+                } elseif (isset($existingBannerImages[$index]) && ! isset($removeBannerImages[$index])) {
                     // Keep existing image if not removed
                     $newBannerPaths[$index] = $existingBannerImages[$index];
                 }
@@ -256,7 +313,7 @@ class CategoryController extends Controller
                     unset($newBannerPaths[$index]);
                 }
             }
-            $validated['banner_images'] = !empty($newBannerPaths) ? array_values($newBannerPaths) : null;
+            $validated['banner_images'] = ! empty($newBannerPaths) ? array_values($newBannerPaths) : null;
         } else {
             // Handle removal only
             foreach ($removeBannerImages as $index => $remove) {
@@ -265,7 +322,7 @@ class CategoryController extends Controller
                     unset($existingBannerImages[$index]);
                 }
             }
-            $validated['banner_images'] = !empty($existingBannerImages) ? array_values($existingBannerImages) : null;
+            $validated['banner_images'] = ! empty($existingBannerImages) ? array_values($existingBannerImages) : null;
         }
 
         // Handle banner texts
@@ -338,11 +395,11 @@ class CategoryController extends Controller
         if ($category->parent_id == $ancestor->id) {
             return true;
         }
-        
+
         if ($category->parent) {
             return $this->isDescendant($ancestor, $category->parent);
         }
-        
+
         return false;
     }
 }

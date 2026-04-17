@@ -10,6 +10,14 @@
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Main Categories</h4>
                 <p class="text-muted mb-0">Manage main product categories</p>
+                <div class="small mt-1">
+                    @if(empty($showAll))
+                        <span class="text-muted">Showing mains linked to the bearing catalog.</span>
+                        <a href="{{ route('admin.main-categories.index', ['show_all' => 1]) }}" class="text-primary ms-2">Show all</a>
+                    @else
+                        <a href="{{ route('admin.main-categories.index') }}" class="text-primary">Only mains used in catalog</a>
+                    @endif
+                </div>
             </div>
             <a href="{{{ route('admin.main-categories.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Main Category

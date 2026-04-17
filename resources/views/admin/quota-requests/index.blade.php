@@ -1,13 +1,13 @@
 @extends('admin.layout')
 
-@section('title', 'Quota requests')
-@section('page-title', 'Quota requests')
+@section('title', 'Quotations')
+@section('page-title', 'Quotations')
 
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <h4 class="mb-1 fw-bold" style="color: #2d3748;">Quota list submissions</h4>
-        <p class="text-muted mb-0">Customer quotation requests from the website</p>
+        <h4 class="mb-1 fw-bold" style="color: #2d3748;">Quotation requests</h4>
+        <p class="text-muted mb-0">Requests submitted from the website quota list</p>
     </div>
 </div>
 

@@ -35,7 +35,7 @@
                            class="item tab-item flex items-center justify-between cursor-pointer {{ request('category') == $category->slug ? 'active' : '' }}" 
                            data-item="{{ $category->slug }}">
                             <div class="type-name text-secondary has-line-before hover:text-black capitalize">{{ $category->name }}</div>
-                            <div class="text-secondary2 number">{{ $category->products_count ?? $category->products()->count() }}</div>
+                            <div class="text-secondary2 number">{{ $category->catalog_product_count ?? 0 }}</div>
                         </a>
                         @endforeach
                     </div>

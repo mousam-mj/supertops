@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
-@section('title', 'Quota request '.$quotaRequest->reference)
-@section('page-title', 'Quota request: '.$quotaRequest->reference)
+@section('title', 'Quotation '.$quotaRequest->reference)
+@section('page-title', 'Quotation: '.$quotaRequest->reference)
 
 @section('content')
 <div class="row mb-3">
@@ -10,7 +10,7 @@
         <form method="POST" action="{{ route('admin.quota-requests.destroy', $quotaRequest) }}" onsubmit="return confirm('Delete this quota request permanently?');" class="d-inline">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-outline-danger btn-sm">Delete request</button>
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete quotation</button>
         </form>
     </div>
 </div>

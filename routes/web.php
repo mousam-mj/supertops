@@ -87,11 +87,23 @@ Route::get('/product/{slug}/pdf/download', [ProductPdfController::class, 'downlo
 Route::get('/range', function (Request $request) {
     $bearingsMainId = MainCategory::bearingsCatalogId();
 
-    $categories = Category::where('is_active', true)
-        ->whereNull('parent_id')
+    $catalogCategoryIds = Product::edxBearingsCatalog()
+        ->where('is_active', true)
+        ->whereNotNull('category_id')
+        ->distinct()
+        ->pluck('category_id');
+
+    $categories = Category::query()
+        ->where('is_active', true)
+        ->whereIn('id', $catalogCategoryIds)
         ->when($bearingsMainId, function ($q) use ($bearingsMainId) {
             $q->where('main_category_id', $bearingsMainId);
         })
+        ->withCount([
+            'products as catalog_product_count' => function ($q) {
+                $q->edxBearingsCatalog()->where('is_active', true);
+            },
+        ])
         ->orderBy('name')
         ->get();
 
@@ -278,10 +290,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
         })->name('alerts.index');
 
         // Main Categories Routes
-        Route::get('/main-categories', function () {
-            $mainCategories = MainCategory::with('categories')->orderBy('sort_order')->get();
+        Route::get('/main-categories', function (Request $request) {
+            $catalogCategoryIds = Product::edxBearingsCatalog()
+                ->where('is_active', true)
+                ->whereNotNull('category_id')
+                ->distinct()
+                ->pluck('category_id');
 
-            return view('admin.main-categories.index', compact('mainCategories'));
+            $usedMainIds = Category::query()
+                ->whereIn('id', $catalogCategoryIds)
+                ->whereNotNull('main_category_id')
+                ->distinct()
+                ->pluck('main_category_id');
+
+            $mainCategories = MainCategory::with('categories')
+                ->when(! $request->boolean('show_all') && $usedMainIds->isNotEmpty(), function ($q) use ($usedMainIds) {
+                    $q->whereIn('id', $usedMainIds);
+                })
+                ->orderBy('sort_order')
+                ->get();
+
+            return view('admin.main-categories.index', [
+                'mainCategories' => $mainCategories,
+                'showAll' => $request->boolean('show_all'),
+            ]);
         })->name('main-categories.index');
 
         Route::get('/main-categories/create', function () {

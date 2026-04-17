@@ -431,6 +431,7 @@
                     <h5 class="text-white mb-0 small text-nowrap">Admin Panel</h5>
                 </div>
                 <div class="sidebar-nav-wrap px-3">
+                    @php($adminMinimalSidebar = (bool) config('app.admin_minimal_sidebar', true))
                     <ul class="nav flex-column mt-2">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
@@ -438,8 +439,32 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                                <i class="bi bi-folder2 me-2"></i> Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
+                                <i class="bi bi-box-seam me-2"></i> Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.quota-requests.*') ? 'active' : '' }}" href="{{ route('admin.quota-requests.index') }}">
+                                <i class="bi bi-clipboard-data me-2"></i> Quotations
+                            </a>
+                        </li>
+                        @unless($adminMinimalSidebar)
+                        <li class="nav-item pt-2 mt-2 border-top border-secondary border-opacity-25">
+                            <div class="px-3 py-2 text-white-50 small text-uppercase" style="letter-spacing: 0.06em;">More</div>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
                                 <i class="bi bi-gear me-2"></i> Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.main-categories.*') ? 'active' : '' }}" href="{{ route('admin.main-categories.index') }}">
+                                <i class="bi bi-folder me-2"></i> Main category groups
                             </a>
                         </li>
                         <li class="nav-item">
@@ -456,23 +481,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.main-categories.*') ? 'active' : '' }}" href="{{ route('admin.main-categories.index') }}">
-                                <i class="bi bi-folder me-2"></i> Main Categories
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.hero-banners.*') ? 'active' : '' }}" href="{{ route('admin.hero-banners.index') }}">
                                 <i class="bi bi-image me-2"></i> Hero Banners
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index', ['sub_only' => 1]) }}">
-                                <i class="bi bi-folder2 me-2"></i> Sub Categories
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
-                                <i class="bi bi-box-seam me-2"></i> Products
                             </a>
                         </li>
                         <li class="nav-item">
@@ -493,11 +503,6 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                                 <i class="bi bi-cart-check me-2"></i> Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.quota-requests.*') ? 'active' : '' }}" href="{{ route('admin.quota-requests.index') }}">
-                                <i class="bi bi-clipboard-data me-2"></i> Quota requests
                             </a>
                         </li>
                         <li class="nav-item">
@@ -535,6 +540,7 @@
                                 <i class="bi bi-chat-square-text me-2"></i> Review Manage
                             </a>
                         </li>
+                        @endunless
                     </ul>
                 </div>
                 <div class="p-3 pt-2 border-top border-secondary border-opacity-25 flex-shrink-0">

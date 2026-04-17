@@ -8,11 +8,27 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-1 fw-bold" style="color: #2d3748;">{{ isset($subOnly) && $subOnly ? 'Sub Categories' : 'All Categories' }}</h4>
-                <p class="text-muted mb-0">{{ isset($subOnly) && $subOnly ? 'Manage sub-categories only (categories with a parent)' : 'Manage your product categories' }}</p>
-                @if(isset($subOnly) && $subOnly)
-                    <a href="{{ route('admin.categories.index') }}" class="text-primary small mt-1 d-inline-block">View all categories</a>
-                @endif
+                <h4 class="mb-1 fw-bold" style="color: #2d3748;">Categories</h4>
+                <p class="text-muted mb-0">
+                    @if(! empty($bearingCatalogOnly))
+                        Bearing catalogue only (main category <strong>Bearings</strong>).
+                    @else
+                        All categories in the database.
+                    @endif
+                </p>
+                <div class="small mt-2 d-flex flex-wrap gap-2 align-items-center">
+                    @if(! empty($bearingCatalogOnly))
+                        <a href="{{ route('admin.categories.index', ['show_all' => 1]) }}" class="text-primary">Show all categories</a>
+                    @else
+                        <a href="{{ route('admin.categories.index') }}" class="text-primary">Bearing categories only</a>
+                    @endif
+                    <span class="text-muted">·</span>
+                    @if(empty($subOnly))
+                        <a href="{{ route('admin.categories.index', array_merge(['sub_only' => 1], ! empty($showAll) ? ['show_all' => 1] : [])) }}" class="text-primary">Sub-categories only</a>
+                    @else
+                        <a href="{{ route('admin.categories.index', ! empty($showAll) ? ['show_all' => 1] : []) }}" class="text-primary">Show top-level + sub</a>
+                    @endif
+                </div>
             </div>
             <a href="{{{ route('admin.categories.create') }}}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Add New Category
@@ -123,9 +139,12 @@
                             @empty
                                 <tr>
                                     <td colspan="9" class="text-center py-4">
-                                        <p class="text-muted mb-0">No categories found.</p>
-                                        <a href="{{{ route('admin.categories.create') }}}" class="btn btn-sm btn-primary mt-2">
-                                            Create First Category
+                                        <p class="text-muted mb-2">No categories match this filter.</p>
+                                        @if(! empty($bearingCatalogOnly))
+                                            <a href="{{ route('admin.categories.index', ['show_all' => 1]) }}" class="btn btn-sm btn-outline-primary me-2">Show all categories</a>
+                                        @endif
+                                        <a href="{{ route('admin.categories.create') }}" class="btn btn-sm btn-primary mt-2">
+                                            Add category
                                         </a>
                                     </td>
                                 </tr>

@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin sidebar (EDX catalog + quotations)
+    |--------------------------------------------------------------------------
+    |
+    | When true, the admin sidebar shows only dashboard, settings, categories,
+    | products, and quotations. Set ADMIN_FULL_SIDEBAR=true in .env to show
+    | all modules (orders, coupons, reels, etc.).
+    |
+    */
+
+    'admin_minimal_sidebar' => ! filter_var(env('ADMIN_FULL_SIDEBAR', false), FILTER_VALIDATE_BOOLEAN),
+
 ];

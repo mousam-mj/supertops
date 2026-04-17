@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -60,6 +61,19 @@ class Category extends Model
     }
 
     /**
+     * Limit to categories under the EDX bearing main category (slug: bearings).
+     */
+    public function scopeForBearingsCatalog(Builder $query): Builder
+    {
+        $id = MainCategory::bearingsCatalogId();
+        if ($id === null) {
+            return $query;
+        }
+
+        return $query->where('main_category_id', $id);
+    }
+
+    /**
      * Get the parent category.
      */
     public function parent()
@@ -106,12 +120,12 @@ class Category extends Model
     {
         $path = [$this->name];
         $parent = $this->parent;
-        
+
         while ($parent) {
             array_unshift($path, $parent->name);
             $parent = $parent->parent;
         }
-        
+
         return implode(' > ', $path);
     }
 }

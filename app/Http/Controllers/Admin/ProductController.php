@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\MainCategory;
 use App\Models\Product;
 use App\Services\BearingCatalogImportService;
 use Illuminate\Http\Request;
@@ -108,7 +109,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('is_active', true)
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->forBearingsCatalog()
             ->orderBy('name')
             ->get();
 
@@ -120,11 +123,19 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $categoryIdRules = ['nullable'];
+        $bearingsMainId = MainCategory::bearingsCatalogId();
+        if ($bearingsMainId) {
+            $categoryIdRules[] = Rule::exists('categories', 'id')->where('main_category_id', $bearingsMainId);
+        } else {
+            $categoryIdRules[] = 'exists:categories,id';
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => $categoryIdRules,
             'sku' => 'nullable|string|unique:products,sku',
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
@@ -208,7 +219,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->forBearingsCatalog()
             ->orderBy('name')
             ->get();
 
@@ -220,11 +233,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $categoryIdRules = ['nullable'];
+        $bearingsMainId = MainCategory::bearingsCatalogId();
+        if ($bearingsMainId) {
+            $categoryIdRules[] = Rule::exists('categories', 'id')->where('main_category_id', $bearingsMainId);
+        } else {
+            $categoryIdRules[] = 'exists:categories,id';
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => $categoryIdRules,
             'sku' => ['nullable', 'string', Rule::unique('products', 'sku')->ignore($product->id)],
             'in_stock' => 'boolean',
             'is_active' => 'boolean',
