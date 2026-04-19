@@ -74,50 +74,70 @@
                         @enderror
                     </div>
 
-                    <div class="alert alert-info mb-4">
-                        <i class="bi bi-box-seam me-2"></i><strong>Inventory:</strong> Manage <strong>price</strong>, quantity, color &amp; size from the <a href="{{ route('admin.inventory.index') }}">Inventory</a> module. Open a product there to add variants, pricing, stock, and color-specific images.
-                    </div>
+                    @php
+                        $structKeys = \App\Models\Product::bearingStructuredSpecKeys();
+                        $allP = is_array($product->specifications) ? $product->specifications : [];
+                        $bearing_specs = [];
+                        foreach ($structKeys as $_k) {
+                            $bearing_specs[$_k] = old('bearing_specs.'.$_k, $allP[$_k] ?? '');
+                        }
+                        $sfxOld = old('bearing_specs.suffix_pairs');
+                        $sfxStored = $allP['suffix_pairs'] ?? null;
+                        $bearing_specs['suffix_pairs'] = is_array($sfxOld)
+                            ? $sfxOld
+                            : (is_array($sfxStored) ? $sfxStored : [['suffix' => '', 'description' => '']]);
+                        if (! is_array($bearing_specs['suffix_pairs']) || count($bearing_specs['suffix_pairs']) === 0) {
+                            $bearing_specs['suffix_pairs'] = [['suffix' => '', 'description' => '']];
+                        }
+                        $extraSpecs = old('specifications');
+                        if (! is_array($extraSpecs)) {
+                            $extraSpecs = [];
+                            foreach ($allP as $k => $v) {
+                                if (in_array($k, $structKeys, true) || $k === 'suffix_pairs' || in_array($k, ['suffix', 'suffix_name', 'suffix_desc', 'suffix_type'], true)) {
+                                    continue;
+                                }
+                                if (is_scalar($v)) {
+                                    $extraSpecs[] = ['key' => $k, 'value' => (string) $v];
+                                }
+                            }
+                        }
+                        if (empty($extraSpecs)) {
+                            $extraSpecs = [['key' => '', 'value' => '']];
+                        }
+                    @endphp
+                    @include('admin.products.partials.bearing-spec-form', ['bearing_specs' => $bearing_specs])
 
                     <div class="mb-3">
-                        <label class="form-label">Specifications</label>
-                        <div id="specifications-container">
-                            @php
-                                $specs = old('specifications', []);
-                                if (empty($specs) && is_array($product->specifications) && !empty($product->specifications)) {
-                                    foreach ($product->specifications as $key => $value) {
-                                        $specs[] = ['key' => $key, 'value' => $value];
-                                    }
-                                }
-                                if (empty($specs)) $specs = [['key' => '', 'value' => '']];
-                            @endphp
-                            @foreach($specs as $idx => $spec)
+                        <label class="form-label">Additional specifications <span class="text-muted fw-normal">(optional)</span></label>
+                        <p class="small text-muted mb-2">Extra key/value pairs stored in specifications. Keys that match the bearing fields above are ignored here.</p>
+                        <div id="extra-specifications-container">
+                            @foreach($extraSpecs as $idx => $spec)
                                 <div class="spec-row mb-2 d-flex gap-2 align-items-start" data-index="{{ $idx }}">
                                     <div class="flex-grow-1">
-                                        <input type="text" 
-                                               name="specifications[{{ $idx }}][key]" 
-                                               class="form-control form-control-sm" 
-                                               placeholder="Key (e.g. Brand, Capacity, Material)" 
+                                        <input type="text"
+                                               name="specifications[{{ $idx }}][key]"
+                                               class="form-control form-control-sm"
+                                               placeholder="Custom key"
                                                value="{{ $spec['key'] ?? '' }}">
                                     </div>
                                     <div class="flex-grow-1">
-                                        <input type="text" 
-                                               name="specifications[{{ $idx }}][value]" 
-                                               class="form-control form-control-sm" 
-                                               placeholder="Value (e.g. Perch, 1000ml, Stainless Steel)" 
+                                        <input type="text"
+                                               name="specifications[{{ $idx }}][value]"
+                                               class="form-control form-control-sm"
+                                               placeholder="Value"
                                                value="{{ $spec['value'] ?? '' }}">
                                     </div>
                                     <div class="d-flex gap-1">
                                         <button type="button" class="btn btn-sm btn-success add-spec-btn" title="Add">
                                             <i class="bi bi-plus"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove" {{ count($specs) <= 1 ? 'style="display:none;"' : '' }}>
+                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove" {{ count($extraSpecs) <= 1 ? 'style="display:none;"' : '' }}>
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                        <small class="text-muted">Add product specifications like Brand, Capacity, Material, etc. Click + to add more.</small>
                     </div>
 
                     <div class="row">
@@ -150,9 +170,9 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="image" class="form-label">Product Image</label>
-                            @if($product->image)
+                            @if($product->resolveMainImagePath())
                                 <div class="mb-2 position-relative d-inline-block">
-                                    <img src="{{ storage_asset($product->image) }}" 
+                                    <img src="{{ $product->image_url }}"
                                          alt="{{ $product->name }}" 
                                          id="currentProductImage"
                                          style="max-width: 150px; max-height: 150px; border-radius: 4px;">
@@ -331,8 +351,8 @@
             });
         }
 
-        var specIndex = {{ count($specs ?? [['key' => '', 'value' => '']]) }};
-        var specContainer = document.getElementById('specifications-container');
+        var specIndex = {{ count($extraSpecs) }};
+        var specContainer = document.getElementById('extra-specifications-container');
         
         function updateRemoveButtons() {
             var rows = specContainer.querySelectorAll('.spec-row');

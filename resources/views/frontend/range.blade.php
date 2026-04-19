@@ -10,10 +10,13 @@
             <div class="main-content w-full h-full flex flex-col relative z-[1]">
                 <div class="text-content" style="color: aliceblue;">
                     <div class="heading2">DABB</div>
+                    @if(!empty($rangeCategory))
+                        <div class="heading6 mt-2 font-semibold text-white/95 leading-snug max-w-3xl">{{ $rangeCategory->name }}</div>
+                    @endif
                     <div class="link flex gap-1 caption1 mt-3">
                         <a href="{{ route('home') }}">Home</a>
                         <i class="ph ph-caret-right text-sm"></i>
-                        <div class="capitalize">Bearing</div>
+                        <div class="capitalize">{{ $rangeCategory?->name ?? 'Bearing' }}</div>
                     </div>
                 </div>
             </div>
@@ -24,55 +27,9 @@
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
         <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
-            <!-- Sidebar Filters -->
+            <!-- Sidebar: same dynamic filters as home -->
             <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                <!-- Category Filter -->
-                <div class="filter-type-block pb-8 border-b border-line">
-                    <div class="heading6">Products Type</div>
-                    <div class="list-type filter-type menu-tab mt-4">
-                        @foreach($categories as $category)
-                        <a href="{{ route('frontend.range', ['category' => $category->slug]) }}" 
-                           class="item tab-item flex items-center justify-between cursor-pointer {{ request('category') == $category->slug ? 'active' : '' }}" 
-                           data-item="{{ $category->slug }}">
-                            <div class="type-name text-secondary has-line-before hover:text-black capitalize">{{ $category->name }}</div>
-                            <div class="text-secondary2 number">{{ $category->catalog_product_count ?? 0 }}</div>
-                        </a>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Search Filter -->
-                <div class="filter-search pb-8 border-b border-line mt-8">
-                    <div class="heading6">Search</div>
-                    <form action="{{ route('frontend.range') }}" method="GET" class="mt-4">
-                        @if(request('category'))
-                        <input type="hidden" name="category" value="{{ request('category') }}">
-                        @endif
-                        <div class="relative">
-                            <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Search by name or SKU..." 
-                                   class="w-full py-3 pl-4 pr-10 rounded-lg border border-line">
-                            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2">
-                                <i class="ph ph-magnifying-glass text-xl"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Bore Diameter Filter -->
-                <div class="filter-size pb-8 border-b border-line mt-8">
-                    <div class="heading6">Bore Diameter (mm)</div>
-                    <div class="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                        <a href="{{ route('frontend.range', array_merge(request()->except('bore'), ['bore' => '0-20'])) }}" 
-                           class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line {{ request('bore') == '0-20' ? 'bg-black text-white' : '' }}">0-20</a>
-                        <a href="{{ route('frontend.range', array_merge(request()->except('bore'), ['bore' => '20-50'])) }}" 
-                           class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line {{ request('bore') == '20-50' ? 'bg-black text-white' : '' }}">20-50</a>
-                        <a href="{{ route('frontend.range', array_merge(request()->except('bore'), ['bore' => '50-100'])) }}" 
-                           class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line {{ request('bore') == '50-100' ? 'bg-black text-white' : '' }}">50-100</a>
-                        <a href="{{ route('frontend.range', array_merge(request()->except('bore'), ['bore' => '100+'])) }}" 
-                           class="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-line {{ request('bore') == '100+' ? 'bg-black text-white' : '' }}">100+</a>
-                    </div>
-                </div>
+                @include('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['cages' => [], 'rows' => []]])
             </div>
 
             <!-- Product List -->
@@ -90,8 +47,6 @@
                             <select id="select-filter" name="select-filter" class="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-line" onchange="window.location.href=this.value">
                                 <option value="{{ route('frontend.range', array_merge(request()->except('sort'), ['sort' => 'latest'])) }}" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest</option>
                                 <option value="{{ route('frontend.range', array_merge(request()->except('sort'), ['sort' => 'name'])) }}" {{ request('sort') == 'name' ? 'selected' : '' }}>Name A-Z</option>
-                                <option value="{{ route('frontend.range', array_merge(request()->except('sort'), ['sort' => 'price_low'])) }}" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price Low To High</option>
-                                <option value="{{ route('frontend.range', array_merge(request()->except('sort'), ['sort' => 'price_high'])) }}" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price High To Low</option>
                             </select>
                             <i class="ph ph-caret-down absolute top-1/2 -translate-y-1/2 md:right-4 right-2"></i>
                         </div>

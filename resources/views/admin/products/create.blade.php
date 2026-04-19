@@ -73,44 +73,53 @@
                         @enderror
                     </div>
 
-                    <div class="alert alert-info mb-4">
-                        <i class="bi bi-box-seam me-2"></i><strong>Inventory:</strong> After creating the product, manage <strong>price</strong>, quantity, color &amp; size from the <a href="{{ route('admin.inventory.index') }}">Inventory</a> module.
-                    </div>
+                    @php
+                        $bearing_specs = [];
+                        foreach (\App\Models\Product::bearingStructuredSpecKeys() as $_k) {
+                            $bearing_specs[$_k] = old('bearing_specs.'.$_k, '');
+                        }
+                        $sfxOld = old('bearing_specs.suffix_pairs');
+                        $bearing_specs['suffix_pairs'] = (is_array($sfxOld) && count($sfxOld) > 0)
+                            ? $sfxOld
+                            : [['suffix' => '', 'description' => '']];
+                        $extraSpecs = old('specifications');
+                        if (! is_array($extraSpecs) || empty($extraSpecs)) {
+                            $extraSpecs = [['key' => '', 'value' => '']];
+                        }
+                    @endphp
+                    @include('admin.products.partials.bearing-spec-form', ['bearing_specs' => $bearing_specs])
 
                     <div class="mb-3">
-                        <label class="form-label">Specifications</label>
-                        <div id="specifications-container">
-                            @php
-                                $specs = old('specifications', [['key' => '', 'value' => '']]);
-                            @endphp
-                            @foreach($specs as $idx => $spec)
+                        <label class="form-label">Additional specifications <span class="text-muted fw-normal">(optional)</span></label>
+                        <p class="small text-muted mb-2">Custom key/value rows. Do not reuse the same internal keys as the bearing fields above (they are ignored here).</p>
+                        <div id="extra-specifications-container">
+                            @foreach($extraSpecs as $idx => $spec)
                                 <div class="spec-row mb-2 d-flex gap-2 align-items-start" data-index="{{ $idx }}">
                                     <div class="flex-grow-1">
-                                        <input type="text" 
-                                               name="specifications[{{ $idx }}][key]" 
-                                               class="form-control form-control-sm" 
-                                               placeholder="Key (e.g. Brand, Capacity, Material)" 
+                                        <input type="text"
+                                               name="specifications[{{ $idx }}][key]"
+                                               class="form-control form-control-sm"
+                                               placeholder="Custom key"
                                                value="{{ $spec['key'] ?? '' }}">
                                     </div>
                                     <div class="flex-grow-1">
-                                        <input type="text" 
-                                               name="specifications[{{ $idx }}][value]" 
-                                               class="form-control form-control-sm" 
-                                               placeholder="Value (e.g. Perch, 1000ml, Stainless Steel)" 
+                                        <input type="text"
+                                               name="specifications[{{ $idx }}][value]"
+                                               class="form-control form-control-sm"
+                                               placeholder="Value"
                                                value="{{ $spec['value'] ?? '' }}">
                                     </div>
                                     <div class="d-flex gap-1">
                                         <button type="button" class="btn btn-sm btn-success add-spec-btn" title="Add">
                                             <i class="bi bi-plus"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove" {{ count($specs) <= 1 ? 'style="display:none;"' : '' }}>
+                                        <button type="button" class="btn btn-sm btn-danger remove-spec-btn" title="Remove" {{ count($extraSpecs) <= 1 ? 'style="display:none;"' : '' }}>
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                        <small class="text-muted">Add product specifications like Brand, Capacity, Material, etc. Click + to add more.</small>
                     </div>
 
                     <div class="row">
@@ -291,8 +300,8 @@
             });
         }
 
-        var specIndex = {{ count(old('specifications', [['key' => '', 'value' => '']])) }};
-        var specContainer = document.getElementById('specifications-container');
+        var specIndex = {{ count($extraSpecs) }};
+        var specContainer = document.getElementById('extra-specifications-container');
         
         function updateRemoveButtons() {
             var rows = specContainer.querySelectorAll('.spec-row');

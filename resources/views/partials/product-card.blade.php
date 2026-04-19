@@ -3,8 +3,6 @@
         <div class="product-thumb bg-white relative rounded-2xl overflow-hidden">
             @if(isset($product->is_new_arrival) && $product->is_new_arrival)
                 <div class="product-tag text-button-uppercase bg-green px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">New</div>
-            @elseif(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
-                <div class="product-tag text-button-uppercase text-white bg-red px-3 py-0.5 inline-block rounded-full absolute top-3 left-3 z-[1]">Sale</div>
             @endif
             
             <div class="list-action-right absolute top-3 right-3 max-lg:hidden">
@@ -62,28 +60,6 @@
         </div>
         
         <div class="product-infor mt-4 lg:mb-7">
-            <div class="product-sold sm:pb-4 pb-2">
-                @php
-                    $stockQuantity = $product->stock_quantity ?? 100;
-                    $sold = rand(10, min(50, $stockQuantity - 10));
-                    $available = $stockQuantity - $sold;
-                    $soldPercentage = $stockQuantity > 0 ? ($sold / $stockQuantity) * 100 : 0;
-                @endphp
-                <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">
-                    <div class="progress-sold bg-red absolute left-0 top-0 h-full" style="width: {{ $soldPercentage }}%"></div>
-                </div>
-                <div class="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
-                    <div class="text-button-uppercase">
-                        <span class="text-secondary2 max-sm:text-xs">Sold: </span>
-                        <span class="max-sm:text-xs">{{ $sold }}</span>
-                    </div>
-                    <div class="text-button-uppercase">
-                        <span class="text-secondary2 max-sm:text-xs">Available: </span>
-                        <span class="max-sm:text-xs">{{ $available }}</span>
-                    </div>
-                </div>
-            </div>
-            
             <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-name text-title duration-300 hover:text-secondary block">{{ $product->name ?? 'Product Name' }}</a>
 
             @if(isset($product->colors) && (is_array($product->colors) || is_object($product->colors)) && count($product->colors) > 0)
@@ -106,21 +82,6 @@
                     @endforeach
                 </div>
             @endif
-
-            <div class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                <div class="product-price text-title">₹{{ number_format(($product->sale_price ?? $product->price ?? 0), 2) }}</div>
-                @if(isset($product->sale_price) && $product->sale_price && isset($product->price) && $product->price > $product->sale_price)
-                    <div class="product-origin-price caption1 text-secondary2">
-                        <del>₹{{ number_format($product->price, 2) }}</del>
-                    </div>
-                    @php
-                        $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
-                    @endphp
-                    @if($discount > 0)
-                        <div class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">-{{ $discount }}%</div>
-                    @endif
-                @endif
-            </div>
         </div>
     </div>
 </div>

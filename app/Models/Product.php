@@ -57,6 +57,34 @@ class Product extends Model
         'sort_order' => 'integer',
     ];
 
+    /**
+     * Keys stored in `specifications` JSON for bearing catalog (admin form, CSV import, storefront tabs).
+     *
+     * @return list<string>
+     */
+    public static function bearingStructuredSpecKeys(): array
+    {
+        return [
+            'bore_diameter',
+            'outside_diameter',
+            'width',
+            'dynamic_load_rating',
+            'static_load_rating',
+            'limiting_speed_grease',
+            'limiting_speed_oil',
+            'number_of_rows',
+            'radial_clearance',
+            'tolerance_class',
+            'cage',
+            'bore_type',
+            'weight',
+            'equiv_skf',
+            'equiv_fag',
+            'equiv_ntn',
+            'equiv_timken',
+        ];
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -215,6 +243,62 @@ class Product extends Model
     }
 
     /**
+     * True when a remote URL is very likely to return image bytes (not an HTML attachment page or site URL).
+     */
+    public static function pathLooksLikeRemoteImageUrl(string $url): bool
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return false;
+        }
+
+        if (str_starts_with($url, '//')) {
+            $url = 'https:'.$url;
+        }
+
+        if (! str_starts_with($url, 'http://') && ! str_starts_with($url, 'https://')) {
+            return false;
+        }
+
+        $parsed = parse_url($url);
+        if (! is_array($parsed)) {
+            return false;
+        }
+
+        $pathname = $parsed['path'] ?? '';
+        if ($pathname !== '' && preg_match('/\.(jpe?g|png|gif|webp|avif|svg|bmp)(\/)?$/i', $pathname)) {
+            return true;
+        }
+
+        $query = $parsed['query'] ?? '';
+        if ($query !== '' && preg_match('/(^|&)(format|fm|type)=(webp|jpg|jpeg|png|gif)/i', $query)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether this stored reference should be used as an <img> src (skips obvious HTML page links).
+     */
+    public static function isAcceptableImageSource(?string $path): bool
+    {
+        if ($path === null || ! is_string($path)) {
+            return false;
+        }
+        $path = trim($path);
+        if ($path === '') {
+            return false;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '//')) {
+            return self::pathLooksLikeRemoteImageUrl($path);
+        }
+
+        return true;
+    }
+
+    /**
      * Public URL for a stored image path (uploads under storage/app/public, or static files under public/).
      */
     public static function publicUrlForPath(?string $path): string
@@ -225,11 +309,17 @@ class Product extends Model
             return $fallback;
         }
 
-        $path = ltrim($path, '/');
+        $raw = trim((string) $path);
 
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://') || str_starts_with($raw, '//')) {
+            if (! self::pathLooksLikeRemoteImageUrl($raw)) {
+                return $fallback;
+            }
+
+            return $raw;
         }
+
+        $path = ltrim($raw, '/');
 
         if (str_starts_with($path, 'assets/')) {
             return is_file(public_path($path)) ? asset($path) : $fallback;
@@ -247,10 +337,55 @@ class Product extends Model
     }
 
     /**
+     * First usable image path: main image, then gallery, then imported bearing_image in specifications.
+     */
+    public function resolveMainImagePath(): ?string
+    {
+        $candidates = [];
+
+        $push = function ($v) use (&$candidates): void {
+            if (! is_string($v)) {
+                return;
+            }
+            $v = trim($v);
+            if ($v === '') {
+                return;
+            }
+            $candidates[] = $v;
+        };
+
+        $push($this->attributes['image'] ?? null);
+
+        $gallery = $this->images;
+        if (is_array($gallery)) {
+            foreach ($gallery as $item) {
+                $push(is_string($item) ? $item : null);
+            }
+        }
+
+        $specs = $this->specifications;
+        if (is_string($specs)) {
+            $decoded = json_decode($specs, true);
+            $specs = is_array($decoded) ? $decoded : [];
+        } elseif (! is_array($specs)) {
+            $specs = [];
+        }
+        $push($specs['bearing_image'] ?? null);
+
+        foreach ($candidates as $candidate) {
+            if (self::isAcceptableImageSource($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Resolved main image URL for Blade / JSON (never points at wrong /storage/... for public assets).
      */
     public function getImageUrlAttribute(): string
     {
-        return self::publicUrlForPath($this->attributes['image'] ?? null);
+        return self::publicUrlForPath($this->resolveMainImagePath());
     }
 }

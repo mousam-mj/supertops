@@ -25,6 +25,7 @@ use App\Models\MasterColor;
 use App\Models\MasterSize;
 use App\Models\Order;
 use App\Models\Product;
+use App\Support\CatalogFilterOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -35,16 +36,18 @@ use Illuminate\Support\Str;
 // =====================================================
 
 // Home Page (edx-bearing HTML catalog only — Bearings main category)
-Route::get('/', function () {
-    $productTotal = Product::edxBearingsCatalog()->where('is_active', true)->count();
-    $products = Product::edxBearingsCatalog()->where('is_active', true)
-        ->with('category')
-        ->orderBy('sort_order')
-        ->orderBy('id')
-        ->limit(12)
-        ->get();
+Route::get('/', function (Request $request) {
+    $base = Product::edxBearingsCatalog()->where('is_active', true);
+    $productTotal = (clone $base)->count();
 
-    return view('frontend.home', compact('products', 'productTotal'));
+    $query = (clone $base)->with('category')->orderByDesc('created_at')->orderByDesc('id');
+
+    $products = $query->limit(12)->get();
+
+    $categories = CatalogFilterOptions::categories();
+    $facets = CatalogFilterOptions::facets();
+
+    return view('frontend.home', compact('products', 'productTotal', 'categories', 'facets'));
 })->name('home');
 
 // Product Detail Page
@@ -85,56 +88,17 @@ Route::get('/product/{slug}/pdf/download', [ProductPdfController::class, 'downlo
 
 // Product Range / Shop Page
 Route::get('/range', function (Request $request) {
-    $bearingsMainId = MainCategory::bearingsCatalogId();
-
-    $catalogCategoryIds = Product::edxBearingsCatalog()
-        ->where('is_active', true)
-        ->whereNotNull('category_id')
-        ->distinct()
-        ->pluck('category_id');
-
-    $categories = Category::query()
-        ->where('is_active', true)
-        ->whereIn('id', $catalogCategoryIds)
-        ->when($bearingsMainId, function ($q) use ($bearingsMainId) {
-            $q->where('main_category_id', $bearingsMainId);
-        })
-        ->withCount([
-            'products as catalog_product_count' => function ($q) {
-                $q->edxBearingsCatalog()->where('is_active', true);
-            },
-        ])
-        ->orderBy('name')
-        ->get();
+    $categories = CatalogFilterOptions::categories();
+    $facets = CatalogFilterOptions::facets();
 
     $query = Product::edxBearingsCatalog()->where('is_active', true)->with('category');
 
-    if ($request->filled('category')) {
-        $category = Category::where('slug', $request->category)->first();
-        if ($category) {
-            $query->where('category_id', $category->id);
-        }
-    }
-
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', '%'.$search.'%')
-                ->orWhere('sku', 'like', '%'.$search.'%')
-                ->orWhere('description', 'like', '%'.$search.'%');
-        });
-    }
+    CatalogFilterOptions::applyListingFilters($query, $request);
 
     $sort = $request->get('sort', 'latest');
     switch ($sort) {
         case 'name':
             $query->orderBy('name');
-            break;
-        case 'price_low':
-            $query->orderByRaw('COALESCE(sale_price, price) ASC');
-            break;
-        case 'price_high':
-            $query->orderByRaw('COALESCE(sale_price, price) DESC');
             break;
         default:
             $query->orderBy('created_at', 'desc');
@@ -142,7 +106,11 @@ Route::get('/range', function (Request $request) {
 
     $products = $query->paginate(12)->withQueryString();
 
-    return view('frontend.range', compact('products', 'categories'));
+    $rangeCategory = $request->filled('category')
+        ? Category::where('slug', $request->category)->first()
+        : null;
+
+    return view('frontend.range', compact('products', 'categories', 'facets', 'rangeCategory'));
 })->name('frontend.range');
 
 // Static Pages
@@ -183,6 +151,7 @@ Route::post('/contact', function (Request $request) {
 // Quota list (session) + quotation request submissions
 Route::prefix('quota-list')->name('frontend.quota-list.')->group(function () {
     Route::get('/', [QuotaListController::class, 'index'])->name('index');
+    Route::get('/preview', [QuotaListController::class, 'preview'])->name('preview');
     Route::get('/count', [QuotaListController::class, 'count'])->name('count');
     Route::post('/add', [QuotaListController::class, 'add'])->name('add');
     Route::post('/update', [QuotaListController::class, 'updateLine'])->name('update');

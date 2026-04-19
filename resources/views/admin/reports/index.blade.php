@@ -7,32 +7,11 @@
 <div class="row mb-4">
     <div class="col-12">
         <h4 class="mb-1 fw-bold" style="color: #2d3748;">Download Reports</h4>
-        <p class="text-muted mb-0">Export inventory, orders, customers, revenue, and SKUs as CSV.</p>
+        <p class="text-muted mb-0">Export orders, customers, revenue, and SKUs as CSV.</p>
     </div>
 </div>
 
 <div class="row g-4">
-    {{-- Inventory --}}
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-3 p-3 me-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                        <i class="bi bi-box-seam text-white fs-4"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title mb-0">Inventory</h5>
-                        <small class="text-muted">Products, stock, categories</small>
-                    </div>
-                </div>
-                <p class="card-text small text-muted mb-3">All products with name, SKU, category, price, stock, and status.</p>
-                <a href="{{ route('admin.dashboard.reports.inventory') }}" class="btn btn-primary btn-sm w-100">
-                    <i class="bi bi-download me-1"></i> Download CSV
-                </a>
-            </div>
-        </div>
-    </div>
-
     {{-- SKUs --}}
     <div class="col-md-6 col-lg-4">
         <div class="card h-100 border-0 shadow-sm">

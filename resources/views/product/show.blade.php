@@ -36,26 +36,6 @@
             if ($path) $colorImageUrls[$cName] = str_starts_with($path, 'http') ? $path : storage_asset($path);
         }
     }
-    $variantPrices = [];
-    $productPrice = (float) ($product->price ?? 0);
-    $productSalePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
-    foreach ($product->inventories as $inv) {
-        $c = $inv->color ?? '';
-        $s = $inv->size ?? '';
-        $p = $inv->price !== null && $inv->price > 0 ? (float) $inv->price : $productPrice;
-        $sp = $inv->sale_price !== null && $inv->sale_price > 0 ? (float) $inv->sale_price : $productSalePrice;
-        $variantPrices[] = ['color' => $c, 'size' => $s, 'price' => $p, 'sale_price' => $sp];
-    }
-    $initialPrice = $productPrice;
-    $initialSalePrice = $productSalePrice;
-    foreach ($variantPrices as $v) {
-        if (($v['color'] === $firstColor || ($v['color'] === '' && !$firstColor)) && ($v['size'] === $firstSize || ($v['size'] === '' && !$firstSize))) {
-            $initialPrice = $v['price'];
-            $initialSalePrice = $v['sale_price'];
-            break;
-        }
-    }
-    $initialDisplayPrice = ($initialSalePrice !== null && $initialSalePrice > 0 && $initialSalePrice < $initialPrice) ? $initialSalePrice : $initialPrice;
 @endphp
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
@@ -174,24 +154,9 @@
                                 </div>
                                 <span class="caption1 text-secondary">({{ number_format($rc) }} {{ $rc === 1 ? 'review' : 'reviews' }})</span>
                             </div>
-                            <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line product-price-block" data-variant-prices="{{ json_encode($variantPrices) }}" data-product-price="{{ $productPrice }}" data-product-sale-price="{{ $productSalePrice !== null ? $productSalePrice : '' }}">
-                                <div class="product-price heading5">₹{{ number_format($initialDisplayPrice, 2) }}</div>
-                                @if($initialSalePrice !== null && $initialSalePrice > 0 && $initialPrice > $initialSalePrice)
-                                    <div class="w-px h-4 bg-line"></div>
-                                    <div class="product-origin-price font-normal text-secondary2">
-                                        <del>₹{{ number_format($initialPrice, 2) }}</del>
-                                    </div>
-                                    @php $discount = round((($initialPrice - $initialSalePrice) / $initialPrice) * 100); @endphp
-                                    @if($discount > 0)
-                                        <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">-{{ $discount }}%</div>
-                                    @endif
-                                @else
-                                    <div class="w-px h-4 bg-line d-none"></div>
-                                    <div class="product-origin-price font-normal text-secondary2 d-none"><del></del></div>
-                                    <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full d-none"></div>
-                                @endif
+                            <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
                                 <div class="product-description text-secondary mt-3 w-full">{{ $product->short_description ?? ($product->description ? \Illuminate\Support\Str::limit($product->description, 150) : 'No description available.') }}</div>
-                </div>
+                            </div>
                             <div class="list-action mt-6">
                                 <div class="discount-code">
                                     @if($coupons && $coupons->count() > 0)
@@ -352,17 +317,6 @@
                                             <div class="item flex gap-1 text-secondary mt-1">
                                                 <i class="ph ph-dot text-2xl"></i>
                                                 <p>Category: {{ $product->category->name }}</p>
-                                            </div>
-                                        @endif
-                                        @if($product->in_stock)
-                                            <div class="item flex gap-1 text-secondary mt-1">
-                                                <i class="ph ph-dot text-2xl"></i>
-                                                <p>In Stock: {{ $product->stock_quantity ?? 'Available' }} units</p>
-                                            </div>
-                                        @else
-                                            <div class="item flex gap-1 text-secondary mt-1">
-                                                <i class="ph ph-dot text-2xl"></i>
-                                                <p>Currently Out of Stock</p>
                                             </div>
                                         @endif
                                         @if(isset($availableSizes) && count($availableSizes) > 0)

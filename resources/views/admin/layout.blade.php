@@ -486,11 +486,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}" href="{{ route('admin.inventory.index') }}">
-                                <i class="bi bi-boxes me-2"></i> Inventory
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.customize.*') ? 'active' : '' }}" href="{{ route('admin.customize.index') }}">
                                 <i class="bi bi-sliders me-2"></i> Customize
                             </a>

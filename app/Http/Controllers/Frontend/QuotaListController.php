@@ -59,6 +59,59 @@ class QuotaListController extends Controller
         ]);
     }
 
+    /**
+     * JSON payload for header quota modal (SKU, qty, links).
+     */
+    public function preview(Request $request): JsonResponse
+    {
+        $lines = $this->sessionLines($request);
+        $excludeIds = collect($lines)->pluck('product_id')->unique()->filter()->map(fn ($id) => (int) $id)->all();
+        $suggestions = $this->suggestionProductsForModal($excludeIds);
+
+        if ($lines === []) {
+            return response()->json([
+                'empty' => true,
+                'count' => 0,
+                'items' => [],
+                'suggestions' => $suggestions,
+            ]);
+        }
+
+        $productIds = collect($lines)->pluck('product_id')->unique()->filter()->all();
+        $products = Product::edxBearingsCatalog()
+            ->where('is_active', true)
+            ->whereIn('id', $productIds)
+            ->with('category')
+            ->get()
+            ->keyBy('id');
+
+        $items = [];
+        foreach ($lines as $line) {
+            $pid = (int) ($line['product_id'] ?? 0);
+            $qty = max(1, (int) ($line['quantity'] ?? 1));
+            $product = $products->get($pid);
+            if (! $product) {
+                continue;
+            }
+            $items[] = [
+                'product_id' => $pid,
+                'quantity' => $qty,
+                'sku' => $product->sku,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'category' => $product->category->name ?? '',
+                'image_url' => $product->image_url,
+            ];
+        }
+
+        return response()->json([
+            'empty' => $items === [],
+            'count' => $this->distinctProductCount($request),
+            'items' => $items,
+            'suggestions' => $suggestions,
+        ]);
+    }
+
     public function add(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -259,6 +312,30 @@ class QuotaListController extends Controller
         return redirect()
             ->route('frontend.quota-list.index')
             ->with('success', 'Your quota request '.$quotaRequest->reference.' was sent. Our team will contact you shortly.');
+    }
+
+    /**
+     * @param  list<int>  $excludeProductIds
+     * @return list<array{slug: string, sku: ?string, name: string, image_url: string}>
+     */
+    private function suggestionProductsForModal(array $excludeProductIds): array
+    {
+        $q = Product::edxBearingsCatalog()->where('is_active', true);
+        if ($excludeProductIds !== []) {
+            $q->whereNotIn('id', $excludeProductIds);
+        }
+
+        return $q->inRandomOrder()
+            ->limit(6)
+            ->get(['id', 'slug', 'sku', 'name'])
+            ->map(fn (Product $p) => [
+                'slug' => $p->slug,
+                'sku' => $p->sku,
+                'name' => $p->name,
+                'image_url' => $p->image_url,
+            ])
+            ->values()
+            ->all();
     }
 
     private function sessionLines(Request $request): array

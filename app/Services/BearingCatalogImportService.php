@@ -64,7 +64,8 @@ class BearingCatalogImportService
 
                     $description = $this->pick($row, ['bearing_description', 'Content', 'Excerpt']);
 
-                    $imageUrls = $this->splitUrls($this->pick($row, ['Image URL']));
+                    $imageCandidates = $this->catalogImageUrlCandidates($row);
+                    $imageUrls = array_values(array_filter($imageCandidates, fn ($u) => Product::isAcceptableImageSource($u)));
                     $mainImage = $imageUrls[0] ?? null;
                     $imagesJson = count($imageUrls) > 0 ? $imageUrls : null;
 
@@ -303,9 +304,30 @@ class BearingCatalogImportService
         $out = [];
         foreach ($parts as $p) {
             $p = trim($p);
-            if ($p !== '' && (str_starts_with($p, 'http://') || str_starts_with($p, 'https://'))) {
+            if ($p !== '' && (str_starts_with($p, 'http://') || str_starts_with($p, 'https://') || str_starts_with($p, '//'))) {
                 $out[] = $p;
             }
+        }
+
+        return array_values(array_unique($out));
+    }
+
+    /**
+     * Ordered remote image URL candidates from export columns (filtered later with Product::isAcceptableImageSource).
+     *
+     * @return list<string>
+     */
+    protected function catalogImageUrlCandidates(array $row): array
+    {
+        $out = [];
+        foreach (['Image URL', 'Attachment URL'] as $col) {
+            foreach ($this->splitUrls($this->pick($row, [$col])) as $u) {
+                $out[] = $u;
+            }
+        }
+        $bearingImg = trim($this->pick($row, ['bearing_image']));
+        if ($bearingImg !== '' && (str_starts_with($bearingImg, 'http://') || str_starts_with($bearingImg, 'https://') || str_starts_with($bearingImg, '//'))) {
+            $out[] = $bearingImg;
         }
 
         return array_values(array_unique($out));
@@ -361,6 +383,11 @@ class BearingCatalogImportService
             if ($v !== '') {
                 $specs[$key] = $v;
             }
+        }
+
+        $bearingImage = trim($this->pick($row, ['bearing_image']));
+        if ($bearingImage !== '') {
+            $set('bearing_image', $bearingImage);
         }
 
         foreach ($row as $k => $v) {

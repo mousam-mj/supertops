@@ -14,7 +14,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <h4 class="mb-1 fw-bold" style="color: #2d3748;">Color & Size Master</h4>
-        <p class="text-muted mb-0">Manage master colors and sizes for products and inventory</p>
+        <p class="text-muted mb-0">Manage master colors and sizes for products</p>
     </div>
 </div>
 

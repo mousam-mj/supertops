@@ -86,19 +86,6 @@ class ProductController extends Controller
             }
         }
 
-        // Filter by stock
-        if ($request->filled('stock')) {
-            if ($request->stock === 'in_stock') {
-                $query->where('in_stock', true)->where('stock_quantity', '>', 0);
-            } elseif ($request->stock === 'out_of_stock') {
-                $query->where(function ($q) {
-                    $q->where('in_stock', false)->orWhere('stock_quantity', '<=', 0);
-                });
-            } elseif ($request->stock === 'low_stock') {
-                $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 10);
-            }
-        }
-
         $products = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return view('admin.products.index', compact('products'));
@@ -131,7 +118,7 @@ class ProductController extends Controller
             $categoryIdRules[] = 'exists:categories,id';
         }
 
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
@@ -146,10 +133,19 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'bearing_specs' => 'nullable|array',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
-            'specifications.*.value' => 'nullable|string|max:500',
-        ]);
+            'specifications.*.value' => 'nullable|string|max:2000',
+        ];
+        foreach (Product::bearingStructuredSpecKeys() as $key) {
+            $rules['bearing_specs.'.$key] = 'nullable|string|max:2000';
+        }
+        $rules['bearing_specs.suffix_pairs'] = 'nullable|array|max:50';
+        $rules['bearing_specs.suffix_pairs.*.suffix'] = 'nullable|string|max:500';
+        $rules['bearing_specs.suffix_pairs.*.description'] = 'nullable|string|max:2000';
+
+        $validated = $request->validate($rules);
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['sizes'] = [];
@@ -159,16 +155,9 @@ class ProductController extends Controller
         $validated['price'] = 0;
         $validated['sale_price'] = null;
 
-        // Process specifications
-        $specifications = [];
-        if ($request->has('specifications') && is_array($request->specifications)) {
-            foreach ($request->specifications as $spec) {
-                if (! empty($spec['key']) && ! empty($spec['value'])) {
-                    $specifications[trim($spec['key'])] = trim($spec['value']);
-                }
-            }
-        }
-        $validated['specifications'] = ! empty($specifications) ? $specifications : null;
+        unset($validated['specifications'], $validated['bearing_specs']);
+        $mergedSpecs = $this->specificationsFromBearingAndExtraForms($request);
+        $validated['specifications'] = $mergedSpecs !== [] ? $mergedSpecs : null;
 
         // Ensure slug is unique
         $originalSlug = $validated['slug'];
@@ -241,7 +230,7 @@ class ProductController extends Controller
             $categoryIdRules[] = 'exists:categories,id';
         }
 
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:50000',
             'short_description' => 'nullable|string|max:500',
@@ -256,21 +245,26 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'bearing_specs' => 'nullable|array',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
-            'specifications.*.value' => 'nullable|string|max:500',
-        ]);
-
-        // Process specifications
-        $specifications = [];
-        if ($request->has('specifications') && is_array($request->specifications)) {
-            foreach ($request->specifications as $spec) {
-                if (! empty($spec['key']) && ! empty($spec['value'])) {
-                    $specifications[trim($spec['key'])] = trim($spec['value']);
-                }
-            }
+            'specifications.*.value' => 'nullable|string|max:2000',
+        ];
+        foreach (Product::bearingStructuredSpecKeys() as $key) {
+            $rules['bearing_specs.'.$key] = 'nullable|string|max:2000';
         }
-        $validated['specifications'] = ! empty($specifications) ? $specifications : null;
+        $rules['bearing_specs.suffix_pairs'] = 'nullable|array|max:50';
+        $rules['bearing_specs.suffix_pairs.*.suffix'] = 'nullable|string|max:500';
+        $rules['bearing_specs.suffix_pairs.*.description'] = 'nullable|string|max:2000';
+
+        $validated = $request->validate($rules);
+
+        unset($validated['specifications'], $validated['bearing_specs']);
+        $mergedSpecs = $this->specificationsFromBearingAndExtraForms($request);
+        if (is_array($mergedSpecs)) {
+            $mergedSpecs = $this->preserveImportedSuffixScalars($product, $mergedSpecs);
+        }
+        $validated['specifications'] = $mergedSpecs !== [] ? $mergedSpecs : null;
 
         // Update slug if name changed
         if ($validated['name'] != $product->name) {
@@ -372,5 +366,98 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * Merge `bearing_specs[*]` with optional extra `specifications[n][key|value]` rows (extra keys must not duplicate structured keys).
+     *
+     * @return array<string, string>
+     */
+    protected function specificationsFromBearingAndExtraForms(Request $request): array
+    {
+        $out = [];
+        $input = $request->input('bearing_specs', []);
+        if (! is_array($input)) {
+            $input = [];
+        }
+        foreach (Product::bearingStructuredSpecKeys() as $key) {
+            if (! array_key_exists($key, $input)) {
+                continue;
+            }
+            $v = $input[$key];
+            if (is_string($v)) {
+                $v = trim($v);
+            } elseif (is_numeric($v)) {
+                $v = trim((string) $v);
+            } else {
+                continue;
+            }
+            if ($v !== '') {
+                $out[$key] = $v;
+            }
+        }
+
+        $suffixPairsIn = $input['suffix_pairs'] ?? [];
+        if (is_array($suffixPairsIn)) {
+            $clean = [];
+            foreach ($suffixPairsIn as $row) {
+                if (! is_array($row)) {
+                    continue;
+                }
+                $s = trim((string) ($row['suffix'] ?? ''));
+                $d = trim((string) ($row['description'] ?? ''));
+                if ($s === '' && $d === '') {
+                    continue;
+                }
+                $clean[] = [
+                    'suffix' => $s !== '' ? $s : '—',
+                    'description' => $d,
+                ];
+            }
+            if ($clean !== []) {
+                $out['suffix_pairs'] = $clean;
+            }
+        }
+
+        $reserved = array_flip(array_merge(Product::bearingStructuredSpecKeys(), ['suffix_pairs']));
+        if ($request->has('specifications') && is_array($request->specifications)) {
+            foreach ($request->specifications as $spec) {
+                if (! is_array($spec)) {
+                    continue;
+                }
+                $k = isset($spec['key']) ? trim((string) $spec['key']) : '';
+                $v = isset($spec['value']) ? trim((string) $spec['value']) : '';
+                if ($k === '' || $v === '') {
+                    continue;
+                }
+                if (isset($reserved[$k])) {
+                    continue;
+                }
+                $out[$k] = $v;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Keep CSV-imported single suffix fields when the admin form no longer posts them.
+     *
+     * @param  array<string, mixed>  $mergedSpecs
+     * @return array<string, mixed>
+     */
+    protected function preserveImportedSuffixScalars(Product $product, array $mergedSpecs): array
+    {
+        $prev = $product->specifications;
+        if (! is_array($prev)) {
+            return $mergedSpecs;
+        }
+        foreach (['suffix', 'suffix_name', 'suffix_desc', 'suffix_type'] as $k) {
+            if (! array_key_exists($k, $mergedSpecs) && array_key_exists($k, $prev) && is_scalar($prev[$k])) {
+                $mergedSpecs[$k] = $prev[$k];
+            }
+        }
+
+        return $mergedSpecs;
     }
 }

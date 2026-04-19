@@ -33,16 +33,17 @@
                         </li>
                     </ul>
                 </div>
-                <div class="right flex gap-12 z-[1]">
+                <div class="right flex items-center gap-5 md:gap-6 z-[5] shrink-0">
                     <div class="max-md:hidden search-icon flex items-center cursor-pointer relative">
                         <i class="ph-bold ph-magnifying-glass text-2xl"></i>
-                        <div class="line absolute bg-line w-px h-6 -right-6"></div>
+                        <div class="line absolute bg-line w-px h-6 -right-4" style="pointer-events: none;" aria-hidden="true"></div>
                     </div>
-                    <div class="list-action flex items-center gap-4">
-                        <a href="{{ route('frontend.quota-list.index') }}" class="max-md:hidden cart-icon quota-bag-link cursor-pointer no-underline text-inherit" title="Quota list">
+                    <div class="list-action flex items-center">
+                        {{-- Do not use class "cart-icon": theme main.js binds the first .cart-icon to legacy cart modal and breaks quota click. --}}
+                        <button type="button" id="edx-header-quota-bag" class="quota-bag-open quota-header-bag max-md:hidden cursor-pointer no-underline text-inherit appearance-none bg-transparent border-0 p-0" title="Quota list" aria-label="Open quotation list" aria-haspopup="dialog" aria-expanded="false" aria-controls="edx-quota-modal">
                             <i class="ph-bold ph-handbag text-2xl" aria-hidden="true"></i>
                             <span class="cart-quota-badge cart-quota-badge--empty" aria-label="Items in quota list">0</span>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -109,13 +110,13 @@
                 <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                 <span class="menu_bar-title caption2 font-semibold">Search</span>
             </a>
-            <a href="{{ route('frontend.quota-list.index') }}" class="menu_bar-link flex flex-col items-center gap-1">
-                <div class="cart-icon">
+            <button type="button" id="edx-menu-bar-quota-bag" class="quota-bag-open menu_bar-link flex flex-col items-center gap-1 appearance-none bg-transparent border-0 p-0 w-full cursor-pointer" aria-label="Open quotation list" aria-haspopup="dialog" aria-expanded="false" aria-controls="edx-quota-modal">
+                <div class="quota-bag-inner">
                     <span class="ph-bold ph-handbag text-2xl block" aria-hidden="true"></span>
                     <span class="cart-quota-badge cart-quota-badge--empty" aria-label="Items in quota list">0</span>
                 </div>
                 <span class="menu_bar-title caption2 font-semibold">Quota</span>
-            </a>
+            </button>
         </div>
     </div>
 </div>

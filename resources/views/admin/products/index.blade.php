@@ -9,7 +9,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">All Products</h4>
-                <p class="text-muted mb-0">Manage your product inventory</p>
+                <p class="text-muted mb-0">Manage your bearing catalog products</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bearingImportModal">
@@ -37,7 +37,7 @@
         <div class="card mb-3">
             <div class="card-body">
                 <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <label for="search" class="form-label">Search</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -49,7 +49,7 @@
                                    value="{{ request('search') }}">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-select" id="status" name="status">
                             <option value="">All Status</option>
@@ -58,21 +58,12 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="stock" class="form-label">Stock</label>
-                        <select class="form-select" id="stock" name="stock">
-                            <option value="">All Stock</option>
-                            <option value="in_stock" {{ request('stock') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
-                            <option value="out_of_stock" {{ request('stock') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
-                            <option value="low_stock" {{ request('stock') === 'low_stock' ? 'selected' : '' }}>Low Stock (≤10)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
                         <label class="form-label">&nbsp;</label>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="bi bi-search me-1"></i>Search
                             </button>
-                            @if(request()->hasAny(['search', 'status', 'stock']))
+                            @if(request()->hasAny(['search', 'status']))
                                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
                                     <i class="bi bi-x-lg"></i>
                                 </a>
@@ -85,7 +76,7 @@
     </div>
 </div>
 
-@if(request()->hasAny(['search', 'status', 'stock']))
+@if(request()->hasAny(['search', 'status']))
     <div class="alert alert-info mb-3">
         <i class="bi bi-info-circle me-2"></i>
         Found <strong>{{ $products->total() }}</strong> product(s) matching your search criteria.
@@ -107,32 +98,14 @@
                                 <th>Image</th>
                                 <th>Name</th>
                                 <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $productPlaceholder = asset('assets/images/product/perch-bottal.webp');
-                                $getImageUrlFromPath = function($path) {
-                                    if (!$path || !is_string($path)) return null;
-                                    if (str_starts_with($path, 'http') || str_starts_with($path, '//')) return $path;
-                                    if (str_starts_with($path, 'assets/') || str_starts_with($path, '/assets/')) return asset($path);
-                                    return storage_asset($path);
-                                };
-                                $getProductImageUrl = function($product) use ($getImageUrlFromPath) {
-                                    if ($product->image) return $getImageUrlFromPath($product->image);
-                                    if (is_array($product->images) && count($product->images) > 0) {
-                                        $first = $product->images[0];
-                                        return is_string($first) ? $getImageUrlFromPath($first) : null;
-                                    }
-                                    return null;
-                                };
-                            @endphp
+                            @php $productPlaceholder = asset('assets/images/product/perch-bottal.webp'); @endphp
                             @forelse($products as $product)
-                                @php $imageUrl = $getProductImageUrl($product) ?? $productPlaceholder; @endphp
+                                @php $imageUrl = $product->image_url; @endphp
                                 <tr>
                                     <td>{{ $product->id }}</td>
                                     <td>
@@ -152,22 +125,6 @@
                                             <span class="badge bg-info">{{ $product->category->name }}</span>
                                         @else
                                             <span class="text-muted">—</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($product->sale_price)
-                                            <span class="text-decoration-line-through text-muted">₹{{ number_format($product->price, 2) }}</span>
-                                            <br>
-                                            <strong class="text-danger">₹{{ number_format($product->sale_price, 2) }}</strong>
-                                        @else
-                                            <strong>₹{{ number_format($product->price, 2) }}</strong>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($product->stock_quantity < 10)
-                                            <span class="badge bg-warning">{{ $product->stock_quantity }}</span>
-                                        @else
-                                            <span class="badge bg-success">{{ $product->stock_quantity }}</span>
                                         @endif
                                     </td>
                                     <td>
@@ -209,7 +166,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         <p class="text-muted mb-0">No products found.</p>
                                         <a href="{{ route('admin.products.create') }}" class="btn btn-sm btn-primary mt-2">
                                             Create First Product

@@ -11,11 +11,11 @@
                 <h5 class="mb-0">Product Information</h5>
             </div>
             <div class="card-body">
-                @if($product->image)
+                @if($product->resolveMainImagePath())
                     <div class="mb-3">
-                        <img src="{{ storage_asset($product->image) }}" 
-                             alt="{{ $product->name }}" 
-                             class="img-fluid" 
+                        <img src="{{ $product->image_url }}"
+                             alt="{{ $product->name }}"
+                             class="img-fluid"
                              style="max-width: 300px; border-radius: 8px;">
                     </div>
                 @endif
@@ -47,28 +47,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Price</th>
-                        <td>
-                            @if($product->sale_price)
-                                <span class="text-decoration-line-through text-muted">{{ currency($product->price) }}</span>
-                                <strong class="text-danger ms-2">{{ currency($product->sale_price) }}</strong>
-                                <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
-                            @else
-                                <strong>{{ currency($product->price) }}</strong>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Stock Quantity</th>
-                        <td>
-                            @if($product->stock_quantity < 10)
-                                <span class="badge bg-warning">{{ $product->stock_quantity }}</span>
-                            @else
-                                <span class="badge bg-success">{{ $product->stock_quantity }}</span>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
                         <th>Status</th>
                         <td>
                             @if($product->is_active)
@@ -78,11 +56,6 @@
                             @endif
                             @if($product->is_featured)
                                 <span class="badge bg-primary ms-2">Featured</span>
-                            @endif
-                            @if($product->in_stock)
-                                <span class="badge bg-info ms-2">In Stock</span>
-                            @else
-                                <span class="badge bg-danger ms-2">Out of Stock</span>
                             @endif
                         </td>
                     </tr>

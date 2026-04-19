@@ -113,7 +113,7 @@
                 </table>
             </div>
 
-            <div class="max-w-xl">
+            <div id="request-quotation" class="max-w-xl scroll-mt-24">
                 <h2 class="heading5 mb-4">Request a quotation</h2>
                 <p class="text-secondary mb-6">Send your list to our sales team. We will reply with availability and pricing. Confirmation emails are sent when mail is configured.</p>
                 <form method="POST" action="{{ route('frontend.quota-list.submit') }}" class="flex flex-col gap-4">
