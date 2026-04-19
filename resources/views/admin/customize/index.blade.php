@@ -138,7 +138,7 @@
                                     <th style="width:9rem">Slug <span class="text-muted fw-normal">(optional)</span></th>
                                     <th style="width:7rem">Price ₹</th>
                                     <th style="min-width:14rem">Type</th>
-                                    <th>Icon <span class="text-muted fw-normal">(URL or file when Upload type)</span></th>
+                                    <th>Icon <span class="text-muted fw-normal">(URL or optional file — Simple / one tap only)</span></th>
                                     <th class="text-end" style="width:4rem"></th>
                                 </tr>
                             </thead>
@@ -172,11 +172,14 @@
                                             </div>
                                         </td>
                                         <td class="align-top">
-                                            <input type="text" class="form-control form-control-sm mb-1" name="engraving_categories[{{ $i }}][icon]" value="{{ old('engraving_categories.'.$i.'.icon', $erow['icon']) }}" placeholder="https://…">
-                                            <div class="engraving-cat-icon-file-wrap" style="display: {{ $engrType === 'upload' ? 'block' : 'none' }}">
-                                                <label class="form-label small text-muted mb-0">Card thumbnail — choose file (optional)</label>
-                                                <input type="file" class="form-control form-control-sm mt-1" name="engraving_categories[{{ $i }}][icon_upload]" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+                                            <div class="engraving-cat-icon-fields" style="display: {{ $engrType === 'simple' ? 'block' : 'none' }}">
+                                                <input type="text" class="form-control form-control-sm mb-1" name="engraving_categories[{{ $i }}][icon]" value="{{ old('engraving_categories.'.$i.'.icon', $erow['icon']) }}" placeholder="https://…" {{ $engrType !== 'simple' ? 'disabled' : '' }}>
+                                                <div class="engraving-cat-icon-file-wrap">
+                                                    <label class="form-label small text-muted mb-0">Card thumbnail — choose file (optional)</label>
+                                                    <input type="file" class="form-control form-control-sm mt-1" name="engraving_categories[{{ $i }}][icon_upload]" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" {{ $engrType !== 'simple' ? 'disabled' : '' }}>
+                                                </div>
                                             </div>
+                                            <span class="engraving-cat-icon-na small text-muted" style="display: {{ $engrType === 'simple' ? 'none' : 'inline' }}">—</span>
                                         </td>
                                         <td class="text-end">
                                             <button type="button" class="btn btn-sm btn-outline-danger customize-row-delete" title="Delete row"><i class="bi bi-trash"></i></button>
@@ -306,13 +309,20 @@
 
     function syncEngravingCatIconFileWrap(tr) {
         if (!tr || !tr.closest('#customize-engraving-categories-tbody')) return;
-        var wrap = tr.querySelector('.engraving-cat-icon-file-wrap');
-        if (!wrap) return;
-        var upload = false;
+        var fields = tr.querySelector('.engraving-cat-icon-fields');
+        var dash = tr.querySelector('.engraving-cat-icon-na');
+        if (!fields) return;
+        var simple = false;
         tr.querySelectorAll('input[type="radio"][name*="[type]"]').forEach(function (r) {
-            if (r.value === 'upload' && r.checked) upload = true;
+            if (r.value === 'simple' && r.checked) simple = true;
         });
-        wrap.style.display = upload ? 'block' : 'none';
+        fields.style.display = simple ? 'block' : 'none';
+        if (dash) dash.style.display = simple ? 'none' : 'inline';
+        fields.querySelectorAll('input').forEach(function (inp) {
+            var n = inp.name || '';
+            if (n.indexOf('[icon]') === -1) return;
+            inp.disabled = !simple;
+        });
     }
 
     function clearRowInputs(tr) {

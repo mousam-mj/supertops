@@ -66,6 +66,17 @@ function logoEngraveColorFromBodyHex(hex){
 // Perch 1200ml CAD space → Three.js (same as perch-customizer.html; parts stay aligned)
 const CX=48.5, CY=48.5, CZ=175.15, SCALE=230/350;
 const ENGR_PLANE_W=42, ENGR_PLANE_H=20, ENGR_PREVIEW_ORDER=18;
+const ENGR_ARC_MULT=1.32;
+/** Fine-tune strip angle (rad) after mesh; keep small. */
+const ENGR_STRIP_YAW=0.08;
+const ENGR_TEX_HPAD=88;
+/** Arc center on bottle (XZ): Three.js cylinder uses x=r·sin θ, z=r·cos θ → θ=0 is +Z (camera / 12 o’clock); θ=π/2 is +X (handle side). */
+const ENGR_THETA_MID=0;
+/** Local Y (flipGroup): more negative ≈ higher on upper body (between handle rails on reference). */
+const ENGR_Y_TOP=-11.5;
+const ENGR_Y_BOTTOM=17;
+/** Added to bbox-based radius; slight negative pulls strip onto paint (reduces air gap); too negative causes z-fighting. */
+const ENGR_RADIUS_OUTSET=-0.025;
 
 // ── THREE.JS ──
 let scene,camera,renderer,flipGroup,group;
@@ -550,11 +561,25 @@ function removeEngraveSlotPreview(slot){
   }
   engrSlotMeshes[slot]=null;
 }
-function wrapEngraveCanvasText(ctx, text, cx, cy, maxWidth, baseFontSize){
+function engrFontStackById(id){
+  var m={
+    inter:"'Inter',system-ui,-apple-system,sans-serif",
+    serif:'Georgia,"Times New Roman",Times,serif',
+    mono:'ui-monospace,Menlo,"Courier New",monospace',
+    rounded:'"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif'
+  };
+  return m[id]||m.inter;
+}
+/** opts: { weight, family (full CSS stack), align: left|center|right } */
+function wrapEngraveCanvasText(ctx, text, canvasW, canvasH, maxWidth, baseFontSize, opts){
+  opts=opts||{};
+  var weight=String(opts.weight||'700');
+  var family=String(opts.family||engrFontStackById('inter'));
+  var align=String(opts.align||'center');
+  ctx.font=weight+' '+baseFontSize+'px '+family;
   var words=String(text||'').split(/\s+/).filter(function(w){ return w.length; });
   var lines=[];
   var line='';
-  ctx.font='700 '+baseFontSize+"px 'Inter',system-ui,sans-serif";
   for(var i=0;i<words.length;i++){
     var test=line?line+' '+words[i]:words[i];
     if(ctx.measureText(test).width>maxWidth&&line){
@@ -564,14 +589,22 @@ function wrapEngraveCanvasText(ctx, text, cx, cy, maxWidth, baseFontSize){
   }
   if(line) lines.push(line);
   var lh=baseFontSize*1.18;
-  var startY=cy-(lines.length-1)*lh/2;
+  var cy=canvasH*0.5;
+  var startY=cy-(lines.length-1)*lh*0.5;
+  var pad=Math.max(28, Math.floor((canvasW-maxWidth)*0.25));
   for(var j=0;j<lines.length;j++){
-    ctx.fillText(lines[j], cx, startY+j*lh);
+    var ln=lines[j];
+    var x, ta;
+    if(align==='left'){ x=pad; ta='left'; }
+    else if(align==='right'){ x=canvasW-pad; ta='right'; }
+    else{ x=canvasW*0.5; ta='center'; }
+    ctx.textAlign=ta;
+    ctx.fillText(ln, x, startY+j*lh);
   }
+  ctx.textAlign='center';
 }
 function drawEngraveSimplePreview(ctx, w, h, sel, cat){
-  ctx.fillStyle='rgba(255,255,255,0.16)';
-  ctx.fillRect(0,0,w,h);
+  ctx.clearRect(0,0,w,h);
   ctx.fillStyle='#141414';
   ctx.textAlign='center';
   ctx.textBaseline='middle';
@@ -583,16 +616,30 @@ function drawEngraveSimplePreview(ctx, w, h, sel, cat){
   return true;
 }
 function drawEngraveTextPreview(ctx, w, h, sel, cat){
-  ctx.fillStyle='rgba(255,255,255,0.14)';
-  ctx.fillRect(0,0,w,h);
+  ctx.clearRect(0,0,w,h);
   var tx=String(sel.text||'').trim();
   ctx.textAlign='center';
   ctx.textBaseline='middle';
   if(tx){
-    ctx.fillStyle='#141414';
+    ctx.shadowColor='rgba(255,255,255,0.35)';
+    ctx.shadowBlur=0;
+    ctx.shadowOffsetX=0;
+    ctx.shadowOffsetY=-1;
+    ctx.fillStyle='rgba(10,10,12,0.88)';
+    var fontId=(sel&&sel.text_font)||'inter';
+    var wt=(sel&&sel.text_weight)||'700';
+    var szKey=(sel&&sel.text_size)||'md';
+    var al=(sel&&sel.text_align)||'center';
     var size=Math.min(56, Math.floor(w/Math.max(8, tx.length*0.52)));
     size=Math.max(20, Math.min(size, 52));
-    wrapEngraveCanvasText(ctx, tx, w/2, h/2, w-36, size);
+    if(szKey==='sm') size=Math.max(16, Math.floor(size*0.86));
+    else if(szKey==='lg') size=Math.min(64, Math.floor(size*1.14));
+    wrapEngraveCanvasText(ctx, tx, w, h, w-ENGR_TEX_HPAD, size, {
+      weight:wt,
+      family:engrFontStackById(fontId),
+      align:al
+    });
+    ctx.shadowColor='transparent';
   }else{
     ctx.strokeStyle='rgba(0,0,0,0.22)';
     ctx.setLineDash([8,6]);
@@ -609,8 +656,7 @@ function drawEngraveTextPreview(ctx, w, h, sel, cat){
   return true;
 }
 function drawEngraveUploadPlaceholder(ctx, w, h, sel, cat){
-  ctx.fillStyle='rgba(255,255,255,0.12)';
-  ctx.fillRect(0,0,w,h);
+  ctx.clearRect(0,0,w,h);
   ctx.strokeStyle='rgba(0,0,0,0.2)';
   ctx.setLineDash([6,5]);
   ctx.strokeRect(16,16,w-32,h-32);
@@ -626,31 +672,54 @@ function drawEngraveUploadPlaceholder(ctx, w, h, sel, cat){
   if(nm) ctx.fillText(nm, w/2, h/2+18);
   return true;
 }
+function bodyHorizontalRadiusForEngrave(){
+  if(!M.body||!M.body.geometry) return 31.8;
+  var g=M.body.geometry;
+  g.computeBoundingBox();
+  var b=g.boundingBox;
+  var ex=b.max.x-b.min.x, ez=b.max.z-b.min.z;
+  var semi=0.5*Math.min(ex, ez);
+  // Bbox is slightly larger than the visible outer wall; nudge down so the strip sits in the surface, not in front of it.
+  return Math.max(8, semi*0.996);
+}
+/** Cylinder UVs map L→R opposite to old plane; flip U so text reads correctly (matches pre-cylinder behavior). */
+function applyCylinderEngraveTextureMap(tex){
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.repeat.set(-1, 1);
+  tex.offset.set(1, 0);
+  tex.needsUpdate = true;
+}
 function makeEngravePreviewMesh(canvas){
   var tex=new THREE.CanvasTexture(canvas);
   tex.flipY=false;
-  tex.needsUpdate=true;
+  applyCylinderEngraveTextureMap(tex);
   var mat=new THREE.MeshBasicMaterial({
     map:tex,
     transparent:true,
-    opacity:0.97,
+    opacity:0.98,
     depthWrite:false,
     side:THREE.DoubleSide,
+    polygonOffset:true,
+    polygonOffsetFactor:-6,
+    polygonOffsetUnits:-3,
   });
-  mat.polygonOffset=true;
-  mat.polygonOffsetFactor=-4;
-  mat.polygonOffsetUnits=-2;
-  var geo=new THREE.PlaneGeometry(ENGR_PLANE_W, ENGR_PLANE_H);
-  var mesh=new THREE.Mesh(geo,mat);
+  var r=bodyHorizontalRadiusForEngrave()+ENGR_RADIUS_OUTSET;
+  var h=ENGR_PLANE_H;
+  var arc=Math.min(ENGR_PLANE_W*ENGR_ARC_MULT, r*Math.PI*0.9);
+  var thetaLen=Math.max(0.18, arc/r);
+  var radial=Math.max(12, Math.min(64, Math.ceil(40*thetaLen/Math.PI)));
+  var theta0=ENGR_THETA_MID-thetaLen*0.5+ENGR_STRIP_YAW;
+  var geo=new THREE.CylinderGeometry(r, r, h, radial, 1, true, theta0, thetaLen);
+  var mesh=new THREE.Mesh(geo, mat);
   mesh.renderOrder=ENGR_PREVIEW_ORDER;
   mesh.castShadow=false;
   mesh.receiveShadow=false;
   return mesh;
 }
 function placeEngravePreviewMesh(mesh, yLocal){
-  // Z ~32 hugs the body surface (radius ~31 in scaled coords); 54 was too far out
-  mesh.position.set(0, yLocal, 32.5);
-  mesh.rotation.set(0, Math.PI, 0);
+  mesh.position.set(0, yLocal, 0);
+  mesh.rotation.set(0, 0, 0);
 }
 function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
   removeEngraveSlotPreview(slot);
@@ -658,8 +727,7 @@ function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
   canvas.width=512;
   canvas.height=256;
   var ctx=canvas.getContext('2d');
-  ctx.fillStyle='rgba(255,255,255,0.1)';
-  ctx.fillRect(0,0,512,256);
+  ctx.clearRect(0,0,512,256);
   var mesh=makeEngravePreviewMesh(canvas);
   placeEngravePreviewMesh(mesh, yLocal);
   group.add(mesh);
@@ -667,8 +735,7 @@ function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
   var img=new Image();
   img.onload=function(){
     if(engrSlotMeshes[slot]!==mesh) return;
-    ctx.fillStyle='rgba(255,255,255,0.08)';
-    ctx.fillRect(0,0,512,256);
+    ctx.clearRect(0,0,512,256);
     var pad=14;
     var cw=512-pad*2, ch=256-pad*2;
     var scale=Math.min(cw/img.width, ch/img.height);
@@ -677,6 +744,7 @@ function loadEngraveUploadToMesh(slot, dataUrl, yLocal){
     if(mesh.material.map) mesh.material.map.dispose();
     var nt=new THREE.CanvasTexture(canvas);
     nt.flipY=false;
+    applyCylinderEngraveTextureMap(nt);
     mesh.material.map=nt;
     mesh.material.map.needsUpdate=true;
     mesh.material.needsUpdate=true;
@@ -706,8 +774,7 @@ function loadEngraveIconToMesh(slot, iconUrl, yLocal, sel, cat){
   img.crossOrigin='anonymous';
   img.onload=function(){
     if(engrSlotMeshes[slot]!==mesh) return;
-    ctx.fillStyle='rgba(255,255,255,0.14)';
-    ctx.fillRect(0,0,512,256);
+    ctx.clearRect(0,0,512,256);
     var pad=18;
     var cw=512-pad*2, ch=256-pad*2;
     var scale=Math.min(cw/Math.max(1,img.width), ch/Math.max(1,img.height));
@@ -716,6 +783,7 @@ function loadEngraveIconToMesh(slot, iconUrl, yLocal, sel, cat){
     if(mesh.material.map) mesh.material.map.dispose();
     var nt=new THREE.CanvasTexture(canvas);
     nt.flipY=false;
+    applyCylinderEngraveTextureMap(nt);
     mesh.material.map=nt;
     mesh.material.map.needsUpdate=true;
     mesh.material.needsUpdate=true;
@@ -762,7 +830,7 @@ function syncEngraveLegacyTextPlane(text){
   var ctx=canvas.getContext('2d');
   drawEngraveTextPreview(ctx,512,256,{text:text,type:'text'},null);
   var mesh=makeEngravePreviewMesh(canvas);
-  placeEngravePreviewMesh(mesh, -12);
+  placeEngravePreviewMesh(mesh, ENGR_Y_TOP);
   group.add(mesh);
   engrSlotMeshes.top=mesh;
 }
@@ -775,8 +843,8 @@ function syncEngraving3dPreview(){
   }
   if(engrCatMode){
     // flipGroup.rotation.x = π inverts vertical screen sense: smaller group Y sits higher on the tumbler
-    syncEngraveSlotPlane('top', S.engrSlots&&S.engrSlots.top, -12);
-    if(slotEnabled('bottom')) syncEngraveSlotPlane('bottom', S.engrSlots&&S.engrSlots.bottom, 18);
+    syncEngraveSlotPlane('top', S.engrSlots&&S.engrSlots.top, ENGR_Y_TOP);
+    if(slotEnabled('bottom')) syncEngraveSlotPlane('bottom', S.engrSlots&&S.engrSlots.bottom, ENGR_Y_BOTTOM);
     else removeEngraveSlotPreview('bottom');
     return;
   }
@@ -979,7 +1047,15 @@ function openEngravingCategory(cat){
   showEngravingDetailView();
   if(tp==='text'){
     var pre=activeEngrSel();
-    setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:(pre&&pre.slug===cat.slug)?String(pre.text||''):''});
+    var same=pre&&pre.slug===cat.slug;
+    setActiveEngrSel({
+      slug:cat.slug,name:cat.name,price:cat.price,type:tp,
+      text:same?String(pre.text||''):'',
+      text_font:same&&pre.text_font?pre.text_font:'inter',
+      text_weight:same&&pre.text_weight?pre.text_weight:'700',
+      text_size:same&&pre.text_size?pre.text_size:'md',
+      text_align:same&&pre.text_align?pre.text_align:'center'
+    });
   }else if(tp==='upload'){
     var preU=activeEngrSel();
     setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,image_data:(preU&&preU.slug===cat.slug)?String(preU.image_data||''):''});
@@ -997,40 +1073,137 @@ function openEngravingCategory(cat){
     ta.placeholder='Enter text for engraving';
     var cur=activeEngrSel();
     ta.value=(cur&&cur.slug===cat.slug)?(cur.text||''):'';
-    ta.addEventListener('input',function(){
+    function slotRow(){
       var s=(S.engrSlot==='bottom')?'bottom':'top';
       if(!S.engrSlots) S.engrSlots={top:null,bottom:null};
-      var row=S.engrSlots[s];
+      return S.engrSlots[s];
+    }
+    function pushStyleToRow(){
+      var row=slotRow();
+      if(!row||row.slug!==cat.slug) return;
+      row.text_font=fontSel.value;
+      row.text_weight=weightSel.value;
+      row.text_size=sizeSel.value;
+      row.text_align=alignSel.value;
+      syncEngraving3dPreview();
+    }
+    var opts=document.createElement('div');
+    opts.className='engraving-text-options';
+    function mkGroup(lab, selEl){
+      var g=document.createElement('div');
+      g.className='engraving-opt-group';
+      var lb=document.createElement('span');
+      lb.className='engraving-opt-label';
+      lb.textContent=lab;
+      g.appendChild(lb);
+      g.appendChild(selEl);
+      return g;
+    }
+    function mkSelect(id, optsArr){
+      var s=document.createElement('select');
+      s.className='engraving-opt-select';
+      s.id=id;
+      for(var i=0;i<optsArr.length;i++){
+        var o=document.createElement('option');
+        o.value=optsArr[i].v;
+        o.textContent=optsArr[i].t;
+        s.appendChild(o);
+      }
+      return s;
+    }
+    var fontSel=mkSelect('engr-text-font',[
+      {v:'inter',t:'Inter (modern)'},
+      {v:'serif',t:'Serif (classic)'},
+      {v:'mono',t:'Monospace'},
+      {v:'rounded',t:'Rounded sans'}
+    ]);
+    fontSel.value=(cur&&cur.slug===cat.slug&&cur.text_font)?cur.text_font:'inter';
+    var weightSel=mkSelect('engr-text-weight',[
+      {v:'400',t:'Regular'},
+      {v:'600',t:'Semibold'},
+      {v:'700',t:'Bold'}
+    ]);
+    weightSel.value=(cur&&cur.slug===cat.slug&&cur.text_weight)?cur.text_weight:'700';
+    var sizeSel=mkSelect('engr-text-size',[
+      {v:'sm',t:'Smaller'},
+      {v:'md',t:'Medium'},
+      {v:'lg',t:'Larger'}
+    ]);
+    sizeSel.value=(cur&&cur.slug===cat.slug&&cur.text_size)?cur.text_size:'md';
+    var alignSel=mkSelect('engr-text-align',[
+      {v:'left',t:'Left'},
+      {v:'center',t:'Center'},
+      {v:'right',t:'Right'}
+    ]);
+    alignSel.value=(cur&&cur.slug===cat.slug&&cur.text_align)?cur.text_align:'center';
+    [fontSel,weightSel,sizeSel,alignSel].forEach(function(el){
+      el.addEventListener('change',pushStyleToRow);
+    });
+    opts.appendChild(mkGroup('Font',fontSel));
+    opts.appendChild(mkGroup('Weight',weightSel));
+    opts.appendChild(mkGroup('Size',sizeSel));
+    opts.appendChild(mkGroup('Align',alignSel));
+    ta.addEventListener('input',function(){
+      var row=slotRow();
       if(row&&row.slug===cat.slug){
         row.text=ta.value;
         syncEngraving3dPreview();
       }
     });
     var sub=document.createElement('button');
-    sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
+    sub.type='button'; sub.className='next-btn'; sub.style.marginTop='12px';
     sub.textContent='Save';
     sub.addEventListener('click',function(){
       var tx=String(ta.value||'').trim();
       if(!tx){ alert('Please enter engraving text.'); return; }
-      setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:tx});
+      setActiveEngrSel({
+        slug:cat.slug,name:cat.name,price:cat.price,type:tp,text:tx,
+        text_font:fontSel.value,
+        text_weight:weightSel.value,
+        text_size:sizeSel.value,
+        text_align:alignSel.value
+      });
       renderEngravingGrid();
       updatePrice();
       showEngravingGridView();
     });
-    body.appendChild(ta); body.appendChild(sub);
+    body.appendChild(ta);
+    body.appendChild(opts);
+    body.appendChild(sub);
   }else if(tp==='upload'){
     var uid='engr-upload-'+String(cat.slug||'x').replace(/[^a-z0-9\-]/gi,'');
-    var lab=document.createElement('label');
-    lab.className='engraving-upload-label';
-    lab.setAttribute('for',uid);
-    lab.textContent='Choose image file';
+    var hint=document.createElement('p');
+    hint.className='engraving-hint engraving-upload-hint';
+    hint.textContent='PNG, JPG, or WebP. Then tap “Use this image”.';
+    var wrap=document.createElement('div');
+    wrap.className='engraving-upload-wrap';
     var inp=document.createElement('input');
     inp.id=uid;
     inp.type='file';
     inp.className='engraving-file-input';
     inp.accept='image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
+    var lab=document.createElement('label');
+    lab.className='engraving-file-picker';
+    lab.setAttribute('for',uid);
+    var cta=document.createElement('span');
+    cta.className='engraving-file-picker__cta';
+    cta.textContent='Choose image file';
+    var nmSpan=document.createElement('span');
+    nmSpan.className='engraving-file-picker__name';
+    nmSpan.id=uid+'-name';
+    var curU=activeEngrSel();
+    var hadData=curU&&curU.slug===cat.slug&&curU.image_data&&String(curU.image_data).length>30;
+    nmSpan.textContent=hadData?'Image ready — choose a file to replace':'No file chosen';
+    if(hadData) wrap.classList.add('engraving-upload-wrap--has-file');
+    lab.appendChild(cta);
+    lab.appendChild(nmSpan);
+    wrap.appendChild(inp);
+    wrap.appendChild(lab);
+    function setUploadWrapHasFile(on){ wrap.classList.toggle('engraving-upload-wrap--has-file',!!on); }
     inp.addEventListener('change',function(){
       var f=inp.files&&inp.files[0];
+      nmSpan.textContent=f?f.name:(hadData?'Image ready — choose a file to replace':'No file chosen');
+      setUploadWrapHasFile(!!f||hadData);
       if(!f) return;
       var r=new FileReader();
       r.onload=function(){
@@ -1041,15 +1214,13 @@ function openEngravingCategory(cat){
         var row=S.engrSlots[s];
         if(row&&row.slug===cat.slug){
           row.image_data=d;
+          setUploadWrapHasFile(true);
           updatePrice();
           syncEngraving3dPreview();
         }
       };
       r.readAsDataURL(f);
     });
-    var hint=document.createElement('p');
-    hint.className='engraving-hint';
-    hint.textContent='PNG, JPG, or WebP. Then tap “Use this image”.';
     var sub=document.createElement('button');
     sub.type='button'; sub.className='next-btn'; sub.style.marginTop='10px';
     sub.textContent='Use this image';
@@ -1068,7 +1239,9 @@ function openEngravingCategory(cat){
       };
       r.readAsDataURL(f);
     });
-    body.appendChild(hint); body.appendChild(lab); body.appendChild(inp); body.appendChild(sub);
+    body.appendChild(hint);
+    body.appendChild(wrap);
+    body.appendChild(sub);
   }
 }
 
@@ -1204,11 +1377,19 @@ function buildCustomizationPayload(){
         o.engraving.top={ category_slug:top.slug, category_name:String(top.name||'') };
         if(top.text) o.engraving.top.text=top.text;
         if(top.image_data) o.engraving.top.image_data=top.image_data;
+        if(top.text_font) o.engraving.top.text_font=top.text_font;
+        if(top.text_weight) o.engraving.top.text_weight=top.text_weight;
+        if(top.text_size) o.engraving.top.text_size=top.text_size;
+        if(top.text_align) o.engraving.top.text_align=top.text_align;
       }
       if(bot&&bot.slug){
         o.engraving.bottom={ category_slug:bot.slug, category_name:String(bot.name||'') };
         if(bot.text) o.engraving.bottom.text=bot.text;
         if(bot.image_data) o.engraving.bottom.image_data=bot.image_data;
+        if(bot.text_font) o.engraving.bottom.text_font=bot.text_font;
+        if(bot.text_weight) o.engraving.bottom.text_weight=bot.text_weight;
+        if(bot.text_size) o.engraving.bottom.text_size=bot.text_size;
+        if(bot.text_align) o.engraving.bottom.text_align=bot.text_align;
       }
     }
   }else if(engrEnabled){

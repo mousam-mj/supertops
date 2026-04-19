@@ -87,6 +87,14 @@
 .customize-page .engraving-check-wrap input{width:16px;height:16px;accent-color:#161616}
 .customize-page .engraving-textarea{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:52px;box-sizing:border-box}
 .customize-page .engraving-textarea:disabled{opacity:.55;background:#f0f0ee}
+.customize-page .engraving-text-options{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:14px}
+.customize-page .engraving-opt-group{display:flex;flex-direction:column;gap:4px;min-width:0}
+.customize-page .engraving-opt-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#6b6b6b}
+.customize-page .engraving-opt-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid #ccc;font-size:13px;background:#fff;font-family:inherit;cursor:pointer;box-sizing:border-box}
+.customize-page .engraving-opt-select:focus{outline:2px solid #161616;outline-offset:1px;border-color:#161616}
+@media(max-width:520px){
+  .customize-page .engraving-text-options{grid-template-columns:1fr}
+}
 /* Hydro-style: single column list, full-width cards */
 .customize-page .engraving-card-list{display:flex;flex-direction:column;gap:12px;margin-top:12px;max-height:min(52vh,520px);overflow-y:auto;padding:2px 6px 8px 2px;scrollbar-width:thin}
 .customize-page .engraving-card-list::-webkit-scrollbar{width:6px}
@@ -110,21 +118,30 @@
 .customize-page .engraving-mode-toggles{display:flex;align-items:center;gap:16px}
 .customize-page .engraving-radio{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#161616;cursor:pointer;user-select:none}
 .customize-page .engraving-radio input{width:16px;height:16px;accent-color:#161616}
-.customize-page .engraving-slot-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-.customize-page .engraving-slot-btn{flex:1;min-width:160px;display:flex;align-items:center;gap:10px;border:1px solid #e0e0e0;border-radius:12px;background:#fff;padding:12px 14px;cursor:pointer;font:inherit;transition:.15s}
-.customize-page .engraving-slot-btn:hover{background:#fafafa;border-color:#c8c8c8}
-.customize-page .engraving-slot-btn.active{border-color:#161616;box-shadow:0 0 0 1px #161616 inset}
-.customize-page .engraving-slot-dot{width:30px;height:30px;border-radius:999px;background:#f0f0ee;border:1px solid #e6e6e6;display:flex;align-items:center;justify-content:center;color:#666;font-weight:800;flex-shrink:0}
-.customize-page .engraving-slot-btn.active .engraving-slot-dot{background:#161616;color:#fff;border-color:#161616}
+.customize-page .engraving-slot-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;padding:2px}
+.customize-page .engraving-slot-btn{flex:1;min-width:160px;display:flex;align-items:center;gap:10px;border:2px solid #e6e6e6;border-radius:12px;background:#fff;padding:11px 13px;cursor:pointer;font:inherit;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
+.customize-page .engraving-slot-btn:hover:not(:disabled){background:#fafafa;border-color:#c8c8c8}
+.customize-page .engraving-slot-btn.active{border:2px solid #161616;background:linear-gradient(180deg,#fff 0%,#f3f3f1 100%);box-shadow:0 0 0 1px rgba(22,22,22,.06) inset,0 6px 20px rgba(0,0,0,.1),0 0 0 3px rgba(22,22,22,.06);transform:translateY(-1px)}
+.customize-page .engraving-slot-btn.active .engraving-slot-dot{background:#161616;color:#fff;border-color:#161616;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.customize-page .engraving-slot-dot{width:30px;height:30px;border-radius:999px;background:#f0f0ee;border:1px solid #e6e6e6;display:flex;align-items:center;justify-content:center;color:#666;font-weight:800;flex-shrink:0;transition:background .18s,border-color .18s,box-shadow .18s}
 .customize-page .engraving-slot-label{font-size:14px;font-weight:700;color:#161616}
 .customize-page .engraving-slot-sub{font-size:12px;color:#777;margin-top:2px}
+.customize-page .engraving-slot-btn.active .engraving-slot-sub{color:#4a4a4a;font-weight:500}
 .customize-page .engraving-slot-text{display:flex;flex-direction:column;min-width:0}
 .customize-page .engraving-slot-summary{font-size:12px;color:#666;margin-top:8px}
 .customize-page .engraving-slot-summary strong{color:#161616}
 .customize-page .engraving-detail-back{background:none;border:none;padding:0;font-size:13px;color:#161616;text-decoration:underline;cursor:pointer;margin-bottom:12px}
-.customize-page .engraving-detail-title{font-size:16px;font-weight:700;margin-bottom:8px}
-.customize-page .engraving-file-input{display:block;width:100%;max-width:100%;margin:12px 0;padding:10px 12px;font-size:14px;border:1px solid #c8c8c8;border-radius:10px;background:#fff;box-sizing:border-box;min-height:46px;cursor:pointer}
-.customize-page .engraving-upload-label{display:block;font-size:13px;font-weight:600;color:#333;margin-top:4px}
+.customize-page .engraving-detail-title{display:inline-block;font-size:15px;font-weight:700;margin:0 0 12px;padding:8px 14px;border-radius:10px;background:linear-gradient(180deg,#f6f6f4 0%,#ececea 100%);border:1px solid #d8d8d4;color:#161616;letter-spacing:.02em;text-transform:capitalize;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.customize-page .engraving-upload-hint{margin:0 0 6px}
+.customize-page .engraving-upload-wrap{position:relative;margin:12px 0 16px}
+.customize-page .engraving-file-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;opacity:0}
+.customize-page .engraving-file-input:focus{outline:none}
+.customize-page .engraving-upload-wrap:focus-within .engraving-file-picker{outline:2px solid #161616;outline-offset:2px}
+.customize-page .engraving-file-picker{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:16px 18px;border:2px dashed #c4c4be;border-radius:14px;background:#fafaf8;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s}
+.customize-page .engraving-file-picker:hover{border-color:#161616;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.customize-page .engraving-upload-wrap--has-file .engraving-file-picker{border-style:solid;border-color:#9a9a94;background:#fff}
+.customize-page .engraving-file-picker__cta{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;border-radius:10px;background:#161616;color:#fff;font-size:13px;font-weight:600;border:none;pointer-events:none}
+.customize-page .engraving-file-picker__name{font-size:12px;color:#5c5c5c;line-height:1.35;word-break:break-word;min-height:1.2em}
 .customize-page .flow-hint{font-size:12px;color:#8a8a8a;margin-top:8px}
 @keyframes customize-spin{to{transform:rotate(360deg)}}
 @media(max-width:980px){

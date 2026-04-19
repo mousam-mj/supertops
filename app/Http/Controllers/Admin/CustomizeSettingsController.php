@@ -154,7 +154,7 @@ class CustomizeSettingsController extends Controller
                 $type = 'simple';
             }
             $icon = trim((string) ($row['icon'] ?? ''));
-            if ($type === 'upload') {
+            if ($type === 'simple') {
                 $upload = $request->file("engraving_categories.$i.icon_upload");
                 if ($upload && $upload->isValid()) {
                     $path = $upload->store('customize/engraving-icons', 'public');
