@@ -63,6 +63,69 @@
             display: block !important;
             visibility: visible !important;
         }
+        /* Mobile slide menu: close control always visible (Phosphor CDN can fail → empty icon) */
+        #menu-mobile .close-menu-mobile-btn {
+            z-index: 30 !important;
+            min-width: 2.25rem;
+            min-height: 2.25rem;
+            background-color: #fff !important;
+            border: 1px solid var(--line, #e9e9e9) !important;
+            color: #111 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        #menu-mobile .close-menu-mobile-btn:not(:has(svg))::after {
+            content: '\00d7';
+            font-size: 1.35rem;
+            line-height: 1;
+            font-weight: 300;
+            display: block;
+        }
+        /* Hide broken / invisible Phosphor glyph when × fallback is used */
+        #menu-mobile .close-menu-mobile-btn:not(:has(svg)) i.ph {
+            display: none !important;
+        }
+        /* Full-height drawer; phone = full width, lg+ = narrow panel (matches header.scss) */
+        #menu-mobile.open {
+            inset: 0 !important;
+            left: 0 !important;
+            top: 0 !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            height: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        @media (max-width: 1023.98px) {
+            #menu-mobile.open {
+                width: 100% !important;
+                max-width: 100vw !important;
+                right: 0 !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            #menu-mobile.open {
+                width: min(380px, 92vw) !important;
+                max-width: 380px !important;
+            }
+        }
+        #menu-mobile.open .menu-container {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+        }
+        #menu-mobile.open .menu-mobile-inner {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body.mobile-menu-open .site-header #header,
+        body.mobile-menu-open .site-header .header-menu {
+            overflow: visible !important;
+        }
         /* Hide Compare Product button site-wide */
         .compare-btn {
             display: none !important;
@@ -325,7 +388,7 @@
         }
         function openMobileMenuFromBottom() {
             var mm = document.getElementById('menu-mobile');
-            if (mm) { mm.classList.add('open'); document.body.style.overflow='hidden'; }
+            if (mm) { mm.classList.add('open'); document.body.style.overflow='hidden'; document.body.classList.add('mobile-menu-open'); }
         }
         document.addEventListener('click', function(e) {
             if (e.target.closest('.cart-icon')) { e.preventDefault(); e.stopPropagation(); openCart(); }

@@ -22,10 +22,17 @@
         <div id="header" class="relative w-full">
             <div class="header-menu style-one relative  w-full md:h-[74px] h-[56px]">
                 <div class="container mx-auto h-full">
-                    <div class="header-main flex justify-between h-full">
-                        <div class="menu-mobile-icon flex items-center">
-                            <i class="icon-category text-2xl flex-shrink-0 cursor-pointer" aria-hidden="true" title="Menu"></i>
-                            <a href="{{{ route('home') }}}" class="flex items-center px-10">
+                    <div class="header-main flex justify-between h-full items-center">
+                        <div class="flex items-center gap-2 min-w-0 shrink-0">
+                            {{-- Real tap target: icon-only button (logo was inside old .menu-mobile-icon and stole / shrank clicks) --}}
+                            <button type="button"
+                                    class="menu-mobile-icon flex lg:hidden items-center justify-center min-h-[48px] min-w-[48px] -ml-1 rounded-lg border-0 bg-transparent p-0 cursor-pointer touch-manipulation shrink-0"
+                                    aria-label="Open menu"
+                                    aria-expanded="false"
+                                    aria-controls="menu-mobile">
+                                <i class="icon-category text-2xl pointer-events-none" aria-hidden="true"></i>
+                            </button>
+                            <a href="{{{ route('home') }}}" class="flex items-center px-3 sm:px-6 md:px-10 min-w-0 touch-manipulation">
                                 @php $logo = \App\Models\Setting::get('site_logo'); @endphp
                                 <img src="{{ $logo ? storage_asset($logo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-8 md:h-10 object-contain" />
                             </a>
@@ -111,17 +118,22 @@
 
             <!-- Menu Mobile -->
             <div id="menu-mobile" class="">
-                <div class="menu-container bg-white h-full">
-                    <div class="container h-full">
-                <div class="menu-main h-full overflow-x-hidden scroll2">
-                            <div class="heading py-2 relative flex items-center justify-center">
-                                <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
-                                    <i class="ph ph-x text-sm"></i>
-                                </div>
-                        <a href="{{ route('home') }}" class="logo flex justify-center">
+                <div class="menu-container bg-white h-full min-h-0 flex flex-col">
+                    <div class="menu-mobile-inner w-full max-w-none mx-0 h-full min-h-0 flex flex-col px-4 sm:px-5">
+                <div class="menu-main flex-1 min-h-0 overflow-y-auto overflow-x-hidden scroll2 pb-6">
+                            <div class="heading grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-2 py-3 shrink-0">
+                                <button type="button"
+                                        class="close-menu-mobile-btn relative z-30 flex h-10 w-10 cursor-pointer items-center justify-center self-center rounded-full border border-line bg-white text-black shadow-sm touch-manipulation justify-self-start"
+                                        aria-label="Close menu">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <path d="M18 6L6 18M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                <a href="{{ route('home') }}" class="logo flex min-w-0 justify-center items-center">
                                 @php $mobileLogo = \App\Models\Setting::get('site_logo'); @endphp
-                                <img src="{{ $mobileLogo ? storage_asset($mobileLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-10 object-contain" />
+                                <img src="{{ $mobileLogo ? storage_asset($mobileLogo) : asset('assets/images/perch-logo.png') }}" alt="{{ \App\Models\Setting::get('site_name', 'Perch') }}" class="h-9 sm:h-10 max-w-full object-contain" />
                             </a>
+                                <span class="w-10 shrink-0 justify-self-end" aria-hidden="true"></span>
                             </div>
                             <div class="form-search relative mt-2">
                                 <form method="GET" action="{{{ route('shop') }}}">

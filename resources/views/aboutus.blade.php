@@ -4,17 +4,18 @@
 
 @section('content')
 <style>
-    /* About hero: PNG may have transparent / uneven bottom — solid base matches texture so content never sits on “white holes” */
-    .about-page-hero {
-        background-color: #6f7f92;
+    /* Full-width top hero: patterned banner as true background (cover), lavender matches PNG transparent edges */
+    .about-page-hero.about-hero--fullbg {
+        --about-hero-minh: clamp(22rem, 48vh, 38rem);
         isolation: isolate;
+        min-height: var(--about-hero-minh);
+        background-color: #9188c4;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center center;
     }
-    .about-page-hero .about-hero-bg-img img {
-        width: 100%;
-        height: 100%;
-        min-height: 100%;
-        object-fit: cover;
-        object-position: center top;
+    .about-page-hero.about-hero--fullbg > .slider-main {
+        min-height: var(--about-hero-minh);
     }
     @media (max-width: 767.98px) {
         .about-page-hero .slider-main {
@@ -22,7 +23,7 @@
             align-items: center;
             gap: 1.25rem;
         }
-        .about-page-hero .about-hero-text {
+        .about-page-hero .text-content {
             width: 100%;
             max-width: 22rem;
             margin-left: auto;
@@ -30,11 +31,11 @@
             padding-left: 0.25rem;
             padding-right: 0.25rem;
         }
-        .about-page-hero .about-hero-heading {
+        .about-page-hero .heading2 {
             font-size: clamp(1.2rem, 4.8vw, 1.65rem);
             line-height: 1.25;
         }
-        .about-page-hero .about-hero-bottle {
+        .about-page-hero .sub-img {
             width: 100%;
             max-width: 200px;
             margin-left: auto;
@@ -43,10 +44,8 @@
     }
 </style>
 {{-- Main markup synced from static about.html (WhatsApp export): hero → flash sale; paths use asset(); shop CTA uses route('shop'). Photoshop-extension junk removed from source. --}}
-        <div class="slider-block style-one about-page-hero relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full">
-            <div class="bg-img about-hero-bg-img pointer-events-none absolute inset-0 z-0 min-h-full">
-                <img src="{{ asset('assets/images/banner/bg-feature-pet1.png') }}" alt="" aria-hidden="true" class="w-full h-full object-cover object-center">
-            </div>
+        <div class="slider-block style-one about-page-hero about-hero--fullbg relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full"
+             style="background-image: url('{{ asset('assets/images/banner/bg-feature-pet1.png') }}');">
                 <div class="slider-main relative z-[1] h-full w-full flex items-center justify-center gap-10">
                     <div class="sub-img w-[440px] max-md:w-1/2 rounded-b-full overflow-hidden max-md:hidden">
                         <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="" class="w-full">
