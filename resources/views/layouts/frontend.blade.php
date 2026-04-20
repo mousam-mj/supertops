@@ -441,6 +441,89 @@
             outline: 2px solid #ec2127;
             outline-offset: 2px;
         }
+
+        /* EDX — light polish across all frontend pages */
+        @media (prefers-reduced-motion: no-preference) {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+
+        main {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        main img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        ::selection {
+            background-color: rgba(236, 33, 39, 0.22);
+            color: inherit;
+        }
+
+        .breadcrumb-block .link a {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-color: rgba(255, 255, 255, 0.4);
+            transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .breadcrumb-block .link a:hover {
+            text-decoration-color: #fff;
+        }
+
+        .spec-table tr {
+            border-bottom-color: #e5e5e5;
+        }
+
+        main a:focus-visible,
+        main button:focus-visible,
+        main input:focus-visible,
+        main textarea:focus-visible,
+        main select:focus-visible {
+            outline: 2px solid #ec2127;
+            outline-offset: 2px;
+        }
+
+        .product-item.edxpro {
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .product-item.edxpro:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
+            border-color: #c8c8c8;
+        }
+
+        .list-pagination a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.5rem;
+            min-height: 2.5rem;
+            padding: 0 0.35rem;
+            border-radius: 0.35rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .list-pagination a:hover {
+            background-color: rgba(236, 33, 39, 0.08);
+            color: #ec2127;
+        }
+
+        .sidebar .filter-type-block .item.tab-item {
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar .filter-type-block .item.tab-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar .filter-type-block .item.tab-item.active {
+            background-color: rgba(236, 33, 39, 0.06);
+        }
     </style>
     
     @yield('styles')
@@ -548,6 +631,8 @@
             }).catch(function () {});
         }
         document.addEventListener('DOMContentLoaded', refreshQuotaBadge);
+        // Capture phase: theme main.js binds bubble listeners on .product-item (redirect)
+        // and .quick-shop-btn (stopPropagation + missing .quick-shop-block throws). Run first.
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('.edx-add-quota-btn');
             if (!btn) {
@@ -605,7 +690,7 @@
             }).finally(function () {
                 btn.disabled = false;
             });
-        });
+        }, true);
 
         var quotaModal = document.getElementById('edx-quota-modal');
         var quotaModalBody = document.getElementById('edx-quota-modal-body');

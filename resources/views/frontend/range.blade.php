@@ -88,7 +88,7 @@
                                 </div>
                             </a>
                             <div class="action w-fit flex flex-col items-center justify-center flex-shrink-0">
-                                <button type="button" class="quick-shop-btn button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $product->id }}">
+                                <button type="button" class="button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $product->id }}">
                                     Add to Quota List
                                 </button>
                             </div>

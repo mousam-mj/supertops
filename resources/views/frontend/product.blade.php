@@ -70,9 +70,6 @@
     }
 
     $suffixCount = count($suffixRows);
-    $suffixMid = $suffixCount > 0 ? (int) ceil($suffixCount / 2) : 0;
-    $suffixLeft = $suffixMid > 0 ? array_slice($suffixRows, 0, $suffixMid) : [];
-    $suffixRight = $suffixMid > 0 ? array_slice($suffixRows, $suffixMid) : [];
 @endphp
 
 @section('title', ($product->sku ?? $product->name) . ' - EDX Rulmenti Romania')
@@ -81,6 +78,93 @@
 <style>
 .product-description-html p { margin-bottom: 0.5rem; }
 .product-description-html p:last-child { margin-bottom: 0; }
+
+/* Product tab — technical tables (card layout, readable columns) */
+.product-detail .desc-tab .edx-spec-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-card-title {
+    margin: 0;
+    padding: 14px 18px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #27272a;
+    background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+    border-bottom: 1px solid #e8e8e8;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table tr {
+    border-bottom: 1px solid #efefef;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table tr:last-child {
+    border-bottom: none;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table td,
+.product-detail .desc-tab .edx-spec-card .edx-spec-table th {
+    padding: 13px 18px;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    vertical-align: top;
+    text-align: left !important;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table thead th {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #52525b;
+    background: #f4f4f5;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table thead th:first-child {
+    width: 40%;
+    max-width: 14rem;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody td:first-child {
+    width: 40%;
+    max-width: 14rem;
+    color: #71717a;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody td:last-child {
+    font-weight: 500;
+    color: #18181b;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody tr:hover td {
+    background-color: #fafafa;
+}
+.product-detail .desc-tab .edx-spec-card .edx-spec-table td.edx-empty-cell {
+    width: auto !important;
+    max-width: none !important;
+    text-align: center !important;
+    color: #71717a !important;
+    font-weight: 400 !important;
+    padding: 2.25rem 1.25rem !important;
+}
+.product-detail .desc-tab .edx-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+@media (min-width: 768px) {
+    .product-detail .desc-tab .edx-overview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
+@media (min-width: 1024px) {
+    .product-detail .desc-tab .edx-overview-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
 </style>
 @endsection
 
@@ -105,12 +189,12 @@
 
 <div class="product-detail default">
     <div class="featured-product underwear filter-product-img md:py-20 py-14">
-        <div class="container flex justify-between gap-y-6 flex-wrap">
-            <div class="list-img md:w-1/2 md:pr-[45px] w-full flex-shrink-0">
-                <img class="w-full duration-700" src="{{ $product->image_url }}" alt="{{ $product->name }}">
+        <div class="container flex justify-between gap-y-6 flex-wrap md:items-start">
+            <div class="list-img w-full md:w-5/12 md:pr-8 lg:pr-10 flex-shrink-0">
+                <img class="w-full object-contain object-center duration-700" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                 <div class="product-description text-secondary mt-3">Image may differ from product. See technical specification for details.</div>
             </div>
-            <div class="product-item product-infor md:w-1/2 w-full lg:pl-[15px] md:pl-2" data-item="{{ $product->id }}">
+            <div class="product-item product-infor w-full md:w-7/12 md:pl-6 lg:pl-8" data-item="{{ $product->id }}">
                 <div class="flex justify-between">
                     <div>
                         <div class="product-name heading4 mt-1">{{ $product->sku ?? $product->name }}</div>
@@ -178,32 +262,30 @@
             <div class="desc-block mt-8 relative">
                 <div class="desc-item description open pb-10" data-item="Overview">
                     <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm border-b border-line">Overview</div>
-                    <div class="grid md:grid-cols-2 gap-8 gap-y-5">
-                        <div class="left">
-                            <div class="container">
-                                <div class="section">
-                                    <div class="heading6">Boundary dimensions</div>
-                                    <table class="spec-table">
-                                        <tr>
-                                            <td>Bore diameter</td>
-                                            <td>{{ $specs['bore_diameter'] ?? '12 mm' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Outside diameter</td>
-                                            <td>{{ $specs['outside_diameter'] ?? '28 mm' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Width</td>
-                                            <td>{{ $specs['width'] ?? '7 mm' }}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="edx-overview-grid">
+                        <div class="edx-spec-card">
+                            <h3 class="heading6 edx-spec-card-title">Boundary dimensions</h3>
+                            <table class="spec-table edx-spec-table">
+                                <tbody>
+                                    <tr>
+                                        <td>Bore diameter</td>
+                                        <td>{{ $specs['bore_diameter'] ?? '12 mm' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Outside diameter</td>
+                                        <td>{{ $specs['outside_diameter'] ?? '28 mm' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Width</td>
+                                        <td>{{ $specs['width'] ?? '7 mm' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="right">
-                            <div class="section">
-                                <div class="heading6">Performance</div>
-                                <table class="spec-table">
+                        <div class="edx-spec-card">
+                            <h3 class="heading6 edx-spec-card-title">Performance</h3>
+                            <table class="spec-table edx-spec-table">
+                                <tbody>
                                     <tr>
                                         <td>Basic dynamic load rating</td>
                                         <td>{{ $specs['dynamic_load_rating'] ?? '5.10 KN' }}</td>
@@ -220,39 +302,35 @@
                                         <td>Limiting speed – Oil</td>
                                         <td>{{ $specs['limiting_speed_oil'] ?? '30000 r/min' }}</td>
                                     </tr>
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8 gap-y-5">
-                        <div class="left">
-                            <div class="container">
-                                <div class="properties-section">
-                                    <div class="heading6">Properties</div>
-                                    <table class="spec-table">
-                                        <tr>
-                                            <td>Number of rows</td>
-                                            <td>{{ $specs['number_of_rows'] ?? '1' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Bore type</td>
-                                            <td>{{ $specs['bore_type'] ?? 'Cylindrical' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cage</td>
-                                            <td>{{ $specs['cage'] ?? 'Sheet Steel' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Radial internal clearance</td>
-                                            <td>{{ $specs['radial_clearance'] ?? 'CN' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tolerance class for dimensions</td>
-                                            <td>{{ $specs['tolerance_class'] ?? 'P6' }}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+                        <div class="edx-spec-card md:col-span-2 lg:col-span-1">
+                            <h3 class="heading6 edx-spec-card-title">Properties</h3>
+                            <table class="spec-table edx-spec-table">
+                                <tbody>
+                                    <tr>
+                                        <td>Number of rows</td>
+                                        <td>{{ $specs['number_of_rows'] ?? '1' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bore type</td>
+                                        <td>{{ $specs['bore_type'] ?? 'Cylindrical' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cage</td>
+                                        <td>{{ $specs['cage'] ?? 'Sheet Steel' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Radial internal clearance</td>
+                                        <td>{{ $specs['radial_clearance'] ?? 'CN' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tolerance class for dimensions</td>
+                                        <td>{{ $specs['tolerance_class'] ?? 'P6' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -260,45 +338,28 @@
 
                 <div class="desc-item description pb-10" data-item="Equivalents">
                     <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm border-b border-line">Equivalents</div>
-                    <div class="grid md:grid-cols-2 gap-8 gap-y-8 mt-6">
-                        <div class="left min-w-0">
-                            <div class="heading6">Manufacturer cross-reference</div>
-                            <table class="spec-table mt-3">
-                                <tr>
-                                    <td><b>Model</b></td>
-                                    <td><b>Brand</b></td>
-                                </tr>
-                                @forelse($equivRows as $row)
-                                <tr>
-                                    <td>{{ $row['model'] }}</td>
-                                    <td>{{ $row['brand'] }}</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="2" class="text-secondary" style="text-align: left;">No manufacturer cross-references are stored for this designation yet.</td>
-                                </tr>
-                                @endforelse
-                            </table>
-                        </div>
-                        <div class="right min-w-0">
-                            <div class="heading6">EDX catalogue designation</div>
-                            <table class="spec-table mt-3">
-                                <tr>
-                                    <td>EDX model</td>
-                                    <td>{{ $product->sku ?? '—' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Bore diameter</td>
-                                    <td>{{ $specs['bore_diameter'] ?? '—' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Outside diameter</td>
-                                    <td>{{ $specs['outside_diameter'] ?? '—' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Width</td>
-                                    <td>{{ $specs['width'] ?? '—' }}</td>
-                                </tr>
+                    <div class="mt-6 min-w-0 overflow-x-auto">
+                        <div class="edx-spec-card max-w-3xl">
+                            <h3 class="heading6 edx-spec-card-title">Manufacturer cross-reference</h3>
+                            <table class="spec-table edx-spec-table w-full">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Model</th>
+                                        <th scope="col">Brand</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($equivRows as $row)
+                                    <tr>
+                                        <td>{{ $row['model'] }}</td>
+                                        <td>{{ $row['brand'] }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="2" class="edx-empty-cell">No manufacturer cross-references are stored for this designation yet.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -309,36 +370,25 @@
                     @if($suffixCount === 0)
                     <p class="text-secondary mt-6">No suffix codes or descriptions are stored for this product in the catalogue data.</p>
                     @else
-                    <div class="grid md:grid-cols-2 gap-8 gap-y-8 mt-6">
-                        <div class="left min-w-0">
-                            <table class="spec-table">
-                                <tr>
-                                    <td><b>Suffix / field</b></td>
-                                    <td><b>Description</b></td>
-                                </tr>
-                                @foreach($suffixLeft as $row)
-                                <tr>
-                                    <td>{{ $row['suffix'] }}</td>
-                                    <td>{{ $row['description'] }}</td>
-                                </tr>
-                                @endforeach
+                    <div class="mt-6 overflow-x-auto">
+                        <div class="edx-spec-card max-w-3xl">
+                            <h3 class="heading6 edx-spec-card-title">Suffix description</h3>
+                            <table class="spec-table edx-spec-table w-full">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Suffix / field</th>
+                                        <th scope="col">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($suffixRows as $row)
+                                    <tr>
+                                        <td>{{ $row['suffix'] }}</td>
+                                        <td>{{ $row['description'] }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
-                        </div>
-                        <div class="right min-w-0">
-                            @if(count($suffixRight) > 0)
-                            <table class="spec-table">
-                                <tr>
-                                    <td><b>Suffix / field</b></td>
-                                    <td><b>Description</b></td>
-                                </tr>
-                                @foreach($suffixRight as $row)
-                                <tr>
-                                    <td>{{ $row['suffix'] }}</td>
-                                    <td>{{ $row['description'] }}</td>
-                                </tr>
-                                @endforeach
-                            </table>
-                            @endif
                         </div>
                     </div>
                     @endif
@@ -370,8 +420,8 @@
                         </div>
                     </a>
                     <div class="action flex flex-col gap-2 p-4 pt-0 mt-auto">
-                        <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="quick-shop-btn button-main w-full text-center py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white no-underline text-sm">View details</a>
-                        <button type="button" class="quick-shop-btn button-main w-full py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn text-sm" data-product-id="{{ $relatedProduct->id }}">Add to quota list</button>
+                        <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="button-main w-full text-center py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white no-underline text-sm">View details</a>
+                        <button type="button" class="button-main w-full py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn text-sm" data-product-id="{{ $relatedProduct->id }}">Add to quota list</button>
                     </div>
                 </div>
                 @endforeach

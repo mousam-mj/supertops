@@ -35,8 +35,12 @@
     }
     .form-group input:focus,
     .form-group textarea:focus {
-        outline: none;
         border-color: #E31E24;
+    }
+    .form-group input:focus-visible,
+    .form-group textarea:focus-visible {
+        outline: 2px solid rgba(227, 30, 36, 0.45);
+        outline-offset: 2px;
     }
     .form-group textarea {
         resize: vertical;
@@ -55,6 +59,10 @@
     }
     .btn-submit:hover {
         background: #c91a1f;
+    }
+    .btn-submit:focus-visible {
+        outline: 2px solid #E31E24;
+        outline-offset: 3px;
     }
     .success-message {
         background: #d4edda;
