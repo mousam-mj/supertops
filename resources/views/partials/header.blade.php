@@ -26,7 +26,7 @@
                         <div class="flex items-center gap-2 min-w-0 shrink-0">
                             {{-- Real tap target: icon-only button (logo was inside old .menu-mobile-icon and stole / shrank clicks) --}}
                             <button type="button"
-                                    class="menu-mobile-icon flex lg:hidden items-center justify-center min-h-[48px] min-w-[48px] -ml-1 rounded-lg border-0 bg-transparent p-0 cursor-pointer touch-manipulation shrink-0"
+                                    class="menu-mobile-icon flex items-center justify-center min-h-[48px] min-w-[48px] -ml-1 rounded-lg border-0 bg-transparent p-0 cursor-pointer touch-manipulation shrink-0"
                                     aria-label="Open menu"
                                     aria-expanded="false"
                                     aria-controls="menu-mobile">
