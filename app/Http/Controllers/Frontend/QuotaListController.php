@@ -311,7 +311,9 @@ class QuotaListController extends Controller
 
         return redirect()
             ->route('frontend.quota-list.index')
-            ->with('success', 'Your quota request '.$quotaRequest->reference.' was sent. Our team will contact you shortly.');
+            ->with('success', 'Your quota request '.$quotaRequest->reference.' was sent. Our team will contact you shortly.')
+            ->with('quota_submitted', true)
+            ->with('quota_reference', $quotaRequest->reference);
     }
 
     /**

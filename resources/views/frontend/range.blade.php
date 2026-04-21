@@ -2,14 +2,29 @@
 
 @section('title', 'Product Range - EDX Rulmenti Romania')
 
+@section('styles')
+<style>
+    /* Scoped to range page only — never target global .ph (breaks all icons) */
+    .range-page .edx-range-badge {
+        --tw-bg-opacity: 1;
+        background-color: rgb(236 33 39);
+        color: #fff !important;
+    }
+    .range-page .edx-range-accent-text {
+        color: rgb(236 33 39);
+    }
+</style>
+@endsection
+
 @section('content')
+<div class="range-page">
 <!-- Breadcrumb -->
 <div class="breadcrumb-block style-shared" style="background-color: #ec2127;">
     <div class="breadcrumb-main overflow-hidden">
         <div class="container pt-3 pb-5 relative">
             <div class="main-content w-full h-full flex flex-col relative z-[1]">
                 <div class="text-content" style="color: aliceblue;">
-                    <div class="heading2">DABB</div>
+                    <div class="heading2">{{ $rangeCategory?->name ?? 'Bearing' }}</div>
                     @if(!empty($rangeCategory))
                         <div class="heading6 mt-2 font-semibold text-white/95 leading-snug max-w-3xl">{{ $rangeCategory->name }}</div>
                     @endif
@@ -88,6 +103,7 @@
                                 </div>
                             </a>
                             <div class="action w-fit flex flex-col items-center justify-center flex-shrink-0">
+                                {{-- edx-add-quota-btn: layout JS + POST /quota-list/add. Not add-cart-btn / quick-shop-btn (theme main.js breaks quota). --}}
                                 <button type="button" class="button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $product->id }}">
                                     Add to Quota List
                                 </button>
@@ -127,5 +143,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

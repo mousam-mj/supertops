@@ -165,6 +165,49 @@
         gap: 1.5rem;
     }
 }
+.tab-edx {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background-color: #e8e8e8;
+    color: #656363;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.product-detail .desc-tab .menu-tab .tab-item.tab-edx.active {
+    background-color: #fff;
+    color: #18181b;
+    box-shadow: 0 0 0 1px #e5e5e5;
+}
+.product-detail .desc-tab .menu-tab .tab-item.tab-edx:hover:not(.active) {
+    background-color: #dedede;
+    color: #18181b;
+}
+.has-line-before::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 0;
+    height: 5px;
+    background-color: #ec2127;
+    transition: all ease 0.3s;
+}
+.edx-red {
+    --tw-bg-opacity: 1;
+    background-color: rgb(236 33 39);
+    color: #fff !important;
+}
+/* Scoped accent — do not use global .ph (breaks every Phosphor icon on the page) */
+.product-detail .edx-text-accent {
+    color: rgb(236 33 39);
+}
+
+/* Match theme .quantity-block .disabled for edx-quantity-block (main.js handleQuantity binds .quantity-block only) */
+.featured-product.underwear .edx-quantity-block .disabled,
+.featured-product.cosmetic .edx-quantity-block .disabled {
+    color: var(--secondary2);
+    opacity: 0.8;
+    cursor: default;
+}
 </style>
 @endsection
 
@@ -175,7 +218,7 @@
         <div class="container pt-3 pb-5 relative">
             <div class="main-content w-full h-full flex flex-col relative z-[1]">
                 <div class="text-content" style="color: aliceblue;">
-                    <div class="heading2">DABB</div>
+                    <div class="heading2">{{ $product->category->name ?? 'Bearing' }}</div>
                     <div class="link flex gap-1 caption1 mt-3">
                         <a href="{{ route('home') }}">Home</a>
                         <i class="ph ph-caret-right text-sm"></i>
@@ -205,7 +248,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
-                    <div class="product-sale caption2 font-semibold bg-green px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Deep Groove Ball Bearing' }}</div>
+                    <div class="product-sale font-semibold edx-red px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Deep Groove Ball Bearing' }}</div>
                     <div class="product-description text-secondary mt-3 w-full product-description-html">
                         @php $descHtml = trim((string) ($product->description ?? '')); @endphp
                         @if($descHtml !== '')
@@ -214,37 +257,55 @@
                             Keep your home organized, yet elegant with storage cabinets by Onita Patio Furniture. Traditionally designed, they are perfect to be used in the any place where you need to store.
                         @endif
                     </div>
+                    <div class="product-price heading5 edx-text-accent">Price on request</div>
+                            
+                            <div class="w-px h-4 bg-line"></div>
                 </div>
 
                 <div class="list-action mt-6">
+                    <div class="product-category text-secondary font-semibold edx-text-accent">Available in stock</div>
                     <div class="text-title mt-5">Quantity:</div>
                     <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
-                        <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
+                        {{-- edx-quantity-block: avoid .quantity-block or theme main.js increments qty twice per + click --}}
+                        <div class="edx-quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                             <i class="ph-bold ph-minus cursor-pointer body1 disabled" id="qty-minus"></i>
                             <div class="quantity body1 font-semibold" id="qty-value">1</div>
                             <i class="ph-bold ph-plus cursor-pointer body1" id="qty-plus"></i>
                         </div>
-                        <button type="button" class="button-main whitespace-nowrap w-full text-center bg-white text-black border border-black edx-add-quota-btn cursor-pointer" data-product-id="{{ $product->id }}">Add To Quota List</button>
+                        <button type="button" class="button-main whitespace-nowrap w-full text-center bg-black text-white border border-black hover:bg-white hover:text-black edx-add-quota-btn cursor-pointer inline-flex items-center justify-center gap-2" data-product-id="{{ $product->id }}">
+                            <i class="ph ph-files text-lg shrink-0" aria-hidden="true"></i>
+                            <span class="edx-quota-btn-label">Add To Quota List</span>
+                        </button>
                     </div>
 
                     <div class="more-infor mt-6">
-                        <div class="flex items-center gap-1 mt-3">
-                            <i class="ph ph-timer body1"></i>
-                            <div class="text-title">Orders placed before 6 p.m. CEST will be shipped today.</div>
-                        </div>
-                        <div class="flex items-center gap-1 mt-3">
-                            <i class="ph ph-eye body1"></i>
-                            <div class="text-title">Payment by invoice possible.</div>
-                        </div>
-                        <div class="flex items-center gap-1 mt-3">
-                            <i class="ph ph-eye body1"></i>
-                            <div class="text-title">Track your order.</div>
-                        </div>
-                    </div>
+                                <div class="flex items-center gap-4 flex-wrap">
+                                    <div class="flex items-center gap-1">
+                                        <i class="ph ph-package body1"></i>
+                                        <div class="text-title">This product is available from stock.</div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="flex items-center gap-1 mt-3">
+                                    <i class="ph ph-clock body1"></i>
+                                    <div class="text-title">Orders placed before 6 p.m. CEST will be shipped today.</div>
+                                    
+                                </div>
+                                <div class="flex items-center gap-1 mt-3">
+                                    <i class="ph ph-scroll body1"></i>
+                                    <div class="text-title">Payment by invoice possible.</div>
+                                </div>
+                                <div class="flex items-center gap-1 mt-3">
+                                    <i class="ph ph-path body1"></i>
+                                    <div class="text-title">Track your order.</div>
+                                    
+                                </div>
+                                
+                            </div>
                 </div>
 
                 <div class="button-block mt-5 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('frontend.product.pdf.download', $product->slug) }}" class="button-main flex-1 text-center">Download PDF</a>
+                    <a href="{{ route('frontend.product.pdf.download', $product->slug) }}" class="button-main flex-1 text-center"><i class="ph ph-download"></i> Download PDF</a>
                 </div>
             </div>
         </div>
@@ -254,9 +315,9 @@
         <div class="container">
             <div class="flex items-center justify-center w-full">
                 <div class="menu-tab flex items-center md:gap-[60px] gap-8">
-                    <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer active" data-item="Overview">Overview</div>
-                    <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Equivalents">Equivalents</div>
-                    <div class="tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Suffixdescription">Suffix description</div>
+                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer active" data-item="Overview">Overview</div>
+                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Equivalents">Equivalents</div>
+                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Suffixdescription">Suffix description</div>
                 </div>
             </div>
             <div class="desc-block mt-8 relative">
@@ -415,13 +476,16 @@
                         <div class="product-infor mt-4">
                             <div class="product-name heading6 block duration-300 line-clamp-2">{{ $relatedProduct->sku ?? $relatedProduct->name }}</div>
                             <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
-                                <div class="product-price text-title bg-green px-3 py-0.5 inline-block rounded-full text-sm">{{ $relatedProduct->category->name ?? 'Bearing' }}</div>
+                                <div class="product-price text-title edx-red px-3 py-0.5 inline-block rounded-full text-sm">{{ $relatedProduct->category->name ?? 'Bearing' }}</div>
                             </div>
                         </div>
                     </a>
                     <div class="action flex flex-col gap-2 p-4 pt-0 mt-auto">
                         <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="button-main w-full text-center py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white no-underline text-sm">View details</a>
-                        <button type="button" class="button-main w-full py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn text-sm" data-product-id="{{ $relatedProduct->id }}">Add to quota list</button>
+                        <button type="button" class="button-main w-full py-2.5 px-4 rounded-full bg-black text-white border border-black hover:bg-white hover:text-black edx-add-quota-btn text-sm inline-flex items-center justify-center gap-2" data-product-id="{{ $relatedProduct->id }}">
+                            <i class="ph ph-files text-base shrink-0" aria-hidden="true"></i>
+                            <span class="edx-quota-btn-label">Add to quota list</span>
+                        </button>
                     </div>
                 </div>
                 @endforeach
