@@ -42,11 +42,10 @@ final class CatalogFilterOptions
     /**
      * Distinct overview-style spec values for sidebar chips (labels are HTML-stripped).
      *
-     * @return array{cages: list<string>, rows: list<string>}
+     * @return array{rows: list<string>}
      */
     public static function facets(): array
     {
-        $cages = [];
         $rows = [];
 
         foreach (Product::edxBearingsCatalog()->where('is_active', true)->pluck('specifications') as $raw) {
@@ -54,23 +53,16 @@ final class CatalogFilterOptions
             if (! is_array($s)) {
                 continue;
             }
-            $cage = isset($s['cage']) ? trim(strip_tags((string) $s['cage'])) : '';
-            if ($cage !== '') {
-                $cages[$cage] = true;
-            }
             $row = isset($s['number_of_rows']) ? trim(strip_tags((string) $s['number_of_rows'])) : '';
             if ($row !== '') {
                 $rows[$row] = true;
             }
         }
 
-        $cageKeys = array_keys($cages);
         $rowKeys = array_keys($rows);
-        natcasesort($cageKeys);
         natcasesort($rowKeys);
 
         return [
-            'cages' => array_slice(array_values($cageKeys), 0, 24),
             'rows' => array_slice(array_values($rowKeys), 0, 12),
         ];
     }
@@ -139,34 +131,6 @@ final class CatalogFilterOptions
                         }
 
                         return $n >= $min && $n < $max;
-                    })
-                    ->keys()
-                    ->values()
-                    ->all();
-                if ($ids === []) {
-                    $query->whereRaw('1 = 0');
-                } else {
-                    $query->whereIn('id', $ids);
-                }
-            }
-        }
-
-        if ($request->filled('cage')) {
-            $want = trim(strip_tags((string) $request->get('cage')));
-            if ($want !== '') {
-                $ids = Product::edxBearingsCatalog()
-                    ->where('is_active', true)
-                    ->pluck('specifications', 'id')
-                    ->filter(function ($specs) use ($want) {
-                        if (is_string($specs)) {
-                            $specs = json_decode($specs, true);
-                        }
-                        if (! is_array($specs)) {
-                            return false;
-                        }
-                        $c = isset($specs['cage']) ? trim(strip_tags((string) $specs['cage'])) : '';
-
-                        return $c !== '' && strcasecmp($c, $want) === 0;
                     })
                     ->keys()
                     ->values()

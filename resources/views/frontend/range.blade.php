@@ -2,35 +2,26 @@
 
 @section('title', 'Product Range - EDX Rulmenti Romania')
 
-@section('styles')
+@section('content')
 <style>
-    /* Scoped to range page only — never target global .ph (breaks all icons) */
-    .range-page .edx-range-badge {
+    .edx-red {
         --tw-bg-opacity: 1;
         background-color: rgb(236 33 39);
         color: #fff !important;
     }
-    .range-page .edx-range-accent-text {
-        color: rgb(236 33 39);
-    }
 </style>
-@endsection
-
-@section('content')
-<div class="range-page">
-<!-- Breadcrumb -->
+<!-- Breadcrumb (red) -->
 <div class="breadcrumb-block style-shared" style="background-color: #ec2127;">
     <div class="breadcrumb-main overflow-hidden">
-        <div class="container pt-3 pb-5 relative">
-            <div class="main-content w-full h-full flex flex-col relative z-[1]">
-                <div class="text-content" style="color: aliceblue;">
-                    <div class="heading2">{{ $rangeCategory?->name ?? 'Bearing' }}</div>
+        <div class="container max-w-5xl mx-auto pt-3 pb-4 md:pt-4 md:pb-5 relative">
+            <div class="main-content w-full flex flex-col items-center text-center relative z-[1]">
+                <div class="text-content w-full" style="color: aliceblue;">
                     @if(!empty($rangeCategory))
-                        <div class="heading6 mt-2 font-semibold text-white/95 leading-snug max-w-3xl">{{ $rangeCategory->name }}</div>
+                        <div class="heading6 font-semibold text-white/95 leading-snug max-w-3xl mx-auto">{{ $rangeCategory->name }}</div>
                     @endif
-                    <div class="link flex gap-1 caption1 mt-3">
+                    <div class="link flex justify-center gap-1 caption1 flex-wrap {{ !empty($rangeCategory) ? 'mt-2' : 'mt-3' }}">
                         <a href="{{ route('home') }}">Home</a>
-                        <i class="ph ph-caret-right text-sm"></i>
+                        <i class="ph ph-caret-right text-sm" aria-hidden="true"></i>
                         <div class="capitalize">{{ $rangeCategory?->name ?? 'Bearing' }}</div>
                     </div>
                 </div>
@@ -38,16 +29,19 @@
         </div>
     </div>
 </div>
+{{-- Search: red ke niche, centered --}}
+<div class="w-full border-b border-line" style="background: #f8f8f8;">
+    <div class="container max-w-6xl mx-auto px-4 py-5 md:py-8">
+        @include('frontend.partials.catalog-search-bar', ['centered' => true])
+    </div>
+</div>
 
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
         <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
-            <!-- Sidebar: same dynamic filters as home -->
             <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                @include('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['cages' => [], 'rows' => []]])
+                @include('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['rows' => []]])
             </div>
-
-            <!-- Product List -->
             <div class="list-product-block style-list lg:w-3/4 md:w-2/3 w-full md:pl-3">
                 <div class="filter-heading flex items-center justify-between gap-5 flex-wrap">
                     <div class="left flex has-line items-center flex-wrap gap-5">
@@ -81,7 +75,7 @@
                                 <div class="product-infor max-sm:w-full">
                                     <div class="product-name heading6 inline-block duration-300">{{ $product->sku ?? $product->name }}</div>
                                     <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
-                                        <div class="product-price text-title bg-green px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Bearing' }}</div>
+                                        <div class="product-price text-title edx-red px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Bearing' }}</div>
                                     </div>
                                     @if($product->specifications)
                                     @php $specs = is_array($product->specifications) ? $product->specifications : json_decode($product->specifications, true); @endphp
@@ -103,9 +97,8 @@
                                 </div>
                             </a>
                             <div class="action w-fit flex flex-col items-center justify-center flex-shrink-0">
-                                {{-- edx-add-quota-btn: layout JS + POST /quota-list/add. Not add-cart-btn / quick-shop-btn (theme main.js breaks quota). --}}
-                                <button type="button" class="button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $product->id }}">
-                                    Add to Quota List
+                                <button type="button" class="edx-btn-add-quote edx-btn-add-quote--compact w-full min-w-0 sm:min-w-[12rem] edx-add-quota-btn whitespace-nowrap" data-product-id="{{ $product->id }}">
+                                    <span class="edx-quota-btn-label">Add to quote</span>
                                 </button>
                             </div>
                         </div>
@@ -118,7 +111,6 @@
                     @endforelse
                 </div>
 
-                <!-- Pagination -->
                 @if($products->hasPages())
                 <div class="list-pagination w-full flex items-center gap-4 mt-10">
                     @if($products->onFirstPage())
@@ -143,6 +135,5 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 @endsection

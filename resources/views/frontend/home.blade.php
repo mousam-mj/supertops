@@ -3,16 +3,15 @@
 @section('title', 'EDX Rulmenti Romania S.R.L. - Ball Bearings & Industrial Products')
 
 @section('content')
-<!-- Breadcrumb -->
+<!-- Breadcrumb (red) -->
 <div class="breadcrumb-block style-shared" style="background-color: #ec2127;">
     <div class="breadcrumb-main overflow-hidden">
         <div class="container pt-3 pb-5 relative">
-            <div class="main-content w-full h-full flex flex-col relative z-[1]">
-                <div class="text-content" style="color: aliceblue;">
-                    <div class="heading2">DABB</div>
-                    <div class="link flex gap-1 caption1 mt-3">
+            <div class="main-content w-full h-full flex flex-col items-center text-center relative z-[1]">
+                <div class="text-content w-full" style="color: aliceblue;">
+                    <div class="link flex justify-center gap-1 caption1 flex-wrap">
                         <a href="{{ route('home') }}">Home</a>
-                        <i class="ph ph-caret-right text-sm"></i>
+                        <i class="ph ph-caret-right text-sm" aria-hidden="true"></i>
                         <div class="capitalize">Bearing</div>
                     </div>
                 </div>
@@ -20,16 +19,19 @@
         </div>
     </div>
 </div>
+{{-- Search: red bar ke niche, centered, fixed max width --}}
+<div class="w-full border-b border-line" style="background: #f8f8f8;">
+    <div class="container max-w-6xl mx-auto px-4 py-5 md:py-8">
+        @include('frontend.partials.catalog-search-bar', ['centered' => true])
+    </div>
+</div>
 
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
         <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
-            <!-- Sidebar: catalog data (categories, search, overview facets) -->
             <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                @include('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['cages' => [], 'rows' => []]])
+                @include('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['rows' => []]])
             </div>
-
-            <!-- Product List -->
             <div class="list-product-block style-list lg:w-3/4 md:w-2/3 w-full md:pl-3">
                 <div class="filter-heading flex items-center justify-between gap-5 flex-wrap">
                     <div class="left flex has-line items-center flex-wrap gap-5">
@@ -77,8 +79,8 @@
                                 </div>
                             </a>
                             <div class="action w-fit flex flex-col items-center justify-center flex-shrink-0">
-                                <button type="button" class="button-main whitespace-nowrap py-2 px-9 max-lg:px-5 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white edx-add-quota-btn" data-product-id="{{ $product->id }}">
-                                    Add to Quota List
+                                <button type="button" class="edx-btn-add-quote edx-btn-add-quote--compact py-2 px-9 max-lg:px-5 edx-add-quota-btn whitespace-nowrap" data-product-id="{{ $product->id }}">
+                                    <span class="edx-quota-btn-label">Add to quote</span>
                                 </button>
                             </div>
                         </div>

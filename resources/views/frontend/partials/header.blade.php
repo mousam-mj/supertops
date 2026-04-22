@@ -34,10 +34,6 @@
                     </ul>
                 </div>
                 <div class="right flex items-center gap-5 md:gap-6 z-[5] shrink-0">
-                    <div class="max-md:hidden search-icon flex items-center cursor-pointer relative">
-                        <i class="ph-bold ph-magnifying-glass text-2xl"></i>
-                        <div class="line absolute bg-line w-px h-6 -right-4" style="pointer-events: none;" aria-hidden="true"></div>
-                    </div>
                     <div class="list-action flex items-center">
                         {{-- Do not use class "cart-icon": theme main.js binds the first .cart-icon to legacy cart modal and breaks quota click. --}}
                         <button type="button" id="edx-header-quota-bag" class="quota-bag-open quota-header-bag max-md:hidden cursor-pointer no-underline text-inherit appearance-none bg-transparent border-0 p-0" title="Quota list" aria-label="Open quotation list" aria-haspopup="dialog" aria-expanded="false" aria-controls="edx-quota-modal">
@@ -61,10 +57,10 @@
                         </div>
                         <a href="{{ route('home') }}" class="logo text-3xl font-semibold text-center">EDX</a>
                     </div>
-                    <div class="form-search relative mt-2">
-                        <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"></i>
-                        <input type="text" placeholder="What are you looking for?" class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" />
-                    </div>
+                    <form action="{{ route('frontend.range') }}" method="get" class="relative mt-2" role="search" aria-label="Search catalogue">
+                        <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></i>
+                        <input type="search" name="search" value="{{ request('search', '') }}" placeholder="Search bearings…" class="h-12 rounded-lg border border-line text-sm w-full pl-10 pr-4" autocomplete="off" />
+                    </form>
                     <div class="list-nav mt-6">
                         <ul>
                             <li>
@@ -106,7 +102,7 @@
                 <span class="ph-bold ph-list text-2xl block"></span>
                 <span class="menu_bar-title caption2 font-semibold">Category</span>
             </a>
-            <a href="{{ route('frontend.range') }}" class="menu_bar-link flex flex-col items-center gap-1">
+            <a href="{{ route('frontend.range') }}#catalog-search" class="menu_bar-link flex flex-col items-center gap-1">
                 <span class="ph-bold ph-magnifying-glass text-2xl block"></span>
                 <span class="menu_bar-title caption2 font-semibold">Search</span>
             </a>

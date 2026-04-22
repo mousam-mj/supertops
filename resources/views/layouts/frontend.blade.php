@@ -204,6 +204,162 @@
             color: #fff !important;
         }
 
+        /* "Add to quote" — red CTA (product, range, home) */
+        .edx-btn-add-quote {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 3rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #fff !important;
+            background-color: #c8102e;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: filter 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+        .edx-btn-add-quote:hover {
+            filter: brightness(0.95);
+        }
+        .edx-btn-add-quote:focus-visible {
+            outline: 2px solid #ec2127;
+            outline-offset: 3px;
+        }
+        .edx-btn-add-quote:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            filter: none;
+        }
+        .edx-btn-add-quote .ph {
+            color: #fff !important;
+            font-size: 1.25rem;
+        }
+        .edx-btn-add-quote--compact {
+            min-height: 2.625rem;
+            min-width: 10rem;
+            padding: 0.5rem 0.875rem;
+            font-size: 0.6875rem;
+            border-radius: 9999px;
+            letter-spacing: 0.06em;
+        }
+        .edx-btn-add-quote--compact .ph {
+            font-size: 1rem;
+        }
+
+        /* Large search card (home / range) — ~modal size, pill field, popular chips */
+        .has-search-card {
+            display: flex;
+            justify-content: center;
+        }
+        .catalog-top-search .edx-search-card {
+            width: 100%;
+            max-width: min(80vw, 32rem);
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+            border: 1px solid #f0f0f0;
+            padding: 1.5rem 1.5rem 1.25rem;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        @media (min-width: 640px) {
+            .catalog-top-search .edx-search-card {
+                max-width: min(80vw, 40rem);
+                padding: 1.75rem 1.75rem 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .catalog-top-search .edx-search-card {
+                max-width: min(80vw, 48rem);
+                border-radius: 1.5rem;
+            }
+        }
+        @media (min-width: 1280px) {
+            .catalog-top-search .edx-search-card {
+                max-width: min(75vw, 56rem);
+            }
+        }
+        .catalog-top-search .edx-search-pill-form {
+            margin: 0;
+        }
+        .catalog-top-search .edx-search-pill-row {
+            display: flex;
+            align-items: center;
+            min-height: 3.25rem;
+            border: 1px solid #e4e4e7;
+            border-radius: 9999px;
+            background: #fff;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .catalog-top-search .edx-search-pill-row:focus-within {
+            border-color: #a1a1aa;
+            box-shadow: 0 0 0 1px #d4d4d8;
+        }
+        .catalog-top-search .edx-search-pill-input {
+            flex: 1 1 0;
+            min-width: 0;
+            border: 0;
+            background: transparent;
+            font-size: 0.95rem;
+            color: #18181b;
+            padding: 0.65rem 0.75rem 0.65rem 1.25rem;
+        }
+        .catalog-top-search .edx-search-pill-input::placeholder {
+            color: #9ca3af;
+        }
+        .catalog-top-search .edx-search-pill-input:focus {
+            outline: none;
+        }
+        .catalog-top-search .edx-search-pill-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 3.25rem;
+            height: 3.25rem;
+            border: 0;
+            background: #fafafa;
+            color: #52525b;
+            cursor: pointer;
+        }
+        .catalog-top-search .edx-search-pill-btn:hover {
+            color: #18181b;
+            background: #f4f4f5;
+        }
+        .catalog-top-search .edx-search-pill-btn .ph {
+            font-size: 1.35rem;
+        }
+        .catalog-top-search input[type="search"]::-webkit-search-decoration,
+        .catalog-top-search input[type="search"]::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+        }
+
+        /* Non-card compact search (fallback) */
+        .catalog-top-search .edx-search-field-wrap {
+            border-color: #e4e4e7;
+        }
+        .catalog-top-search .edx-search-submit {
+            border: 1px solid #e4e4e7;
+            border-left: 0;
+            background: #e4e4e7;
+            color: #27272a;
+        }
+        .catalog-top-search .edx-search-submit:hover {
+            background: #d4d4d8;
+        }
+        .catalog-top-search .edx-search-input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
         /* Quota list count badge (explicit CSS — Tailwind build does not scan Blade files) */
         .header-menu .list-action,
         .header-menu .quota-bag-link,
@@ -547,25 +703,6 @@
     <!-- Scroll to Top -->
     <a class="scroll-to-top-btn" href="#top-nav"><i class="ph-bold ph-caret-up"></i></a>
     
-    <!-- Search Modal -->
-    <div class="modal-search-block">
-        <div class="modal-search-main md:p-10 p-6 rounded-[32px]">
-            <div class="form-search relative w-full">
-                <i class="ph ph-magnifying-glass absolute heading5 right-6 top-1/2 -translate-y-1/2 cursor-pointer"></i>
-                <input type="text" placeholder="Search bearings..." class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-12" />
-            </div>
-            <div class="keyword mt-8">
-                <div class="heading5">Popular Searches</div>
-                <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
-                    <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Ball Bearing</button>
-                    <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Roller Bearing</button>
-                    <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Pillow Block</button>
-                    <button class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Taper Roller</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Quota list quick view (header bag) — wide two-column layout like storefront cart drawer -->
     <div id="edx-quota-modal" class="edx-quota-modal-root" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="edx-quota-modal-title" aria-hidden="true">
         <div class="edx-quota-modal-shell">
@@ -648,7 +785,8 @@
             var qtyEl = scope ? scope.querySelector('#qty-value') : document.getElementById('qty-value');
             var qty = 1;
             if (qtyEl) {
-                qty = parseInt(qtyEl.textContent || qtyEl.innerText, 10) || 1;
+                var raw = (typeof qtyEl.value === 'string') ? qtyEl.value : (qtyEl.textContent || qtyEl.innerText || '');
+                qty = Math.max(1, Math.min(99999, parseInt(String(raw).trim(), 10) || 1));
             }
             var labelEl = btn.querySelector('.edx-quota-btn-label') || btn;
             var prev = (labelEl.textContent || '').trim();
@@ -920,6 +1058,24 @@
                 closeQuotaModal();
             }
         });
+    })();
+    </script>
+    <script>
+    (function () {
+        if (location.hash !== '#catalog-search') {
+            return;
+        }
+        function focusCatalogSearch() {
+            var el = document.querySelector('#catalog-search input[name="search"]');
+            if (el) {
+                el.focus({ preventScroll: false });
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', focusCatalogSearch);
+        } else {
+            focusCatalogSearch();
+        }
     })();
     </script>
     

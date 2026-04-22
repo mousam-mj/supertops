@@ -79,124 +79,140 @@
 .product-description-html p { margin-bottom: 0.5rem; }
 .product-description-html p:last-child { margin-bottom: 0; }
 
-/* Product tab — technical tables (card layout, readable columns) */
-.product-detail .desc-tab .edx-spec-card {
-    border: 1px solid #e5e5e5;
-    border-radius: 14px;
-    overflow: hidden;
+/* Spec tables in tabs use global .spec-table (layouts/frontend) */
+.product-detail .desc-tab .spec-table td.edx-empty-cell {
+    text-align: left !important;
+    color: #71717a !important;
+    padding: 1.25rem 0 !important;
+    font-size: 0.875rem;
+}
+.product-detail .desc-tab .edx-spec-block__table .spec-table td.edx-empty-cell {
+    padding: 1.25rem 0 !important;
+}
+
+/* Product spec sheet (edx-product.html style): flat, label left / value right, hairline rules — no “card” chrome */
+.product-detail .desc-tab .desc-block--spec {
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 2rem;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-card-title {
+.product-detail .desc-tab .edx-spec-block {
+    min-width: 0;
     margin: 0;
-    padding: 14px 18px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #27272a;
-    background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
-    border-bottom: 1px solid #e8e8e8;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table {
+.product-detail .desc-tab .edx-spec-block__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #18181b;
+    line-height: 1.3;
+    margin: 0 0 0.75rem 0;
+    padding: 0;
+    letter-spacing: -0.01em;
+}
+.product-detail .desc-tab .edx-spec-block__table .spec-table {
     width: 100%;
     border-collapse: collapse;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table tr {
-    border-bottom: 1px solid #efefef;
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr {
+    border-bottom: 1px solid #e8e8ed;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table tr:last-child {
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr:last-child {
     border-bottom: none;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table td,
-.product-detail .desc-tab .edx-spec-card .edx-spec-table th {
-    padding: 13px 18px;
+.product-detail .desc-tab .edx-spec-block__table .spec-table td {
+    padding: 0.6rem 0;
     font-size: 0.875rem;
     line-height: 1.45;
+    color: #3f3f46;
     vertical-align: top;
-    text-align: left !important;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table thead th {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
+.product-detail .desc-tab .edx-spec-block__table .spec-table td:first-child {
     color: #52525b;
-    background: #f4f4f5;
-}
-.product-detail .desc-tab .edx-spec-card .edx-spec-table thead th:first-child {
-    width: 40%;
-    max-width: 14rem;
-}
-.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody td:first-child {
-    width: 40%;
-    max-width: 14rem;
-    color: #71717a;
-}
-.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody td:last-child {
     font-weight: 500;
+    padding-right: 1.25rem;
+    max-width: 58%;
+}
+.product-detail .desc-tab .edx-spec-block__table .spec-table td:last-child {
+    text-align: right;
     color: #18181b;
+    font-weight: 500;
+    word-break: break-word;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table tbody tr:hover td {
-    background-color: #fafafa;
+/* Cross-ref / suffix: two-column data with a header row (no grey bar — hairline only) */
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr.edx-spec-th {
+    border-bottom: 1px solid #d4d4d8;
 }
-.product-detail .desc-tab .edx-spec-card .edx-spec-table td.edx-empty-cell {
-    width: auto !important;
-    max-width: none !important;
-    text-align: center !important;
-    color: #71717a !important;
-    font-weight: 400 !important;
-    padding: 2.25rem 1.25rem !important;
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr.edx-spec-th td {
+    background: transparent;
+    font-weight: 600;
+    color: #18181b;
+    font-size: 0.875rem;
+    padding: 0 0 0.5rem 0;
+    vertical-align: bottom;
+    border: none;
 }
-.product-detail .desc-tab .edx-overview-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    margin-top: 1.5rem;
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr.edx-spec-th td:first-child {
+    color: #18181b;
+    font-weight: 600;
 }
-@media (min-width: 768px) {
-    .product-detail .desc-tab .edx-overview-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.5rem;
-    }
+.product-detail .desc-tab .edx-spec-block__table .spec-table tr.edx-spec-th td:last-child {
+    text-align: right;
 }
-@media (min-width: 1024px) {
-    .product-detail .desc-tab .edx-overview-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1.5rem;
-    }
+/* edx.ltd style: rectangular tab buttons, uppercase, grey inactive / solid red selected */
+.product-detail .desc-tab .menu-tab.edx-spec-tabs {
+    position: relative;
+    justify-content: flex-start;
 }
-.tab-edx {
-    padding: 10px 14px;
-    border-radius: 8px;
-    background-color: #e8e8e8;
-    color: #656363;
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab {
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0.65rem 1.35rem;
+    min-height: 2.75rem;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    color: #18181b;
+    background-color: #e4e4e7;
     transition: background-color 0.2s ease, color 0.2s ease;
+    text-align: center;
+    line-height: 1.2;
 }
-.product-detail .desc-tab .menu-tab .tab-item.tab-edx.active {
-    background-color: #fff;
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:hover,
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:focus-visible {
+    background-color: #d4d4d8;
     color: #18181b;
-    box-shadow: 0 0 0 1px #e5e5e5;
+    outline: none;
 }
-.product-detail .desc-tab .menu-tab .tab-item.tab-edx:hover:not(.active) {
-    background-color: #dedede;
-    color: #18181b;
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:focus-visible {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ec2127;
 }
-.has-line-before::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0px;
-    width: 0;
-    height: 5px;
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active,
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active:hover {
     background-color: #ec2127;
-    transition: all ease 0.3s;
+    color: #fff;
+    box-shadow: none;
+}
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active:focus-visible {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #18181b;
 }
 .edx-red {
     --tw-bg-opacity: 1;
     background-color: rgb(236 33 39);
     color: #fff !important;
 }
-/* Scoped accent — do not use global .ph (breaks every Phosphor icon on the page) */
+/* Scoped accent — never add bare `.ph` here (breaks all Phosphor icons) */
 .product-detail .edx-text-accent {
     color: rgb(236 33 39);
 }
@@ -207,6 +223,33 @@
     color: var(--secondary2);
     opacity: 0.8;
     cursor: default;
+}
+
+/* Quantity: typeable number, hide spinners, match stepper row */
+.edx-quantity-block input#qty-value {
+    width: 2.75rem;
+    min-width: 1.5rem;
+    max-width: 4rem;
+    text-align: center;
+    font: inherit;
+    font-weight: 600;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.edx-quantity-block input#qty-value:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(236, 33, 39, 0.25);
+    border-radius: 4px;
+}
+.edx-quantity-block input#qty-value::-webkit-outer-spin-button,
+.edx-quantity-block input#qty-value::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 </style>
 @endsection
@@ -234,7 +277,7 @@
     <div class="featured-product underwear filter-product-img md:py-20 py-14">
         <div class="container flex justify-between gap-y-6 flex-wrap md:items-start">
             <div class="list-img w-full md:w-5/12 md:pr-8 lg:pr-10 flex-shrink-0">
-                <img class="w-full object-contain object-center duration-700" src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                <img class="object-contain object-center duration-700" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                 <div class="product-description text-secondary mt-3">Image may differ from product. See technical specification for details.</div>
             </div>
             <div class="product-item product-infor w-full md:w-7/12 md:pl-6 lg:pl-8" data-item="{{ $product->id }}">
@@ -267,14 +310,14 @@
                     <div class="text-title mt-5">Quantity:</div>
                     <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
                         {{-- edx-quantity-block: avoid .quantity-block or theme main.js increments qty twice per + click --}}
-                        <div class="edx-quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
-                            <i class="ph-bold ph-minus cursor-pointer body1 disabled" id="qty-minus"></i>
-                            <div class="quantity body1 font-semibold" id="qty-value">1</div>
-                            <i class="ph-bold ph-plus cursor-pointer body1" id="qty-plus"></i>
+                        <div class="edx-quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-center gap-1 rounded-lg border border-line sm:w-[160px] w-[140px] flex-shrink-0">
+                            <i class="ph-bold ph-minus cursor-pointer body1 disabled shrink-0" id="qty-minus" role="button" aria-label="Decrease quantity" tabindex="0"></i>
+                            <input type="number" class="body1 quantity" id="qty-value" name="quantity" min="1" max="99999" value="1" inputmode="numeric" pattern="[0-9]*" aria-label="Quantity" autocomplete="off" />
+                            <i class="ph-bold ph-plus cursor-pointer body1 shrink-0" id="qty-plus" role="button" aria-label="Increase quantity" tabindex="0"></i>
                         </div>
-                        <button type="button" class="button-main whitespace-nowrap w-full text-center bg-black text-white border border-black hover:bg-white hover:text-black edx-add-quota-btn cursor-pointer inline-flex items-center justify-center gap-2" data-product-id="{{ $product->id }}">
-                            <i class="ph ph-files text-lg shrink-0" aria-hidden="true"></i>
-                            <span class="edx-quota-btn-label">Add To Quota List</span>
+                        <button type="button" class="edx-btn-add-quote whitespace-nowrap edx-add-quota-btn" data-product-id="{{ $product->id }}">
+                            <i class="ph ph-files shrink-0" aria-hidden="true"></i>
+                            <span class="edx-quota-btn-label">Add to quote</span>
                         </button>
                     </div>
 
@@ -313,21 +356,20 @@
 
     <div class="desc-tab md:pb-20 pb-10">
         <div class="container">
-            <div class="flex items-center justify-center w-full">
-                <div class="menu-tab flex items-center md:gap-[60px] gap-8">
-                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer active" data-item="Overview">Overview</div>
-                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Equivalents">Equivalents</div>
-                    <div class="tab-edx tab-item heading5 has-line-before text-secondary2 hover:text-black duration-300 cursor-pointer" data-item="Suffixdescription">Suffix description</div>
+            <div class="w-full">
+                <div class="menu-tab edx-spec-tabs flex flex-wrap items-stretch gap-2" role="tablist" aria-label="Product information">
+                    <button type="button" class="tab-item edx-spec-tab active" data-item="Overview" role="tab" aria-selected="true" id="tab-overview">Overview</button>
+                    <button type="button" class="tab-item edx-spec-tab" data-item="Equivalents" role="tab" aria-selected="false" id="tab-equivalents">Equivalents</button>
+                    <button type="button" class="tab-item edx-spec-tab" data-item="Suffixdescription" role="tab" aria-selected="false" id="tab-suffix">Suffix description</button>
                 </div>
             </div>
-            <div class="desc-block mt-8 relative">
+            <div class="desc-block desc-block--spec mt-6 relative">
                 <div class="desc-item description open pb-10" data-item="Overview">
-                    <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm border-b border-line">Overview</div>
-                    <div class="edx-overview-grid">
-                        <div class="edx-spec-card">
-                            <h3 class="heading6 edx-spec-card-title">Boundary dimensions</h3>
-                            <table class="spec-table edx-spec-table">
-                                <tbody>
+                    <div class="grid md:grid-cols-2 gap-8 md:gap-x-12 gap-y-8 mt-2">
+                        <section class="edx-spec-block min-w-0" aria-labelledby="spec-dim">
+                            <h2 id="spec-dim" class="edx-spec-block__title">Boundary dimensions</h2>
+                            <div class="edx-spec-block__table">
+                                <table class="spec-table">
                                     <tr>
                                         <td>Bore diameter</td>
                                         <td>{{ $specs['bore_diameter'] ?? '12 mm' }}</td>
@@ -340,13 +382,13 @@
                                         <td>Width</td>
                                         <td>{{ $specs['width'] ?? '7 mm' }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="edx-spec-card">
-                            <h3 class="heading6 edx-spec-card-title">Performance</h3>
-                            <table class="spec-table edx-spec-table">
-                                <tbody>
+                                </table>
+                            </div>
+                        </section>
+                        <section class="edx-spec-block min-w-0" aria-labelledby="spec-perf">
+                            <h2 id="spec-perf" class="edx-spec-block__title">Performance</h2>
+                            <div class="edx-spec-block__table">
+                                <table class="spec-table">
                                     <tr>
                                         <td>Basic dynamic load rating</td>
                                         <td>{{ $specs['dynamic_load_rating'] ?? '5.10 KN' }}</td>
@@ -363,13 +405,13 @@
                                         <td>Limiting speed – Oil</td>
                                         <td>{{ $specs['limiting_speed_oil'] ?? '30000 r/min' }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="edx-spec-card md:col-span-2 lg:col-span-1">
-                            <h3 class="heading6 edx-spec-card-title">Properties</h3>
-                            <table class="spec-table edx-spec-table">
-                                <tbody>
+                                </table>
+                            </div>
+                        </section>
+                        <section class="edx-spec-block min-w-0 md:col-span-2" aria-labelledby="spec-props">
+                            <h2 id="spec-props" class="edx-spec-block__title">Properties</h2>
+                            <div class="edx-spec-block__table max-w-4xl">
+                                <table class="spec-table">
                                     <tr>
                                         <td>Number of rows</td>
                                         <td>{{ $specs['number_of_rows'] ?? '1' }}</td>
@@ -390,26 +432,23 @@
                                         <td>Tolerance class for dimensions</td>
                                         <td>{{ $specs['tolerance_class'] ?? 'P6' }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                </table>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
 
                 <div class="desc-item description pb-10" data-item="Equivalents">
-                    <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm border-b border-line">Equivalents</div>
-                    <div class="mt-6 min-w-0 overflow-x-auto">
-                        <div class="edx-spec-card max-w-3xl">
-                            <h3 class="heading6 edx-spec-card-title">Manufacturer cross-reference</h3>
-                            <table class="spec-table edx-spec-table w-full">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Model</th>
-                                        <th scope="col">Brand</th>
+                    <div class="mt-2 min-w-0 overflow-x-auto max-w-3xl">
+                        <section class="edx-spec-block" aria-labelledby="spec-equiv">
+                            <h2 id="spec-equiv" class="edx-spec-block__title">Manufacturer cross-reference</h2>
+                            <div class="edx-spec-block__table">
+                                <table class="spec-table w-full">
+                                    <tr class="edx-spec-th">
+                                        <td>Model</td>
+                                        <td>Brand</td>
                                     </tr>
-                                </thead>
-                                <tbody>
                                     @forelse($equivRows as $row)
                                     <tr>
                                         <td>{{ $row['model'] }}</td>
@@ -420,37 +459,34 @@
                                         <td colspan="2" class="edx-empty-cell">No manufacturer cross-references are stored for this designation yet.</td>
                                     </tr>
                                     @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                </table>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
                 <div class="desc-item description pb-10" data-item="Suffixdescription">
-                    <div class="text-button-uppercase text-white bg-red px-2 py-0.5 inline-block rounded-sm border-b border-line">Suffix description</div>
                     @if($suffixCount === 0)
-                    <p class="text-secondary mt-6">No suffix codes or descriptions are stored for this product in the catalogue data.</p>
+                    <p class="text-secondary mt-2">No suffix codes or descriptions are stored for this product in the catalogue data.</p>
                     @else
-                    <div class="mt-6 overflow-x-auto">
-                        <div class="edx-spec-card max-w-3xl">
-                            <h3 class="heading6 edx-spec-card-title">Suffix description</h3>
-                            <table class="spec-table edx-spec-table w-full">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Suffix / field</th>
-                                        <th scope="col">Description</th>
+                    <div class="mt-2 overflow-x-auto max-w-3xl">
+                        <section class="edx-spec-block" aria-labelledby="spec-suf">
+                            <h2 id="spec-suf" class="edx-spec-block__title">Suffix description</h2>
+                            <div class="edx-spec-block__table">
+                                <table class="spec-table w-full">
+                                    <tr class="edx-spec-th">
+                                        <td>Suffix / field</td>
+                                        <td>Description</td>
                                     </tr>
-                                </thead>
-                                <tbody>
                                     @foreach($suffixRows as $row)
                                     <tr>
                                         <td>{{ $row['suffix'] }}</td>
                                         <td>{{ $row['description'] }}</td>
                                     </tr>
                                     @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                </table>
+                            </div>
+                        </section>
                     </div>
                     @endif
                 </div>
@@ -464,7 +500,7 @@
             <div class="heading text-center mb-10">
                 <div class="heading3">Related Products</div>
             </div>
-            <div class="list-product grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="list-product grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                 @foreach($relatedProducts as $relatedProduct)
                 <div class="product-item edxpro bg-white rounded-2xl border border-line overflow-hidden flex flex-col h-full" data-product-id="{{ $relatedProduct->id }}">
                     <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="block p-4 pb-3 no-underline text-inherit flex-1 min-w-0">
@@ -482,9 +518,9 @@
                     </a>
                     <div class="action flex flex-col gap-2 p-4 pt-0 mt-auto">
                         <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="button-main w-full text-center py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white no-underline text-sm">View details</a>
-                        <button type="button" class="button-main w-full py-2.5 px-4 rounded-full bg-black text-white border border-black hover:bg-white hover:text-black edx-add-quota-btn text-sm inline-flex items-center justify-center gap-2" data-product-id="{{ $relatedProduct->id }}">
-                            <i class="ph ph-files text-base shrink-0" aria-hidden="true"></i>
-                            <span class="edx-quota-btn-label">Add to quota list</span>
+                        <button type="button" class="edx-btn-add-quote edx-btn-add-quote--compact w-full text-sm edx-add-quota-btn inline-flex items-center justify-center gap-2" data-product-id="{{ $relatedProduct->id }}">
+                            <i class="ph ph-files shrink-0" aria-hidden="true"></i>
+                            <span class="edx-quota-btn-label">Add to quote</span>
                         </button>
                     </div>
                 </div>
@@ -503,20 +539,43 @@
     const qtyPlus = document.getElementById('qty-plus');
     const qtyValue = document.getElementById('qty-value');
 
+    function getQty() {
+        var n = parseInt(String(qtyValue && qtyValue.value !== undefined ? qtyValue.value : '').trim(), 10);
+        if (isNaN(n) || n < 1) {
+            return 1;
+        }
+        return Math.min(99999, n);
+    }
     function setQty(n) {
-        const v = Math.max(1, n);
-        qtyValue.textContent = String(v);
+        var v = Math.max(1, Math.min(99999, parseInt(n, 10) || 1));
+        if (qtyValue) {
+            qtyValue.value = String(v);
+        }
         if (qtyMinus) {
             qtyMinus.classList.toggle('disabled', v <= 1);
         }
     }
-
     if (qtyMinus && qtyPlus && qtyValue) {
-        qtyMinus.addEventListener('click', function () {
-            setQty(parseInt(qtyValue.textContent, 10) - 1);
+        qtyMinus.addEventListener('click', function (e) {
+            e.preventDefault();
+            setQty(getQty() - 1);
         });
-        qtyPlus.addEventListener('click', function () {
-            setQty(parseInt(qtyValue.textContent, 10) + 1);
+        qtyPlus.addEventListener('click', function (e) {
+            e.preventDefault();
+            setQty(getQty() + 1);
+        });
+        qtyValue.addEventListener('change', function () {
+            setQty(getQty());
+        });
+        qtyValue.addEventListener('blur', function () {
+            setQty(getQty());
+        });
+        qtyValue.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                setQty(getQty());
+                qtyValue.blur();
+            }
         });
         setQty(1);
     }
@@ -537,7 +596,9 @@
                 return;
             }
             descTabItems.forEach(function (t) {
-                t.classList.toggle('active', t === tab);
+                var isActive = t === tab;
+                t.classList.toggle('active', isActive);
+                t.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
             showDescTab(key);
         });

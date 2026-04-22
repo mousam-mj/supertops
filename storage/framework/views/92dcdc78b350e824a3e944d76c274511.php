@@ -123,7 +123,7 @@
                     <span style="font-size: 18px; font-weight: bold;">EDX</span>
                 <?php endif; ?>
             </td>
-            <td class="pdf-header-title">EDX RULMENTI ROMANIA</td>
+            <td class="pdf-header-title">EDX RULMENTI ROMANIA S.R.L.</td>
         </tr>
     </table>
 </div>
@@ -205,7 +205,7 @@
             </td>
         </tr>
     </table>
-    <div class="footer-bottom"><?php echo e(date('Y')); ?> © All Rights Reserved by Edx Rulmenti Romania Srl</div>
+    <div class="footer-bottom"><?php echo e(date('Y')); ?> © All Rights Reserved by Edx Rulmenti Romania S.R.L.</div>
 </div>
 </body>
 </html>
