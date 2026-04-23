@@ -159,6 +159,24 @@
   .customize-page .nav-step{font-size:11px;padding:6px 10px}
   .customize-page .add-cart-btn,.customize-page .customize-checkout-btn{font-size:12px;padding:8px 12px}
 }
+/* Mobile: swipe/flick color swatches (no side arrows), scroll the row horizontally */
+@media(max-width:768px){
+  .customize-page .color-row .color-arrow{display:none !important}
+  .customize-page .color-row{gap:0}
+  .customize-page .swatches-track{
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-x;
+    flex:1 1 100%;
+    min-width:0;
+    max-width:100%;
+    padding:6px 4px 8px 4px;
+    scrollbar-width:thin;
+  }
+  .customize-page .swatches-track::-webkit-scrollbar{height:4px}
+  .customize-page .swatches-track::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px}
+}
 </style>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -203,7 +221,7 @@
           <div class="side-wish">
             <button class="wish-btn" id="wish-btn" onclick="toggleWish()">♡</button>
           </div>
-          <div class="hint-label">Drag to rotate · Scroll to zoom · Preview shows all parts; use tabs to change each</div>
+          <div class="hint-label">Drag to rotate · Pinch or scroll to zoom · Preview shows all parts; use tabs to change each</div>
         </div>
         <div class="bottom-links">
           <button type="button" class="bottom-link" style="background:none;border:none;padding:0;font:inherit;" onclick="shareCustomizeDesign()">↑ Share link</button>

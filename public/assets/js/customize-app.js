@@ -54,13 +54,25 @@ function normalizeHex(h){
   }
   return s;
 }
+/** sRGB 0..1 per channel (IEC) → linear, for PBR albedo. UI swatches are sRGB. */
+function srgbChannelToLinear(s){
+  return s<0.04045 ? s*0.0773993808 : Math.pow(s*0.9478672986+0.0521327014,2.4);
+}
+/** #hex from customizer (CSS) → three.js Color in linear sRGB for MeshStandardMaterial. */
+function albedoColorFromHex(hex){
+  var c=new THREE.Color();
+  c.setStyle(normalizeHex(hex));
+  c.r=srgbChannelToLinear(c.r);
+  c.g=srgbChannelToLinear(c.g);
+  c.b=srgbChannelToLinear(c.b);
+  return c;
+}
 function logoEngraveColorFromBodyHex(hex){
-  var b=new THREE.Color(normalizeHex(hex));
-  var lum=0.299*b.r+0.587*b.g+0.114*b.b;
-  if(lum<=0.42){
-    return new THREE.Color('#ececf2');
-  }
-  return new THREE.Color('#141418');
+  var s=normalizeHex(hex);
+  var r=parseInt(s.slice(1,3),16), g=parseInt(s.slice(3,5),16), b0=parseInt(s.slice(5,7),16);
+  var lum=0.299*(r/255)+0.587*(g/255)+0.114*(b0/255);
+  if(lum<=0.42) return albedoColorFromHex('#ececf2');
+  return albedoColorFromHex('#141418');
 }
 
 // Perch 1200ml CAD space → Three.js (same as perch-customizer.html; parts stay aligned)
@@ -112,15 +124,16 @@ function initThree(){
 
   wrap.appendChild(renderer.domElement);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.68));
-  const d1 = new THREE.DirectionalLight(0xffffff, 0.55);
+  /* Softer fill so powder-coat albedo (after sRGB→linear) matches swatches, not white-washed. */
+  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+  const d1 = new THREE.DirectionalLight(0xffffff, 0.48);
   d1.position.set(140, 260, 220);
   scene.add(d1);
-  const d2 = new THREE.DirectionalLight(0xffffff, 0.32);
+  const d2 = new THREE.DirectionalLight(0xffffff, 0.28);
   d2.position.set(-160, 90, -100); scene.add(d2);
-  const d3 = new THREE.DirectionalLight(0xffffff, 0.18);
+  const d3 = new THREE.DirectionalLight(0xffffff, 0.16);
   d3.position.set(40, -120, 80); scene.add(d3);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xeee8e4, 0.45));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xeee8e4, 0.26));
 
   flipGroup = new THREE.Group();
   flipGroup.rotation.x = Math.PI;
@@ -143,14 +156,47 @@ function initThree(){
   c.addEventListener('mouseleave', ()=>mDown=false);
 
   let tx=0,ty=0;
-  c.addEventListener('touchstart', e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;autoRot=false;},{passive:true});
+  let touchPinchD0=0, touchPinchZ0=390;
+  function dist2Touches(t0,t1){
+    const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+  c.addEventListener('touchstart', e=>{
+    autoRot=false;
+    if(e.touches.length>=2){
+      touchPinchD0=Math.max(8, dist2Touches(e.touches[0], e.touches[1]));
+      touchPinchZ0=camera.position.z;
+    }else if(e.touches[0]){
+      tx=e.touches[0].clientX;ty=e.touches[0].clientY;
+    }
+  },{passive:true});
   c.addEventListener('touchmove', e=>{
+    if(e.touches.length>=2){
+      e.preventDefault();
+      const d=Math.max(8, dist2Touches(e.touches[0], e.touches[1]));
+      if(touchPinchD0>0){
+        camera.position.z=Math.max(80, Math.min(700, touchPinchZ0*(touchPinchD0/d)));
+      }
+      return;
+    }
     e.preventDefault();
     group.rotation.y += (e.touches[0].clientX-tx)*0.013;
     group.rotation.x += (e.touches[0].clientY-ty)*0.008;
     group.rotation.x = Math.max(-1.2, Math.min(1.2, group.rotation.x));
     tx=e.touches[0].clientX; ty=e.touches[0].clientY;
   },{passive:false});
+  c.addEventListener('touchend', e=>{
+    if(e.touches.length===1){
+      tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+    }
+    if(e.touches.length<2) touchPinchD0=0;
+  },{passive:true});
+  c.addEventListener('touchcancel', e=>{
+    if(e.touches.length===1){
+      tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+    }
+    if(e.touches.length<2) touchPinchD0=0;
+  },{passive:true});
 
   c.addEventListener('wheel', e=>{
     e.preventDefault();
@@ -274,7 +320,7 @@ function makePartMaterial(key, hex){
       color:c,
       metalness:0.22,
       roughness:0.42,
-      envMapIntensity:0.95,
+      envMapIntensity:0.4,
       side:THREE.DoubleSide,
     });
     mat.polygonOffset=true;
@@ -286,10 +332,10 @@ function makePartMaterial(key, hex){
   }
   const thin=key==='handle'||key==='boot'||key==='straw'||key==='cap'||key==='ring';
   const mat=new THREE.MeshStandardMaterial({
-    color:new THREE.Color(h),
-    metalness:0.04,
-    roughness:0.38,
-    envMapIntensity:0.85,
+    color:albedoColorFromHex(h),
+    metalness:0,
+    roughness:0.64,
+    envMapIntensity:0.22,
     side: thin ? THREE.DoubleSide : THREE.FrontSide,
   });
   if(thin){
@@ -297,8 +343,9 @@ function makePartMaterial(key, hex){
     mat.polygonOffsetFactor=key==='straw'?-1.5:((key==='cap'||key==='ring')?2:(key==='boot'?2:1));
     mat.polygonOffsetUnits=key==='straw'?-1:1;
   }
-  mat._cur=new THREE.Color(h);
-  mat._tgt=new THREE.Color(h);
+  var a=albedoColorFromHex(h);
+  mat._cur=a.clone();
+  mat._tgt=a.clone();
   return mat;
 }
 
@@ -468,16 +515,10 @@ function animLoop(){
 
 function snapMatColor(mesh, hex){
   if(!mesh||!mesh.material) return;
-  var h=normalizeHex(hex);
-  try{
-    mesh.material._tgt.setStyle(h);
-    mesh.material._cur.setStyle(h);
-    mesh.material.color.setStyle(h);
-  }catch(err){
-    mesh.material._tgt.set(h);
-    mesh.material._cur.set(h);
-    mesh.material.color.set(h);
-  }
+  var t=albedoColorFromHex(hex);
+  mesh.material._tgt.copy(t);
+  mesh.material._cur.copy(t);
+  mesh.material.color.copy(t);
   mesh.material.needsUpdate=true;
 }
 function setBodyColor(hex){ snapMatColor(M.body, hex); }
@@ -1268,6 +1309,50 @@ function goTo(s){
   renderAll();
 }
 
+function initCustomizeMobileStepSwipe(){
+  var rc=document.querySelector('.customize-page .right-col');
+  if(!rc) return;
+  var minDx=56, maxYDrift=56;
+  var startX, startY, t0, skip, lastAt=0;
+  function isMobilePanel(){ return typeof window.matchMedia!=='undefined' && window.matchMedia('(max-width:768px)').matches; }
+  function noSwipeTarget(el){
+    if(!el||!el.closest) return true;
+    if(el.closest('input,textarea,select,button')) return true;
+    if(el.closest('a,label[for]')) return true;
+    if(el.closest('.color-row')) return true;
+    if(el.closest('.size-card')) return true;
+    if(el.closest('.size-static-text')) return true;
+    if(el.closest('.engraving-card-list')||el.closest('.engraving-text-options')||el.closest('.engraving-upload-wrap')||el.closest('.engraving-file-picker')||el.closest('.engraving-textarea')||el.closest('.engraving-mode-toggles')||el.closest('.engraving-slot-row')) return true;
+    if(el.closest('.bottom-nav')) return true;
+    if(el.getAttribute('data-no-step-swipe')==='1'||el.closest('[data-no-step-swipe]')) return true;
+    return false;
+  }
+  rc.addEventListener('touchstart', function(e){
+    if(!isMobilePanel()||e.touches.length!==1){ skip=true; return; }
+    var te=e.target;
+    if(te&&te.nodeType!==1) te=te.parentElement;
+    if(noSwipeTarget(te)) { skip=true; return; }
+    skip=false;
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    t0=Date.now();
+  }, {passive: true});
+  rc.addEventListener('touchend', function(e){
+    if(skip){ return; }
+    if(!isMobilePanel()) return;
+    if(!e.changedTouches||!e.changedTouches.length) return;
+    if(Date.now()-t0>850) return;
+    if(Date.now()-lastAt<420) return;
+    var t=e.changedTouches[0], dx=t.clientX-startX, dy=t.clientY-startY;
+    if(Math.abs(dx)<minDx) return;
+    if(Math.abs(dy)>maxYDrift&&Math.abs(dy)>Math.abs(dx)*0.9) return;
+    if(dx<0){
+      if(S.step<maxStep) goTo(S.step+1);
+    } else if(S.step>1) goTo(S.step-1);
+    lastAt=Date.now();
+  }, {passive: true});
+}
+
 function shareCustomizeDesign(){
   var url=window.location.href;
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -1589,4 +1674,5 @@ window.addEventListener('DOMContentLoaded',()=>{
   updatePrice();
   initThree();
   updateNavSteps();
+  initCustomizeMobileStepSwipe();
 });
