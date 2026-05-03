@@ -26,7 +26,8 @@
 
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
-        <div class="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
+        
+        <div class="flex max-md:flex-wrap max-md:flex-col gap-y-8">
             <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
                 <?php echo $__env->make('frontend.partials.catalog-sidebar', ['categories' => $categories ?? collect(), 'facets' => $facets ?? ['rows' => []]], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             </div>

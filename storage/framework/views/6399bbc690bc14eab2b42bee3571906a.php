@@ -172,47 +172,21 @@
             }
         }
 
-        /* Site header: keep brand mark within bar (avoids huge intrinsic PNG height) */
-        #top-nav .header-menu.style-one {
-            min-height: 56px;
-            height: 56px;
-            box-sizing: border-box;
-        }
-        @media (min-width: 768px) {
-            #top-nav .header-menu.style-one {
-                min-height: 74px;
-                height: 74px;
-            }
-        }
         #top-nav .header-main {
             align-items: center;
         }
-        /* Logo fills header bar height — no extra gap above/below */
-        #top-nav .header-menu.style-one > .container {
-            padding-top: 0;
-            padding-bottom: 0;
-        }
-        #top-nav .header-main .edx-header-brand {
-            align-self: stretch;
+        /* Mobile header: keep menu + logo left-aligned; desktop unchanged (display:contents passes children to .header-main flex) */
+        #top-nav .edx-header-brand-cluster {
             display: flex;
             align-items: center;
-            padding: 0;
-            margin: 0;
-            line-height: 0;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            min-width: 0;
         }
-        #top-nav .header-main .edx-header-brand img.edx-header-logo {
-            height: 100%;
-            max-height: 100%;
-            width: auto;
-            object-fit: contain;
-            display: block;
-        }
-        img.edx-header-logo--drawer {
-            max-height: 36px;
-            width: auto;
-            height: auto;
-            display: block;
-            object-fit: contain;
+        @media (min-width: 1024px) {
+            #top-nav .edx-header-brand-cluster {
+                display: contents;
+            }
         }
         
         /* Product item styles */
@@ -221,14 +195,66 @@
             border-radius: 15px;
             padding: 20px;
         }
-        .product-item .product-main .product-infor {
-            position: relative;
-            width: 60%;
-            border-right: 1px solid #ccc;
-            padding-right: 20px;
+        /* Catalogue list rows: web markup unchanged — mobile fixes only via this query */
+        @media (min-width: 768px) {
+            .list-product .product-item.list-type .product-main .product-infor {
+                position: relative;
+                width: 60%;
+                border-right: 1px solid #ccc;
+                padding-right: 20px;
+            }
+            .list-product .product-item.list-type .product-main .action {
+                padding-left: 20px;
+            }
         }
-        .product-item .product-main .action {
-            padding-left: 20px;
+        @media (max-width: 767.98px) {
+            .shop-product.breadcrumb1 {
+                overflow-x: hidden;
+            }
+            .list-product .product-item.list-type.edxpro {
+                padding: 12px;
+            }
+            .list-product .product-item.list-type .product-main {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .list-product .product-item.list-type .product-main > a {
+                flex-direction: column !important;
+                align-items: center !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .list-product .product-item.list-type .product-thumb {
+                width: auto !important;
+                max-width: 100%;
+            }
+            .list-product .product-item.list-type .product-thumb img {
+                width: auto !important;
+                max-width: min(200px, 100%) !important;
+                height: auto !important;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .list-product .product-item.list-type .product-main .product-infor {
+                width: 100% !important;
+                max-width: 100%;
+                border-right: none !important;
+                padding-right: 0 !important;
+                text-align: center;
+            }
+            .list-product .product-item.list-type .product-price-block {
+                justify-content: center;
+            }
+            .list-product .product-item.list-type .product-main .action {
+                width: 100% !important;
+                max-width: 100%;
+                padding-left: 0 !important;
+                align-items: stretch !important;
+                border-top: 1px solid #e5e5e5;
+                padding-top: 0.75rem;
+                margin-top: 0.25rem;
+            }
         }
         .list-pagination button {
             width: 40px;

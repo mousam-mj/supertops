@@ -2,12 +2,15 @@
     <div class="header-menu style-one relative bg-white w-full md:h-[74px] h-[56px]">
         <div class="container mx-auto h-full">
             <div class="header-main flex justify-between items-center h-full gap-3">
-                <div class="menu-mobile-icon lg:hidden flex items-center shrink-0">
-                    <i class="icon-category text-2xl"></i>
+                
+                <div class="edx-header-brand-cluster">
+                    <div class="menu-mobile-icon lg:hidden flex items-center shrink-0">
+                        <i class="icon-category text-2xl"></i>
+                    </div>
+                    <a href="<?php echo e(route('home')); ?>" class="flex items-center shrink-0 leading-none min-w-0" aria-label="EDX Rulmenți — Home">
+                        <img src="<?php echo e(asset('assets/images/EDX-LOGO-RULMENTI.png')); ?>" alt="EDX Rulmenți" width="160" height="160" decoding="async" style="height: 50px; width: auto; max-height: 50px; object-fit: contain; display: block;">
+                    </a>
                 </div>
-                <a href="<?php echo e(route('home')); ?>" class="edx-header-brand shrink-0" aria-label="EDX Rulmenți — Home">
-                    <img src="<?php echo e(asset('assets/images/EDX-LOGO-RULMENTI.png')); ?>" alt="EDX Rulmenți" width="160" height="160" class="edx-header-logo" decoding="async">
-                </a>
                 <div class="menu-main h-full max-lg:hidden">
                     <ul class="flex items-center gap-8 h-full">
                         <li class="h-full relative">
