@@ -1,10 +1,9 @@
 <footer class="footer">
     <div class="footer-container">
         <div class="footer-column logo-section">
-            <div class="logo-box">
-                <span class="logo-text">EDX</span>
-                <span class="logo-subtext">RULMENȚI</span>
-            </div>
+            <a href="{{ route('home') }}" class="inline-block" aria-label="EDX Rulmenți — Home">
+                <img src="{{ asset('assets/images/EDX-LOGO-RULMENTI.png') }}" alt="EDX Rulmenți" width="150" height="150" style="width: 140px; max-width: 100%; height: auto; display: block;">
+            </a>
         </div>
 
         <div class="footer-column">

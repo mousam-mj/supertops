@@ -133,6 +133,11 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:5000',
+            'meta_keywords' => 'nullable|string|max:1000',
             'bearing_specs' => 'nullable|array',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
@@ -152,8 +157,8 @@ class ProductController extends Controller
         $validated['colors'] = [];
         $validated['stock_quantity'] = 0;
         $validated['in_stock'] = false;
-        $validated['price'] = 0;
-        $validated['sale_price'] = null;
+        $validated['price'] = $request->filled('price') ? (float) $request->input('price') : 0;
+        $validated['sale_price'] = $request->filled('sale_price') ? (float) $request->input('sale_price') : null;
 
         unset($validated['specifications'], $validated['bearing_specs']);
         $mergedSpecs = $this->specificationsFromBearingAndExtraForms($request);
@@ -245,6 +250,11 @@ class ProductController extends Controller
             'gallery_images.*' => 'image|max:2048',
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-matroska|max:51200',
             'sort_order' => 'nullable|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:5000',
+            'meta_keywords' => 'nullable|string|max:1000',
             'bearing_specs' => 'nullable|array',
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
@@ -258,6 +268,9 @@ class ProductController extends Controller
         $rules['bearing_specs.suffix_pairs.*.description'] = 'nullable|string|max:2000';
 
         $validated = $request->validate($rules);
+
+        $validated['price'] = $request->filled('price') ? (float) $request->input('price') : 0;
+        $validated['sale_price'] = $request->filled('sale_price') ? (float) $request->input('sale_price') : null;
 
         unset($validated['specifications'], $validated['bearing_specs']);
         $mergedSpecs = $this->specificationsFromBearingAndExtraForms($request);

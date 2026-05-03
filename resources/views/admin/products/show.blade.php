@@ -37,6 +37,32 @@
                         <td>{{ $product->sku ?? '—' }}</td>
                     </tr>
                     <tr>
+                        <th>MRP</th>
+                        <td>{{ (float) $product->price > 0 ? number_format((float) $product->price, 2) : '—' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Sale price</th>
+                        <td>{{ $product->sale_price !== null && (float) $product->sale_price > 0 ? number_format((float) $product->sale_price, 2) : '—' }}</td>
+                    </tr>
+                    @if(filled($product->meta_title))
+                    <tr>
+                        <th>Meta title</th>
+                        <td>{{ $product->meta_title }}</td>
+                    </tr>
+                    @endif
+                    @if(filled($product->meta_description))
+                    <tr>
+                        <th>Meta description</th>
+                        <td>{{ \Illuminate\Support\Str::limit($product->meta_description, 500) }}</td>
+                    </tr>
+                    @endif
+                    @if(filled($product->meta_keywords))
+                    <tr>
+                        <th>Meta keywords</th>
+                        <td>{{ $product->meta_keywords }}</td>
+                    </tr>
+                    @endif
+                    <tr>
                         <th>Category</th>
                         <td>
                             @if($product->category)

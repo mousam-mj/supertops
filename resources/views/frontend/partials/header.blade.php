@@ -1,12 +1,12 @@
 <div id="top-nav" class="relative w-full">
     <div class="header-menu style-one relative bg-white w-full md:h-[74px] h-[56px]">
         <div class="container mx-auto h-full">
-            <div class="header-main flex justify-between h-full">
-                <div class="menu-mobile-icon lg:hidden flex items-center">
+            <div class="header-main flex justify-between items-center h-full gap-3">
+                <div class="menu-mobile-icon lg:hidden flex items-center shrink-0">
                     <i class="icon-category text-2xl"></i>
                 </div>
-                <a href="{{ route('home') }}" class="flex items-center">
-                    <img src="{{ asset('assets/images/edx.png') }}" alt="EDX Logo" style="height: 50px;">
+                <a href="{{ route('home') }}" class="edx-header-brand shrink-0" aria-label="EDX Rulmenți — Home">
+                    <img src="{{ asset('assets/images/EDX-LOGO-RULMENTI.png') }}" alt="EDX Rulmenți" width="160" height="160" class="edx-header-logo" decoding="async">
                 </a>
                 <div class="menu-main h-full max-lg:hidden">
                     <ul class="flex items-center gap-8 h-full">
@@ -55,7 +55,9 @@
                         <div class="close-menu-mobile-btn absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface flex items-center justify-center">
                             <i class="ph ph-x text-sm"></i>
                         </div>
-                        <a href="{{ route('home') }}" class="logo text-3xl font-semibold text-center">EDX</a>
+                        <a href="{{ route('home') }}" class="flex justify-center leading-none py-1" aria-label="EDX Rulmenți — Home">
+                            <img src="{{ asset('assets/images/EDX-LOGO-RULMENTI.png') }}" alt="EDX Rulmenți" width="160" height="160" class="edx-header-logo--drawer h-9 max-h-9 w-auto object-contain mx-auto">
+                        </a>
                     </div>
                     <form action="{{ route('frontend.range') }}" method="get" class="relative mt-2" role="search" aria-label="Search catalogue">
                         <i class="ph ph-magnifying-glass text-xl absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></i>

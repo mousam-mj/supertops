@@ -56,8 +56,11 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:5000',
+            'meta_keywords' => 'nullable|string|max:1000',
             'sku' => 'nullable|string|unique:products,sku',
             'stock_quantity' => 'nullable|integer|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -73,6 +76,13 @@ class ProductController extends Controller
             'colors' => 'nullable|array',
             'sort_order' => 'nullable|integer|min:0',
         ]);
+
+        $validated['price'] = array_key_exists('price', $validated) && $validated['price'] !== null ? (float) $validated['price'] : 0;
+        if (! array_key_exists('sale_price', $validated) || $validated['sale_price'] === '' || $validated['sale_price'] === null) {
+            $validated['sale_price'] = null;
+        } else {
+            $validated['sale_price'] = (float) $validated['sale_price'];
+        }
 
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
@@ -135,8 +145,11 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
             'category_id' => 'sometimes|required|exists:categories,id',
-            'price' => 'sometimes|required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:5000',
+            'meta_keywords' => 'nullable|string|max:1000',
             'sku' => ['nullable', 'string', \Illuminate\Validation\Rule::unique('products', 'sku')->ignore($id)],
             'stock_quantity' => 'nullable|integer|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -152,6 +165,15 @@ class ProductController extends Controller
             'colors' => 'nullable|array',
             'sort_order' => 'nullable|integer|min:0',
         ]);
+
+        if (array_key_exists('price', $validated)) {
+            $validated['price'] = $validated['price'] !== null ? (float) $validated['price'] : 0;
+        }
+        if (array_key_exists('sale_price', $validated)) {
+            $validated['sale_price'] = $validated['sale_price'] !== null && $validated['sale_price'] !== ''
+                ? (float) $validated['sale_price']
+                : null;
+        }
 
         // Update slug if name changed
         if ($request->has('name') && $validated['name'] != $product->name && empty($validated['slug'])) {

@@ -17,6 +17,9 @@ class Product extends Model
         'slug',
         'description',
         'short_description',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
         'category_id',
         'price',
         'sale_price',
@@ -157,6 +160,21 @@ class Product extends Model
     public function allApprovedReviews()
     {
         return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
+    /**
+     * Whether the product has any customer-visible numeric price (MRP or sale).
+     */
+    public function hasDisplayablePrice(): bool
+    {
+        $mrp = (float) ($this->attributes['price'] ?? 0);
+        $sale = $this->sale_price;
+
+        if ($mrp > 0) {
+            return true;
+        }
+
+        return $sale !== null && (float) $sale > 0;
     }
 
     /**

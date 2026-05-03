@@ -61,6 +61,87 @@
                         @enderror
                     </div>
 
+                    <div class="card border mb-3 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Pricing</h6>
+                            <p class="small text-muted mb-3">Leave both empty or zero for <strong>Price on request</strong> on the storefront. <strong>MRP</strong> is stored as the main list price; <strong>Sale price</strong> is the promotional price when set.</p>
+                            <div class="row">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="price" class="form-label">MRP</label>
+                                    <input type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control @error('price') is-invalid @enderror"
+                                           id="price"
+                                           name="price"
+                                           value="{{ old('price', $product->price) }}"
+                                           placeholder="0.00">
+                                    @error('price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="sale_price" class="form-label">Sale price</label>
+                                    <input type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control @error('sale_price') is-invalid @enderror"
+                                           id="sale_price"
+                                           name="sale_price"
+                                           value="{{ old('sale_price', $product->sale_price) }}"
+                                           placeholder="Optional">
+                                    @error('sale_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">SEO</h6>
+                            <div class="mb-3">
+                                <label for="meta_title" class="form-label">Meta title</label>
+                                <input type="text"
+                                       class="form-control @error('meta_title') is-invalid @enderror"
+                                       id="meta_title"
+                                       name="meta_title"
+                                       value="{{ old('meta_title', $product->meta_title) }}"
+                                       maxlength="255"
+                                       placeholder="Overrides browser tab title when set">
+                                @error('meta_title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="meta_description" class="form-label">Meta description</label>
+                                <textarea class="form-control @error('meta_description') is-invalid @enderror"
+                                          id="meta_description"
+                                          name="meta_description"
+                                          rows="3"
+                                          maxlength="5000"
+                                          placeholder="Search engines — short summary">{{ old('meta_description', $product->meta_description) }}</textarea>
+                                @error('meta_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-0">
+                                <label for="meta_keywords" class="form-label">Meta keywords</label>
+                                <input type="text"
+                                       class="form-control @error('meta_keywords') is-invalid @enderror"
+                                       id="meta_keywords"
+                                       name="meta_keywords"
+                                       value="{{ old('meta_keywords', $product->meta_keywords) }}"
+                                       maxlength="1000"
+                                       placeholder="Comma-separated keywords">
+                                @error('meta_keywords')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Detailed Description</label>
                         <div id="editor-description" class="bg-white border rounded" style="min-height: 220px;"></div>

@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title><?php echo $__env->yieldContent('title', 'EDX Rulmenti Romania S.R.L.'); ?></title>
-    <link rel="shortcut icon" href="<?php echo e(asset('assets/images/EDX-LOGO-RULMENTI.webp')); ?>" type="image/x-icon">
+    <?php echo $__env->yieldPushContent('meta'); ?>
+    <link rel="icon" href="<?php echo e(asset('assets/images/EDX-LOGO-RULMENTI.png')); ?>" type="image/png">
+    <link rel="shortcut icon" href="<?php echo e(asset('assets/images/EDX-LOGO-RULMENTI.png')); ?>" type="image/png">
     
     <!-- CSS Files -->
     <link rel="stylesheet" href="<?php echo e(asset('assets/css/swiper-bundle.min.css')); ?>">
@@ -168,6 +170,49 @@
                 text-align: center;
                 gap: 20px;
             }
+        }
+
+        /* Site header: keep brand mark within bar (avoids huge intrinsic PNG height) */
+        #top-nav .header-menu.style-one {
+            min-height: 56px;
+            height: 56px;
+            box-sizing: border-box;
+        }
+        @media (min-width: 768px) {
+            #top-nav .header-menu.style-one {
+                min-height: 74px;
+                height: 74px;
+            }
+        }
+        #top-nav .header-main {
+            align-items: center;
+        }
+        /* Logo fills header bar height — no extra gap above/below */
+        #top-nav .header-menu.style-one > .container {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        #top-nav .header-main .edx-header-brand {
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            line-height: 0;
+        }
+        #top-nav .header-main .edx-header-brand img.edx-header-logo {
+            height: 100%;
+            max-height: 100%;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        img.edx-header-logo--drawer {
+            max-height: 36px;
+            width: auto;
+            height: auto;
+            display: block;
+            object-fit: contain;
         }
         
         /* Product item styles */

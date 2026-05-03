@@ -49,6 +49,9 @@
             border: 1px solid #e5e5e5;
         }
         .pdf-desc { color: #444; line-height: 1.45; }
+        .pdf-desc p { margin: 0 0 8px 0; }
+        .pdf-desc p:last-child { margin-bottom: 0; }
+        .pdf-desc ul, .pdf-desc ol { margin: 0 0 8px 0; padding-left: 1.2em; }
         .section-label {
             background: #e31e24;
             color: #fff;
@@ -83,17 +86,11 @@
         .pdf-footer ul { margin: 0; padding-left: 14px; }
         .pdf-footer li { margin: 2px 0; }
         .pdf-footer a { color: #ccc; text-decoration: none; }
-        .logo-box {
-            background: #e31e24;
+        .pdf-footer .pdf-brand-logo {
             width: 56px;
-            height: 56px;
-            text-align: center;
-            padding: 6px 4px;
-            font-weight: bold;
-            line-height: 1.1;
+            height: auto;
+            display: block;
         }
-        .logo-box .big { font-size: 18px; display: block; }
-        .logo-box .sub { font-size: 8px; display: block; }
         .footer-bottom {
             border-top: 1px solid #333;
             margin-top: 10px;
@@ -138,7 +135,7 @@
         <td>
             <div class="pdf-main-title"><?php echo e($product->sku ?? $product->name); ?></div>
             <div class="pdf-cat"><?php echo e($product->category->name ?? 'Deep Groove Ball Bearing'); ?></div>
-            <div class="pdf-desc"><?php echo e($product->description ?? ''); ?></div>
+            <div class="pdf-desc"><?php echo $product->description ?? ''; ?></div>
         </td>
     </tr>
 </table>
@@ -182,11 +179,12 @@
 <div class="pdf-footer">
     <table>
         <tr>
-            <td>
-                <div class="logo-box">
-                    <span class="big">EDX</span>
-                    <span class="sub">RULMENȚI</span>
-                </div>
+            <td style="vertical-align: top; width: 64px;">
+                <?php if($pdfLogoSrc !== ''): ?>
+                    <img src="<?php echo e($pdfLogoSrc); ?>" alt="EDX Rulmenți" class="pdf-brand-logo">
+                <?php else: ?>
+                    <div style="background:#e31e24;color:#fff;width:56px;height:56px;text-align:center;padding:6px 4px;font-weight:bold;line-height:1.1;font-size:14px;">EDX</div>
+                <?php endif; ?>
             </td>
             <td>
                 <h4>Get in touch</h4>

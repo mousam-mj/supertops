@@ -27,7 +27,7 @@ class ProductPdfController extends Controller
             ->with('category')
             ->firstOrFail();
 
-        $pdfLogoSrc = $this->fileUri(public_path('assets/images/edx.png'));
+        $pdfLogoSrc = $this->fileUri(public_path('assets/images/EDX-LOGO-RULMENTI.png'));
         $pdfProductImageSrc = $this->resolveProductImageFileUri($product);
 
         $pdf = Pdf::loadView('pdf.product-specification', compact('product', 'pdfLogoSrc', 'pdfProductImageSrc'))
@@ -75,7 +75,12 @@ class ProductPdfController extends Controller
     {
         $base = $product->sku ?: $product->slug ?: 'product';
         $base = preg_replace('/[^a-zA-Z0-9_-]+/', '-', $base) ?: 'product';
+        $base = strtoupper($base);
+        $prefix = 'EDX-';
+        if (! str_starts_with($base, $prefix)) {
+            $base = $prefix.$base;
+        }
 
-        return strtoupper($base);
+        return $base;
     }
 }

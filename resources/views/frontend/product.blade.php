@@ -72,7 +72,22 @@
     $suffixCount = count($suffixRows);
 @endphp
 
-@section('title', ($product->sku ?? $product->name) . ' - EDX Rulmenti Romania')
+@section('title')
+{{ trim((string) ($product->meta_title ?? '')) !== '' ? trim($product->meta_title) : (($product->sku ?? $product->name).' - EDX Rulmenti Romania') }}
+@endsection
+
+@push('meta')
+@php
+    $metaDesc = trim((string) ($product->meta_description ?? ''));
+    $metaKw = trim((string) ($product->meta_keywords ?? ''));
+@endphp
+@if($metaDesc !== '')
+<meta name="description" content="{{ \Illuminate\Support\Str::limit(strip_tags($metaDesc), 500) }}">
+@endif
+@if($metaKw !== '')
+<meta name="keywords" content="{{ e(strip_tags($metaKw)) }}">
+@endif
+@endpush
 
 @section('styles')
 <style>
@@ -281,14 +296,7 @@
                 <div class="product-description text-secondary mt-3">Image may differ from product. See technical specification for details.</div>
             </div>
             <div class="product-item product-infor w-full md:w-7/12 md:pl-6 lg:pl-8" data-item="{{ $product->id }}">
-                <div class="flex justify-between">
-                    <div>
-                        <div class="product-name heading4 mt-1">{{ $product->sku ?? $product->name }}</div>
-                    </div>
-                    <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white">
-                        <i class="ph ph-heart text-xl"></i>
-                    </div>
-                </div>
+                <div class="product-name heading4 mt-1">{{ $product->sku ?? $product->name }}</div>
 
                 <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
                     <div class="product-sale font-semibold edx-red px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Deep Groove Ball Bearing' }}</div>
@@ -300,8 +308,32 @@
                             Keep your home organized, yet elegant with storage cabinets by Onita Patio Furniture. Traditionally designed, they are perfect to be used in the any place where you need to store.
                         @endif
                     </div>
-                    <div class="product-price heading5 edx-text-accent">Price on request</div>
-                            
+                    @php
+                        $mrp = (float) $product->price;
+                        $sale = $product->sale_price !== null ? (float) $product->sale_price : null;
+                        $showPrice = $product->hasDisplayablePrice();
+                    @endphp
+                    @if($showPrice)
+                        <div class="w-full flex flex-col gap-1 mt-2">
+                            @if($mrp > 0 && $sale !== null && $sale > 0 && $sale < $mrp)
+                                <div class="caption1 text-secondary">
+                                    <span class="line-through">{{ number_format($mrp, 2) }}</span>
+                                    <span class="font-semibold text-black ms-1">MRP</span>
+                                </div>
+                                <div class="heading5 edx-text-accent mb-0">Sale price: {{ number_format($sale, 2) }}</div>
+                            @elseif($sale !== null && $sale > 0)
+                                <div class="heading5 edx-text-accent mb-0">Sale price: {{ number_format($sale, 2) }}</div>
+                                @if($mrp > 0 && $sale >= $mrp)
+                                    <div class="caption1 text-secondary mb-0">MRP: {{ number_format($mrp, 2) }}</div>
+                                @endif
+                            @elseif($mrp > 0)
+                                <div class="heading5 edx-text-accent mb-0">MRP: {{ number_format($mrp, 2) }}</div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="product-price heading5 edx-text-accent">Price on request</div>
+                    @endif
+
                             <div class="w-px h-4 bg-line"></div>
                 </div>
 
@@ -502,7 +534,7 @@
             </div>
             <div class="list-product grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                 @foreach($relatedProducts as $relatedProduct)
-                <div class="product-item edxpro bg-white rounded-2xl border border-line overflow-hidden flex flex-col h-full" data-product-id="{{ $relatedProduct->id }}">
+                <div class="product-item edxpro bg-white rounded-2xl border border-line overflow-hidden flex flex-col h-full">
                     <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="block p-4 pb-3 no-underline text-inherit flex-1 min-w-0">
                         <div class="product-thumb bg-white relative overflow-hidden rounded-2xl aspect-square">
                             <div class="product-img w-full h-full rounded-2xl overflow-hidden flex items-center justify-center bg-surface">
@@ -518,10 +550,6 @@
                     </a>
                     <div class="action flex flex-col gap-2 p-4 pt-0 mt-auto">
                         <a href="{{ route('frontend.product', $relatedProduct->slug) }}" class="button-main w-full text-center py-2.5 px-4 rounded-full bg-white text-black border border-black hover:bg-black hover:text-white no-underline text-sm">View details</a>
-                        <button type="button" class="edx-btn-add-quote edx-btn-add-quote--compact w-full text-sm edx-add-quota-btn inline-flex items-center justify-center gap-2" data-product-id="{{ $relatedProduct->id }}">
-                            <i class="ph ph-files shrink-0" aria-hidden="true"></i>
-                            <span class="edx-quota-btn-label">Add to quote</span>
-                        </button>
                     </div>
                 </div>
                 @endforeach
