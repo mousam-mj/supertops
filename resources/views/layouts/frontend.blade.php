@@ -275,6 +275,14 @@
             color: #fff !important;
         }
 
+        /* Original list price — built Tailwind bundle omits .line-through in this project */
+        .edx-mrp-strike {
+            text-decoration: line-through;
+            -webkit-text-decoration-line: line-through;
+            text-decoration-line: line-through;
+            text-decoration-thickness: 1px;
+        }
+
         /* "Add to quote" — red CTA (product, range, home) */
         .edx-btn-add-quote {
             display: inline-flex;

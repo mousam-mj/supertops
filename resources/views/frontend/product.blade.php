@@ -308,33 +308,7 @@
                             Keep your home organized, yet elegant with storage cabinets by Onita Patio Furniture. Traditionally designed, they are perfect to be used in the any place where you need to store.
                         @endif
                     </div>
-                    @php
-                        $mrp = (float) $product->price;
-                        $sale = $product->sale_price !== null ? (float) $product->sale_price : null;
-                        $showPrice = $product->hasDisplayablePrice();
-                    @endphp
-                    @if($showPrice)
-                        <div class="w-full flex flex-col gap-1 mt-2">
-                            @if($mrp > 0 && $sale !== null && $sale > 0 && $sale < $mrp)
-                                <div class="caption1 text-secondary">
-                                    <span class="line-through">{{ number_format($mrp, 2) }}</span>
-                                    <span class="font-semibold text-black ms-1">MRP</span>
-                                </div>
-                                <div class="heading5 edx-text-accent mb-0">Sale price: {{ number_format($sale, 2) }}</div>
-                            @elseif($sale !== null && $sale > 0)
-                                <div class="heading5 edx-text-accent mb-0">Sale price: {{ number_format($sale, 2) }}</div>
-                                @if($mrp > 0 && $sale >= $mrp)
-                                    <div class="caption1 text-secondary mb-0">MRP: {{ number_format($mrp, 2) }}</div>
-                                @endif
-                            @elseif($mrp > 0)
-                                <div class="heading5 edx-text-accent mb-0">MRP: {{ number_format($mrp, 2) }}</div>
-                            @endif
-                        </div>
-                    @else
-                        <div class="product-price heading5 edx-text-accent">Price on request</div>
-                    @endif
-
-                            <div class="w-px h-4 bg-line"></div>
+                    @include('frontend.partials.catalog-list-price', ['variant' => 'detail'])
                 </div>
 
                 <div class="list-action mt-6">

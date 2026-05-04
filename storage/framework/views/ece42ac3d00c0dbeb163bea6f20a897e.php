@@ -24,6 +24,8 @@
     </div>
 </div>
 
+<?php echo $__env->make('frontend.partials.edx-product-category', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
         

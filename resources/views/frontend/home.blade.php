@@ -26,6 +26,8 @@
     </div>
 </div>
 
+@include('frontend.partials.edx-product-category')
+
 <div class="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
     <div class="container">
         {{-- Mobile only: natural column order (filters then list). Desktop unchanged from default flex row. --}}

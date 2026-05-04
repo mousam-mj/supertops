@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Anvogue</title>
+    <title>Admin Login | EDX Admin</title>
+    <link rel="icon" href="{{ asset('assets/images/edx.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('assets/images/edx.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -55,7 +57,7 @@
         <div class="login-card" style="margin: 0 auto;">
             <div class="login-header">
                 <h3><i class="bi bi-shield-lock me-2"></i>Admin Login</h3>
-                <p class="mb-0 mt-2">Anvogue Admin Panel</p>
+                <p class="mb-0 mt-2">EDX Admin</p>
             </div>
             <div class="login-body">
                 @if($errors->any())
