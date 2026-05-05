@@ -56,6 +56,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Asset base URL
+    |--------------------------------------------------------------------------
+    |
+    | When the web server document root is the project folder (not public/),
+    | static files are served under /public/... In that case set ASSET_URL to
+    | your public URL including /public, e.g. https://example.com/edx-bearings/public
+    | so asset() and mix() point at real paths. Leave empty when the vhost root
+    | is already the Laravel public directory (recommended production setup).
+    |
+    */
+
+    'asset_url' => ($u = env('ASSET_URL')) ? rtrim((string) $u, '/') : null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
