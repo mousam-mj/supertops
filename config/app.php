@@ -60,10 +60,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | When the web server document root is the project folder (not public/),
-    | static files are served under /public/... In that case set ASSET_URL to
-    | your public URL including /public, e.g. https://example.com/edx-bearings/public
-    | so asset() and mix() point at real paths. Leave empty when the vhost root
-    | is already the Laravel public directory (recommended production setup).
+    | static files are served under /public/... Options:
+    | 1) Set ASSET_URL to the full public base, e.g. https://example.com/app/public
+    | 2) Set APP_PUBLIC_ASSET_BASE=true (uses APP_URL + "/public") — see AppServiceProvider
+    | 3) Leave ASSET_URL unset: auto-detect when DOCUMENT_ROOT equals the project root
+    | Disable auto-detect with ASSET_URL_AUTO_PUBLIC=false in .env.
     |
     */
 
