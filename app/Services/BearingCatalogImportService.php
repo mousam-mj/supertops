@@ -12,6 +12,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 /**
  * Imports bearing rows from WordPress-style exports (CSV / XLSX):
  * DGBB (bearings), SRB (srb_bearings), CRB (crb_bearings) — same column families as the reference files.
+ *
+ * Optional extra columns (see sample header): meta_title, meta_description, meta_keywords, mrp (→ price),
+ * sale_price. Empty cells do not overwrite existing product values on re-import.
  */
 class BearingCatalogImportService
 {
@@ -85,6 +88,9 @@ class BearingCatalogImportService
                     $product->images = $imagesJson;
                     $product->specifications = count($specs) > 0 ? $specs : null;
                     $product->is_active = true;
+
+                    $this->applyOptionalMetaAndPricing($product, $row);
+
                     if ($product->price === null) {
                         $product->price = 0;
                     }
@@ -242,6 +248,60 @@ class BearingCatalogImportService
         }
 
         return '';
+    }
+
+    /**
+     * Optional SEO and pricing columns (append to export). Empty cells leave existing values unchanged.
+     */
+    protected function applyOptionalMetaAndPricing(Product $product, array $row): void
+    {
+        $metaTitle = $this->pick($row, ['meta_title', 'Meta Title']);
+        if ($metaTitle !== '') {
+            $product->meta_title = Str::limit($metaTitle, 255, '');
+        }
+
+        $metaDesc = $this->pick($row, ['meta_description', 'Meta Description']);
+        if ($metaDesc !== '') {
+            $product->meta_description = Str::limit($metaDesc, 5000, '');
+        }
+
+        $metaKw = $this->pick($row, ['meta_keywords', 'Meta Keywords']);
+        if ($metaKw !== '') {
+            $product->meta_keywords = Str::limit($metaKw, 1024, '');
+        }
+
+        $mrpRaw = $this->pick($row, ['mrp', 'MRP', 'regular_price', 'Regular price']);
+        if ($mrpRaw !== '') {
+            $mrp = $this->parseDecimalOrNull($mrpRaw);
+            if ($mrp !== null) {
+                $product->price = $mrp;
+            }
+        }
+
+        $saleRaw = $this->pick($row, ['sale_price', 'Sale Price', 'Sale price']);
+        if ($saleRaw !== '') {
+            $sale = $this->parseDecimalOrNull($saleRaw);
+            $product->sale_price = ($sale !== null && $sale > 0) ? $sale : null;
+        }
+    }
+
+    protected function parseDecimalOrNull(string $raw): ?float
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return null;
+        }
+        $s = str_replace(["\xc2\xa0", ' '], '', $raw);
+        $s = str_replace(',', '.', $s);
+        if (! is_numeric($s)) {
+            return null;
+        }
+        $f = (float) $s;
+        if ($f < 0) {
+            return null;
+        }
+
+        return round($f, 2);
     }
 
     /**

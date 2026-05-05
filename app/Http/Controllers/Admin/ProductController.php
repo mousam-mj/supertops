@@ -21,7 +21,7 @@ class ProductController extends Controller
      */
     public function bearingImportSample(): StreamedResponse
     {
-        $header = 'ID,Title,Content,Excerpt,Post Type,Image URL,Image Title,Image Caption,Image Description,Image Alt Text,Image Featured,Attachment URL,Bearing Category,bearing_no,bore_diameter,outside_diameter,width,basic_dynamic_load_rating,basic_static_load_rating,limiting_speed_grease,limiting_speed_oil,number_of_rows,radial_internal_clearance,tolerance_class_for_dimensions,cage,bore_type,skf,fag,ntn,timken,suffix_name,suffix_desc,suffix,suffix_type,bearing_image,bearing_category';
+        $header = 'ID,Title,Content,Excerpt,Post Type,Image URL,Image Title,Image Caption,Image Description,Image Alt Text,Image Featured,Attachment URL,Bearing Category,bearing_no,bore_diameter,outside_diameter,width,basic_dynamic_load_rating,basic_static_load_rating,limiting_speed_grease,limiting_speed_oil,number_of_rows,radial_internal_clearance,tolerance_class_for_dimensions,cage,bore_type,skf,fag,ntn,timken,suffix_name,suffix_desc,suffix,suffix_type,bearing_image,bearing_category,meta_title,meta_description,meta_keywords,mrp,sale_price';
 
         return response()->streamDownload(function () use ($header) {
             echo "\xEF\xBB\xBF";
