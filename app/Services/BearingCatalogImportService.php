@@ -26,6 +26,14 @@ class BearingCatalogImportService
         }
 
         $ext = strtolower($file->getClientOriginalExtension());
+
+        if (in_array($ext, ['xlsx', 'xls'], true) && ! class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
+            return $this->result(0, 0, 0, [
+                'Excel (.xlsx / .xls) needs the phpoffice/phpspreadsheet package. On the server, from the project folder run: composer install --no-dev',
+                'Until then, export your sheet as CSV and upload a .csv file instead.',
+            ]);
+        }
+
         $rows = match ($ext) {
             'csv', 'txt' => iterator_to_array($this->rowsFromCsv($path)),
             'xlsx', 'xls' => iterator_to_array($this->rowsFromSpreadsheet($path)),
