@@ -198,29 +198,163 @@
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
-    color: #18181b;
-    background-color: #e4e4e7;
+    /* Inactive: very light grey, dark text (edxromania reference) */
+    color: #52525b;
+    background-color: #f4f4f5;
     transition: background-color 0.2s ease, color 0.2s ease;
     text-align: center;
     line-height: 1.2;
 }
-.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:hover,
-.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:focus-visible {
-    background-color: #d4d4d8;
-    color: #18181b;
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:hover:not(.active) {
+    background-color: #e9e9ec;
+    color: #3f3f46;
     outline: none;
 }
-.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:focus-visible {
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab:focus-visible:not(.active) {
     box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ec2127;
+    outline: none;
 }
-.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active,
+/* Active: medium grey + white label + red top bar (~4px), like edxromania Equivalents tab */
+.product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active {
+    background-color: #9ca3af;
+    color: #ffffff;
+    box-shadow: inset 0 4px 0 #ec2127;
+}
 .product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active:hover {
-    background-color: #ec2127;
-    color: #fff;
-    box-shadow: none;
+    background-color: #8b909a;
+    color: #ffffff;
+    box-shadow: inset 0 4px 0 #ec2127;
 }
 .product-detail .desc-tab .menu-tab .tab-item.edx-spec-tab.active:focus-visible {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #18181b;
+    box-shadow: inset 0 4px 0 #ec2127, 0 0 0 2px #fff, 0 0 0 4px #18181b;
+}
+
+/* Equivalents & Suffix — full width inside .container; Equivalents uses light grey rules only (see --equiv) */
+.product-detail .edx-tab-table-panel {
+    width: 100%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+.product-detail .edx-tab-table-panel .edx-tab-panel-heading {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #18181b;
+    line-height: 1.25;
+    margin: 0 0 1rem 0;
+    padding: 0;
+    letter-spacing: -0.02em;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #18181b;
+    padding: 0 0 0.65rem 0;
+    border-bottom: none;
+    vertical-align: bottom;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table thead th:first-child,
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody td:first-child {
+    padding-right: 1.25rem;
+    box-sizing: border-box;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table thead th:last-child {
+    text-align: right;
+}
+/* Suffix: column split + strong header rule */
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix thead tr {
+    border-bottom: 2px solid #18181b;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix thead th:first-child,
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix tbody td:first-child {
+    width: 38%;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix thead th:last-child,
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix tbody td:last-child {
+    width: 62%;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix thead th:last-child {
+    text-align: left;
+}
+
+/* Equivalents (Model | Brand) — match reference: light grey horizontal rules only, no vertical borders */
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv {
+    border-top: 1px solid #e0e0e0;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th {
+    padding: 12px 0;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #18181b;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:first-child,
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td:first-child {
+    width: 50%;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:last-child,
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td:last-child {
+    width: 50%;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:last-child {
+    text-align: left;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td {
+    padding: 12px 0;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #27272a;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: top;
+    text-align: left;
+}
+
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody td {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #3f3f46;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #e8e8ed;
+    vertical-align: top;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody td:first-child {
+    font-weight: 500;
+    color: #18181b;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody td:last-child {
+    text-align: right;
+    font-weight: 500;
+    color: #18181b;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix tbody td:first-child {
+    font-weight: 700;
+    color: #18181b;
+    text-align: left;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--suffix tbody td:last-child {
+    text-align: left;
+    font-weight: 400;
+    color: #3f3f46;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody tr:last-child td {
+    border-bottom: 1px solid #e0e0e0;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table td.edx-empty-cell {
+    text-align: left !important;
+    color: #71717a !important;
+    padding: 1rem 0 !important;
 }
 .edx-red {
     --tw-bg-opacity: 1;
@@ -369,9 +503,9 @@
                     <button type="button" class="tab-item edx-spec-tab" data-item="Suffixdescription" role="tab" aria-selected="false" id="tab-suffix">Suffix description</button>
                 </div>
             </div>
-            <div class="desc-block desc-block--spec mt-6 relative">
-                <div class="desc-item description open pb-10" data-item="Overview">
-                    <div class="grid md:grid-cols-2 gap-8 md:gap-x-12 gap-y-8 mt-2">
+            <div class="desc-block desc-block--spec mt-6 relative w-full max-w-full">
+                <div class="desc-item description open pb-10 w-full max-w-full" data-item="Overview">
+                    <div class="grid md:grid-cols-2 gap-8 md:gap-x-12 gap-y-8 mt-2 w-full">
                         <section class="edx-spec-block min-w-0" aria-labelledby="spec-dim">
                             <h2 id="spec-dim" class="edx-spec-block__title">Boundary dimensions</h2>
                             <div class="edx-spec-block__table">
@@ -445,16 +579,18 @@
                 </div>
 
 
-                <div class="desc-item description pb-10" data-item="Equivalents">
-                    <div class="mt-2 min-w-0 overflow-x-auto max-w-3xl">
-                        <section class="edx-spec-block" aria-labelledby="spec-equiv">
-                            <h2 id="spec-equiv" class="edx-spec-block__title">Manufacturer cross-reference</h2>
-                            <div class="edx-spec-block__table">
-                                <table class="spec-table w-full">
-                                    <tr class="edx-spec-th">
-                                        <td>Model</td>
-                                        <td>Brand</td>
+                <div class="desc-item description pb-10 w-full max-w-full" data-item="Equivalents">
+                    <div class="mt-2 min-w-0 w-full max-w-full overflow-x-auto">
+                        <section class="edx-spec-block edx-tab-table-panel" aria-labelledby="spec-equiv">
+                            <h2 id="spec-equiv" class="edx-tab-panel-heading">Equivalents</h2>
+                            <table class="edx-tab-minimal-table edx-tab-minimal-table--equiv">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Model</th>
+                                        <th scope="col">Brand</th>
                                     </tr>
+                                </thead>
+                                <tbody>
                                     @forelse($equivRows as $row)
                                     <tr>
                                         <td>{{ $row['model'] }}</td>
@@ -462,36 +598,38 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="2" class="edx-empty-cell">No manufacturer cross-references are stored for this designation yet.</td>
+                                        <td colspan="2" class="edx-empty-cell">No equivalents are stored for this designation yet.</td>
                                     </tr>
                                     @endforelse
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </section>
                     </div>
                 </div>
 
-                <div class="desc-item description pb-10" data-item="Suffixdescription">
+                <div class="desc-item description pb-10 w-full max-w-full" data-item="Suffixdescription">
                     @if($suffixCount === 0)
                     <p class="text-secondary mt-2">No suffix codes or descriptions are stored for this product in the catalogue data.</p>
                     @else
-                    <div class="mt-2 overflow-x-auto max-w-3xl">
-                        <section class="edx-spec-block" aria-labelledby="spec-suf">
-                            <h2 id="spec-suf" class="edx-spec-block__title">Suffix description</h2>
-                            <div class="edx-spec-block__table">
-                                <table class="spec-table w-full">
-                                    <tr class="edx-spec-th">
-                                        <td>Suffix / field</td>
-                                        <td>Description</td>
+                    <div class="mt-2 min-w-0 w-full max-w-full overflow-x-auto">
+                        <section class="edx-spec-block edx-tab-table-panel" aria-labelledby="spec-suf">
+                            <h2 id="spec-suf" class="edx-tab-panel-heading">Suffix description</h2>
+                            <table class="edx-tab-minimal-table edx-tab-minimal-table--suffix">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Suffix / field</th>
+                                        <th scope="col">Description</th>
                                     </tr>
+                                </thead>
+                                <tbody>
                                     @foreach($suffixRows as $row)
                                     <tr>
                                         <td>{{ $row['suffix'] }}</td>
                                         <td>{{ $row['description'] }}</td>
                                     </tr>
                                     @endforeach
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </section>
                     </div>
                     @endif

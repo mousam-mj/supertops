@@ -17,16 +17,118 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ProductController extends Controller
 {
     /**
-     * Sample CSV header row matching DGBB / SRB WordPress export shape (CRB uses the same bearing_* columns without the leading ID/Content columns).
+     * Sample CSV with header row + dummy data rows matching DGBB / SRB WordPress export shape (CRB uses the same bearing_* columns without the leading ID/Content columns).
      */
     public function bearingImportSample(): StreamedResponse
     {
         $header = 'ID,Title,Content,Excerpt,Post Type,Image URL,Image Title,Image Caption,Image Description,Image Alt Text,Image Featured,Attachment URL,Bearing Category,bearing_no,bore_diameter,outside_diameter,width,basic_dynamic_load_rating,basic_static_load_rating,limiting_speed_grease,limiting_speed_oil,number_of_rows,radial_internal_clearance,tolerance_class_for_dimensions,cage,bore_type,skf,fag,ntn,timken,suffix_name,suffix_desc,suffix,suffix_type,bearing_image,bearing_category,meta_title,meta_description,meta_keywords,mrp,sale_price';
 
         return response()->streamDownload(function () use ($header) {
-            echo "\xEF\xBB\xBF";
-            echo $header."\n";
-        }, 'bearing-import-sample-dgbb-header.csv', [
+            $out = fopen('php://output', 'w');
+            if ($out === false) {
+                return;
+            }
+            fwrite($out, "\xEF\xBB\xBF");
+
+            $columns = explode(',', $header);
+            fputcsv($out, $columns);
+
+            $samples = [
+                [
+                    'ID' => '1',
+                    'Title' => 'Deep Groove Ball Bearing 6000',
+                    'Content' => '<p>Sample import row — replace with real HTML description.</p>',
+                    'Excerpt' => 'Sample DGBB 6000 row for testing meta and pricing columns.',
+                    'Post Type' => 'post',
+                    'Image URL' => '',
+                    'Image Title' => '',
+                    'Image Caption' => '',
+                    'Image Description' => '',
+                    'Image Alt Text' => 'Deep Groove Ball Bearing 6000',
+                    'Image Featured' => '',
+                    'Attachment URL' => '',
+                    'Bearing Category' => 'Deep Groove Ball Bearing',
+                    'bearing_no' => '6000',
+                    'bore_diameter' => '10',
+                    'outside_diameter' => '26',
+                    'width' => '8',
+                    'basic_dynamic_load_rating' => '5.10',
+                    'basic_static_load_rating' => '2.39',
+                    'limiting_speed_grease' => '26000',
+                    'limiting_speed_oil' => '30000',
+                    'number_of_rows' => '1',
+                    'radial_internal_clearance' => 'CN',
+                    'tolerance_class_for_dimensions' => 'P6',
+                    'cage' => 'Sheet Steel',
+                    'bore_type' => 'Cylindrical',
+                    'skf' => '6000',
+                    'fag' => '',
+                    'ntn' => '',
+                    'timken' => '',
+                    'suffix_name' => '',
+                    'suffix_desc' => '',
+                    'suffix' => '',
+                    'suffix_type' => '',
+                    'bearing_image' => '',
+                    'bearing_category' => 'Deep Groove Ball Bearing',
+                    'meta_title' => '6000 Deep Groove Ball Bearing | EDX sample',
+                    'meta_description' => 'Sample meta description for SKU 6000 — edit before production import.',
+                    'meta_keywords' => 'bearing,6000,deep groove,DGBB,EDX',
+                    'mrp' => '500.00',
+                    'sale_price' => '449.99',
+                ],
+                [
+                    'ID' => '2',
+                    'Title' => 'Angular Contact Ball Bearing 7204',
+                    'Content' => '<p>Second sample row — Angular contact bearing.</p>',
+                    'Excerpt' => 'Sample ACBB for catalog import.',
+                    'Post Type' => 'post',
+                    'Image URL' => '',
+                    'Image Title' => '',
+                    'Image Caption' => '',
+                    'Image Description' => '',
+                    'Image Alt Text' => 'Angular Contact Ball Bearing 7204',
+                    'Image Featured' => '',
+                    'Attachment URL' => '',
+                    'Bearing Category' => 'Angular Contact Ball Bearing',
+                    'bearing_no' => '7204-B-TVP',
+                    'bore_diameter' => '20',
+                    'outside_diameter' => '47',
+                    'width' => '14',
+                    'basic_dynamic_load_rating' => '14.0',
+                    'basic_static_load_rating' => '9.40',
+                    'limiting_speed_grease' => '18000',
+                    'limiting_speed_oil' => '24000',
+                    'number_of_rows' => '1',
+                    'radial_internal_clearance' => 'CN',
+                    'tolerance_class_for_dimensions' => 'P6',
+                    'cage' => 'Sheet Steel',
+                    'bore_type' => 'Cylindrical',
+                    'skf' => '7204',
+                    'fag' => '',
+                    'ntn' => '',
+                    'timken' => '',
+                    'suffix_name' => '',
+                    'suffix_desc' => '',
+                    'suffix' => '',
+                    'suffix_type' => '',
+                    'bearing_image' => '',
+                    'bearing_category' => 'Angular Contact Ball Bearing',
+                    'meta_title' => '7204 Angular Contact Ball Bearing | EDX sample',
+                    'meta_description' => 'Sample meta description for angular contact bearing 7204.',
+                    'meta_keywords' => 'bearing,7204,angular contact,ACBB,EDX',
+                    'mrp' => '1200.00',
+                    'sale_price' => '1099.00',
+                ],
+            ];
+
+            foreach ($samples as $assoc) {
+                $line = array_map(static fn (string $col): string => $assoc[$col] ?? '', $columns);
+                fputcsv($out, $line);
+            }
+
+            fclose($out);
+        }, 'bearing-import-sample-dgbb.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }

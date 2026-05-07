@@ -207,8 +207,9 @@
                     </div>
                     <p class="mb-2">
                         <a href="<?php echo e(route('admin.products.bearing-import.sample')); ?>" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-download me-1"></i>Download sample header (DGBB-style)
+                            <i class="bi bi-download me-1"></i>Download sample CSV (DGBB-style)
                         </a>
+                        <span class="text-muted small ms-2">Includes header + 2 example rows (meta, MRP, sale price).</span>
                     </p>
                     <details class="small text-muted mt-3">
                         <summary class="fw-semibold text-secondary mb-2">Expected columns (reference)</summary>
