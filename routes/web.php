@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReviewController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\QuotaRequestController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
@@ -189,6 +190,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Admin Protected Routes
     Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 

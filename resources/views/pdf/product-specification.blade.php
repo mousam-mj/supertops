@@ -19,6 +19,12 @@
         }
         .pdf-header-inner { width: 100%; border-collapse: collapse; }
         .pdf-header-inner td { vertical-align: middle; }
+        .pdf-header .pdf-logo-link {
+            display: inline-block;
+            text-decoration: none;
+            border: 0;
+            line-height: 0;
+        }
         .pdf-header img { height: 36px; display: block; }
         .pdf-header-title {
             font-size: 13px;
@@ -67,8 +73,19 @@
         .spec-title { font-size: 11px; font-weight: bold; margin: 0 0 6px 0; }
         .spec-table { width: 100%; border-collapse: collapse; }
         .spec-table tr { border-bottom: 1px solid #ccc; }
-        .spec-table td { padding: 7px 0; font-size: 10px; }
-        .spec-table td:last-child { text-align: right; font-weight: bold; }
+        /* DomPDF: baseline + mixed font-weights misaligns label vs value; middle + one line-height fixes row alignment */
+        .spec-table td {
+            padding: 6px 0;
+            font-size: 10px;
+            line-height: 1.35;
+            vertical-align: middle;
+            font-weight: normal;
+        }
+        .spec-table td.spec-value {
+            text-align: right;
+            font-weight: bold;
+            white-space: nowrap;
+        }
         .pdf-footer {
             margin-top: 22px;
             background: #0f0f0f;
@@ -86,6 +103,11 @@
         .pdf-footer ul { margin: 0; padding-left: 14px; }
         .pdf-footer li { margin: 2px 0; }
         .pdf-footer a { color: #ccc; text-decoration: none; }
+        .pdf-footer a.pdf-logo-link {
+            display: inline-block;
+            line-height: 0;
+            border: 0;
+        }
         .pdf-footer .pdf-brand-logo {
             width: 56px;
             height: auto;
@@ -108,17 +130,20 @@
         $specs = json_decode($specs, true);
     }
     $specs = is_array($specs) ? $specs : [];
+    $pdfSiteUrl = rtrim((string) config('app.url'), '/');
 @endphp
 
 <div class="pdf-header">
     <table class="pdf-header-inner">
         <tr>
             <td style="width: 50%;">
-                @if($pdfLogoSrc !== '')
-                    <img src="{{ $pdfLogoSrc }}" alt="EDX">
-                @else
-                    <span style="font-size: 18px; font-weight: bold;">EDX</span>
-                @endif
+                <a href="{{ $pdfSiteUrl }}" class="pdf-logo-link">
+                    @if($pdfLogoSrc !== '')
+                        <img src="{{ $pdfLogoSrc }}" alt="EDX">
+                    @else
+                        <span style="font-size: 18px; font-weight: bold;">EDX</span>
+                    @endif
+                </a>
             </td>
             <td class="pdf-header-title">EDX RULMENTI ROMANIA S.R.L.</td>
         </tr>
@@ -147,18 +172,18 @@
         <td>
             <div class="spec-title">Boundary dimensions</div>
             <table class="spec-table">
-                <tr><td>Bore diameter</td><td>{{ $specs['bore_diameter'] ?? '—' }}</td></tr>
-                <tr><td>Outside diameter</td><td>{{ $specs['outside_diameter'] ?? '—' }}</td></tr>
-                <tr><td>Width</td><td>{{ $specs['width'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Bore diameter</td><td class="spec-value" valign="middle">{{ $specs['bore_diameter'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Outside diameter</td><td class="spec-value" valign="middle">{{ $specs['outside_diameter'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Width</td><td class="spec-value" valign="middle">{{ $specs['width'] ?? '—' }}</td></tr>
             </table>
         </td>
         <td>
             <div class="spec-title">Performance</div>
             <table class="spec-table">
-                <tr><td>Basic dynamic load rating</td><td>{{ $specs['dynamic_load_rating'] ?? '—' }}</td></tr>
-                <tr><td>Basic static load rating</td><td>{{ $specs['static_load_rating'] ?? '—' }}</td></tr>
-                <tr><td>Limiting speed – Grease</td><td>{{ $specs['limiting_speed_grease'] ?? '—' }}</td></tr>
-                <tr><td>Limiting speed – Oil</td><td>{{ $specs['limiting_speed_oil'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Basic dynamic load rating</td><td class="spec-value" valign="middle">{{ $specs['dynamic_load_rating'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Basic static load rating</td><td class="spec-value" valign="middle">{{ $specs['static_load_rating'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Limiting speed – Grease</td><td class="spec-value" valign="middle">{{ $specs['limiting_speed_grease'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Limiting speed – Oil</td><td class="spec-value" valign="middle">{{ $specs['limiting_speed_oil'] ?? '—' }}</td></tr>
             </table>
         </td>
     </tr>
@@ -166,11 +191,11 @@
         <td colspan="2" style="padding-top: 10px;">
             <div class="spec-title">Properties</div>
             <table class="spec-table">
-                <tr><td>Number of rows</td><td>{{ $specs['number_of_rows'] ?? '—' }}</td></tr>
-                <tr><td>Bore type</td><td>{{ $specs['bore_type'] ?? '—' }}</td></tr>
-                <tr><td>Cage</td><td>{{ $specs['cage'] ?? '—' }}</td></tr>
-                <tr><td>Radial internal clearance</td><td>{{ $specs['radial_clearance'] ?? '—' }}</td></tr>
-                <tr><td>Tolerance class for dimensions</td><td>{{ $specs['tolerance_class'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Number of rows</td><td class="spec-value" valign="middle">{{ $specs['number_of_rows'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Bore type</td><td class="spec-value" valign="middle">{{ $specs['bore_type'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Cage</td><td class="spec-value" valign="middle">{{ $specs['cage'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Radial internal clearance</td><td class="spec-value" valign="middle">{{ $specs['radial_clearance'] ?? '—' }}</td></tr>
+                <tr><td valign="middle">Tolerance class for dimensions</td><td class="spec-value" valign="middle">{{ $specs['tolerance_class'] ?? '—' }}</td></tr>
             </table>
         </td>
     </tr>
@@ -180,11 +205,13 @@
     <table>
         <tr>
             <td style="vertical-align: top; width: 64px;">
-                @if($pdfLogoSrc !== '')
-                    <img src="{{ $pdfLogoSrc }}" alt="EDX Rulmenți" class="pdf-brand-logo">
-                @else
-                    <div style="background:#e31e24;color:#fff;width:56px;height:56px;text-align:center;padding:6px 4px;font-weight:bold;line-height:1.1;font-size:14px;">EDX</div>
-                @endif
+                <a href="{{ $pdfSiteUrl }}" class="pdf-logo-link">
+                    @if($pdfLogoSrc !== '')
+                        <img src="{{ $pdfLogoSrc }}" alt="EDX Rulmenți" class="pdf-brand-logo">
+                    @else
+                        <div style="background:#e31e24;color:#fff;width:56px;height:56px;text-align:center;padding:6px 4px;font-weight:bold;line-height:1.1;font-size:14px;">EDX</div>
+                    @endif
+                </a>
             </td>
             <td>
                 <h4>Get in touch</h4>

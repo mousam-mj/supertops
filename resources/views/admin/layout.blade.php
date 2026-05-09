@@ -455,6 +455,11 @@
                                 <i class="bi bi-clipboard-data me-2"></i> Quotations
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}" href="{{ route('admin.profile.edit') }}">
+                                <i class="bi bi-person me-2"></i> Profile
+                            </a>
+                        </li>
                         @unless($adminMinimalSidebar)
                         <li class="nav-item pt-2 mt-2 border-top border-secondary border-opacity-25">
                             <div class="px-3 py-2 text-white-50 small text-uppercase" style="letter-spacing: 0.06em;">More</div>
@@ -560,16 +565,22 @@
                             <div class="text-muted small">Control Center</div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center me-3">
+                            <a href="{{ route('admin.profile.edit') }}" class="d-flex align-items-center me-3 text-decoration-none text-body" title="My profile">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold;">
                                     {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
                                 </div>
                                 <div>
                                     <div class="fw-semibold">{{ Auth::user()->name ?? 'Admin' }}</div>
-                                    <div class="text-muted small">Administrator</div>
+                                    <div class="text-muted small">
+                                        @if(Auth::user()->isAdmin())
+                                            Administrator
+                                        @else
+                                            {{ ucfirst(Auth::user()->role ?? 'User') }}
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            <form action="{{{ route('admin.logout') }}}" method="POST" class="d-inline">
+                            </a>
+                            <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
                                     <i class="bi bi-box-arrow-right me-1"></i> Logout

@@ -455,6 +455,11 @@
                                 <i class="bi bi-clipboard-data me-2"></i> Quotations
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo e(request()->routeIs('admin.profile.*') ? 'active' : ''); ?>" href="<?php echo e(route('admin.profile.edit')); ?>">
+                                <i class="bi bi-person me-2"></i> Profile
+                            </a>
+                        </li>
                         <?php if (! ($adminMinimalSidebar)): ?>
                         <li class="nav-item pt-2 mt-2 border-top border-secondary border-opacity-25">
                             <div class="px-3 py-2 text-white-50 small text-uppercase" style="letter-spacing: 0.06em;">More</div>
@@ -560,16 +565,23 @@
                             <div class="text-muted small">Control Center</div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center me-3">
+                            <a href="<?php echo e(route('admin.profile.edit')); ?>" class="d-flex align-items-center me-3 text-decoration-none text-body" title="My profile">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-weight: bold;">
                                     <?php echo e(strtoupper(substr(Auth::user()->name ?? 'A', 0, 1))); ?>
 
                                 </div>
                                 <div>
                                     <div class="fw-semibold"><?php echo e(Auth::user()->name ?? 'Admin'); ?></div>
-                                    <div class="text-muted small">Administrator</div>
+                                    <div class="text-muted small">
+                                        <?php if(Auth::user()->isAdmin()): ?>
+                                            Administrator
+                                        <?php else: ?>
+                                            <?php echo e(ucfirst(Auth::user()->role ?? 'User')); ?>
+
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                             <form action="<?php echo e(route('admin.logout')); ?>" method="POST" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <button type="submit" class="btn btn-outline-danger btn-sm">
