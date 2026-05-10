@@ -32,10 +32,19 @@
             text-align: right;
             letter-spacing: 0.04em;
         }
+        .pdf-header a.pdf-header-title-link {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
         .pdf-main-title {
             font-size: 16px;
             font-weight: bold;
             margin: 0 0 6px 0;
+        }
+        a.pdf-product-title-link {
+            color: #1a1a1a;
+            text-decoration: none;
         }
         .pdf-cat {
             display: inline-block;
@@ -108,6 +117,15 @@
             line-height: 0;
             border: 0;
         }
+        .pdf-footer a.pdf-footer-block-link {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .pdf-footer a.pdf-footer-bottom-link {
+            color: #aaa;
+            text-decoration: none;
+        }
         .pdf-footer .pdf-brand-logo {
             width: 56px;
             height: auto;
@@ -131,6 +149,9 @@
     }
     $specs = is_array($specs) ? $specs : [];
     $pdfSiteUrl = rtrim((string) config('app.url'), '/');
+    $pdfProductUrl = ($product->slug ?? '') !== ''
+        ? $pdfSiteUrl.'/product/'.$product->slug
+        : $pdfSiteUrl;
 ?>
 
 <div class="pdf-header">
@@ -145,7 +166,9 @@
                     <?php endif; ?>
                 </a>
             </td>
-            <td class="pdf-header-title">EDX RULMENTI ROMANIA S.R.L.</td>
+            <td class="pdf-header-title">
+                <a href="<?php echo e($pdfSiteUrl); ?>" class="pdf-header-title-link">EDX RULMENTI ROMANIA S.R.L.</a>
+            </td>
         </tr>
     </table>
 </div>
@@ -158,7 +181,9 @@
             <?php endif; ?>
         </td>
         <td>
-            <div class="pdf-main-title"><?php echo e($product->sku ?? $product->name); ?></div>
+            <div class="pdf-main-title">
+                <a href="<?php echo e($pdfProductUrl); ?>" class="pdf-product-title-link"><?php echo e($product->sku ?? $product->name); ?></a>
+            </div>
             <div class="pdf-cat"><?php echo e($product->category->name ?? 'Deep Groove Ball Bearing'); ?></div>
             <div class="pdf-desc"><?php echo $product->description ?? ''; ?></div>
         </td>
@@ -214,23 +239,29 @@
                 </a>
             </td>
             <td>
-                <h4>Get in touch</h4>
-                <div>Sediu social: Bucuresti Sectorul 4,<br>Bulevardul METALURGIEI, Nc 132, Bloc BIC, Etaj 4, Ap. 42.</div>
-                <div style="margin-top: 4px;">+40 723 370 345</div>
-                <div>info@edxromania.ro</div>
+                <a href="<?php echo e($pdfSiteUrl); ?>" class="pdf-footer-block-link">
+                    <h4>Get in touch</h4>
+                    <div>Sediu social: Bucuresti Sectorul 4,<br>Bulevardul METALURGIEI, Nc 132, Bloc BIC, Etaj 4, Ap. 42.</div>
+                    <div style="margin-top: 4px;">+40 723 370 345</div>
+                    <div>info@edxromania.ro</div>
+                </a>
             </td>
             <td>
-                <h4>Products &amp; services</h4>
-                <ul>
-                    <li>Ball Bearing</li>
-                    <li>Spherical Roller Bearing</li>
-                    <li>Cylindrical Roller Bearing</li>
-                    <li>Taper Roller Bearing</li>
-                </ul>
+                <a href="<?php echo e($pdfSiteUrl); ?>" class="pdf-footer-block-link">
+                    <h4>Products &amp; services</h4>
+                    <ul>
+                        <li>Ball Bearing</li>
+                        <li>Spherical Roller Bearing</li>
+                        <li>Cylindrical Roller Bearing</li>
+                        <li>Taper Roller Bearing</li>
+                    </ul>
+                </a>
             </td>
         </tr>
     </table>
-    <div class="footer-bottom"><?php echo e(date('Y')); ?> © All Rights Reserved by Edx Rulmenti Romania S.R.L.</div>
+    <div class="footer-bottom">
+        <a href="<?php echo e($pdfSiteUrl); ?>" class="pdf-footer-bottom-link"><?php echo e(date('Y')); ?> © All Rights Reserved by Edx Rulmenti Romania S.R.L.</a>
+    </div>
 </div>
 </body>
 </html>
