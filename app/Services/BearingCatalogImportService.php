@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\MainCategory;
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -318,14 +319,37 @@ class BearingCatalogImportService
     protected function resolveCategoryId(array $row): ?int
     {
         $name = $this->pick($row, ['Bearing Category', 'bearing_category']);
-        $slug = $this->mapExportCategoryNameToSlug($name);
-        if ($slug === null) {
+        $name = trim($name);
+        if ($name === '') {
             return null;
         }
 
-        return Category::query()->where('slug', $slug)->where('is_active', true)->value('id');
+        $slug = $this->mapExportCategoryNameToSlug($name) ?? Str::slug($name);
+        if ($slug === '') {
+            return null;
+        }
+
+        $catalogQuery = Category::query()->forBearingsCatalog()->where('is_active', true);
+
+        $id = (clone $catalogQuery)->where('slug', $slug)->value('id');
+        if ($id !== null) {
+            return (int) $id;
+        }
+
+        $normalizedName = strtolower(preg_replace('/\s+/u', ' ', $name));
+        $id = (clone $catalogQuery)
+            ->whereRaw('LOWER(TRIM(name)) = ?', [$normalizedName])
+            ->value('id');
+        if ($id !== null) {
+            return (int) $id;
+        }
+
+        return $this->createCategoryForImport($name, $slug);
     }
 
+    /**
+     * Map known export labels to catalogue slugs; unknown names fall back to Str::slug() in resolveCategoryId().
+     */
     protected function mapExportCategoryNameToSlug(string $name): ?string
     {
         $n = strtolower(preg_replace('/\s+/u', ' ', trim($name)));
@@ -346,6 +370,8 @@ class BearingCatalogImportService
             'angular contact ball bearing' => 'angular-contact-ball-bearing',
             'thrust ball bearing' => 'thrust-ball-bearing',
             'needle roller bearing' => 'needle-roller-bearing',
+            'spindle bearing' => 'spindle-bearing',
+            'spindle bearings' => 'spindle-bearing',
         ];
 
         if (isset($map[$n])) {
@@ -358,6 +384,39 @@ class BearingCatalogImportService
         }
 
         return null;
+    }
+
+    /**
+     * Create a bearing-catalog category when the sheet references a name not yet in the database.
+     */
+    protected function createCategoryForImport(string $name, string $slug): ?int
+    {
+        $mainCategoryId = MainCategory::bearingsCatalogId();
+        if ($mainCategoryId === null) {
+            return null;
+        }
+
+        $existing = Category::query()
+            ->where('slug', $slug)
+            ->first();
+
+        if ($existing !== null) {
+            if ((int) $existing->main_category_id === (int) $mainCategoryId && $existing->is_active) {
+                return (int) $existing->id;
+            }
+
+            return null;
+        }
+
+        $category = Category::query()->create([
+            'name' => $name,
+            'slug' => $slug,
+            'main_category_id' => $mainCategoryId,
+            'is_active' => true,
+            'sort_order' => 0,
+        ]);
+
+        return (int) $category->id;
     }
 
     /**
