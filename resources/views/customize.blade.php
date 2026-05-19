@@ -149,7 +149,7 @@
   .customize-page .left-col{flex:0 0 auto;border-right:none;border-bottom:1px solid #ececec}
   .customize-page #three-wrap{min-height:320px}
   .customize-page .top-nav{flex-wrap:wrap;gap:10px;padding:12px 14px}
-  .customize-page .nav-steps{order:2;width:100%;flex:none;padding-bottom:4px}
+  .customize-page .nav-steps{order:2;width:100%;flex:none;padding-bottom:4px;flex-wrap:wrap;overflow:visible}
   .customize-page .nav-right{order:1;width:100%;justify-content:space-between}
   .customize-page .nav-cart-wrap{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}
   .customize-page .nav-cart-actions{width:100%}
@@ -159,23 +159,56 @@
   .customize-page .nav-step{font-size:11px;padding:6px 10px}
   .customize-page .add-cart-btn,.customize-page .customize-checkout-btn{font-size:12px;padding:8px 12px}
 }
-/* Mobile: swipe/flick color swatches (no side arrows), scroll the row horizontally */
+/* Mobile: show tabs and swatches without horizontal swipe scrolling */
 @media(max-width:768px){
+  .customize-page{padding:12px 8px}
+  .customize-page .modal{border-radius:16px}
+  .customize-page .top-nav{gap:8px;padding:10px 12px}
   .customize-page .color-row .color-arrow{display:none !important}
-  .customize-page .color-row{gap:0}
+  .customize-page .nav-steps{gap:6px;overflow:visible;scrollbar-width:none}
+  .customize-page .nav-step{flex:1 1 calc(33.333% - 6px);min-width:0;text-align:center;font-size:10px;padding:5px 8px}
+  .customize-page .nav-cart-actions{gap:6px}
+  .customize-page .price-hint{font-size:10px}
+  .customize-page .left-col{padding:12px}
+  .customize-page .bottle-title{font-size:15px;margin-bottom:8px}
+  .customize-page #three-wrap{min-height:220px}
+  .customize-page .view-controls{left:8px;gap:6px}
+  .customize-page .view-btn,.customize-page .wish-btn{width:30px;height:30px;font-size:13px}
+  .customize-page .hint-label{font-size:10px;right:8px;bottom:8px;max-width:82%}
+  .customize-page .bottom-links{gap:12px;margin-top:8px}
+  .customize-page .bottom-link,.customize-page .bottom-note{font-size:11px}
+  .customize-page .right-col{padding:16px}
+  .customize-page .step-heading{font-size:18px}
+  .customize-page .step-subtext{font-size:12px;margin:6px 0 12px}
+  .customize-page .option-card{padding:10px;margin-bottom:12px}
+  .customize-page .option-thumb{width:38px;height:38px}
+  .customize-page .option-name{font-size:13px}
+  .customize-page .option-desc{font-size:11px}
+  .customize-page .bottom-nav{gap:8px;padding-top:12px}
+  .customize-page .prev-btn,.customize-page .next-btn{padding:9px 12px;font-size:12px}
+  .customize-page .color-row{gap:6px;align-items:flex-start}
   .customize-page .swatches-track{
-    overflow-x:auto;
-    overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    touch-action:pan-x;
+    overflow:visible;
+    -webkit-overflow-scrolling:auto;
+    touch-action:auto;
     flex:1 1 100%;
+    flex-wrap:wrap;
     min-width:0;
     max-width:100%;
     padding:6px 4px 8px 4px;
-    scrollbar-width:thin;
+    scrollbar-width:none;
+    justify-content:flex-start;
   }
-  .customize-page .swatches-track::-webkit-scrollbar{height:4px}
-  .customize-page .swatches-track::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px}
+  .customize-page .swatches-track::-webkit-scrollbar{display:none}
+}
+@media(max-width:520px){
+  .customize-page .nav-step{flex:1 1 calc(50% - 6px)}
+  .customize-page .top-nav{padding:8px 10px}
+  .customize-page .left-col{padding:10px}
+  .customize-page #three-wrap{min-height:190px}
+  .customize-page .hint-label{display:none}
+  .customize-page .bottom-links{flex-wrap:wrap;gap:10px}
+  .customize-page .right-col{padding:14px}
 }
 </style>
 
