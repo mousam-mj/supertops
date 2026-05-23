@@ -26,6 +26,7 @@
 .customize-page button.customize-checkout-btn{font:inherit;line-height:inherit;cursor:pointer}
 .customize-page .customize-checkout-btn:disabled{opacity:.65;cursor:not-allowed}
 .customize-page .nav-cart-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
+.customize-page .mobile-qty-select{display:none}
 .customize-page .price-hint{font-size:11px;color:#8a8a8a;text-align:right}
 .customize-page .close-btn{width:34px;height:34px;border:1px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#777;background:#fff}
 .customize-page .close-btn:hover{color:#111;border-color:#bdbdbd}
@@ -47,6 +48,7 @@
 .customize-page .bottom-link{font-size:12px;color:#161616;text-decoration:underline;text-underline-offset:3px}
 .customize-page .bottom-note{font-size:11px;color:#8a8a8a;margin-top:6px}
 .customize-page .right-col{flex:1;padding:22px;display:flex;flex-direction:column;overflow-y:auto}
+.customize-page .mobile-step-nav{display:none}
 .customize-page .step-panel{display:none;flex-direction:column;flex:1}
 .customize-page .step-panel.active{display:flex}
 .customize-page .step-heading{font-size:24px;font-weight:700}
@@ -161,54 +163,79 @@
 }
 /* Mobile: show tabs and swatches without horizontal swipe scrolling */
 @media(max-width:768px){
-  .customize-page{padding:12px 8px}
-  .customize-page .modal{border-radius:16px}
-  .customize-page .top-nav{gap:8px;padding:10px 12px}
+  .customize-page{padding:0;background:#fff}
+  .customize-page .modal{max-width:none;border:none;border-radius:0;box-shadow:none}
+  .customize-page .top-nav{gap:8px;padding:14px 14px 10px;border-bottom:none;background:#fff;position:sticky;top:0;z-index:20}
+  .customize-page .nav-steps{display:none}
+  .customize-page .nav-right{width:100%;justify-content:stretch}
+  .customize-page .nav-cart-wrap{width:100%;align-items:stretch;gap:0}
+  .customize-page .nav-cart-actions{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:stretch;width:100%}
+  .customize-page .mobile-qty-select{display:block;padding:0 12px;height:56px;border:1.5px solid #d7d7d7;border-radius:18px;background:#fff;font-size:24px;font-weight:500}
+  .customize-page .add-cart-btn{height:56px;border-radius:18px;font-size:16px;font-weight:700;padding:0 18px}
+  .customize-page .customize-checkout-btn{display:none}
+  .customize-page .close-btn{width:44px;height:56px;border:none;border-radius:16px;background:transparent;font-size:28px;color:#222}
+  .customize-page .price-hint{display:none}
   .customize-page .color-row .color-arrow{display:none !important}
-  .customize-page .nav-steps{gap:6px;overflow:visible;scrollbar-width:none}
-  .customize-page .nav-step{flex:1 1 calc(33.333% - 6px);min-width:0;text-align:center;font-size:10px;padding:5px 8px}
-  .customize-page .nav-cart-actions{gap:6px}
-  .customize-page .price-hint{font-size:10px}
-  .customize-page .left-col{padding:12px}
-  .customize-page .bottle-title{font-size:15px;margin-bottom:8px}
-  .customize-page #three-wrap{min-height:220px}
+  .customize-page .left-col{padding:0 0 10px;border-bottom:none;background:#fff}
+  .customize-page .bottle-title{display:none}
+  .customize-page #three-wrap{min-height:420px;border:none;border-radius:0;background:#fff}
   .customize-page .view-controls{left:8px;gap:6px}
-  .customize-page .view-btn,.customize-page .wish-btn{width:30px;height:30px;font-size:13px}
-  .customize-page .hint-label{font-size:10px;right:8px;bottom:8px;max-width:82%}
-  .customize-page .bottom-links{gap:12px;margin-top:8px}
-  .customize-page .bottom-link,.customize-page .bottom-note{font-size:11px}
-  .customize-page .right-col{padding:16px}
-  .customize-page .step-heading{font-size:18px}
-  .customize-page .step-subtext{font-size:12px;margin:6px 0 12px}
-  .customize-page .option-card{padding:10px;margin-bottom:12px}
-  .customize-page .option-thumb{width:38px;height:38px}
-  .customize-page .option-name{font-size:13px}
-  .customize-page .option-desc{font-size:11px}
-  .customize-page .bottom-nav{gap:8px;padding-top:12px}
-  .customize-page .prev-btn,.customize-page .next-btn{padding:9px 12px;font-size:12px}
+  .customize-page .view-btn,.customize-page .wish-btn{width:40px;height:40px;font-size:18px;border-radius:14px}
+  .customize-page .side-wish{right:14px;top:14px}
+  .customize-page .hint-label{display:none}
+  .customize-page .bottom-links,.customize-page .bottom-note{display:none}
+  .customize-page .right-col{padding:18px 14px 28px;background:#f7f7f7;border-top:1px solid #ededed}
+  .customize-page .mobile-step-nav{display:block;margin:-2px -14px 12px;padding:0 14px 16px;background:#f7f7f7;border-bottom:1px solid #ececec}
+  .customize-page .mobile-step-handle{width:92px;height:6px;border-radius:999px;background:#bdbdbd;margin:0 auto 14px}
+  .customize-page .mobile-step-row{display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:8px}
+  .customize-page .mobile-step-arrow{border:none;background:transparent;color:#222;font-size:42px;line-height:1;cursor:pointer;padding:0;height:44px}
+  .customize-page .mobile-step-arrow[disabled]{opacity:.28;cursor:default}
+  .customize-page .mobile-step-center{text-align:center}
+  .customize-page .mobile-step-title{font-size:32px;font-weight:700;letter-spacing:-.045em;line-height:1.02}
+  .customize-page .mobile-step-title span{font-size:16px;font-weight:500;letter-spacing:0;color:#666;margin-left:4px}
+  .customize-page .step-heading,.customize-page .step-counter{display:none}
+  .customize-page .step-subtext{text-align:center;font-size:12px;margin:8px auto 16px;max-width:320px}
+  .customize-page .size-card,.customize-page .size-static-text,.customize-page .option-card{border:2px solid #111;border-radius:22px;padding:14px 16px;background:#fff;box-shadow:none}
+  .customize-page .option-card{margin-bottom:16px}
+  .customize-page .option-thumb{width:56px;height:56px;border-radius:16px}
+  .customize-page .option-name{font-size:16px}
+  .customize-page .option-desc{font-size:12px}
+  .customize-page .color-label{text-align:center;font-size:12px;margin:10px 0 12px}
   .customize-page .color-row{gap:6px;align-items:flex-start}
   .customize-page .swatches-track{
-    overflow:visible;
-    -webkit-overflow-scrolling:auto;
-    touch-action:auto;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-x;
     flex:1 1 100%;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
     min-width:0;
     max-width:100%;
-    padding:6px 4px 8px 4px;
+    padding:2px 0 10px;
     scrollbar-width:none;
     justify-content:flex-start;
   }
+  .customize-page .swatch{width:38px;height:38px;min-width:38px;min-height:38px;border-width:3px}
+  .customize-page .color-name-label{font-size:13px;font-weight:600;color:#222;margin-top:2px}
+  .customize-page .bottom-nav{gap:10px;padding-top:18px;justify-content:space-between}
+  .customize-page .prev-btn,.customize-page .next-btn{flex:1;padding:13px 12px;font-size:14px;border-radius:18px}
   .customize-page .swatches-track::-webkit-scrollbar{display:none}
 }
 @media(max-width:520px){
-  .customize-page .nav-step{flex:1 1 calc(50% - 6px)}
-  .customize-page .top-nav{padding:8px 10px}
-  .customize-page .left-col{padding:10px}
-  .customize-page #three-wrap{min-height:190px}
-  .customize-page .hint-label{display:none}
-  .customize-page .bottom-links{flex-wrap:wrap;gap:10px}
-  .customize-page .right-col{padding:14px}
+  .customize-page .top-nav{padding:12px 12px 8px}
+  .customize-page .nav-cart-actions{grid-template-columns:64px minmax(0,1fr);gap:8px}
+  .customize-page .mobile-qty-select{height:52px;padding:0 10px;font-size:20px;border-radius:16px}
+  .customize-page .add-cart-btn{height:52px;font-size:14px;border-radius:16px}
+  .customize-page .close-btn{width:40px;height:52px;font-size:24px}
+  .customize-page #three-wrap{min-height:360px}
+  .customize-page .right-col{padding:16px 12px 24px}
+  .customize-page .mobile-step-nav{margin:-2px -12px 10px;padding:0 12px 14px}
+  .customize-page .mobile-step-handle{margin-bottom:12px}
+  .customize-page .mobile-step-row{grid-template-columns:40px minmax(0,1fr) 40px}
+  .customize-page .mobile-step-arrow{font-size:34px;height:38px}
+  .customize-page .mobile-step-title{font-size:24px}
+  .customize-page .mobile-step-title span{display:inline-block;font-size:14px}
+  .customize-page .swatch{width:34px;height:34px;min-width:34px;min-height:34px}
 }
 </style>
 
@@ -230,6 +257,13 @@
       <div class="nav-right">
         <div class="nav-cart-wrap">
           <div class="nav-cart-actions">
+            <select class="qty-select customize-qty-select mobile-qty-select" title="Quantity" onchange="onCustomizeQtyChange(this)">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
             <button type="button" class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
@@ -263,6 +297,16 @@
         <div class="bottom-note">Please be aware that customized products are not eligible for returns.</div>
       </div>
       <div class="right-col">
+        <div class="mobile-step-nav" aria-label="Mobile step navigation">
+          <div class="mobile-step-handle" aria-hidden="true"></div>
+          <div class="mobile-step-row">
+            <button type="button" class="mobile-step-arrow" id="mobile-step-prev" onclick="goTo(Math.max(1, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) - 1))" aria-label="Previous step">‹</button>
+            <div class="mobile-step-center">
+              <div class="mobile-step-title" id="mobile-step-title">Body <span id="mobile-step-counter">(1/5)</span></div>
+            </div>
+            <button type="button" class="mobile-step-arrow" id="mobile-step-next" onclick="goTo(Math.min({{ $stepTotal }}, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) + 1))" aria-label="Next step">›</button>
+          </div>
+        </div>
         <!-- Step 1: Tumbler -->
         <div class="step-panel active" id="panel-1">
           <div class="step-heading">Body</div>
@@ -406,7 +450,7 @@
             @if($engrOn && $engrCatMode)
             <button type="button" class="next-btn" onclick="goTo(6)">Next – Engraving</button>
             @else
-            <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+            <select class="qty-select customize-qty-select" id="customize-qty-final" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
             <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
             @endif
@@ -452,7 +496,7 @@
           <div class="engraving-slot-summary" id="engraving-slot-summary" style="display:none"></div>
           <div class="bottom-nav">
             <button type="button" class="prev-btn" onclick="goTo(5)">Previous – Bottom Base</button>
-            <select class="qty-select" id="customize-qty" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+            <select class="qty-select customize-qty-select" id="customize-qty-engr" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
             <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price-engr">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
