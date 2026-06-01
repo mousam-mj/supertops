@@ -7,13 +7,13 @@
 <div class="filter-type-block pb-8 border-b border-line">
     <div class="heading6">Type of bearing</div>
     <div class="list-type filter-type menu-tab mt-4">
-        <a href="{{ route('frontend.range', request()->except(['category', 'page'])) }}"
+        <a href="{{ route('frontend.range', request()->except(['category', 'page', 'search'])) }}"
            class="item tab-item flex items-center justify-between cursor-pointer {{ ! request()->filled('category') ? 'active' : '' }}">
             <div class="type-name text-secondary has-line-before hover:text-black capitalize">All types</div>
             <div class="text-secondary2 number">{{ $categories->sum('catalog_product_count') }}</div>
         </a>
         @foreach($categories as $category)
-            <a href="{{ route('frontend.range', array_merge(request()->except(['category', 'page']), ['category' => $category->slug])) }}"
+            <a href="{{ route('frontend.range', array_merge(request()->except(['category', 'page', 'search']), ['category' => $category->slug])) }}"
                class="item tab-item flex items-center justify-between cursor-pointer {{ request('category') === $category->slug ? 'active' : '' }}"
                data-item="{{ $category->slug }}">
                 <div class="type-name text-secondary has-line-before hover:text-black capitalize">{{ $category->name }}</div>

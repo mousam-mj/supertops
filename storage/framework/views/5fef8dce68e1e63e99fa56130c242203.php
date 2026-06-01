@@ -8,9 +8,7 @@
     $equivRows = [];
     foreach (['equiv_skf' => 'SKF', 'equiv_fag' => 'FAG', 'equiv_ntn' => 'NTN', 'equiv_timken' => 'Timken'] as $key => $brand) {
         $model = isset($specs[$key]) ? trim((string) $specs[$key]) : '';
-        if ($model !== '') {
-            $equivRows[] = ['model' => $model, 'brand' => $brand];
-        }
+        $equivRows[] = ['brand' => $brand, 'model' => $model];
     }
 
     $suffixRows = [];
@@ -71,7 +69,7 @@
 ?>
 
 <?php $__env->startSection('title'); ?>
-<?php echo e(trim((string) ($product->meta_title ?? '')) !== '' ? trim($product->meta_title) : (($product->sku ?? $product->name).' - EDX Rulmenti Romania')); ?>
+<?php echo e(trim((string) ($product->meta_title ?? '')) !== '' ? trim($product->meta_title) : ($product->display_name.' - EDX Rulmenti Romania')); ?>
 
 <?php $__env->stopSection(); ?>
 
@@ -282,32 +280,36 @@
     text-align: left;
 }
 
-/* Equivalents (Model | Brand) — match reference: light grey horizontal rules only, no vertical borders */
+/* Equivalents (Brand | Model) — brand first, model beside it; empty model cells when no data */
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv {
     border-top: 1px solid #e0e0e0;
+    width: auto;
+    max-width: 100%;
 }
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead tr {
     border-bottom: 1px solid #e0e0e0;
 }
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th {
-    padding: 12px 0;
+    padding: 12px 1.25rem 12px 0;
     font-weight: 700;
     font-size: 0.875rem;
     color: #18181b;
+    text-align: left;
 }
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:first-child,
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td:first-child {
-    width: 50%;
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 1.25rem;
+    font-weight: 600;
 }
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:last-child,
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td:last-child {
-    width: 50%;
-}
-.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv thead th:last-child {
+    width: auto;
     text-align: left;
 }
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td {
-    padding: 12px 0;
+    padding: 12px 1.25rem 12px 0;
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.5;
@@ -315,6 +317,10 @@
     border-bottom: 1px solid #e0e0e0;
     vertical-align: top;
     text-align: left;
+}
+.product-detail .edx-tab-table-panel .edx-tab-minimal-table--equiv tbody td:last-child {
+    text-align: left !important;
+    font-weight: 400;
 }
 
 .product-detail .edx-tab-table-panel .edx-tab-minimal-table tbody td {
@@ -429,7 +435,7 @@
                 <div class="product-description text-secondary mt-3">Image may differ from product. See technical specification for details.</div>
             </div>
             <div class="product-item product-infor w-full md:w-7/12 md:pl-6 lg:pl-8" data-item="<?php echo e($product->id); ?>">
-                <div class="product-name heading4 mt-1"><?php echo e($product->sku ?? $product->name); ?></div>
+                <div class="product-name heading4 mt-1"><?php echo e($product->display_name); ?></div>
 
                 <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
                     <div class="product-sale font-semibold edx-red px-3 py-0.5 inline-block rounded-full"><?php echo e($product->category->name ?? 'Deep Groove Ball Bearing'); ?></div>
@@ -586,21 +592,17 @@
                             <table class="edx-tab-minimal-table edx-tab-minimal-table--equiv">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Model</th>
                                         <th scope="col">Brand</th>
+                                        <th scope="col">Model</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $__empty_1 = true; $__currentLoopData = $equivRows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <?php $__currentLoopData = $equivRows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($row['model']); ?></td>
                                         <td><?php echo e($row['brand']); ?></td>
+                                        <td><?php if($row['model'] !== ''): ?><?php echo e($row['model']); ?><?php endif; ?></td>
                                     </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                    <tr>
-                                        <td colspan="2" class="edx-empty-cell">No equivalents are stored for this designation yet.</td>
-                                    </tr>
-                                    <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
                         </section>
@@ -654,7 +656,7 @@
                             </div>
                         </div>
                         <div class="product-infor mt-4">
-                            <div class="product-name heading6 block duration-300 line-clamp-2"><?php echo e($relatedProduct->sku ?? $relatedProduct->name); ?></div>
+                            <div class="product-name heading6 block duration-300 line-clamp-2"><?php echo e($relatedProduct->display_name); ?></div>
                             <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
                                 <div class="product-price text-title edx-red px-3 py-0.5 inline-block rounded-full text-sm"><?php echo e($relatedProduct->category->name ?? 'Bearing'); ?></div>
                             </div>

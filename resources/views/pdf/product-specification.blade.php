@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $product->sku ?? $product->name }} — EDX</title>
+    <title>{{ $product->display_name }} — EDX</title>
     <style>
         @page { margin: 28px 36px 32px 36px; }
         body {
@@ -182,7 +182,7 @@
         </td>
         <td>
             <div class="pdf-main-title">
-                <a href="{{ $pdfProductUrl }}" class="pdf-product-title-link">{{ $product->sku ?? $product->name }}</a>
+                <a href="{{ $pdfProductUrl }}" class="pdf-product-title-link">{{ $product->display_name }}</a>
             </div>
             <div class="pdf-cat">{{ $product->category->name ?? 'Deep Groove Ball Bearing' }}</div>
             <div class="pdf-desc">{!! $product->description ?? '' !!}</div>

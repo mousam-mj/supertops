@@ -13,8 +13,9 @@ final class CatalogFilterOptions
 {
     /**
      * Bearing catalog categories that appear in the storefront sidebar, with product counts.
+     * When $request is passed, counts reflect search / bore / rows filters (not category).
      */
-    public static function categories(): Collection
+    public static function categories(?Request $request = null): Collection
     {
         $bearingsMainId = MainCategory::bearingsCatalogId();
 
@@ -24,6 +25,12 @@ final class CatalogFilterOptions
             ->distinct()
             ->pluck('category_id');
 
+        $hasListingFilters = $request !== null && (
+            $request->filled('search')
+            || $request->filled('bore')
+            || $request->filled('rows')
+        );
+
         return Category::query()
             ->where('is_active', true)
             ->whereIn('id', $catalogCategoryIds)
@@ -31,8 +38,11 @@ final class CatalogFilterOptions
                 $q->where('main_category_id', $bearingsMainId);
             })
             ->withCount([
-                'products as catalog_product_count' => function ($q) {
+                'products as catalog_product_count' => function ($q) use ($request, $hasListingFilters) {
                     $q->edxBearingsCatalog()->where('is_active', true);
+                    if ($hasListingFilters) {
+                        self::applyListingFilters($q, $request, ['category']);
+                    }
                 },
             ])
             ->orderBy('name')
@@ -89,26 +99,45 @@ final class CatalogFilterOptions
 
     /**
      * Narrow a bearings-catalog product query using sidebar / URL filters.
+     *
+     * @param  list<string>  $except  Query keys to skip (e.g. category when counting per-category).
      */
-    public static function applyListingFilters(Builder $query, Request $request): void
+    public static function applyListingFilters(Builder $query, Request $request, array $except = []): void
     {
-        if ($request->filled('category')) {
-            $category = Category::where('slug', $request->category)->first();
+        if (! in_array('category', $except, true) && $request->filled('category')) {
+            $bearingsMainId = MainCategory::bearingsCatalogId();
+            $categoryQuery = Category::query()
+                ->where('slug', $request->category)
+                ->where('is_active', true);
+            if ($bearingsMainId !== null) {
+                $categoryQuery->where('main_category_id', $bearingsMainId);
+            }
+            $category = $categoryQuery->first();
             if ($category) {
                 $query->where('category_id', $category->id);
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('sku', 'like', '%'.$search.'%')
-                    ->orWhere('description', 'like', '%'.$search.'%');
-            });
+        if (! in_array('search', $except, true) && $request->filled('search')) {
+            $search = trim((string) $request->search);
+            if ($search !== '') {
+                $query->where(function ($q) use ($search, $request, $except) {
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('sku', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
+                    // Only match category names when not already filtered to one category.
+                    if (! in_array('category', $except, true) && ! $request->filled('category')) {
+                        $q->orWhereHas('category', function ($categoryQuery) use ($search) {
+                            $categoryQuery->where('name', 'like', '%'.$search.'%');
+                        });
+                    }
+                });
+            }
         }
 
-        if ($request->filled('bore')) {
+        if (! in_array('bore', $except, true) && $request->filled('bore')) {
             $bounds = match ($request->get('bore')) {
                 '0-20' => [0.0, 20.0],
                 '20-50' => [20.0, 50.0],
@@ -143,7 +172,7 @@ final class CatalogFilterOptions
             }
         }
 
-        if ($request->filled('rows')) {
+        if (! in_array('rows', $except, true) && $request->filled('rows')) {
             $want = trim(strip_tags((string) $request->get('rows')));
             if ($want !== '') {
                 $ids = Product::edxBearingsCatalog()

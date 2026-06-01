@@ -87,7 +87,7 @@
                             @if($row['product'])
                             <tr class="border-b border-line last:border-0">
                                 <td class="p-4">
-                                    <a href="{{ route('frontend.product', $row['product']->slug) }}" class="font-semibold hover:underline">{{ $row['product']->sku ?? $row['product']->name }}</a>
+                                    <a href="{{ route('frontend.product', $row['product']->slug) }}" class="font-semibold hover:underline">{{ $row['product']->display_name }}</a>
                                     <div class="text-secondary caption1 mt-1">{{ $row['product']->category->name ?? '' }}</div>
                                 </td>
                                 <td class="p-4 text-secondary">{{ $row['product']->sku ?? '—' }}</td>

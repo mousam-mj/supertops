@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
                                 <div class="product-infor max-sm:w-full">
-                                    <div class="product-name heading6 inline-block duration-300"><?php echo e($product->sku ?? $product->name); ?></div>
+                                    <div class="product-name heading6 inline-block duration-300"><?php echo e($product->display_name); ?></div>
                                     <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
                                         <div class="product-price text-title bg-green px-3 py-0.5 inline-block rounded-full"><?php echo e($product->category->name ?? 'Deep Groove Ball Bearing'); ?></div>
                                     </div>

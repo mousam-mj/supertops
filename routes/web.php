@@ -89,7 +89,7 @@ Route::get('/product/{slug}/pdf/download', [ProductPdfController::class, 'downlo
 
 // Product Range / Shop Page
 Route::get('/range', function (Request $request) {
-    $categories = CatalogFilterOptions::categories();
+    $categories = CatalogFilterOptions::categories($request);
     $facets = CatalogFilterOptions::facets();
 
     $query = Product::edxBearingsCatalog()->where('is_active', true)->with('category');
@@ -107,11 +107,26 @@ Route::get('/range', function (Request $request) {
 
     $products = $query->paginate(12)->withQueryString();
 
-    $rangeCategory = $request->filled('category')
-        ? Category::where('slug', $request->category)->first()
-        : null;
+    $rangeCategory = null;
+    if ($request->filled('category')) {
+        $bearingsMainId = MainCategory::bearingsCatalogId();
+        $rangeCategoryQuery = Category::query()
+            ->where('slug', $request->category)
+            ->where('is_active', true);
+        if ($bearingsMainId !== null) {
+            $rangeCategoryQuery->where('main_category_id', $bearingsMainId);
+        }
+        $rangeCategory = $rangeCategoryQuery->first();
+    }
 
-    return view('frontend.range', compact('products', 'categories', 'facets', 'rangeCategory'));
+    $searchWithoutCategoryCount = null;
+    if ($products->total() === 0 && $request->filled('category') && $request->filled('search')) {
+        $broaderQuery = Product::edxBearingsCatalog()->where('is_active', true);
+        CatalogFilterOptions::applyListingFilters($broaderQuery, $request, ['category']);
+        $searchWithoutCategoryCount = $broaderQuery->count();
+    }
+
+    return view('frontend.range', compact('products', 'categories', 'facets', 'rangeCategory', 'searchWithoutCategoryCount'));
 })->name('frontend.range');
 
 // Static Pages

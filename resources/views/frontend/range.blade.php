@@ -50,6 +50,12 @@
                             <div>Products:</div>
                             <div class="min-price">{{ $products->total() }}</div>
                         </div>
+                        @if(request()->filled('search'))
+                            <a href="{{ route('frontend.range', request()->except(['search', 'page'])) }}" class="caption1 inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-secondary hover:text-black">
+                                Search: {{ request('search') }}
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        @endif
                     </div>
                     <div class="sort-product right flex items-center gap-3">
                         <label for="select-filter" class="caption1 capitalize">Sort by</label>
@@ -74,7 +80,7 @@
                                     </div>
                                 </div>
                                 <div class="product-infor max-sm:w-full">
-                                    <div class="product-name heading6 inline-block duration-300">{{ $product->sku ?? $product->name }}</div>
+                                    <div class="product-name heading6 inline-block duration-300">{{ $product->display_name }}</div>
                                     <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
                                         <div class="product-price text-title edx-red px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Bearing' }}</div>
                                     </div>
@@ -107,7 +113,19 @@
                     @empty
                     <div class="text-center py-10">
                         <p class="text-lg text-gray-500">No products found.</p>
-                        <a href="{{ route('frontend.range') }}" class="mt-4 inline-block button-main py-2 px-6 rounded-full">View All Products</a>
+                        @if(request()->filled('search') && request()->filled('category'))
+                            <p class="text-secondary mt-2">No matches for &ldquo;{{ request('search') }}&rdquo; in {{ $rangeCategory?->name ?? 'this category' }}.</p>
+                        @endif
+                        @if(!empty($searchWithoutCategoryCount) && $searchWithoutCategoryCount > 0)
+                            <p class="text-secondary mt-2">
+                                {{ $searchWithoutCategoryCount }} matching {{ $searchWithoutCategoryCount === 1 ? 'product' : 'products' }} for &ldquo;{{ request('search') }}&rdquo; in other bearing types.
+                            </p>
+                            <a href="{{ route('frontend.range', request()->except(['category', 'page'])) }}" class="mt-3 inline-block button-main py-2 px-6 rounded-full">View all matching products</a>
+                        @elseif(request()->filled('category'))
+                            <a href="{{ route('frontend.range', ['category' => request('category')]) }}" class="mt-4 inline-block button-main py-2 px-6 rounded-full">View all in {{ $rangeCategory?->name ?? 'category' }}</a>
+                        @else
+                            <a href="{{ route('frontend.range') }}" class="mt-4 inline-block button-main py-2 px-6 rounded-full">View All Products</a>
+                        @endif
                     </div>
                     @endforelse
                 </div>

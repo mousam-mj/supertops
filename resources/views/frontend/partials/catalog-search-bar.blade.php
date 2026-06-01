@@ -6,7 +6,7 @@
     @if($centered)
         <div class="edx-search-card w-full max-w-full">
             <form action="{{ $searchAction }}" method="GET" class="edx-search-pill-form">
-                @foreach (['bore', 'rows', 'sort', 'category'] as $preserveKey)
+                @foreach (['bore', 'rows', 'sort'] as $preserveKey)
                     @if (request()->filled($preserveKey))
                         <input type="hidden" name="{{ $preserveKey }}" value="{{ request($preserveKey) }}">
                     @endif
@@ -29,7 +29,7 @@
     @else
         <div class="heading6 mb-3">Search</div>
         <form action="{{ $searchAction }}" method="GET" class="edx-catalog-search-form flex w-full max-w-5xl items-stretch">
-            @foreach (['bore', 'rows', 'sort', 'category'] as $preserveKey)
+            @foreach (['bore', 'rows', 'sort'] as $preserveKey)
                 @if (request()->filled($preserveKey))
                     <input type="hidden" name="{{ $preserveKey }}" value="{{ request($preserveKey) }}">
                 @endif

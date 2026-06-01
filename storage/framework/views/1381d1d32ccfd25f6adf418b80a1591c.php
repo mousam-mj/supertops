@@ -72,7 +72,7 @@
                                     </div>
                                 </div>
                                 <div class="product-infor max-sm:w-full">
-                                    <div class="product-name heading6 inline-block duration-300"><?php echo e($product->sku ?? $product->name); ?></div>
+                                    <div class="product-name heading6 inline-block duration-300"><?php echo e($product->display_name); ?></div>
                                     <div class="product-price-block flex items-center gap-2 flex-wrap mt-2 duration-300 relative z-[1]">
                                         <div class="product-price text-title edx-red px-3 py-0.5 inline-block rounded-full"><?php echo e($product->category->name ?? 'Bearing'); ?></div>
                                     </div>
@@ -105,7 +105,14 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <div class="text-center py-10">
                         <p class="text-lg text-gray-500">No products found.</p>
-                        <a href="<?php echo e(route('frontend.range')); ?>" class="mt-4 inline-block button-main py-2 px-6 rounded-full">View All Products</a>
+                        <?php if(!empty($searchWithoutCategoryCount) && $searchWithoutCategoryCount > 0): ?>
+                            <p class="text-secondary mt-2">
+                                <?php echo e($searchWithoutCategoryCount); ?> matching <?php echo e($searchWithoutCategoryCount === 1 ? 'product' : 'products'); ?> for &ldquo;<?php echo e(request('search')); ?>&rdquo; in other bearing types.
+                            </p>
+                            <a href="<?php echo e(route('frontend.range', request()->except(['category', 'page']))); ?>" class="mt-3 inline-block button-main py-2 px-6 rounded-full">View all matching products</a>
+                        <?php else: ?>
+                            <a href="<?php echo e(route('frontend.range')); ?>" class="mt-4 inline-block button-main py-2 px-6 rounded-full">View All Products</a>
+                        <?php endif; ?>
                     </div>
                     <?php endif; ?>
                 </div>

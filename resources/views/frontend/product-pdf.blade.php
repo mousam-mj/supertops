@@ -1,6 +1,6 @@
 @extends('layouts.frontend')
 
-@section('title', ($product->sku ?? $product->name) . ' - PDF - EDX Rulmenti Romania')
+@section('title', $product->display_name . ' - PDF - EDX Rulmenti Romania')
 
 @section('content')
     <div class="breadcrumb-block style-shared" style="background-color: #ec2127;">
@@ -10,7 +10,7 @@
     </div>
 
     <div class="container py-10 md:py-14">
-        <h1 class="heading4 mb-2">{{ $product->sku ?? $product->name }}</h1>
+        <h1 class="heading4 mb-2">{{ $product->display_name }}</h1>
         <p class="text-secondary body1 mb-8">Product sheet — preview in the browser or download a PDF that includes EDX header and footer.</p>
 
         <div class="flex flex-wrap gap-4 justify-center md:justify-start">

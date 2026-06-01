@@ -400,6 +400,19 @@ class Product extends Model
     }
 
     /**
+     * Customer-facing title: admin product name, falling back to SKU.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        $name = trim((string) ($this->name ?? ''));
+        if ($name !== '') {
+            return $name;
+        }
+
+        return trim((string) ($this->sku ?? '')) ?: 'Product';
+    }
+
+    /**
      * Resolved main image URL for Blade / JSON (never points at wrong /storage/... for public assets).
      */
     public function getImageUrlAttribute(): string
