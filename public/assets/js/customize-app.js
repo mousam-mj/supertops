@@ -83,8 +83,8 @@ const ENGR_ARC_MULT=1.32;
 /** Fine-tune strip angle (rad) after mesh; keep small. */
 const ENGR_STRIP_YAW=0.08;
 const ENGR_TEX_HPAD=88;
-/** Arc center on bottle (XZ): Three.js cylinder uses x=r·sin θ, z=r·cos θ → θ=0 is +Z (camera / 12 o’clock); θ=π/2 is +X (handle side). */
-const ENGR_THETA_MID=0;
+/** Fallback azimuth when logo mesh is not loaded (logo side on 1200ml tumbler). */
+const ENGR_THETA_FALLBACK=Math.PI;
 /** Local Y (flipGroup): more negative ≈ higher on upper body (between handle rails on reference). */
 const ENGR_Y_TOP=-11.5;
 const ENGR_Y_BOTTOM=17;
@@ -730,6 +730,30 @@ function bodyHorizontalRadiusForEngrave(){
   // Bbox is slightly larger than the visible outer wall; nudge down so the strip sits in the surface, not in front of it.
   return Math.max(8, semi*0.996);
 }
+/** Match engraving strip to the logo mesh (or body emboss) azimuth on the tumbler. */
+function engraveAzimuthMid(){
+  if(M.logo&&M.logo.geometry){
+    M.logo.geometry.computeBoundingBox();
+    var lb=M.logo.geometry.boundingBox;
+    var cx=(lb.min.x+lb.max.x)*0.5+(M.logo.position.x||0);
+    var cz=(lb.min.z+lb.max.z)*0.5+(M.logo.position.z||0);
+    if(Math.hypot(cx,cz)>0.05) return Math.atan2(cx,cz);
+  }
+  if(M.body&&M.body.geometry){
+    var pos=M.body.geometry.getAttribute('position');
+    if(pos){
+      var bestR=0, bx=0, bz=0;
+      for(var i=0;i<pos.count;i++){
+        var x=pos.getX(i), y=pos.getY(i), z=pos.getZ(i);
+        if(y<-28||y>18) continue;
+        var r=Math.sqrt(x*x+z*z);
+        if(r>bestR){ bestR=r; bx=x; bz=z; }
+      }
+      if(bestR>0.5) return Math.atan2(bx,bz);
+    }
+  }
+  return ENGR_THETA_FALLBACK;
+}
 /** Cylinder UVs map L→R opposite to old plane; flip U so text reads correctly (matches pre-cylinder behavior). */
 function applyCylinderEngraveTextureMap(tex){
   tex.wrapS = THREE.RepeatWrapping;
@@ -757,7 +781,8 @@ function makeEngravePreviewMesh(canvas){
   var arc=Math.min(ENGR_PLANE_W*ENGR_ARC_MULT, r*Math.PI*0.9);
   var thetaLen=Math.max(0.18, arc/r);
   var radial=Math.max(12, Math.min(64, Math.ceil(40*thetaLen/Math.PI)));
-  var theta0=ENGR_THETA_MID-thetaLen*0.5+ENGR_STRIP_YAW;
+  var thetaMid=engraveAzimuthMid();
+  var theta0=thetaMid-thetaLen*0.5+ENGR_STRIP_YAW;
   var geo=new THREE.CylinderGeometry(r, r, h, radial, 1, true, theta0, thetaLen);
   var mesh=new THREE.Mesh(geo, mat);
   mesh.renderOrder=ENGR_PREVIEW_ORDER;

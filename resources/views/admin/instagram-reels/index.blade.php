@@ -6,6 +6,12 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0"><i class="bi bi-instagram me-2"></i>Instagram Reels</h1>
+        <form action="{{ route('admin.instagram-reels.sync') }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-repeat me-1"></i> Sync from {{ config('services.instagram.username', 'perch.life') }}
+            </button>
+        </form>
     </div>
 
     @if(session('success'))
@@ -20,6 +26,28 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
+
+    <div class="alert alert-info">
+        <strong>Auto-sync from Instagram</strong>
+        <p class="mb-2 small">
+            Reels are pulled from
+            <a href="https://www.instagram.com/{{ config('services.instagram.username', 'perch.life') }}/" target="_blank" rel="noopener">
+                {{ config('services.instagram.username', 'perch.life') }}
+            </a>
+            via the Meta Graph API. Add these to <code>.env</code>, then click <strong>Sync</strong> above (or run <code>php artisan instagram:sync-reels</code>):
+        </p>
+        <pre class="small mb-0 bg-white p-2 rounded border"><code>INSTAGRAM_ACCESS_TOKEN=your_long_lived_token
+INSTAGRAM_USERNAME=perch.life
+INSTAGRAM_USER_ID=          # optional if token is linked to the account
+INSTAGRAM_REELS_LIMIT=10</code></pre>
+        <p class="small text-muted mt-2 mb-0">
+            Generate the token in
+            <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">Meta for Developers</a>
+            → your app → Instagram Graph API → generate a token with
+            <code>instagram_basic</code> and <code>pages_read_engagement</code>.
+            The Instagram account must be a Business/Creator account linked to a Facebook Page.
+        </p>
+    </div>
 
     <div class="card mb-4">
         <div class="card-header">Add Reel or post link</div>

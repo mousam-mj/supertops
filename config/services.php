@@ -68,4 +68,12 @@ return [
         'template_id' => env('MSG91_TEMPLATE_ID'),
     ],
 
+    'instagram' => [
+        'access_token' => env('INSTAGRAM_ACCESS_TOKEN'),
+        'user_id' => env('INSTAGRAM_USER_ID'),
+        'username' => env('INSTAGRAM_USERNAME', 'perch.life'),
+        'reels_limit' => env('INSTAGRAM_REELS_LIMIT', 10),
+        'graph_url' => env('INSTAGRAM_GRAPH_URL', 'https://graph.facebook.com/v21.0'),
+    ],
+
 ];

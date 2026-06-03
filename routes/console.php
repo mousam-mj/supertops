@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -61,3 +62,26 @@ Artisan::command('storage:fix', function () {
     $this->line('   - VPS with sudo: sudo chown -R www-data:www-data storage bootstrap/cache && sudo chmod -R 775 storage bootstrap/cache');
     $this->line('4. On SELinux: sudo chcon -R -t httpd_sys_rw_content_t storage');
 })->purpose('Create storage link and fix permissions for uploaded images on server');
+
+Artisan::command('instagram:sync-reels', function () {
+    $instagram = app(\App\Services\InstagramService::class);
+    $result = $instagram->syncReelsToDatabase();
+
+    if ($result['error'] !== null) {
+        $this->error($result['error']);
+
+        return 1;
+    }
+
+    $this->info(sprintf(
+        'Synced @%s: %d new, %d skipped (%d fetched).',
+        config('services.instagram.username', 'perch.life'),
+        $result['added'],
+        $result['skipped'],
+        $result['total']
+    ));
+
+    return 0;
+})->purpose('Fetch latest Instagram reels from @perch.life into the database');
+
+Schedule::command('instagram:sync-reels')->hourly();

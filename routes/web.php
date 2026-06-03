@@ -620,6 +620,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/instagram-reels', [InstagramReelController::class, 'index'])->name('instagram-reels.index');
         Route::post('/instagram-reels', [InstagramReelController::class, 'store'])->name('instagram-reels.store');
+        Route::post('/instagram-reels/sync', [InstagramReelController::class, 'sync'])->name('instagram-reels.sync');
         Route::put('/instagram-reels/sort', [InstagramReelController::class, 'updateSort'])->name('instagram-reels.sort');
         Route::delete('/instagram-reels/{instagram_reel}', [InstagramReelController::class, 'destroy'])->name('instagram-reels.destroy');
 

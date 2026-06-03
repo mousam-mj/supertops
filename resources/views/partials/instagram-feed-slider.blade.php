@@ -37,7 +37,7 @@
                     @empty
                         @foreach([1,2,3,4,5,1] as $imgNum)
                             <div class="swiper-slide">
-                                <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="item relative block rounded-[32px] overflow-hidden">
+                                <a href="https://www.instagram.com/{{ config('services.instagram.username', 'perch.life') }}/" target="_blank" rel="noopener noreferrer" class="item relative block rounded-[32px] overflow-hidden">
                                     <img src="{{ asset('assets/images/instagram/p1('.$imgNum.').webp') }}" alt="" class="h-full w-full duration-500 relative object-cover" />
                                     <div class="icon w-12 h-12 bg-white hover:bg-black duration-500 flex items-center justify-center rounded-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
                                         <div class="icon-instagram text-2xl text-black"></div>

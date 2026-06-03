@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\InstagramReel;
+use App\Services\InstagramService;
 use Illuminate\Http\Request;
 
 class InstagramReelController extends Controller
@@ -60,5 +61,26 @@ class InstagramReelController extends Controller
 
         return redirect()->route('admin.instagram-reels.index')
             ->with('success', 'Order saved.');
+    }
+
+    public function sync(InstagramService $instagram)
+    {
+        $result = $instagram->syncReelsToDatabase();
+
+        if ($result['error'] !== null) {
+            return redirect()->route('admin.instagram-reels.index')
+                ->with('error', $result['error']);
+        }
+
+        $message = sprintf(
+            'Synced from @%s: %d new reel(s), %d already in list (%d fetched).',
+            config('services.instagram.username', 'perch.life'),
+            $result['added'],
+            $result['skipped'],
+            $result['total']
+        );
+
+        return redirect()->route('admin.instagram-reels.index')
+            ->with('success', $message);
     }
 }
