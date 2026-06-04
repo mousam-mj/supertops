@@ -33,6 +33,7 @@ class CustomizeSettingsController extends Controller
         $engravingMaxChars = (int) ($raw['engraving_max_chars'] ?? 40);
         $engravingLabel = (string) ($raw['engraving_label'] ?? '');
         $engravingCategoryRows = $this->padEngravingCategoryRows($raw['engraving_categories'] ?? []);
+        $stepContent = CustomizeConfigService::normalizeStepContent($raw['step_content'] ?? []);
 
         return view('admin.customize.index', [
             'paddedPalettes' => $paddedPalettes,
@@ -43,6 +44,7 @@ class CustomizeSettingsController extends Controller
             'engravingMaxChars' => $engravingMaxChars,
             'engravingLabel' => $engravingLabel,
             'engravingCategoryRows' => $engravingCategoryRows,
+            'stepContent' => $stepContent,
             'hasGlobalSaved' => CustomizeConfigService::getGlobalCustomizeConfig() !== [],
         ]);
     }
@@ -183,6 +185,12 @@ class CustomizeSettingsController extends Controller
             'engraving_max_chars' => 'nullable|integer|min:1|max:500',
             'engraving_label' => 'nullable|string|max:255',
             'engraving_categories.*.icon_upload' => 'nullable|file|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'step_content.*.heading' => 'nullable|string|max:255',
+            'step_content.*.subtext' => 'nullable|string|max:2000',
+            'step_content.*.option_name' => 'nullable|string|max:255',
+            'step_content.*.option_desc' => 'nullable|string|max:2000',
+            'step_content.*.color_label' => 'nullable|string|max:255',
+            'step_content.*.flow_hint' => 'nullable|string|max:2000',
         ]);
 
         $cfg = CustomizeConfigService::getGlobalCustomizeConfig();
@@ -209,6 +217,8 @@ class CustomizeSettingsController extends Controller
         }
 
         $cfg['engraving_categories'] = $this->parseEngravingCategories($request->input('engraving_categories', []), $request);
+
+        $cfg['step_content'] = $this->parseStepContent($request->input('step_content', []));
 
         if ($request->filled('display_name')) {
             $cfg['display_name'] = trim((string) $request->display_name);
@@ -275,6 +285,32 @@ class CustomizeSettingsController extends Controller
                 'desc' => trim((string) ($row['desc'] ?? '')),
                 'price' => max(0, (float) ($row['price'] ?? 0)),
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @return array<string, array<string, string>>
+     */
+    private function parseStepContent(array $input): array
+    {
+        $defaults = CustomizeConfigService::defaultStepContent();
+        $out = [];
+
+        foreach ($defaults as $key => $fields) {
+            $row = is_array($input[$key] ?? null) ? $input[$key] : [];
+            $parsed = [];
+            foreach ($fields as $field => $_default) {
+                $value = trim((string) ($row[$field] ?? ''));
+                if ($value !== '') {
+                    $parsed[$field] = $value;
+                }
+            }
+            if ($parsed !== []) {
+                $out[$key] = $parsed;
+            }
         }
 
         return $out;

@@ -290,7 +290,79 @@ class CustomizeConfigService
             'engraving_categories' => $engravingCategories,
             'engraving_category_mode' => $engravingCategoryMode,
             'customize_max_step' => $customizeMaxStep,
+            'step_content' => self::normalizeStepContent($customizeConfig['step_content'] ?? []),
         ];
+    }
+
+    /**
+     * Default copy for each public customizer step tab.
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function defaultStepContent(): array
+    {
+        return [
+            'body' => [
+                'heading' => 'Body',
+                'subtext' => 'Main tumbler body ka color yahan set karein. Baaki marked parts next steps me milenge.',
+                'color_label' => 'Choose color for Body',
+                'flow_hint' => 'Tip: complete each step left to right, or jump using the tabs above. Your 3D preview updates live.',
+            ],
+            'cap' => [
+                'heading' => 'Cap',
+                'subtext' => 'Top cap aur uske neeche wale ring dono ka color yahan set hota hai.',
+                'option_name' => 'Cap',
+                'option_desc' => 'Straw opening ke around upper cap; neeche wala ring bhi isi color me match hoga.',
+                'color_label' => 'Choose color for Cap',
+            ],
+            'straw' => [
+                'heading' => 'Straw',
+                'subtext' => 'Marked straw ka color yahan change hoga.',
+                'option_name' => 'Silicone Tumbler Straw',
+                'option_desc' => 'Soft, flexible straw.',
+                'color_label' => 'Choose color for Straw',
+            ],
+            'handle' => [
+                'heading' => 'Handle',
+                'subtext' => 'Side handle ka color alag set karein.',
+                'option_name' => 'Side Handle',
+                'option_desc' => 'Bottle side grip handle color.',
+                'color_label' => 'Choose color for Handle',
+            ],
+            'boot' => [
+                'heading' => 'Bottom Base',
+                'subtext' => 'Neeche ka base/boot ring color yahan alag se set karein (image ke bottom marked area).',
+                'option_name' => 'Bottom Base Ring',
+                'option_desc' => 'Protective base/boot color.',
+                'color_label' => 'Choose color for Bottom Base',
+            ],
+            'engraving' => [
+                'heading' => 'Engraving',
+                'subtext' => 'Pick a style below. Each option has its own price and opens the next step when needed. You can skip engraving or go back to change colors.',
+            ],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $stored
+     * @return array<string, array<string, string>>
+     */
+    public static function normalizeStepContent(array $stored): array
+    {
+        $defaults = self::defaultStepContent();
+        $out = [];
+
+        foreach ($defaults as $key => $fields) {
+            $row = is_array($stored[$key] ?? null) ? $stored[$key] : [];
+            $merged = [];
+            foreach ($fields as $field => $defaultVal) {
+                $value = trim((string) ($row[$field] ?? ''));
+                $merged[$field] = $value !== '' ? $value : $defaultVal;
+            }
+            $out[$key] = $merged;
+        }
+
+        return $out;
     }
 
     /**

@@ -7,6 +7,7 @@
   $engrOn = !empty($config['has_engraving']);
   $engrCatMode = !empty($config['engraving_category_mode']);
   $stepTotal = (int) ($config['customize_max_step'] ?? 5);
+  $sc = $config['step_content'] ?? [];
 @endphp
 <style>
 .customize-page{font-family:'Inter',sans-serif;background:#f4f4f2;color:#161616;padding:20px 14px;min-height:72vh}
@@ -245,13 +246,13 @@
   <div class="modal">
     <div class="top-nav">
       <div class="nav-steps">
-        <div class="nav-step active" data-step="1" onclick="goTo(1)">Body</div>
-        <div class="nav-step" data-step="2" onclick="goTo(2)">Cap</div>
-        <div class="nav-step" data-step="3" onclick="goTo(3)">Straw</div>
-        <div class="nav-step" data-step="4" onclick="goTo(4)">Handle</div>
-        <div class="nav-step" data-step="5" onclick="goTo(5)">Bottom Base</div>
+        <div class="nav-step active" data-step="1" onclick="goTo(1)">{{ $sc['body']['heading'] ?? 'Body' }}</div>
+        <div class="nav-step" data-step="2" onclick="goTo(2)">{{ $sc['cap']['heading'] ?? 'Cap' }}</div>
+        <div class="nav-step" data-step="3" onclick="goTo(3)">{{ $sc['straw']['heading'] ?? 'Straw' }}</div>
+        <div class="nav-step" data-step="4" onclick="goTo(4)">{{ $sc['handle']['heading'] ?? 'Handle' }}</div>
+        <div class="nav-step" data-step="5" onclick="goTo(5)">{{ $sc['boot']['heading'] ?? 'Bottom Base' }}</div>
         @if($engrOn && $engrCatMode)
-        <div class="nav-step" data-step="6" onclick="goTo(6)">Engraving</div>
+        <div class="nav-step" data-step="6" onclick="goTo(6)">{{ $config['engraving_label'] ?? ($sc['engraving']['heading'] ?? 'Engraving') }}</div>
         @endif
       </div>
       <div class="nav-right">
@@ -302,16 +303,16 @@
           <div class="mobile-step-row">
             <button type="button" class="mobile-step-arrow" id="mobile-step-prev" onclick="goTo(Math.max(1, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) - 1))" aria-label="Previous step">‹</button>
             <div class="mobile-step-center">
-              <div class="mobile-step-title" id="mobile-step-title">Body <span id="mobile-step-counter">(1/5)</span></div>
+              <div class="mobile-step-title" id="mobile-step-title">{{ $sc['body']['heading'] ?? 'Body' }} <span id="mobile-step-counter">(1/5)</span></div>
             </div>
             <button type="button" class="mobile-step-arrow" id="mobile-step-next" onclick="goTo(Math.min({{ $stepTotal }}, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) + 1))" aria-label="Next step">›</button>
           </div>
         </div>
         <!-- Step 1: Tumbler -->
         <div class="step-panel active" id="panel-1">
-          <div class="step-heading">Body</div>
+          <div class="step-heading">{{ $sc['body']['heading'] ?? 'Body' }}</div>
           <div class="step-counter">1 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Main tumbler body ka color yahan set karein. Baaki marked parts next steps me milenge.</div>
+          <div class="step-subtext">{{ $sc['body']['subtext'] ?? '' }}</div>
           <div class="size-cards" id="size-cards">
             @php
               $sz = $config['sizes'] ?? [];
@@ -343,7 +344,7 @@
               @endforeach
             @endif
           </div>
-          <div class="color-label">Choose color for Body</div>
+          <div class="color-label">{{ $sc['body']['color_label'] ?? 'Choose color for Body' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('bottle',-1)">&#8249;</button>
             <div class="swatches-track" id="bottle-swatches"></div>
@@ -351,19 +352,19 @@
           </div>
           <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – Cap</button></div>
-          <p class="flow-hint">Tip: complete each step left to right, or jump using the tabs above. Your 3D preview updates live.</p>
+          <p class="flow-hint">{{ $sc['body']['flow_hint'] ?? '' }}</p>
         </div>
 
         <!-- Step 2: Cap -->
         <div class="step-panel" id="panel-2">
-          <div class="step-heading">Cap</div>
+          <div class="step-heading">{{ $sc['cap']['heading'] ?? 'Cap' }}</div>
           <div class="step-counter">2 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Top cap aur uske neeche wale ring dono ka color yahan set hota hai.</div>
+          <div class="step-subtext">{{ $sc['cap']['subtext'] ?? '' }}</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="11" stroke="#222" stroke-width="2"/><path d="M15 4 Q22 4 22 12" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
-            <div class="option-info"><div class="option-name">Cap</div><div class="option-desc">Straw opening ke around upper cap; neeche wala ring bhi isi color me match hoga.</div></div>
+            <div class="option-info"><div class="option-name">{{ $sc['cap']['option_name'] ?? 'Cap' }}</div><div class="option-desc">{{ $sc['cap']['option_desc'] ?? '' }}</div></div>
           </div>
-          <div class="color-label">Choose color for Cap</div>
+          <div class="color-label">{{ $sc['cap']['color_label'] ?? 'Choose color for Cap' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('cap',-1)">&#8249;</button>
             <div class="swatches-track" id="cap-swatches"></div>
@@ -378,14 +379,14 @@
 
         <!-- Step 3: Straw -->
         <div class="step-panel" id="panel-3">
-          <div class="step-heading">Straw</div>
+          <div class="step-heading">{{ $sc['straw']['heading'] ?? 'Straw' }}</div>
           <div class="step-counter">3 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Marked straw ka color yahan change hoga.</div>
+          <div class="step-subtext">{{ $sc['straw']['subtext'] ?? '' }}</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><path d="M8 26 Q8 6 15 6 Q22 6 22 26" stroke="#222" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
-            <div class="option-info"><div class="option-name">Silicone Tumbler Straw</div><div class="option-desc">Soft, flexible straw.</div></div>
+            <div class="option-info"><div class="option-name">{{ $sc['straw']['option_name'] ?? 'Silicone Tumbler Straw' }}</div><div class="option-desc">{{ $sc['straw']['option_desc'] ?? '' }}</div></div>
           </div>
-          <div class="color-label">Choose color for Straw</div>
+          <div class="color-label">{{ $sc['straw']['color_label'] ?? 'Choose color for Straw' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('strap',-1)">&#8249;</button>
             <div class="swatches-track" id="strap-swatches"></div>
@@ -400,14 +401,14 @@
 
         <!-- Step 4: Handle -->
         <div class="step-panel" id="panel-4">
-          <div class="step-heading">Handle</div>
+          <div class="step-heading">{{ $sc['handle']['heading'] ?? 'Handle' }}</div>
           <div class="step-counter">4 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Side handle ka color alag set karein.</div>
+          <div class="step-subtext">{{ $sc['handle']['subtext'] ?? '' }}</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><path d="M22 8 Q28 8 28 18 L28 48 Q28 56 22 56 Q16 56 16 48 L16 18 Q16 8 22 8Z" stroke="#222" stroke-width="2.2" fill="#e8e8e8"/></svg></div>
-            <div class="option-info"><div class="option-name">Side Handle</div><div class="option-desc">Bottle side grip handle color.</div></div>
+            <div class="option-info"><div class="option-name">{{ $sc['handle']['option_name'] ?? 'Side Handle' }}</div><div class="option-desc">{{ $sc['handle']['option_desc'] ?? '' }}</div></div>
           </div>
-          <div class="color-label">Choose color for Handle</div>
+          <div class="color-label">{{ $sc['handle']['color_label'] ?? 'Choose color for Handle' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('handle',-1)">&#8249;</button>
             <div class="swatches-track" id="handle-swatches"></div>
@@ -422,14 +423,14 @@
 
         <!-- Step 5: Bottom Base -->
         <div class="step-panel" id="panel-5">
-          <div class="step-heading">Bottom Base</div>
+          <div class="step-heading">{{ $sc['boot']['heading'] ?? 'Bottom Base' }}</div>
           <div class="step-counter">5 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Neeche ka base/boot ring color yahan alag se set karein (image ke bottom marked area).</div>
+          <div class="step-subtext">{{ $sc['boot']['subtext'] ?? '' }}</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><path d="M5 47 H25 V55 H5 Z" stroke="#222" stroke-width="2" fill="#e8e8e8"/></svg></div>
-            <div class="option-info"><div class="option-name">Bottom Base Ring</div><div class="option-desc">Protective base/boot color.</div></div>
+            <div class="option-info"><div class="option-name">{{ $sc['boot']['option_name'] ?? 'Bottom Base Ring' }}</div><div class="option-desc">{{ $sc['boot']['option_desc'] ?? '' }}</div></div>
           </div>
-          <div class="color-label">Choose color for Bottom Base</div>
+          <div class="color-label">{{ $sc['boot']['color_label'] ?? 'Choose color for Bottom Base' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('boot',-1)">&#8249;</button>
             <div class="swatches-track" id="boot-swatches"></div>
@@ -459,9 +460,9 @@
 
         @if($engrOn && $engrCatMode)
         <div class="step-panel engraving-step" id="panel-6">
-          <div class="step-heading">{{ $config['engraving_label'] ?? 'Add Engraving' }}</div>
+          <div class="step-heading">{{ $config['engraving_label'] ?? ($sc['engraving']['heading'] ?? 'Add Engraving') }}</div>
           <div class="step-counter">6 of {{ $stepTotal }}</div>
-          <div class="step-subtext">Pick a style below. Each option has its own price and opens the next step when needed. You can skip engraving or go back to change colors.</div>
+          <div class="step-subtext">{{ $sc['engraving']['subtext'] ?? '' }}</div>
           <div class="engraving-mode-row">
             <div class="mode-title">Add Engraving</div>
             <div class="engraving-mode-toggles" role="radiogroup" aria-label="Engraving mode">

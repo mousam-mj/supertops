@@ -58,6 +58,11 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-step-content-btn" data-bs-toggle="tab" data-bs-target="#tab-step-content" type="button" role="tab" aria-controls="tab-step-content" aria-selected="false">
+                        <i class="bi bi-card-text me-1"></i>Tab content
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tab-engraving-btn" data-bs-toggle="tab" data-bs-target="#tab-engraving" type="button" role="tab" aria-controls="tab-engraving" aria-selected="false">
                         <i class="bi bi-pencil-square me-1"></i>Engraving
                     </button>
@@ -103,6 +108,68 @@
                         </table>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-primary mt-2 customize-add-row" data-tbody="customize-sizes-tbody"><i class="bi bi-plus-lg me-1"></i>Add more</button>
+                </div>
+
+                @php
+                    $stepContentMeta = [
+                        'body' => ['label' => 'Body (step 1)', 'has_option' => false, 'has_color' => true, 'has_flow_hint' => true],
+                        'cap' => ['label' => 'Cap (step 2)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
+                        'straw' => ['label' => 'Straw (step 3)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
+                        'handle' => ['label' => 'Handle (step 4)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
+                        'boot' => ['label' => 'Bottom Base (step 5)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
+                        'engraving' => ['label' => 'Engraving (step 6)', 'has_option' => false, 'has_color' => false, 'has_flow_hint' => false],
+                    ];
+                @endphp
+                <div class="tab-pane fade" id="tab-step-content" role="tabpanel" aria-labelledby="tab-step-content-btn" tabindex="0">
+                    <p class="text-muted small mb-3">Edit the heading, description and color label shown on each tab of the public <code>/customize</code> page. Leave a field blank to use the default text.</p>
+                    <div class="accordion" id="stepContentAccordion">
+                        @foreach($stepContentMeta as $stepKey => $meta)
+                            @php $row = $stepContent[$stepKey] ?? []; @endphp
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="step-content-heading-{{ $stepKey }}">
+                                    <button class="accordion-button {{ $loop->first ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#step-content-collapse-{{ $stepKey }}" aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="step-content-collapse-{{ $stepKey }}">
+                                        {{ $meta['label'] }}
+                                    </button>
+                                </h2>
+                                <div id="step-content-collapse-{{ $stepKey }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" aria-labelledby="step-content-heading-{{ $stepKey }}" data-bs-parent="#stepContentAccordion">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tab &amp; step heading</label>
+                                                <input type="text" class="form-control" name="step_content[{{ $stepKey }}][heading]" value="{{ old('step_content.'.$stepKey.'.heading', $row['heading'] ?? '') }}" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['heading'] ?? '' }}">
+                                            </div>
+                                            @if($meta['has_color'])
+                                            <div class="col-md-6">
+                                                <label class="form-label">Color picker label</label>
+                                                <input type="text" class="form-control" name="step_content[{{ $stepKey }}][color_label]" value="{{ old('step_content.'.$stepKey.'.color_label', $row['color_label'] ?? '') }}" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['color_label'] ?? '' }}">
+                                            </div>
+                                            @endif
+                                            <div class="col-12">
+                                                <label class="form-label">Intro text <span class="text-muted fw-normal">(below step counter)</span></label>
+                                                <textarea class="form-control" name="step_content[{{ $stepKey }}][subtext]" rows="2" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['subtext'] ?? '' }}">{{ old('step_content.'.$stepKey.'.subtext', $row['subtext'] ?? '') }}</textarea>
+                                            </div>
+                                            @if($meta['has_option'])
+                                            <div class="col-md-6">
+                                                <label class="form-label">Info card title</label>
+                                                <input type="text" class="form-control" name="step_content[{{ $stepKey }}][option_name]" value="{{ old('step_content.'.$stepKey.'.option_name', $row['option_name'] ?? '') }}" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['option_name'] ?? '' }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Info card description</label>
+                                                <textarea class="form-control" name="step_content[{{ $stepKey }}][option_desc]" rows="2" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['option_desc'] ?? '' }}">{{ old('step_content.'.$stepKey.'.option_desc', $row['option_desc'] ?? '') }}</textarea>
+                                            </div>
+                                            @endif
+                                            @if($meta['has_flow_hint'])
+                                            <div class="col-12">
+                                                <label class="form-label">Tip text <span class="text-muted fw-normal">(bottom of Body step)</span></label>
+                                                <textarea class="form-control" name="step_content[{{ $stepKey }}][flow_hint]" rows="2" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['flow_hint'] ?? '' }}">{{ old('step_content.'.$stepKey.'.flow_hint', $row['flow_hint'] ?? '') }}</textarea>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="tab-pane fade" id="tab-engraving" role="tabpanel" aria-labelledby="tab-engraving-btn" tabindex="0">
