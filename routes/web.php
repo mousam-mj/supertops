@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ColorSizeMasterController;
 use App\Http\Controllers\Admin\CustomizeSettingsController;
@@ -605,6 +606,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Reports hub (all downloads in one place)
         Route::get('/reports', [DashboardController::class, 'reportsIndex'])->name('reports.index');
+
+        // Backups (database + images)
+        Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+        Route::get('/backup/database', [BackupController::class, 'downloadDatabase'])->name('backup.database');
+        Route::get('/backup/images', [BackupController::class, 'downloadImages'])->name('backup.images');
+        Route::get('/backup/download/{file}', [BackupController::class, 'downloadStored'])->name('backup.download');
 
         // Resource Routes
         Route::resource('users', UserController::class);
