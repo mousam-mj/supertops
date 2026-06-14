@@ -4118,8 +4118,47 @@ input[type=file]::-webkit-file-upload-button {
 }
 
 /* Banner */
-.banner-block .banner-item:hover .banner-img img {
-  opacity: 0.9;
+.banner-block .banner-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.4s ease;
+  pointer-events: none;
+}
+.banner-block .banner-item .banner-img img {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+.banner-block .banner-item .heading4,
+.banner-block .banner-item .button-main,
+.banner-block .banner-item .banner-content,
+.banner-block .banner-item .text-button {
+  z-index: 2;
+  transition: color 0.4s ease, background-color 0.4s ease, border-color 0.4s ease;
+}
+.banner-block .banner-item:hover::before,
+.banner-block .banner-item:focus-within::before {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.banner-block .banner-item:hover .heading4,
+.banner-block .banner-item:focus-within .heading4 {
+  color: var(--white);
+}
+.banner-block .banner-item:hover .button-main,
+.banner-block .banner-item:focus-within .button-main {
+  color: var(--white);
+  background-color: transparent;
+  border: 1px solid var(--white);
+}
+.banner-block .banner-item:hover .text-button,
+.banner-block .banner-item:focus-within .text-button {
+  color: var(--white);
+  border-color: var(--white);
+}
+.banner-block .banner-item:hover .banner-img img,
+.banner-block .banner-item:focus-within .banner-img img {
   transform: scale(1.07);
 }
 .banner-block .banner-ads-item img {

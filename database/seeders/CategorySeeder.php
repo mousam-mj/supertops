@@ -37,7 +37,7 @@ class CategorySeeder extends Seeder
             ['slug' => 'kitchenware'],
             [
                 'name' => 'Kitchenware',
-                'is_active' => true,
+                'is_active' => false,
                 'sort_order' => 3,
             ]
         );
@@ -165,7 +165,7 @@ class CategorySeeder extends Seeder
                 'parent_id' => null,
                 'main_category_id' => $mainKitchenware->id,
                 'sort_order' => 1,
-                'is_active' => true,
+                'is_active' => false,
             ]
         );
 

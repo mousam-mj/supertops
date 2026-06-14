@@ -64,6 +64,14 @@ class MainCategory extends Model
     {
         return $this->hasMany(Category::class, 'main_category_id')->where('is_active', true);
     }
+
+    /**
+     * Main categories shown on the storefront (header, footer, filters).
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_active', true);
+    }
 }
 
 

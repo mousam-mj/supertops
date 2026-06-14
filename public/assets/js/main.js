@@ -879,38 +879,40 @@ if (document.querySelector(".slider-toys-kid")) {
   });
 }
 
-// Change active menu tab
-const tabItems = document.querySelectorAll(".menu-tab .tab-item");
-const itemActive = document.querySelectorAll(".menu-tab .tab-item.active");
+// Change active menu tab — pill tracks each tab's actual width/position (not equal % slots)
+function syncMenuTabIndicator(menuEl) {
+  if (!menuEl) return;
+  var indicator = menuEl.querySelector(".indicator");
+  var active = menuEl.querySelector(".tab-item.active");
+  if (!indicator || !active) return;
+  indicator.style.width = active.offsetWidth + "px";
+  indicator.style.left = active.offsetLeft + "px";
+}
+window.syncMenuTabIndicator = syncMenuTabIndicator;
 
-itemActive.forEach((item) => {
-  let indicator = item.parentElement.querySelector(".indicator");
-  if (indicator) {
-    indicator.style.width = item.getBoundingClientRect().width + "px";
-    indicator.style.left =
-      item.getBoundingClientRect().left -
-      item.parentElement.getBoundingClientRect().left +
-      "px";
-  }
+function syncAllMenuTabIndicators() {
+  document.querySelectorAll(".menu-tab .menu").forEach(syncMenuTabIndicator);
+}
+
+const tabItems = document.querySelectorAll(".menu-tab .tab-item");
+
+document.querySelectorAll(".menu-tab .tab-item.active").forEach((item) => {
+  syncMenuTabIndicator(item.parentElement);
 });
 
 tabItems.forEach((item) => {
   item.addEventListener("click", () => {
-    let indicator = item.parentElement.querySelector(".indicator");
-    if (indicator) {
-      indicator.style.width = item.getBoundingClientRect().width + "px";
-      indicator.style.left =
-        item.getBoundingClientRect().left -
-        item.parentElement.getBoundingClientRect().left +
-        "px";
-    }
-
-    if (item.parentElement.querySelector(".active")) {
-      item.parentElement.querySelector(".active").classList.remove("active");
+    var menu = item.parentElement;
+    if (menu && menu.querySelector(".active")) {
+      menu.querySelector(".active").classList.remove("active");
     }
     item.classList.add("active");
+    syncMenuTabIndicator(menu);
   });
 });
+
+window.addEventListener("resize", syncAllMenuTabIndicators);
+window.addEventListener("load", syncAllMenuTabIndicators);
 
 // Countdown time
 const countDown = new Date("October 30, 2024 00:00:00").getTime();
@@ -2357,6 +2359,12 @@ fetch("./assets/data/Product.json")
     // Display the first 4 products
     if (listFourProduct) {
       listFourProduct.forEach((list) => {
+        if (
+          list.closest(".what-new-block[data-filter-type]") ||
+          list.classList.contains("home-tab-products")
+        ) {
+          return;
+        }
         const parent = list.parentElement;
         if (parent.querySelector(".menu-tab .active")) {
           const menuItemActive = parent

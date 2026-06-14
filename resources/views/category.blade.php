@@ -98,7 +98,7 @@
         <div class="heading flex flex-col items-center text-center">
             <div class="heading3">What's new</div>
             <div class="menu-tab bg-surface rounded-2xl mt-6">
-                <div class="menu flex items-center gap-2 p-1">
+                <div class="menu flex items-center gap-2 p-1 relative">
                     <div class="indicator absolute top-1 bottom-1 bg-white rounded-full shadow-md duration-300"></div>
                     <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="top">top</div>
                     <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black active" data-item="t-shirt">t-shirt</div>
@@ -496,28 +496,7 @@
 
 <div class="container">
     <div class="benefit-block md:mt-20 mt-10 py-10 px-2.5 bg-surface rounded-3xl">
-        <div class="list-benefit grid items-start lg:grid-cols-4 grid-cols-2 gap-[30px]">
-            <div class="benefit-item flex flex-col items-center justify-center">
-                <i class="icon-phone-call lg:text-7xl text-5xl"></i>
-                <div class="heading6 text-center mt-5">24/7 Customer Service</div>
-                <div class="caption1 text-secondary text-center mt-3">We're here to help you with any questions or concerns you have, 24/7.</div>
-            </div>
-            <div class="benefit-item flex flex-col items-center justify-center">
-                <i class="icon-return lg:text-7xl text-5xl"></i>
-                <div class="heading6 text-center mt-5">14-Day Money Back</div>
-                <div class="caption1 text-secondary text-center mt-3">If you're not satisfied with your purchase, simply return it within 14 days for a refund.</div>
-            </div>
-            <div class="benefit-item flex flex-col items-center justify-center">
-                <i class="icon-guarantee lg:text-7xl text-5xl"></i>
-                <div class="heading6 text-center mt-5">Our Guarantee</div>
-                <div class="caption1 text-secondary text-center mt-3">We stand behind our products and services and guarantee your satisfaction.</div>
-            </div>
-            <div class="benefit-item flex flex-col items-center justify-center">
-                <i class="icon-delivery-truck lg:text-7xl text-5xl"></i>
-                <div class="heading6 text-center mt-5">Shipping worldwide</div>
-                <div class="caption1 text-secondary text-center mt-3">We ship our products worldwide, making them accessible to customers everywhere.</div>
-            </div>
-        </div>
+        @include('partials.benefit-items')
     </div>
 </div>
 
@@ -528,32 +507,6 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching for product types
-    const tabItems = document.querySelectorAll('.tab-item[data-item]');
-    const indicator = document.querySelector('.indicator');
-    
-    if (tabItems.length > 0 && indicator) {
-        tabItems.forEach((item, index) => {
-            item.addEventListener('click', function() {
-                const type = this.getAttribute('data-item');
-                
-                // Update active tab
-                tabItems.forEach(tab => tab.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Move indicator
-                const itemWidth = 100 / tabItems.length;
-                indicator.style.left = (index * itemWidth) + '%';
-                indicator.style.width = itemWidth + '%';
-                
-                // Filter products
-                if (typeof window.categorySlug !== 'undefined') {
-                    window.location.href = '{{{ route("category", $category->slug ?? "") }}}?type=' + type;
-                }
-            });
-        });
-    }
-    
     // Brand block now shows single logo (no swiper)
     if (typeof Swiper !== 'undefined') {
         const brandSwiper = document.querySelector('.swiper-list-brand');

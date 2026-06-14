@@ -36,8 +36,8 @@
 
     @php
         $paletteMeta = [
-            'bottle' => ['id' => 'tab-body', 'label' => 'Body', 'field' => 'palette_bottle', 'icon' => 'bi-circle'],
-            'cap' => ['id' => 'tab-lid', 'label' => 'Cap', 'field' => 'palette_cap', 'icon' => 'bi-record-circle'],
+            'bottle' => ['id' => 'tab-body', 'label' => 'Tumbler', 'field' => 'palette_bottle', 'icon' => 'bi-circle'],
+            'cap' => ['id' => 'tab-lid', 'label' => 'LID', 'field' => 'palette_cap', 'icon' => 'bi-record-circle'],
             'strap' => ['id' => 'tab-straw', 'label' => 'Straw', 'field' => 'palette_strap', 'icon' => 'bi-droplet'],
             'handle' => ['id' => 'tab-handle', 'label' => 'Handle', 'field' => 'palette_handle', 'icon' => 'bi-grip-vertical'],
             'boot' => ['id' => 'tab-base', 'label' => 'Bottom base', 'field' => 'palette_boot', 'icon' => 'bi-disc'],
@@ -112,8 +112,8 @@
 
                 @php
                     $stepContentMeta = [
-                        'body' => ['label' => 'Body (step 1)', 'has_option' => false, 'has_color' => true, 'has_flow_hint' => true],
-                        'cap' => ['label' => 'Cap (step 2)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
+                        'body' => ['label' => 'Tumbler (step 1)', 'has_option' => false, 'has_color' => true, 'has_flow_hint' => true],
+                        'cap' => ['label' => 'LID (step 2)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
                         'straw' => ['label' => 'Straw (step 3)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
                         'handle' => ['label' => 'Handle (step 4)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
                         'boot' => ['label' => 'Bottom Base (step 5)', 'has_option' => true, 'has_color' => true, 'has_flow_hint' => false],
@@ -160,7 +160,7 @@
                                             @endif
                                             @if($meta['has_flow_hint'])
                                             <div class="col-12">
-                                                <label class="form-label">Tip text <span class="text-muted fw-normal">(bottom of Body step)</span></label>
+                                                <label class="form-label">Tip text <span class="text-muted fw-normal">(bottom of Tumbler step)</span></label>
                                                 <textarea class="form-control" name="step_content[{{ $stepKey }}][flow_hint]" rows="2" placeholder="{{ \App\Services\CustomizeConfigService::defaultStepContent()[$stepKey]['flow_hint'] ?? '' }}">{{ old('step_content.'.$stepKey.'.flow_hint', $row['flow_hint'] ?? '') }}</textarea>
                                             </div>
                                             @endif
@@ -180,6 +180,13 @@
                                 <input type="checkbox" class="form-check-input" id="has_engraving" name="has_engraving" value="1" {{ old('has_engraving', $hasEngraving) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="has_engraving">Offer engraving on the public customizer</label>
                             </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="engraving_upload_enabled" name="engraving_upload_enabled" value="1" {{ old('engraving_upload_enabled', $engravingUploadEnabled) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="engraving_upload_enabled">Show &ldquo;Upload your own design&rdquo; option on the customizer</label>
+                            </div>
+                            <small class="text-muted d-block mt-1">Leave unchecked to hide upload-type engraving categories from customers.</small>
                         </div>
                         <div class="col-md-8 col-lg-6">
                             <label class="form-label">Engraving step title</label>

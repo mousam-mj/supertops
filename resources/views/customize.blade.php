@@ -8,6 +8,14 @@
   $engrCatMode = !empty($config['engraving_category_mode']);
   $stepTotal = (int) ($config['customize_max_step'] ?? 5);
   $sc = $config['step_content'] ?? [];
+  $stepLabels = [
+    1 => $sc['body']['heading'] ?? 'Tumbler',
+    2 => $sc['cap']['heading'] ?? 'LID',
+    3 => $sc['straw']['heading'] ?? 'Straw',
+    4 => $sc['handle']['heading'] ?? 'Handle',
+    5 => $sc['boot']['heading'] ?? 'Bottom Base',
+    6 => $config['engraving_label'] ?? ($sc['engraving']['heading'] ?? 'Engraving'),
+  ];
 @endphp
 <style>
 .customize-page{font-family:'Inter',sans-serif;background:#f4f4f2;color:#161616;padding:20px 14px;min-height:72vh}
@@ -29,6 +37,9 @@
 .customize-page .nav-cart-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
 .customize-page .mobile-qty-select{display:none}
 .customize-page .price-hint{font-size:11px;color:#8a8a8a;text-align:right}
+.customize-page:not(.customize-show-prices) .customize-price-el{display:none!important}
+.customize-page:not(.customize-show-prices) .nav-cart-actions{display:none!important}
+.customize-page:not(.customize-show-prices) .price-hint{display:none!important}
 .customize-page .close-btn{width:34px;height:34px;border:1px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#777;background:#fff}
 .customize-page .close-btn:hover{color:#111;border-color:#bdbdbd}
 .customize-page .content{display:flex;min-height:660px}
@@ -162,7 +173,7 @@
   .customize-page .nav-step{font-size:11px;padding:6px 10px}
   .customize-page .add-cart-btn,.customize-page .customize-checkout-btn{font-size:12px;padding:8px 12px}
 }
-/* Mobile: show tabs and swatches without horizontal swipe scrolling */
+/* Mobile: swipeable color swatches (all colors in a horizontal scroll row) */
 @media(max-width:768px){
   .customize-page{padding:0;background:#fff}
   .customize-page .modal{max-width:none;border:none;border-radius:0;box-shadow:none}
@@ -202,17 +213,19 @@
   .customize-page .option-name{font-size:16px}
   .customize-page .option-desc{font-size:12px}
   .customize-page .color-label{text-align:center;font-size:12px;margin:10px 0 12px}
-  .customize-page .color-row{gap:6px;align-items:flex-start}
+  .customize-page .color-row{gap:6px;align-items:flex-start;width:100%;max-width:100%;min-width:0}
   .customize-page .swatches-track{
     overflow-x:auto;
     overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
     touch-action:pan-x;
+    overscroll-behavior-x:contain;
     flex:1 1 100%;
     flex-wrap:nowrap;
     min-width:0;
     max-width:100%;
-    padding:2px 0 10px;
+    width:100%;
+    padding:2px 4px 10px;
     scrollbar-width:none;
     justify-content:flex-start;
   }
@@ -246,13 +259,13 @@
   <div class="modal">
     <div class="top-nav">
       <div class="nav-steps">
-        <div class="nav-step active" data-step="1" onclick="goTo(1)">{{ $sc['body']['heading'] ?? 'Body' }}</div>
-        <div class="nav-step" data-step="2" onclick="goTo(2)">{{ $sc['cap']['heading'] ?? 'Cap' }}</div>
-        <div class="nav-step" data-step="3" onclick="goTo(3)">{{ $sc['straw']['heading'] ?? 'Straw' }}</div>
-        <div class="nav-step" data-step="4" onclick="goTo(4)">{{ $sc['handle']['heading'] ?? 'Handle' }}</div>
-        <div class="nav-step" data-step="5" onclick="goTo(5)">{{ $sc['boot']['heading'] ?? 'Bottom Base' }}</div>
+        <div class="nav-step active" data-step="1" onclick="goTo(1)">{{ $stepLabels[1] }}</div>
+        <div class="nav-step" data-step="2" onclick="goTo(2)">{{ $stepLabels[2] }}</div>
+        <div class="nav-step" data-step="3" onclick="goTo(3)">{{ $stepLabels[3] }}</div>
+        <div class="nav-step" data-step="4" onclick="goTo(4)">{{ $stepLabels[4] }}</div>
+        <div class="nav-step" data-step="5" onclick="goTo(5)">{{ $stepLabels[5] }}</div>
         @if($engrOn && $engrCatMode)
-        <div class="nav-step" data-step="6" onclick="goTo(6)">{{ $config['engraving_label'] ?? ($sc['engraving']['heading'] ?? 'Engraving') }}</div>
+        <div class="nav-step" data-step="6" onclick="goTo(6)">{{ $stepLabels[6] }}</div>
         @endif
       </div>
       <div class="nav-right">
@@ -265,7 +278,7 @@
               <option value="4">4</option>
               <option value="5">5</option>
             </select>
-            <button type="button" class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – {{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</button>
+            <button type="button" class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – <span id="top-cart-price" class="customize-price-el">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
           <span class="price-hint" id="price-hint"></span>
@@ -303,14 +316,14 @@
           <div class="mobile-step-row">
             <button type="button" class="mobile-step-arrow" id="mobile-step-prev" onclick="goTo(Math.max(1, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) - 1))" aria-label="Previous step">‹</button>
             <div class="mobile-step-center">
-              <div class="mobile-step-title" id="mobile-step-title">{{ $sc['body']['heading'] ?? 'Body' }} <span id="mobile-step-counter">(1/5)</span></div>
+              <div class="mobile-step-title" id="mobile-step-title">{{ $stepLabels[1] }} <span id="mobile-step-counter">(1/5)</span></div>
             </div>
             <button type="button" class="mobile-step-arrow" id="mobile-step-next" onclick="goTo(Math.min({{ $stepTotal }}, (window.CUSTOMIZE_STATE && window.CUSTOMIZE_STATE.step || 1) + 1))" aria-label="Next step">›</button>
           </div>
         </div>
         <!-- Step 1: Tumbler -->
         <div class="step-panel active" id="panel-1">
-          <div class="step-heading">{{ $sc['body']['heading'] ?? 'Body' }}</div>
+          <div class="step-heading">{{ $stepLabels[1] }}</div>
           <div class="step-counter">1 of {{ $stepTotal }}</div>
           <div class="step-subtext">{{ $sc['body']['subtext'] ?? '' }}</div>
           <div class="size-cards" id="size-cards">
@@ -329,7 +342,7 @@
                   <p class="static-size-desc">{{ $s0['desc'] }}</p>
                 @endif
                 @if(isset($s0['price']) && $s0['price'] !== '' && $s0['price'] !== null)
-                  <p class="static-size-price">{{ $config['currency'] }}{{ number_format((float) $s0['price'], 2) }}</p>
+                  <p class="static-size-price customize-price-el">{{ $config['currency'] }}{{ number_format((float) $s0['price'], 2) }}</p>
                 @endif
               </div>
             @else
@@ -338,42 +351,42 @@
                 <div class="option-thumb"><svg viewBox="0 0 30 60" fill="none"><rect x="6" y="14" width="18" height="38" rx="1" fill="#222"/><path d="M7 14 Q4 18 3 24 L27 24 Q26 18 23 14Z" fill="#444"/><rect x="9" y="8" width="12" height="8" rx="2" fill="#555"/></svg></div>
                 <div class="option-info"><div class="option-name">{{ $size['name'] ?? '40 oz' }}</div><div class="option-desc">{{ $size['desc'] ?? 'Large insulated tumbler with handle and straw.' }}</div></div>
                 @if(!empty($size['price']))
-                <div class="option-price">{{ $config['currency'] }}{{ number_format($size['price'], 2) }}</div>
+                <div class="option-price customize-price-el">{{ $config['currency'] }}{{ number_format($size['price'], 2) }}</div>
                 @endif
               </div>
               @endforeach
             @endif
           </div>
-          <div class="color-label">{{ $sc['body']['color_label'] ?? 'Choose color for Body' }}</div>
+          <div class="color-label">{{ $sc['body']['color_label'] ?? 'Choose color for Tumbler' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('bottle',-1)">&#8249;</button>
-            <div class="swatches-track" id="bottle-swatches"></div>
+            <div class="swatches-track" id="bottle-swatches" data-no-step-swipe="1"></div>
             <button class="color-arrow" onclick="shiftS('bottle',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
-          <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – Cap</button></div>
+          <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – {{ $stepLabels[2] }}</button></div>
           <p class="flow-hint">{{ $sc['body']['flow_hint'] ?? '' }}</p>
         </div>
 
-        <!-- Step 2: Cap -->
+        <!-- Step 2: LID -->
         <div class="step-panel" id="panel-2">
-          <div class="step-heading">{{ $sc['cap']['heading'] ?? 'Cap' }}</div>
+          <div class="step-heading">{{ $stepLabels[2] }}</div>
           <div class="step-counter">2 of {{ $stepTotal }}</div>
           <div class="step-subtext">{{ $sc['cap']['subtext'] ?? '' }}</div>
           <div class="option-card">
             <div class="option-thumb"><svg viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="11" stroke="#222" stroke-width="2"/><path d="M15 4 Q22 4 22 12" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
-            <div class="option-info"><div class="option-name">{{ $sc['cap']['option_name'] ?? 'Cap' }}</div><div class="option-desc">{{ $sc['cap']['option_desc'] ?? '' }}</div></div>
+            <div class="option-info"><div class="option-name">{{ $sc['cap']['option_name'] ?? 'LID' }}</div><div class="option-desc">{{ $sc['cap']['option_desc'] ?? '' }}</div></div>
           </div>
-          <div class="color-label">{{ $sc['cap']['color_label'] ?? 'Choose color for Cap' }}</div>
+          <div class="color-label">{{ $sc['cap']['color_label'] ?? 'Choose color for LID' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('cap',-1)">&#8249;</button>
-            <div class="swatches-track" id="cap-swatches"></div>
+            <div class="swatches-track" id="cap-swatches" data-no-step-swipe="1"></div>
             <button class="color-arrow" onclick="shiftS('cap',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="cap-color-label">{{ ($config['cap_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(1)">Previous – Body</button>
-            <button class="next-btn" onclick="goTo(3)">Next – Straw</button>
+            <button class="prev-btn" onclick="goTo(1)">Previous – {{ $stepLabels[1] }}</button>
+            <button class="next-btn" onclick="goTo(3)">Next – {{ $stepLabels[3] }}</button>
           </div>
         </div>
 
@@ -389,13 +402,13 @@
           <div class="color-label">{{ $sc['straw']['color_label'] ?? 'Choose color for Straw' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('strap',-1)">&#8249;</button>
-            <div class="swatches-track" id="strap-swatches"></div>
+            <div class="swatches-track" id="strap-swatches" data-no-step-swipe="1"></div>
             <button class="color-arrow" onclick="shiftS('strap',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="strap-color-label">{{ ($config['strap_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(2)">Previous – Cap</button>
-            <button class="next-btn" onclick="goTo(4)">Next – Handle</button>
+            <button class="prev-btn" onclick="goTo(2)">Previous – {{ $stepLabels[2] }}</button>
+            <button class="next-btn" onclick="goTo(4)">Next – {{ $stepLabels[4] }}</button>
           </div>
         </div>
 
@@ -411,13 +424,13 @@
           <div class="color-label">{{ $sc['handle']['color_label'] ?? 'Choose color for Handle' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('handle',-1)">&#8249;</button>
-            <div class="swatches-track" id="handle-swatches"></div>
+            <div class="swatches-track" id="handle-swatches" data-no-step-swipe="1"></div>
             <button class="color-arrow" onclick="shiftS('handle',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="handle-color-label">{{ ($config['handle_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav">
-            <button class="prev-btn" onclick="goTo(3)">Previous – Straw</button>
-            <button class="next-btn" onclick="goTo(5)">Next – Bottom Base</button>
+            <button class="prev-btn" onclick="goTo(3)">Previous – {{ $stepLabels[3] }}</button>
+            <button class="next-btn" onclick="goTo(5)">Next – {{ $stepLabels[5] }}</button>
           </div>
         </div>
 
@@ -433,7 +446,7 @@
           <div class="color-label">{{ $sc['boot']['color_label'] ?? 'Choose color for Bottom Base' }}</div>
           <div class="color-row">
             <button class="color-arrow" onclick="shiftS('boot',-1)">&#8249;</button>
-            <div class="swatches-track" id="boot-swatches"></div>
+            <div class="swatches-track" id="boot-swatches" data-no-step-swipe="1"></div>
             <button class="color-arrow" onclick="shiftS('boot',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="boot-color-label">{{ ($config['boot_colors'][0]['name'] ?? 'Lavender') }}</div>
@@ -447,12 +460,12 @@
           </div>
           @endif
           <div class="bottom-nav">
-            <button type="button" class="prev-btn" onclick="goTo(4)">Previous – Handle</button>
+            <button type="button" class="prev-btn" onclick="goTo(4)">Previous – {{ $stepLabels[4] }}</button>
             @if($engrOn && $engrCatMode)
-            <button type="button" class="next-btn" onclick="goTo(6)">Next – Engraving</button>
+            <button type="button" class="next-btn" onclick="goTo(6)">Next – {{ $stepLabels[6] }}</button>
             @else
             <select class="qty-select customize-qty-select" id="customize-qty-final" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
+            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price" class="customize-price-el">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
             @endif
           </div>
@@ -496,9 +509,9 @@
           </div>
           <div class="engraving-slot-summary" id="engraving-slot-summary" style="display:none"></div>
           <div class="bottom-nav">
-            <button type="button" class="prev-btn" onclick="goTo(5)">Previous – Bottom Base</button>
+            <button type="button" class="prev-btn" onclick="goTo(5)">Previous – {{ $stepLabels[5] }}</button>
             <select class="qty-select customize-qty-select" id="customize-qty-engr" title="Quantity" onchange="onCustomizeQtyChange(this)"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price-engr">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
+            <button type="button" class="next-btn" onclick="addToCart()">Add to Cart – <span id="final-price-engr" class="customize-price-el">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
         </div>

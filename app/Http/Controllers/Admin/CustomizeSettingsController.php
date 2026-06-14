@@ -33,6 +33,7 @@ class CustomizeSettingsController extends Controller
         $engravingMaxChars = (int) ($raw['engraving_max_chars'] ?? 40);
         $engravingLabel = (string) ($raw['engraving_label'] ?? '');
         $engravingCategoryRows = $this->padEngravingCategoryRows($raw['engraving_categories'] ?? []);
+        $engravingUploadEnabled = (bool) ($raw['engraving_upload_enabled'] ?? false);
         $stepContent = CustomizeConfigService::normalizeStepContent($raw['step_content'] ?? []);
 
         return view('admin.customize.index', [
@@ -44,6 +45,7 @@ class CustomizeSettingsController extends Controller
             'engravingMaxChars' => $engravingMaxChars,
             'engravingLabel' => $engravingLabel,
             'engravingCategoryRows' => $engravingCategoryRows,
+            'engravingUploadEnabled' => $engravingUploadEnabled,
             'stepContent' => $stepContent,
             'hasGlobalSaved' => CustomizeConfigService::getGlobalCustomizeConfig() !== [],
         ]);
@@ -217,6 +219,8 @@ class CustomizeSettingsController extends Controller
         }
 
         $cfg['engraving_categories'] = $this->parseEngravingCategories($request->input('engraving_categories', []), $request);
+
+        $cfg['engraving_upload_enabled'] = $request->boolean('engraving_upload_enabled');
 
         $cfg['step_content'] = $this->parseStepContent($request->input('step_content', []));
 

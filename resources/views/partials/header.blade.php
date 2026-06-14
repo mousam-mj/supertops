@@ -40,7 +40,7 @@
                         
                         <div class="menu-main h-full max-lg:hidden">
                             @php
-                                $headerMainCategories = \App\Models\MainCategory::where('is_active', true)
+                                $headerMainCategories = \App\Models\MainCategory::visible()
                                     ->orderBy('sort_order')
                                     ->with(['activeCategories' => function ($q) {
                                         $q->whereNull('parent_id');
@@ -104,11 +104,11 @@
                                 </div>
                                 <a href="javascript:void(0)" role="button" class="max-md:hidden wishlist-icon flex items-center relative cursor-pointer no-underline text-inherit" onclick="var m=document.querySelectorAll('.modal-wishlist-block .modal-wishlist-main');var el=m.length?m[m.length-1]:null;if(el){el.classList.add('open');document.body.style.overflow='hidden';if(window.handleItemModalWishlist)window.handleItemModalWishlist();}return false">
                                     <i class="ph-bold ph-heart text-2xl"></i>
-                                    <span class="quantity wishlist-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
+                                    <span class="quantity wishlist-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black min-w-4 h-4 px-0.5 flex items-center justify-center rounded-full leading-none">0</span>
                                 </a>
                                 <a href="javascript:void(0)" role="button" class="max-md:hidden cart-icon flex items-center relative cursor-pointer no-underline text-inherit" onclick="var m=document.querySelectorAll('.modal-cart-block .modal-cart-main');var el=m.length?m[m.length-1]:null;if(el){el.classList.add('open');document.body.style.overflow='hidden';if(window.loadCartItems)window.loadCartItems();}return false">
                                     <i class="ph-bold ph-handbag text-2xl"></i>
-                                    <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black w-4 h-4 flex items-center justify-center rounded-full">0</span>
+                                    <span class="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-white bg-black min-w-4 h-4 px-0.5 flex items-center justify-center rounded-full leading-none">0</span>
                                 </a>
                             </div>
                         </div>
@@ -148,7 +148,7 @@
                     
                             <div class="list-nav mt-6">
                         @php
-                            $mobileMainCategories = \App\Models\MainCategory::where('is_active', true)
+                            $mobileMainCategories = \App\Models\MainCategory::visible()
                                 ->orderBy('sort_order')
                                 ->with(['activeCategories' => function ($q) {
                                     $q->whereNull('parent_id')->with(['children' => function ($q2) {

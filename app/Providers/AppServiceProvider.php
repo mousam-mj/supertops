@@ -18,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
         if (file_exists($helperPath = app_path('Helpers/CurrencyHelper.php'))) {
             require_once $helperPath;
         }
+        if (file_exists($helperPath = app_path('Helpers/BenefitBlockHelper.php'))) {
+            require_once $helperPath;
+        }
     }
 
     /**
@@ -45,5 +48,9 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
         );
+
+        view()->composer('partials.benefit-items', function ($view) {
+            $view->with('benefitItems', benefit_block_items());
+        });
     }
 }

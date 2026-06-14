@@ -262,7 +262,7 @@ class CustomizeConfigService
             ? trim($customizeConfig['engraving_label'])
             : 'Engraving';
 
-        $engravingCategories = self::normalizeEngravingCategoriesArray($customizeConfig['engraving_categories'] ?? []);
+        $engravingCategories = self::publicEngravingCategories($customizeConfig);
         $engravingCategoryMode = count($engravingCategories) > 0;
         // Any saved category row enables the engraving step (upload/text/simple), even if the master checkbox was left off.
         $hasEngraving = $hasEngravingFlag || $engravingCategoryMode;
@@ -303,17 +303,17 @@ class CustomizeConfigService
     {
         return [
             'body' => [
-                'heading' => 'Body',
+                'heading' => 'Tumbler',
                 'subtext' => 'Main tumbler body ka color yahan set karein. Baaki marked parts next steps me milenge.',
-                'color_label' => 'Choose color for Body',
+                'color_label' => 'Choose color for Tumbler',
                 'flow_hint' => 'Tip: complete each step left to right, or jump using the tabs above. Your 3D preview updates live.',
             ],
             'cap' => [
-                'heading' => 'Cap',
-                'subtext' => 'Top cap aur uske neeche wale ring dono ka color yahan set hota hai.',
-                'option_name' => 'Cap',
-                'option_desc' => 'Straw opening ke around upper cap; neeche wala ring bhi isi color me match hoga.',
-                'color_label' => 'Choose color for Cap',
+                'heading' => 'LID',
+                'subtext' => 'Top lid aur uske neeche wale ring dono ka color yahan set hota hai.',
+                'option_name' => 'LID',
+                'option_desc' => 'Straw opening ke around upper lid; neeche wala ring bhi isi color me match hoga.',
+                'color_label' => 'Choose color for LID',
             ],
             'straw' => [
                 'heading' => 'Straw',
@@ -416,14 +416,44 @@ class CustomizeConfigService
         return $out;
     }
 
+    public static function engravingUploadEnabled(array $customizeConfig = []): bool
+    {
+        if ($customizeConfig === []) {
+            $customizeConfig = self::getGlobalCustomizeConfig();
+        }
+
+        return ! empty($customizeConfig['engraving_upload_enabled']);
+    }
+
+    /**
+     * Engraving categories shown on the public customizer (upload type hidden unless enabled).
+     *
+     * @return list<array{slug: string, name: string, price: float, type: string, icon: ?string}>
+     */
+    public static function publicEngravingCategories(array $customizeConfig = []): array
+    {
+        if ($customizeConfig === []) {
+            $customizeConfig = self::getGlobalCustomizeConfig();
+        }
+
+        $categories = self::normalizeEngravingCategoriesArray($customizeConfig['engraving_categories'] ?? []);
+
+        if (! self::engravingUploadEnabled($customizeConfig)) {
+            $categories = array_values(array_filter(
+                $categories,
+                fn (array $cat) => ($cat['type'] ?? '') !== 'upload'
+            ));
+        }
+
+        return $categories;
+    }
+
     /**
      * @return list<array{slug: string, name: string, price: float, type: string, icon: ?string}>
      */
     public static function normalizedEngravingCategoriesFromGlobal(): array
     {
-        $g = self::getGlobalCustomizeConfig();
-
-        return self::normalizeEngravingCategoriesArray($g['engraving_categories'] ?? []);
+        return self::publicEngravingCategories();
     }
 
     public static function engravingCategoryMode(): bool

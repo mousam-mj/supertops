@@ -53,7 +53,7 @@
                         <div class="item flex flex-col basis-1/3">
                             @php
                                 /* Quick Shop: dynamic from main categories only (same as header: Drinkware, Barware, Kitchenware) */
-                                $footerQuickShopMainCategories = \App\Models\MainCategory::where('is_active', true)
+                                $footerQuickShopMainCategories = \App\Models\MainCategory::visible()
                                     ->orderBy('sort_order')
                                     ->with(['activeCategories' => function ($q) {
                                         $q->whereNull('parent_id')->orderBy('sort_order');

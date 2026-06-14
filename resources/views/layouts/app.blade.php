@@ -32,6 +32,17 @@
             z-index: 10;
             pointer-events: auto;
         }
+        .header-menu .cart-quantity,
+        .header-menu .wishlist-quantity {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            min-width: 1rem;
+            padding-left: 2px;
+            padding-right: 2px;
+            font-variant-numeric: tabular-nums;
+        }
         /* Header hover states */
         .user-icon .login-popup {
             opacity: 0;

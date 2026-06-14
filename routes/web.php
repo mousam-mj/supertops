@@ -48,9 +48,10 @@ Route::get('/', function () {
         ->orderBy('sort_order')
         ->get();
 
-    // Get top 3 categories for home page banners
+    // Get top 3 categories for home page banners (active main categories only)
     $homeCategories = Category::whereNull('parent_id')
         ->where('is_active', true)
+        ->whereHas('mainCategory', fn ($q) => $q->visible())
         ->orderBy('sort_order')
         ->limit(3)
         ->get();
@@ -70,7 +71,7 @@ Route::get('/', function () {
         ->get();
 
     // Main categories for What's New tabs and header
-    $mainCategories = MainCategory::where('is_active', true)
+    $mainCategories = MainCategory::visible()
         ->orderBy('sort_order')
         ->get();
 

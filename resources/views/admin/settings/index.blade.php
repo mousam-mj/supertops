@@ -55,6 +55,11 @@
                                     <input type="text" name="contact_phone" class="form-control" value="{{ old('contact_phone', $settings['contact_phone'] ?? '') }}" placeholder="+91 1234567890">
                                 </div>
                                 <div class="col-12 mb-3">
+                                    <label class="form-label">Contact page location heading</label>
+                                    <input type="text" name="contact_location_heading" class="form-control" value="{{ old('contact_location_heading', $settings['contact_location_heading'] ?? 'Our Office') }}" placeholder="Our Office">
+                                    <small class="text-muted">Heading above address on the contact page (e.g. Our Office).</small>
+                                </div>
+                                <div class="col-12 mb-3">
                                     <label class="form-label">Address Line 1</label>
                                     <input type="text" name="contact_address" class="form-control" value="{{ old('contact_address', $settings['contact_address'] ?? '') }}" placeholder="Street address">
                                 </div>
@@ -81,8 +86,8 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Working Hours</label>
-                                    <textarea name="working_hours" class="form-control" rows="4" placeholder="Mon - Fri: 9:00am - 6:00pm&#10;Saturday: 10:00am - 4:00pm&#10;Sunday: Closed">{{ old('working_hours', $settings['working_hours'] ?? '') }}</textarea>
-                                    <small class="text-muted">One line per slot. Shown on contact page.</small>
+                                    <textarea name="working_hours" class="form-control" rows="4" placeholder="Mon - Sat: 11:00am - 6:00pm&#10;Sunday: Closed">{{ old('working_hours', $settings['working_hours'] ?? '') }}</textarea>
+                                    <small class="text-muted">One line per schedule row. Put <strong>Sunday</strong> on its own line (press Enter after Mon–Sat hours).</small>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label class="form-label">Map Embed</label>
@@ -111,6 +116,40 @@
                                 <textarea name="contact_page_text" id="settings-contact-page-text" class="d-none" rows="3">{{ old('contact_page_text', $settings['contact_page_text'] ?? '') }}</textarea>
                                 <small class="text-muted">Short text for the contact page (e.g. "We're Here To Help").</small>
                             </div>
+
+                            <hr class="my-4">
+                            <h6 class="mb-2">Homepage benefit icons</h6>
+                            <p class="text-muted small mb-3">The four icon boxes on the homepage and category pages (24/7 Customer Service, Money Back, etc.). Leave blank to keep the default text.</p>
+                            @php
+                                $benefitDefaults = [
+                                    1 => ['icon' => 'icon-phone-call', 'title' => '24/7 Customer Service', 'text' => "We're here to help you with any questions or concerns you have, 24/7."],
+                                    2 => ['icon' => 'icon-return', 'title' => '14-Day Money Back', 'text' => "If you're not satisfied with your purchase, simply return it within 14 days for a refund."],
+                                    3 => ['icon' => 'icon-guarantee', 'title' => 'Our Guarantee', 'text' => 'We stand behind our products and services and guarantee your satisfaction.'],
+                                    4 => ['icon' => 'icon-delivery-truck', 'title' => 'Shipping worldwide', 'text' => 'We ship our products worldwide, making them accessible to customers everywhere.'],
+                                ];
+                            @endphp
+                            @foreach($benefitDefaults as $n => $def)
+                                <div class="card mb-3">
+                                    <div class="card-header py-2"><strong>Box {{ $n }}</strong></div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Icon class</label>
+                                                <input type="text" name="benefit_{{ $n }}_icon" class="form-control" value="{{ old('benefit_'.$n.'_icon', $settings['benefit_'.$n.'_icon'] ?? '') }}" placeholder="{{ $def['icon'] }}">
+                                                <small class="text-muted">e.g. {{ $def['icon'] }}</small>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label">Title</label>
+                                                <input type="text" name="benefit_{{ $n }}_title" class="form-control" value="{{ old('benefit_'.$n.'_title', $settings['benefit_'.$n.'_title'] ?? '') }}" placeholder="{{ $def['title'] }}">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Description</label>
+                                                <textarea name="benefit_{{ $n }}_text" class="form-control" rows="2" placeholder="{{ $def['text'] }}">{{ old('benefit_'.$n.'_text', $settings['benefit_'.$n.'_text'] ?? '') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
                         {{-- Social Media Tab --}}
@@ -158,7 +197,7 @@
                                 <textarea name="meta_description" class="form-control" rows="2">{{ old('meta_description', $settings['meta_description'] ?? '') }}</textarea>
                             </div>
                             <hr class="my-4">
-                            <h6 class="mb-3">Product Page Features (shown on product detail page)</h6>
+                            <h6 class="mb-3">Product Page Features (shown on product detail page only)</h6>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Feature 1 Title</label>

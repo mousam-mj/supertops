@@ -116,13 +116,13 @@
                         <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </button>
                 </form>
-
+<!-- 
                 <div class="text-center mt-4">
                     <small class="text-muted">
                         <i class="bi bi-info-circle me-1"></i>
                         Default: admin@test.com / password
                     </small>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

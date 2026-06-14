@@ -132,6 +132,10 @@ class ShopController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        if ($category->mainCategory && ! $category->mainCategory->is_active) {
+            abort(404);
+        }
+
         // Get MainCategory for fallback content
         $mainCategory = $category->mainCategory;
 
@@ -206,7 +210,7 @@ class ShopController extends Controller
             ->limit(12)
             ->get();
 
-        $mainCategories = \App\Models\MainCategory::where('is_active', true)->orderBy('sort_order')->get();
+        $mainCategories = \App\Models\MainCategory::visible()->orderBy('sort_order')->get();
 
         return view('shop.category', compact('categories', 'category', 'mainCategory', 'products', 'subCategories', 'featuredProducts', 'mainCategories'));
     }

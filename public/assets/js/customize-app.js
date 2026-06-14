@@ -44,6 +44,9 @@ const maxStep=typeof cfg.customize_max_step==='number'?cfg.customize_max_step:5;
 const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1,engrMode:'single',engrSlot:'top',engrSlots:{top:null,bottom:null}};
 window.CUSTOMIZE_STATE=S;
 const VIS=7;
+function isCustomizeMobile(){
+  return typeof window.matchMedia!=='undefined' && window.matchMedia('(max-width:768px)').matches;
+}
 
 function normalizeHex(h){
   if(h==null||h==='') return '#888888';
@@ -553,8 +556,11 @@ function toggleWish(){
 // ── SWATCHES ──
 function renderSw(id, colors_arr, sel, off, lblId){
   const w=document.getElementById(id); if(!w)return; w.innerHTML='';
-  colors_arr.slice(off, off+VIS).forEach((c,i)=>{
-    const ri=off+i, el=document.createElement('div');
+  const mobile=isCustomizeMobile();
+  const start=mobile?0:off;
+  const end=mobile?colors_arr.length:Math.min(off+VIS, colors_arr.length);
+  colors_arr.slice(start, end).forEach((c,i)=>{
+    const ri=mobile?i:off+i, el=document.createElement('div');
     const hx=normalizeHex(c.hex||c.color||'#888888');
     el.className='swatch'+(ri===sel?' selected':'')+(c.outOfStock?' out-of-stock':'');
     el.style.background=hx; el.title=c.name;
@@ -569,6 +575,14 @@ function renderSw(id, colors_arr, sel, off, lblId){
     };
     w.appendChild(el);
   });
+  if(mobile&&sel>=0){
+    requestAnimationFrame(function(){
+      var selected=w.querySelector('.swatch.selected');
+      if(selected&&typeof selected.scrollIntoView==='function'){
+        selected.scrollIntoView({inline:'center',block:'nearest',behavior:'auto'});
+      }
+    });
+  }
 }
 function shiftS(t,d){
   if(t==='bottle'){ S.bOff=Math.max(0,Math.min(bottleColors.length-VIS,S.bOff+d)); }
@@ -1034,10 +1048,11 @@ function updatePrice(){
   var extra=engravingUnitAdd();
   var unit=basePrice+extra;
   var total=unit*qty;
-  var tb=document.getElementById('top-cart-btn');
-  if(tb) tb.textContent='Add to Cart – '+fmtMoney(total);
-  var fp=document.getElementById('final-price'); if(fp) fp.textContent=fmtMoney(total);
-  var fp2=document.getElementById('final-price-engr'); if(fp2) fp2.textContent=fmtMoney(total);
+  var priceStr=fmtMoney(total);
+  var tcp=document.getElementById('top-cart-price');
+  if(tcp) tcp.textContent=priceStr;
+  var fp=document.getElementById('final-price'); if(fp) fp.textContent=priceStr;
+  var fp2=document.getElementById('final-price-engr'); if(fp2) fp2.textContent=priceStr;
   var hint=document.getElementById('price-hint');
   if(hint){
     var s=fmtMoney(basePrice)+' size';
@@ -1045,6 +1060,14 @@ function updatePrice(){
     if(qty>1) s+=' · '+qty+'× '+fmtMoney(unit)+' = '+fmtMoney(total);
     hint.textContent=s;
   }
+  syncPriceVisibility();
+}
+function isCustomizeCheckoutStep(){
+  return S.step >= maxStep;
+}
+function syncPriceVisibility(){
+  var root=document.querySelector('.customize-page');
+  if(root) root.classList.toggle('customize-show-prices', isCustomizeCheckoutStep());
 }
 
 function showEngravingGridView(){
@@ -1098,7 +1121,7 @@ function renderEngravingGrid(){
     t.className='engraving-card-title';
     t.textContent=cat.name||'';
     var pr=document.createElement('div');
-    pr.className='engraving-card-price';
+    pr.className='engraving-card-price customize-price-el';
     pr.textContent=currency+Number(cat.price||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
     bd.appendChild(t); bd.appendChild(pr);
     var cv=document.createElement('span');
@@ -1355,6 +1378,7 @@ function goTo(s){
   if(engrCatMode&&s===6) showEngravingGridView();
   if(engrCatMode&&s===6) syncEngraving3dPreview();
   renderAll();
+  syncPriceVisibility();
 }
 
 function initCustomizeMobileStepSwipe(){
@@ -1575,7 +1599,7 @@ function addToCart(){
   var unit=meta.unit,qty=meta.qty,body=meta.body;
 
   var tb=document.getElementById('top-cart-btn');
-  var ob=tb?tb.textContent:'';
+  var ob=tb?tb.innerHTML:'';
   if(tb){ tb.disabled=true; tb.textContent='Adding…'; }
 
   var csrf=document.querySelector('meta[name="csrf-token"]');
@@ -1616,7 +1640,14 @@ function addToCart(){
     if(typeof window.showNotification==='function') window.showNotification('Network error','error');
     else alert('Network error. Please try again.');
   }).finally(function(){
-    if(tb){ tb.disabled=false; tb.textContent=ob||('Add to Cart – '+fmtMoney(unit*qty)); }
+    if(tb){
+      tb.disabled=false;
+      if(ob){
+        tb.innerHTML=ob;
+      }else{
+        tb.innerHTML='Add to Cart – <span id="top-cart-price" class="customize-price-el">'+fmtMoney(unit*qty)+'</span>';
+      }
+    }
     updatePrice();
   });
 }
@@ -1734,4 +1765,21 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateNavSteps();
   updateMobileStepNav();
   initCustomizeMobileStepSwipe();
+  var customizeMobileMq=typeof window.matchMedia==='function'?window.matchMedia('(max-width:768px)'):null;
+  var customizeWasMobile=customizeMobileMq?customizeMobileMq.matches:null;
+  function onCustomizeLayoutChange(){
+    var now=customizeMobileMq?customizeMobileMq.matches:false;
+    if(now!==customizeWasMobile){
+      customizeWasMobile=now;
+      renderAll();
+    }
+  }
+  if(customizeMobileMq){
+    if(typeof customizeMobileMq.addEventListener==='function'){
+      customizeMobileMq.addEventListener('change', onCustomizeLayoutChange);
+    }else if(typeof customizeMobileMq.addListener==='function'){
+      customizeMobileMq.addListener(onCustomizeLayoutChange);
+    }
+  }
+  window.addEventListener('resize', onCustomizeLayoutChange);
 });

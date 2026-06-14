@@ -174,17 +174,25 @@
             if (!block) return;
             var tabs = block.querySelectorAll('.menu-tab .tab-item[data-item]');
             var wraps = block.querySelectorAll('.what-new-product-wrap');
+            function syncIndicator() {
+                var menu = block.querySelector('.menu-tab .menu');
+                if (menu && typeof window.syncMenuTabIndicator === 'function') {
+                    window.syncMenuTabIndicator(menu);
+                }
+            }
             tabs.forEach(function(tab) {
                 tab.addEventListener('click', function() {
                     var slug = this.getAttribute('data-item');
                     block.querySelectorAll('.menu-tab .tab-item').forEach(function(t){ t.classList.remove('active'); });
                     this.classList.add('active');
+                    syncIndicator();
                     wraps.forEach(function(w) {
                         var cat = w.getAttribute('data-main-category');
                         if (slug === 'all' || cat === slug) { w.style.display = ''; } else { w.style.display = 'none'; }
                     });
                 });
             });
+            syncIndicator();
         })();
         </script>
         @endpush
@@ -290,28 +298,7 @@
 
         <div class="container">
             <div class="benefit-block md:mt-20 mt-10 py-10 px-2.5 bg-surface rounded-3xl">
-                <div class="list-benefit grid items-start lg:grid-cols-4 grid-cols-2 gap-[30px]">
-                    <div class="benefit-item flex flex-col items-center justify-center">
-                        <i class="icon-phone-call lg:text-7xl text-5xl"></i>
-                        <div class="heading6 text-center mt-5">24/7 Customer Service</div>
-                        <div class="caption1 text-secondary text-center mt-3">We're here to help you with any questions or concerns you have, 24/7.</div>
-                    </div>
-                    <div class="benefit-item flex flex-col items-center justify-center">
-                        <i class="icon-return lg:text-7xl text-5xl"></i>
-                        <div class="heading6 text-center mt-5">14-Day Money Back</div>
-                        <div class="caption1 text-secondary text-center mt-3">If you're not satisfied with your purchase, simply return it within 14 days for a refund.</div>
-                    </div>
-                    <div class="benefit-item flex flex-col items-center justify-center">
-                        <i class="icon-guarantee lg:text-7xl text-5xl"></i>
-                        <div class="heading6 text-center mt-5">Our Guarantee</div>
-                        <div class="caption1 text-secondary text-center mt-3">We stand behind our products and services and guarantee your satisfaction.</div>
-                    </div>
-                    <div class="benefit-item flex flex-col items-center justify-center">
-                        <i class="icon-delivery-truck lg:text-7xl text-5xl"></i>
-                        <div class="heading6 text-center mt-5">Shipping worldwide</div>
-                        <div class="caption1 text-secondary text-center mt-3">We ship our products worldwide, making them accessible to customers everywhere.</div>
-                    </div>
-                </div>
+                @include('partials.benefit-items')
             </div>
         </div>
 
@@ -322,32 +309,6 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching for product types
-    const tabItems = document.querySelectorAll('.tab-item[data-item]');
-    const indicator = document.querySelector('.indicator');
-    
-    if (tabItems.length > 0 && indicator) {
-        tabItems.forEach((item, index) => {
-            item.addEventListener('click', function() {
-                const type = this.getAttribute('data-item');
-                
-                // Update active tab
-                tabItems.forEach(tab => tab.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Move indicator
-                const itemWidth = 100 / tabItems.length;
-                indicator.style.left = (index * itemWidth) + '%';
-                indicator.style.width = itemWidth + '%';
-                
-                // Filter products
-                if (typeof window.categorySlug !== 'undefined') {
-                    window.location.href = '{{{ route("category", $category->slug ?? "") }}}?type=' + type;
-                }
-            });
-        });
-    }
-    
     // Initialize Swiper for brands
     if (typeof Swiper !== 'undefined') {
         const brandSwiper = document.querySelector('.swiper-list-brand');

@@ -450,7 +450,9 @@
                         el.textContent = count;
                         if (el.style) {
                             if (count > 0) {
-                                el.style.display = (el.classList && el.classList.contains('mobile-app-nav__badge')) ? 'flex' : 'block';
+                                el.style.display = 'flex';
+                                el.style.alignItems = 'center';
+                                el.style.justifyContent = 'center';
                             } else {
                                 el.style.display = 'none';
                             }

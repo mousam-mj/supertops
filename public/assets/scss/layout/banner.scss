@@ -1,9 +1,51 @@
 /* Banner */
 .banner-block {
     .banner-item {
-        &:hover {
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            background-color: rgba(0, 0, 0, 0);
+            transition: background-color 0.4s ease;
+            pointer-events: none;
+        }
+
+        .banner-img img {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .heading4,
+        .button-main,
+        .banner-content,
+        .text-button {
+            z-index: 2;
+            transition: color 0.4s ease, background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        &:hover,
+        &:focus-within {
+            &::before {
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .heading4 {
+                color: var(--white);
+            }
+
+            .button-main {
+                color: var(--white);
+                background-color: transparent;
+                border: 1px solid var(--white);
+            }
+
+            .text-button {
+                color: var(--white);
+                border-color: var(--white);
+            }
+
             .banner-img img {
-                opacity: 0.9;
                 transform: scale(1.07);
             }
         }

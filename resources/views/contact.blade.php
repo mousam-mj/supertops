@@ -600,7 +600,7 @@
                     </div>
                     <div class="right lg:w-1/4 lg:pl-4">
                         <div class="item">
-                            <div class="heading4">Our Store</div>
+                            <div class="heading4">{{ \App\Models\Setting::get('contact_location_heading', 'Our Office') }}</div>
                             @php
                                 $addr = \App\Models\Setting::get('contact_address', '');
                                 $city = \App\Models\Setting::get('contact_city', '');
@@ -622,9 +622,32 @@
                             <p class="mt-1">Email: <a href="mailto:{{ $storeEmail }}" class="whitespace-nowrap">{{ $storeEmail }}</a></p>
                         </div>
                         @if($workingHours)
+                        @php
+                            $workingHourLines = [];
+                            foreach (preg_split('/\r\n|\r|\n/', $workingHours) ?: [] as $line) {
+                                $line = trim($line);
+                                if ($line === '') {
+                                    continue;
+                                }
+                                if (preg_match('/^(.*?)(\s+Sunday\s*:.*)$/iu', $line, $m)) {
+                                    $first = trim($m[1]);
+                                    $second = trim($m[2]);
+                                    if ($first !== '') {
+                                        $workingHourLines[] = $first;
+                                    }
+                                    if ($second !== '') {
+                                        $workingHourLines[] = $second;
+                                    }
+                                } else {
+                                    $workingHourLines[] = $line;
+                                }
+                            }
+                        @endphp
                         <div class="item mt-10">
                             <div class="heading4">Working Hours</div>
-                            <div class="mt-3 text-secondary whitespace-pre-line">{{ $workingHours }}</div>
+                            @foreach($workingHourLines as $i => $hourLine)
+                                <p class="text-secondary {{ $i === 0 ? 'mt-3' : 'mt-2' }}">{{ $hourLine }}</p>
+                            @endforeach
                         </div>
                         @endif
                     </div>
