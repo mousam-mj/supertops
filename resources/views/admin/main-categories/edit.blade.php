@@ -71,6 +71,7 @@
 
                     <div class="mb-3">
                         <label for="image" class="form-label fw-bold">Category Image</label>
+                        <small class="text-muted d-block mb-2">Shown on the homepage category cards (Drinkware, Barware, etc.).</small>
                         @php
                             $hasImage = !empty($category->image);
                             $imageExists = false;

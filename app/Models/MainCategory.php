@@ -98,6 +98,24 @@ class MainCategory extends Model
 
         return route('category', $category?->slug ?? $this->slug);
     }
+
+    /**
+     * Homepage category card image (custom upload or theme default by slug).
+     */
+    public function homepageImageUrl(): string
+    {
+        if ($this->image) {
+            return storage_asset($this->image);
+        }
+
+        $defaults = [
+            'drinkware' => 'assets/images/product/Bottle-1.webp',
+            'barware' => 'assets/images/product/Bottle-4.webp',
+            'kitchenware' => 'assets/images/product/Bottle-8.webp',
+        ];
+
+        return asset($defaults[$this->slug] ?? 'assets/images/product/Bottle-1.webp');
+    }
 }
 
 

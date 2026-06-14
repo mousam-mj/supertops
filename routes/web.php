@@ -50,10 +50,9 @@ Route::get('/', function () {
         ->orderBy('sort_order')
         ->get();
 
-    // Get top 3 categories for home page banners (active main categories only)
-    $homeCategories = Category::whereNull('parent_id')
-        ->where('is_active', true)
-        ->whereHas('mainCategory', fn ($q) => $q->visible())
+    // Homepage category cards (Main Categories — image editable in Admin → Main Categories)
+    $homeCategories = MainCategory::visible()
+        ->with(['activeCategories' => fn ($q) => $q->whereNull('parent_id')->orderBy('sort_order')])
         ->orderBy('sort_order')
         ->limit(3)
         ->get();

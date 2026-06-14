@@ -46,24 +46,13 @@
                 <div class="banner-block md:pt-20 pt-10">
             <div class="container">
                 <div class="list-banner grid md:grid-cols-3 gap-[20px]">
-                    @php
-                        $defaultImages = [
-                            asset('assets/images/product/Bottle-1.webp'),
-                            asset('assets/images/product/Bottle-4.webp'),
-                            asset('assets/images/product/Bottle-8.webp')
-                        ];
-                    @endphp
-                    @forelse($homeCategories as $index => $category)
+                    @forelse($homeCategories as $category)
                         <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                                @if($category->image)
-                                    <img src="{{ storage_asset($category->image) }}" alt="{{ $category->name }}" class="w-full duration-500" />
-                                @else
-                                    <img src="{{ $defaultImages[$index] ?? $defaultImages[0] }}" alt="{{ $category->name }}" class="w-full duration-500" />
-                                @endif
+                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full duration-500" />
                             </div>
                             <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
-                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
+                            <a href="{{ $category->storefrontUrl() }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
                         </div>
                     @empty
                         {{-- Fallback if no categories --}}
