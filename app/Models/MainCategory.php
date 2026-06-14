@@ -72,6 +72,32 @@ class MainCategory extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Primary category used for storefront navigation links.
+     */
+    public function navigationCategory(): ?Category
+    {
+        if ($this->relationLoaded('activeCategories')) {
+            $categories = $this->activeCategories;
+
+            return $categories->whereNull('parent_id')->sortBy('sort_order')->first()
+                ?? $categories->sortBy('sort_order')->first();
+        }
+
+        return $this->activeCategories()->whereNull('parent_id')->orderBy('sort_order')->first()
+            ?? $this->activeCategories()->orderBy('sort_order')->first();
+    }
+
+    /**
+     * URL for header/footer/mobile nav.
+     */
+    public function storefrontUrl(): string
+    {
+        $category = $this->navigationCategory();
+
+        return route('category', $category?->slug ?? $this->slug);
+    }
 }
 
 

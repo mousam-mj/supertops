@@ -130,7 +130,15 @@ class ShopController extends Controller
         $category = Category::where('slug', $slug)
             ->with(['children.children', 'parent', 'mainCategory'])
             ->where('is_active', true)
-            ->firstOrFail();
+            ->first();
+
+        if (! $category) {
+            $mainCategory = \App\Models\MainCategory::visible()->where('slug', $slug)->firstOrFail();
+            $category = Category::where('main_category_id', $mainCategory->id)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->firstOrFail();
+        }
 
         if ($category->mainCategory && ! $category->mainCategory->is_active) {
             abort(404);

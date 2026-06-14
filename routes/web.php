@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\InstagramReelController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\PolicyPageController as AdminPolicyPageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -309,13 +310,9 @@ Route::get('/faqs', function () {
     return view('faqs', compact('faqCategories'));
 })->name('faqs');
 
-// About Us - dedicated view (aboutus.blade.php)
-Route::get('/about', function () {
-    return view('aboutus');
-})->name('about');
-Route::get('/about-us', function () {
-    return view('aboutus');
-})->name('about-us');
+// About Us — content editable in Admin → Policy Pages
+Route::get('/about', [AboutController::class, 'show'])->name('about');
+Route::get('/about-us', [AboutController::class, 'show'])->name('about-us');
 
 // Customize Tumbler (product-specific)
 Route::get('/customize-assets/app.js', [CustomizeController::class, 'appJs'])->name('customize.app.js');

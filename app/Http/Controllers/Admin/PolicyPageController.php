@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PolicyPage;
+use App\Support\AboutPageContent;
+use App\Support\PolicyPageDefaults;
 use Illuminate\Http\Request;
 
 class PolicyPageController extends Controller
@@ -27,7 +29,9 @@ class PolicyPageController extends Controller
                 ['slug' => $slug],
                 [
                     'title' => $title,
-                    'content' => '<p>Edit this page to add content.</p>',
+                    'content' => $slug === 'about-us'
+                        ? AboutPageContent::defaultHtml()
+                        : '<p>Edit this page to add content.</p>',
                     'is_active' => true,
                 ]
             );
@@ -42,7 +46,14 @@ class PolicyPageController extends Controller
      */
     public function edit(PolicyPage $policy_page)
     {
-        return view('admin.policy-pages.edit', compact('policy_page'));
+        if ($policy_page->slug === 'about-us' && AboutPageContent::isPlaceholder($policy_page->content)) {
+            $policy_page->content = AboutPageContent::defaultHtml();
+            $policy_page->save();
+        }
+
+        $pageDefault = PolicyPageDefaults::forSlug($policy_page->slug);
+
+        return view('admin.policy-pages.edit', compact('policy_page', 'pageDefault'));
     }
 
     /**
@@ -58,9 +69,21 @@ class PolicyPageController extends Controller
 
         $validated['is_active'] = $request->boolean('is_active');
 
+        if ($request->boolean('reset_to_default')) {
+            $default = PolicyPageDefaults::forSlug($policy_page->slug);
+            if ($default) {
+                $validated['title'] = $default['title'];
+                $validated['content'] = $default['content'];
+            }
+        }
+
         $policy_page->update($validated);
 
-        return redirect()->route('admin.policy-pages.index')
-            ->with('success', 'Policy page updated successfully!');
+        $message = $request->boolean('reset_to_default')
+            ? 'Page reset to default content.'
+            : 'Policy page updated successfully!';
+
+        return redirect()->route('admin.policy-pages.edit', $policy_page)
+            ->with('success', $message);
     }
 }

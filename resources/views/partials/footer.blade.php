@@ -61,10 +61,7 @@
                                     ->get();
                                 $quickShopLinks = [];
                                 foreach ($footerQuickShopMainCategories as $mainCat) {
-                                    $firstCat = $mainCat->activeCategories->first();
-                                    if ($firstCat) {
-                                        $quickShopLinks[] = ['name' => $mainCat->name, 'url' => route('category', $firstCat->slug)];
-                                    }
+                                    $quickShopLinks[] = ['name' => $mainCat->name, 'url' => $mainCat->storefrontUrl()];
                                 }
                                 if (empty($quickShopLinks)) {
                                     $quickShopLinks[] = ['name' => 'Shop', 'url' => route('shop')];

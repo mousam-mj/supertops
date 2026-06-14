@@ -43,7 +43,7 @@ const maxStep=typeof cfg.customize_max_step==='number'?cfg.customize_max_step:5;
 
 const S={step:1,bIdx:0,cIdx:0,sIdx:0,hIdx:0,boIdx:0,sizeIdx:0,bOff:0,cOff:0,sOff:0,hOff:0,boOff:0,wish:false,qty:1,maxVisited:1,engrMode:'single',engrSlot:'top',engrSlots:{top:null,bottom:null}};
 window.CUSTOMIZE_STATE=S;
-const VIS=7;
+const VIS=9;
 function isCustomizeMobile(){
   return typeof window.matchMedia!=='undefined' && window.matchMedia('(max-width:768px)').matches;
 }
@@ -584,6 +584,57 @@ function renderSw(id, colors_arr, sel, off, lblId){
     });
   }
 }
+function syncColorArrows(){
+  var mobile=isCustomizeMobile();
+  var swatchSize=34, gap=8;
+  var panels=[
+    {trackId:'bottle-swatches',colors:bottleColors,offKey:'bOff'},
+    {trackId:'cap-swatches',colors:capColors,offKey:'cOff'},
+    {trackId:'strap-swatches',colors:strapColors,offKey:'sOff'},
+    {trackId:'handle-swatches',colors:handleColors,offKey:'hOff'},
+    {trackId:'boot-swatches',colors:bootColors,offKey:'boOff'}
+  ];
+  panels.forEach(function(panel){
+    var track=document.getElementById(panel.trackId);
+    if(!track) return;
+    var row=track.closest('.color-row');
+    if(!row) return;
+    var prev=row.querySelector('.color-arrow:first-of-type');
+    var next=row.querySelector('.color-arrow:last-of-type');
+    var count=panel.colors.length;
+    var off=S[panel.offKey]||0;
+    if(!mobile&&count<=VIS){
+      S[panel.offKey]=0;
+      off=0;
+    }
+    var needsPager=!mobile&&count>VIS;
+    var visibleCount=mobile?count:Math.min(VIS,Math.max(0,count-off));
+    [prev,next].forEach(function(btn){
+      if(!btn) return;
+      btn.classList.toggle('is-hidden',mobile||!needsPager);
+      btn.disabled=false;
+      btn.classList.remove('is-disabled');
+      btn.setAttribute('aria-hidden',mobile||!needsPager?'true':'false');
+    });
+    if(needsPager){
+      if(off<=0&&prev){
+        prev.disabled=true;
+        prev.classList.add('is-disabled');
+      }
+      if(off>=count-VIS&&next){
+        next.disabled=true;
+        next.classList.add('is-disabled');
+      }
+    }
+    if(mobile){
+      track.style.maxWidth='';
+    }else if(visibleCount>0){
+      track.style.maxWidth=(visibleCount*swatchSize+Math.max(0,visibleCount-1)*gap+4)+'px';
+    }else{
+      track.style.maxWidth='';
+    }
+  });
+}
 function shiftS(t,d){
   if(t==='bottle'){ S.bOff=Math.max(0,Math.min(bottleColors.length-VIS,S.bOff+d)); }
   else if(t==='cap'){ S.cOff=Math.max(0,Math.min(capColors.length-VIS,S.cOff+d)); }
@@ -598,6 +649,7 @@ function renderAll(){
   renderSw('strap-swatches',strapColors,S.sIdx,S.sOff,'strap-color-label');
   renderSw('handle-swatches',handleColors,S.hIdx,S.hOff,'handle-color-label');
   renderSw('boot-swatches',bootColors,S.boIdx,S.boOff,'boot-color-label');
+  syncColorArrows();
   syncAllPartsFromState();
   updatePrice();
 }
@@ -1773,6 +1825,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       customizeWasMobile=now;
       renderAll();
     }
+    syncColorArrows();
   }
   if(customizeMobileMq){
     if(typeof customizeMobileMq.addEventListener==='function'){

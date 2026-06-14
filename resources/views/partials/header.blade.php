@@ -49,12 +49,9 @@
                             @endphp
                             <ul class="flex items-center gap-8 h-full">
                                 @foreach($headerMainCategories as $mainCat)
-                                    @php $primaryCat = $mainCat->activeCategories->first(); @endphp
-                                    @if($primaryCat)
-                                        <li class="h-full">
-                                            <a href="{{ route('category', $primaryCat->slug) }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">{{ $mainCat->name }}</a>
-                                        </li>
-                                    @endif
+                                    <li class="h-full">
+                                        <a href="{{ $mainCat->storefrontUrl() }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">{{ $mainCat->name }}</a>
+                                    </li>
                                 @endforeach
                                 <li class="h-full">
                                     <a href="{{ route('about') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">About Us</a>
@@ -162,18 +159,17 @@
                         
                         <ul>
                             @foreach($mobileMainCategories as $mainCat)
-                                @php $primaryCat = $mainCat->activeCategories->first(); @endphp
-                                @if($primaryCat)
-                                    <li>
-                                        <a href="{{ $primaryCat->children->count() > 0 ? '#!' : route('category', $primaryCat->slug) }}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all justify-between">
-                                            {{ $mainCat->name }}
-                                            @if($primaryCat->children->count() > 0)
-                                            <span class="text-right">
-                                                <i class="ph ph-caret-right text-xl"></i>
-                                            </span>
-                                            @endif
-                                        </a>
-                                        @if($primaryCat->children->count() > 0)
+                                @php $primaryCat = $mainCat->navigationCategory(); @endphp
+                                <li>
+                                    <a href="{{ $primaryCat && $primaryCat->children->count() > 0 ? '#!' : $mainCat->storefrontUrl() }}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all justify-between">
+                                        {{ $mainCat->name }}
+                                        @if($primaryCat && $primaryCat->children->count() > 0)
+                                        <span class="text-right">
+                                            <i class="ph ph-caret-right text-xl"></i>
+                                        </span>
+                                        @endif
+                                    </a>
+                                    @if($primaryCat && $primaryCat->children->count() > 0)
                                             <div class="sub-nav-mobile">
                                                 <div class="back-btn flex items-center gap-3">
                                                     <i class="ph ph-caret-left text-xl"></i>
@@ -198,7 +194,6 @@
                                             </div>
                                         @endif
                                     </li>
-                                @endif
                             @endforeach
                                                             <li>
                                 <a href="{{{ route('shop') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">Shop</a>

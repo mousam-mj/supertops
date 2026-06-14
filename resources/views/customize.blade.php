@@ -82,8 +82,16 @@
 .customize-page .option-price{font-size:14px;font-weight:700}
 .customize-page .color-label{font-size:13px;color:#666;margin-bottom:8px}
 .customize-page .color-row{display:flex;align-items:center;gap:8px}
-.customize-page .color-arrow{width:30px;height:30px;border:1px solid #ddd;border-radius:50%;background:#fff;color:#777;cursor:pointer}
+.customize-page .color-arrow{width:30px;height:30px;min-width:30px;border:1px solid #ddd;border-radius:50%;background:#fff;color:#777;cursor:pointer;flex-shrink:0}
 .customize-page .swatches-track{display:flex;gap:8px;align-items:center;overflow:hidden;flex:1;padding:5px}
+@media(min-width:769px){
+  .customize-page .color-row{justify-content:center;width:fit-content;max-width:100%;margin:0 auto;gap:10px}
+  .customize-page .color-row:has(.color-arrow.is-hidden){gap:0}
+  .customize-page .swatches-track{flex:0 0 auto;width:auto;justify-content:flex-start;padding:5px 2px}
+  .customize-page .color-arrow.is-hidden{display:none!important}
+  .customize-page .color-arrow.is-disabled{opacity:.28;cursor:default;pointer-events:none}
+  .customize-page .color-name-label{text-align:center}
+}
 .customize-page .swatch{width:34px;height:34px;min-width:34px;min-height:34px;aspect-ratio:1;flex-shrink:0;align-self:center;box-sizing:border-box;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative}
 .customize-page .swatch.selected{border-color:#161616}
 .customize-page .swatch.out-of-stock{opacity:.55;cursor:not-allowed}
@@ -359,9 +367,9 @@
           </div>
           <div class="color-label">{{ $sc['body']['color_label'] ?? 'Choose color for Tumbler' }}</div>
           <div class="color-row">
-            <button class="color-arrow" onclick="shiftS('bottle',-1)">&#8249;</button>
+            <button type="button" class="color-arrow" onclick="shiftS('bottle',-1)" aria-label="Previous colors">&#8249;</button>
             <div class="swatches-track" id="bottle-swatches" data-no-step-swipe="1"></div>
-            <button class="color-arrow" onclick="shiftS('bottle',1)">&#8250;</button>
+            <button type="button" class="color-arrow" onclick="shiftS('bottle',1)" aria-label="Next colors">&#8250;</button>
           </div>
           <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
           <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – {{ $stepLabels[2] }}</button></div>

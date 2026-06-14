@@ -15,9 +15,16 @@
                 </a>
             </div>
             <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
                 <form id="policy-page-form" action="{{ route('admin.policy-pages.update', $policy_page) }}" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="reset_to_default" id="reset_to_default" value="0">
 
                     <div class="mb-3">
                         <label for="title" class="form-label">Page Title <span class="text-danger">*</span></label>
@@ -48,6 +55,12 @@
                                       placeholder="Paste or type HTML here (e.g. <p>, <strong>, <a>, <ul>)">{{ old('content', $policy_page->content) }}</textarea>
                         </div>
                         <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML. Content saved while in <strong>Edit as HTML</strong> is stored exactly as entered (no code change).</small>
+                        @if($policy_page->slug === 'about-us')
+                            <small class="text-muted d-block mt-2">
+                                This page uses the full About Us layout (hero, images, sections). Use <strong>Edit as HTML</strong> for layout changes.
+                                The line <code>&lt;!--PERCH_BENEFIT_BLOCK--&gt;</code> is replaced on the site with the four benefit icons from <a href="{{ route('admin.settings.index') }}">Settings → Content</a>.
+                            </small>
+                        @endif
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -62,10 +75,15 @@
                     </div>
                 </form>
             </div>
-            <div class="card-footer bg-light border-top py-3 d-flex gap-2 flex-wrap">
+            <div class="card-footer bg-light border-top py-3 d-flex gap-2 flex-wrap align-items-center">
                 <button type="submit" form="policy-page-form" class="btn btn-primary">
                     <i class="bi bi-check-lg me-2"></i> Save changes
                 </button>
+                @if(!empty($pageDefault))
+                    <button type="button" id="reset-default-btn" class="btn btn-outline-danger">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to default
+                    </button>
+                @endif
                 <a href="{{ route('admin.policy-pages.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </div>
@@ -95,8 +113,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     if (textarea && textarea.value.trim()) quill.clipboard.dangerouslyPasteHTML(textarea.value);
-    var isHtmlMode = false;
+    var isHtmlMode = @json($policy_page->slug === 'about-us');
     var editorEl = document.getElementById('editor');
+    if (isHtmlMode) {
+        editorEl.classList.add('d-none');
+        textarea.classList.remove('d-none');
+        toggleLabel.textContent = 'Visual editor';
+    }
+    var resetFlag = document.getElementById('reset_to_default');
+    var resetBtn = document.getElementById('reset-default-btn');
+    var titleInput = document.getElementById('title');
+    var pageDefault = @json($pageDefault ?? null);
     toggleBtn.addEventListener('click', function() {
         isHtmlMode = !isHtmlMode;
         if (isHtmlMode) {
@@ -113,14 +140,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (isHtmlMode) {
+        var isReset = resetFlag && resetFlag.value === '1';
+        if (!isReset) {
+            if (isHtmlMode) {
+                textarea.classList.remove('d-none');
+            } else {
+                textarea.value = quill.root.innerHTML;
+            }
+        } else if (isHtmlMode) {
             textarea.classList.remove('d-none');
-            // Submit raw textarea value as-is (no Quill transformation)
-        } else {
-            textarea.value = quill.root.innerHTML;
         }
         form.submit();
     });
+
+    if (resetBtn && resetFlag && pageDefault) {
+        resetBtn.addEventListener('click', function() {
+            if (!confirm('Reset this page to the original default content? Your current edits will be replaced.')) {
+                return;
+            }
+            resetFlag.value = '1';
+            if (titleInput) {
+                titleInput.value = pageDefault.title || titleInput.value;
+            }
+            if (textarea) {
+                textarea.value = pageDefault.content || '';
+            }
+            if (!isHtmlMode) {
+                quill.clipboard.dangerouslyPasteHTML(pageDefault.content || '');
+            }
+            form.requestSubmit();
+        });
+    }
 });
 </script>
 @endpush

@@ -118,6 +118,58 @@
                             </div>
 
                             <hr class="my-4">
+                            <h6 class="mb-2">Homepage — Discover collection block</h6>
+                            <p class="text-muted small mb-3">The section with “Discover the latest collection” and two large images side by side.</p>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Heading</label>
+                                    <input type="text" name="home_lookbook_heading" class="form-control" value="{{ setting_form_value('home_lookbook_heading', $settings, $textSettingDefaults['home_lookbook_heading']) }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Button text</label>
+                                    <input type="text" name="home_lookbook_button_text" class="form-control" value="{{ setting_form_value('home_lookbook_button_text', $settings, $textSettingDefaults['home_lookbook_button_text']) }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Button link</label>
+                                    <input type="text" name="home_lookbook_button_url" class="form-control" value="{{ setting_form_value('home_lookbook_button_url', $settings, $textSettingDefaults['home_lookbook_button_url']) }}">
+                                    <small class="text-muted">Path or full URL</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Left image</label>
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_1'])
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Right image</label>
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_2'])
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="mb-2">Homepage — Best Sellers banner</h6>
+                            <p class="text-muted small mb-3">The wide banner below the collection block (heading overlay on image).</p>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Heading</label>
+                                    <input type="text" name="home_best_sellers_heading" class="form-control" value="{{ setting_form_value('home_best_sellers_heading', $settings, $textSettingDefaults['home_best_sellers_heading']) }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Button text</label>
+                                    <input type="text" name="home_best_sellers_button_text" class="form-control" value="{{ setting_form_value('home_best_sellers_button_text', $settings, $textSettingDefaults['home_best_sellers_button_text']) }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Button link</label>
+                                    <input type="text" name="home_best_sellers_button_url" class="form-control" value="{{ setting_form_value('home_best_sellers_button_url', $settings, $textSettingDefaults['home_best_sellers_button_url']) }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Banner image</label>
+                                    @include('admin.settings.partials.homepage-image-field', [
+                                        'key' => 'home_best_sellers_banner_image',
+                                        'previewMaxHeight' => 140,
+                                    ])
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
                             <h6 class="mb-2">Homepage benefit icons</h6>
                             <p class="text-muted small mb-3">The four icon boxes on the homepage and category pages (24/7 Customer Service, Money Back, etc.). Leave blank to keep the default text.</p>
                             @php
@@ -266,6 +318,48 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         taContact.value = contactText.root.innerHTML;
         this.submit();
+    });
+
+    document.querySelectorAll('.setting-image-reset-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (!confirm('Reset this image to the theme default?')) {
+                return;
+            }
+            var field = btn.closest('[data-setting-image-field]');
+            if (!field) {
+                return;
+            }
+            var resetFlag = field.querySelector('.setting-image-reset-flag');
+            var preview = field.querySelector('.setting-image-preview');
+            var fileInput = field.querySelector('.setting-image-file');
+            if (resetFlag) {
+                resetFlag.value = '1';
+            }
+            if (preview) {
+                preview.src = btn.getAttribute('data-default-url') || preview.src;
+            }
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            document.getElementById('settings-form').requestSubmit();
+        });
+    });
+
+    document.querySelectorAll('.setting-image-file').forEach(function(input) {
+        input.addEventListener('change', function() {
+            var field = input.closest('[data-setting-image-field]');
+            if (!field || !input.files || !input.files[0]) {
+                return;
+            }
+            var preview = field.querySelector('.setting-image-preview');
+            var resetFlag = field.querySelector('.setting-image-reset-flag');
+            if (resetFlag) {
+                resetFlag.value = '0';
+            }
+            if (preview) {
+                preview.src = URL.createObjectURL(input.files[0]);
+            }
+        });
     });
 });
 </script>

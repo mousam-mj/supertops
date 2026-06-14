@@ -154,12 +154,12 @@
             <div class="container">
                 <div class="main-content relative flex max-lg:flex-wrap gap-y-5 items-center lg:justify-end justify-center">
                     <div class="heading bg-white xl:py-20 py-10 xl:px-10 px-8 rounded-2xl lg:w-[30%] lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-0 z-[1] max-lg:text-center">
-                        <div class="heading3">Discover the latest collection</div>
-                        <a href="{{{ route('shop.collection') }}}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">Shop Collection </a>
+                        <div class="heading3">{{ \App\Models\Setting::get('home_lookbook_heading', 'Discover the latest collection') }}</div>
+                        <a href="{{ setting_link_url(\App\Models\Setting::get('home_lookbook_button_url'), route('shop.collection')) }}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">{{ \App\Models\Setting::get('home_lookbook_button_text', 'Shop Collection') }}</a>
                     </div>
                     <div class="list popular-product w-3/4 grid sm:grid-cols-2 gap-4 max-lg:w-full">
                         <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ asset('assets/images/banner/perch123(1).webp') }}" alt="/images/banner/perch123(1).webp" class="w-full h-full object-cover" />
+                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_1'), 'assets/images/banner/perch123(1).webp') }}" alt="" class="w-full h-full object-cover" />
                             <!--<div class="dots absolute top-[22%] left-[55%] cursor-pointer">
                                 <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
                                     <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
@@ -192,7 +192,7 @@
                             </div>-->
                         </div>
                         <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ asset('assets/images/banner/perch123(2).webp') }}" alt="/images/banner/perch123(2).webp" class="w-full h-full object-cover" />
+                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_2'), 'assets/images/banner/perch123(2).webp') }}" alt="" class="w-full h-full object-cover" />
                            <!-- <div class="dots absolute top-[26%] left-[54%] cursor-pointer">
                                 <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
                                     <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
@@ -220,13 +220,13 @@
         </div>
 
         <div class="banner-block style-one grid sm:grid-cols-1 ">
-            <a href="{{{ route('shop') }}}" class="banner-item relative block overflow-hidden duration-500">
+            <a href="{{ setting_link_url(\App\Models\Setting::get('home_best_sellers_button_url'), route('shop')) }}" class="banner-item relative block overflow-hidden duration-500">
                 <div class="banner-img">
-                    <img src="{{ asset('assets/images/banner/Blog-3.webp') }}"  alt="img" />
+                    <img src="{{ setting_image_url(\App\Models\Setting::get('home_best_sellers_banner_image'), 'assets/images/banner/Blog-3.webp') }}" alt="" />
                 </div>
                 <div class="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
-                    <div class="heading2 text-white">Best Sellers</div>
-                    <div class="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">Shop Now</div>
+                    <div class="heading2 text-white">{{ \App\Models\Setting::get('home_best_sellers_heading', 'Best Sellers') }}</div>
+                    <div class="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">{{ \App\Models\Setting::get('home_best_sellers_button_text', 'Shop Now') }}</div>
                 </div>
             </a>
             

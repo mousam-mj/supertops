@@ -9,6 +9,28 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
+    protected array $homepageImageKeys = [
+        'home_lookbook_image_1',
+        'home_lookbook_image_2',
+        'home_best_sellers_banner_image',
+    ];
+
+    protected array $homepageImageDefaults = [
+        'home_lookbook_image_1' => 'assets/images/banner/perch123(1).webp',
+        'home_lookbook_image_2' => 'assets/images/banner/perch123(2).webp',
+        'home_best_sellers_banner_image' => 'assets/images/banner/Blog-3.webp',
+    ];
+
+    /** Empty save = theme default (row removed so Setting::get falls back). */
+    protected array $textSettingDefaults = [
+        'home_lookbook_heading' => 'Discover the latest collection',
+        'home_lookbook_button_text' => 'Shop Collection',
+        'home_lookbook_button_url' => '/shop/collection',
+        'home_best_sellers_heading' => 'Best Sellers',
+        'home_best_sellers_button_text' => 'Shop Now',
+        'home_best_sellers_button_url' => '/shop',
+    ];
+
     protected array $settingKeys = [
         'general' => [
             'site_name',
@@ -29,6 +51,15 @@ class SettingsController extends Controller
         ],
         'content' => [
             'contact_page_text',
+            'home_lookbook_heading',
+            'home_lookbook_button_text',
+            'home_lookbook_button_url',
+            'home_lookbook_image_1',
+            'home_lookbook_image_2',
+            'home_best_sellers_heading',
+            'home_best_sellers_button_text',
+            'home_best_sellers_button_url',
+            'home_best_sellers_banner_image',
             'benefit_1_icon',
             'benefit_1_title',
             'benefit_1_text',
@@ -71,6 +102,8 @@ class SettingsController extends Controller
         return view('admin.settings.index', [
             'settings' => $settings,
             'settingKeys' => $this->settingKeys,
+            'homepageImageDefaults' => $this->homepageImageDefaults,
+            'textSettingDefaults' => $this->textSettingDefaults,
         ]);
     }
 
@@ -93,6 +126,15 @@ class SettingsController extends Controller
             'currency' => 'nullable|string|max:10',
             'currency_symbol' => 'nullable|string|max:10',
             'contact_page_text' => 'nullable|string|max:2000',
+            'home_lookbook_heading' => 'nullable|string|max:255',
+            'home_lookbook_button_text' => 'nullable|string|max:100',
+            'home_lookbook_button_url' => 'nullable|string|max:500',
+            'home_lookbook_image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_lookbook_image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_best_sellers_heading' => 'nullable|string|max:255',
+            'home_best_sellers_button_text' => 'nullable|string|max:100',
+            'home_best_sellers_button_url' => 'nullable|string|max:500',
+            'home_best_sellers_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'benefit_1_icon' => 'nullable|string|max:100',
             'benefit_1_title' => 'nullable|string|max:255',
             'benefit_1_text' => 'nullable|string|max:1000',
@@ -135,6 +177,26 @@ class SettingsController extends Controller
             $validated['site_logo'] = Setting::get('site_logo', '');
         }
 
+        foreach ($this->homepageImageKeys as $imageKey) {
+            if ($request->boolean('reset_'.$imageKey)) {
+                $oldImage = Setting::get($imageKey);
+                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+                Setting::set($imageKey, '');
+
+                continue;
+            }
+
+            if ($request->hasFile($imageKey)) {
+                $oldImage = Setting::get($imageKey);
+                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+                Setting::set($imageKey, $request->file($imageKey)->store('settings/homepage', 'public'));
+            }
+        }
+
         $allKeys = array_merge(
             $this->settingKeys['general'],
             $this->settingKeys['content'],
@@ -143,15 +205,33 @@ class SettingsController extends Controller
         );
 
         foreach ($allKeys as $key) {
+            if (in_array($key, $this->homepageImageKeys, true)) {
+                continue;
+            }
             $value = $validated[$key] ?? $request->input($key, '');
             if ($key === 'working_hours') {
                 $value = $this->normalizeWorkingHours($value);
             }
+
+            if (array_key_exists($key, $this->textSettingDefaults) && trim((string) $value) === '') {
+                $this->clearSetting($key);
+
+                continue;
+            }
+
             Setting::set($key, $value ?? '');
         }
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Settings updated successfully!');
+    }
+
+    private function clearSetting(string $key): void
+    {
+        $setting = Setting::where('key', $key)->first();
+        if ($setting) {
+            $setting->delete();
+        }
     }
 
     private function normalizeWorkingHours(?string $value): string
