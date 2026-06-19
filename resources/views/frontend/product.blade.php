@@ -433,21 +433,18 @@
         <div class="container flex justify-between gap-y-6 flex-wrap md:items-start">
             <div class="list-img w-full md:w-5/12 md:pr-8 lg:pr-10 flex-shrink-0">
                 <img class="object-contain object-center duration-700" src="{{ $product->image_url }}" alt="{{ $product->name }}">
-                <div class="product-description text-secondary mt-3">Image may differ from product. See technical specification for details.</div>
             </div>
             <div class="product-item product-infor w-full md:w-7/12 md:pl-6 lg:pl-8" data-item="{{ $product->id }}">
                 <div class="product-name heading4 mt-1">{{ $product->display_name }}</div>
 
                 <div class="flex items-center gap-3 flex-wrap mt-5 pb-6 border-b border-line">
                     <div class="product-sale font-semibold edx-red px-3 py-0.5 inline-block rounded-full">{{ $product->category->name ?? 'Deep Groove Ball Bearing' }}</div>
+                    @php $descHtml = trim((string) ($product->description ?? '')); @endphp
+                    @if($descHtml !== '')
                     <div class="product-description text-secondary mt-3 w-full product-description-html">
-                        @php $descHtml = trim((string) ($product->description ?? '')); @endphp
-                        @if($descHtml !== '')
-                            {!! $descHtml !!}
-                        @else
-                            Keep your home organized, yet elegant with storage cabinets by Onita Patio Furniture. Traditionally designed, they are perfect to be used in the any place where you need to store.
-                        @endif
+                        {!! $descHtml !!}
                     </div>
+                    @endif
                     @include('frontend.partials.catalog-list-price', ['variant' => 'detail'])
                 </div>
 

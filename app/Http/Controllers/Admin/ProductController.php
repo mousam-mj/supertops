@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\MainCategory;
 use App\Models\Product;
+use App\Services\BearingCatalogExportService;
 use App\Services\BearingCatalogImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -159,14 +160,27 @@ class ProductController extends Controller
             ->with('success', $message);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function exportBearings(Request $request, BearingCatalogExportService $exporter)
     {
-        $query = Product::with('category');
+        $request->validate([
+            'format' => 'nullable|in:csv,xlsx',
+        ]);
 
-        // Search functionality
+        $format = $request->get('format', 'csv');
+        $query = $this->productsIndexQuery($request);
+
+        return $format === 'xlsx'
+            ? $exporter->downloadXlsx($query)
+            : $exporter->downloadCsv($query);
+    }
+
+    /**
+     * Base query for admin product list / export (search + status filters).
+     */
+    protected function productsIndexQuery(Request $request)
+    {
+        $query = Product::query()->with('category');
+
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
@@ -179,7 +193,6 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by status
         if ($request->filled('status')) {
             if ($request->status === 'active') {
                 $query->where('is_active', true);
@@ -188,7 +201,18 @@ class ProductController extends Controller
             }
         }
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        return $query;
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $products = $this->productsIndexQuery($request)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.products.index', compact('products'));
     }

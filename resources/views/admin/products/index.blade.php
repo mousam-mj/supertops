@@ -12,6 +12,21 @@
                 <p class="text-muted mb-0">Manage your bearing catalog products</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
+                @php
+                    $exportQuery = request()->only(['search', 'status']);
+                @endphp
+                <div class="btn-group">
+                    <a href="{{ route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'csv'])) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-download me-2"></i>Export CSV
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Export format</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'csv'])) }}">CSV (.csv)</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'xlsx'])) }}">Excel (.xlsx)</a></li>
+                    </ul>
+                </div>
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bearingImportModal">
                     <i class="bi bi-upload me-2"></i>Import bearings (CSV / Excel)
                 </button>
