@@ -10,6 +10,24 @@
                 <p class="text-muted mb-0">Manage your bearing catalog products</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
+                <?php
+                    $exportQuery = request()->only(['search', 'status']);
+                ?>
+                <button type="button" class="btn btn-outline-dark" id="toggleDatabaseMode">
+                    <i class="bi bi-database me-2"></i>Database Mode
+                </button>
+                <div class="btn-group">
+                    <a href="<?php echo e(route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'csv']))); ?>" class="btn btn-outline-secondary">
+                        <i class="bi bi-download me-2"></i>Export CSV
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Export format</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="<?php echo e(route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'csv']))); ?>">CSV (.csv)</a></li>
+                        <li><a class="dropdown-item" href="<?php echo e(route('admin.products.bearing-export', array_merge($exportQuery, ['format' => 'xlsx']))); ?>">Excel (.xlsx)</a></li>
+                    </ul>
+                </div>
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bearingImportModal">
                     <i class="bi bi-upload me-2"></i>Import bearings (CSV / Excel)
                 </button>
@@ -86,7 +104,8 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <!-- Normal View -->
+        <div class="card" id="normalView">
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -183,6 +202,82 @@
                 </div>
             <?php endif; ?>
         </div>
+
+        <!-- Database Mode View -->
+        <div class="card d-none" id="databaseModeView">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Database Mode - All Fields</h5>
+                    <button type="button" class="btn btn-success" id="saveDatabaseChanges">
+                        <i class="bi bi-save me-2"></i>Save Changes
+                    </button>
+                </div>
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped table-sm" id="databaseTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Sale Price</th>
+                                <th>Stock Qty</th>
+                                <th>In Stock</th>
+                                <th>Active</th>
+                                <th>Featured</th>
+                                <th>New Arrival</th>
+                                <th>Category ID</th>
+                                <th>Sort Order</th>
+                                <th>Description</th>
+                                <th>Short Desc</th>
+                                <th>Meta Title</th>
+                                <th>Meta Desc</th>
+                                <th>Meta Keywords</th>
+                                <th>Product Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <tr data-product-id="<?php echo e($product->id); ?>">
+                                    <td><?php echo e($product->id); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="name"><?php echo e($product->name); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="slug"><?php echo e($product->slug); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="sku"><?php echo e($product->sku); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="price"><?php echo e($product->price); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="sale_price"><?php echo e($product->sale_price); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="stock_quantity"><?php echo e($product->stock_quantity); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="in_stock"><?php echo e($product->in_stock ? '1' : '0'); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="is_active"><?php echo e($product->is_active ? '1' : '0'); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="is_featured"><?php echo e($product->is_featured ? '1' : '0'); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="is_new_arrival"><?php echo e($product->is_new_arrival ? '1' : '0'); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="category_id"><?php echo e($product->category_id); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="sort_order"><?php echo e($product->sort_order); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="description"><?php echo e(Str::limit($product->description ?? '', 100)); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="short_description"><?php echo e(Str::limit($product->short_description ?? '', 50)); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="meta_title"><?php echo e($product->meta_title); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="meta_description"><?php echo e(Str::limit($product->meta_description ?? '', 50)); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="meta_keywords"><?php echo e($product->meta_keywords); ?></td>
+                                    <td contenteditable="true" class="editable" data-field="product_type"><?php echo e($product->product_type); ?></td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="19" class="text-center py-4">
+                                        <p class="text-muted mb-0">No products found.</p>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php if($products->hasPages()): ?>
+                <div class="card-footer-pagination">
+                    <?php echo e($products->links()); ?>
+
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 
@@ -227,6 +322,116 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggleDatabaseMode');
+    const normalView = document.getElementById('normalView');
+    const databaseModeView = document.getElementById('databaseModeView');
+    const saveButton = document.getElementById('saveDatabaseChanges');
+    let isDatabaseMode = false;
+
+    // Toggle between normal and database mode
+    toggleButton.addEventListener('click', function() {
+        isDatabaseMode = !isDatabaseMode;
+        
+        if (isDatabaseMode) {
+            normalView.classList.add('d-none');
+            databaseModeView.classList.remove('d-none');
+            toggleButton.innerHTML = '<i class="bi bi-table me-2"></i>Normal View';
+            toggleButton.classList.remove('btn-outline-dark');
+            toggleButton.classList.add('btn-dark');
+        } else {
+            normalView.classList.remove('d-none');
+            databaseModeView.classList.add('d-none');
+            toggleButton.innerHTML = '<i class="bi bi-database me-2"></i>Database Mode';
+            toggleButton.classList.remove('btn-dark');
+            toggleButton.classList.add('btn-outline-dark');
+        }
+    });
+
+    // Save database changes
+    saveButton.addEventListener('click', function() {
+        const updates = [];
+        const rows = document.querySelectorAll('#databaseTable tbody tr[data-product-id]');
+        
+        rows.forEach(row => {
+            const productId = row.getAttribute('data-product-id');
+            const editableCells = row.querySelectorAll('.editable');
+            const productData = { id: productId };
+            
+            editableCells.forEach(cell => {
+                const field = cell.getAttribute('data-field');
+                let value = cell.textContent.trim();
+                
+                // Convert boolean fields
+                if (['in_stock', 'is_active', 'is_featured', 'is_new_arrival'].includes(field)) {
+                    value = value === '1' || value === 'true' || value.toLowerCase() === 'yes';
+                }
+                
+                // Convert numeric fields
+                if (['price', 'sale_price', 'stock_quantity', 'category_id', 'sort_order'].includes(field)) {
+                    value = value === '' ? null : parseFloat(value);
+                }
+                
+                productData[field] = value;
+            });
+            
+            updates.push(productData);
+        });
+
+        // Send updates to server
+        if (updates.length > 0) {
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<i class="bi bi-spinner me-2"></i>Saving...';
+            
+            // Get CSRF token from meta tag or hidden input
+            const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+            const csrfInput = document.querySelector('input[name="_token"]');
+            const csrfToken = csrfMetaTag ? csrfMetaTag.getAttribute('content') : (csrfInput ? csrfInput.value : '');
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            if (csrfToken) {
+                headers['X-CSRF-TOKEN'] = csrfToken;
+            }
+            
+            fetch('<?php echo e(route('admin.products.bulkUpdate')); ?>', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ products: updates })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Changes saved successfully!');
+                    location.reload();
+                } else {
+                    alert('Error saving changes: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving changes. Please try again.');
+            })
+            .finally(() => {
+                saveButton.disabled = false;
+                saveButton.innerHTML = '<i class="bi bi-save me-2"></i>Save Changes';
+            });
+        }
+    });
+
+    // Highlight changed cells
+    const editableCells = document.querySelectorAll('.editable');
+    editableCells.forEach(cell => {
+        cell.addEventListener('input', function() {
+            this.classList.add('bg-warning');
+        });
+    });
+});
+</script>
 <?php $__env->stopSection(); ?>
 
 

@@ -229,6 +229,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('products.bearing-import');
         Route::get('products/bearing-export', [ProductController::class, 'exportBearings'])
             ->name('products.bearing-export');
+        Route::post('products/bulk-update', [ProductController::class, 'bulkUpdate'])
+            ->name('products.bulkUpdate');
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);

@@ -599,4 +599,72 @@ class ProductController extends Controller
 
         return $mergedSpecs;
     }
+
+    /**
+     * Bulk update products from database mode.
+     */
+    public function bulkUpdate(Request $request)
+    {
+        $request->validate([
+            'products' => 'required|array',
+            'products.*.id' => 'required|integer|exists:products,id',
+            'products.*.name' => 'nullable|string|max:255',
+            'products.*.slug' => 'nullable|string|max:255',
+            'products.*.sku' => 'nullable|string',
+            'products.*.price' => 'nullable|numeric|min:0',
+            'products.*.sale_price' => 'nullable|numeric|min:0',
+            'products.*.stock_quantity' => 'nullable|integer|min:0',
+            'products.*.in_stock' => 'nullable|boolean',
+            'products.*.is_active' => 'nullable|boolean',
+            'products.*.is_featured' => 'nullable|boolean',
+            'products.*.is_new_arrival' => 'nullable|boolean',
+            'products.*.category_id' => 'nullable|integer|exists:categories,id',
+            'products.*.sort_order' => 'nullable|integer|min:0',
+            'products.*.description' => 'nullable|string|max:50000',
+            'products.*.short_description' => 'nullable|string|max:500',
+            'products.*.meta_title' => 'nullable|string|max:255',
+            'products.*.meta_description' => 'nullable|string|max:5000',
+            'products.*.meta_keywords' => 'nullable|string|max:1000',
+            'products.*.product_type' => 'nullable|string|max:255',
+        ]);
+
+        $products = $request->input('products', []);
+        $updated = 0;
+        $errors = [];
+
+        foreach ($products as $productData) {
+            try {
+                $product = Product::findOrFail($productData['id']);
+                
+                // Build update data, only including fields that are present
+                $updateData = [];
+                $allowedFields = [
+                    'name', 'slug', 'sku', 'price', 'sale_price', 'stock_quantity',
+                    'in_stock', 'is_active', 'is_featured', 'is_new_arrival',
+                    'category_id', 'sort_order', 'description', 'short_description',
+                    'meta_title', 'meta_description', 'meta_keywords', 'product_type'
+                ];
+
+                foreach ($allowedFields as $field) {
+                    if (array_key_exists($field, $productData)) {
+                        $updateData[$field] = $productData[$field];
+                    }
+                }
+
+                if (! empty($updateData)) {
+                    $product->update($updateData);
+                    $updated++;
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Product ID {$productData['id']}: " . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'updated' => $updated,
+            'errors' => $errors,
+            'message' => "Successfully updated {$updated} product(s)." . ($errors ? ' Some errors occurred.' : ''),
+        ]);
+    }
 }
