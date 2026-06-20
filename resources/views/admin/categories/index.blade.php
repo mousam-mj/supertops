@@ -9,7 +9,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h4 class="mb-1 fw-bold" style="color: #2d3748;">{{ isset($subOnly) && $subOnly ? 'Sub Categories' : 'All Categories' }}</h4>
-                <p class="text-muted mb-0">{{ isset($subOnly) && $subOnly ? 'Manage sub-categories only (categories with a parent)' : 'Manage your product categories' }}</p>
+                <p class="text-muted mb-0">{{ isset($subOnly) && $subOnly ? 'Manage sub-categories — edit card image and page top banner from each subcategory' : 'Manage your product categories' }}</p>
                 @if(isset($subOnly) && $subOnly)
                     <a href="{{ route('admin.categories.index') }}" class="text-primary small mt-1 d-inline-block">View all categories</a>
                 @endif
@@ -30,7 +30,10 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Image</th>
+                                <th>{{ isset($subOnly) && $subOnly ? 'Card' : 'Image' }}</th>
+                                @if(isset($subOnly) && $subOnly)
+                                    <th>Page Banner</th>
+                                @endif
                                 <th>Name</th>
                                 <th>Slug</th>
                                 <th>Parent</th>
@@ -64,6 +67,28 @@
                                             </div>
                                         @endif
                                     </td>
+                                    @if(isset($subOnly) && $subOnly)
+                                    <td>
+                                        @if($category->hero_image)
+                                            @php $heroImgUrl = storage_asset($category->hero_image); @endphp
+                                            <div class="position-relative" style="width: 60px; height: 60px;">
+                                                <img src="{{ $heroImgUrl }}"
+                                                     alt="{{ $category->name }} banner"
+                                                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                                     onerror="this.style.display='none'; var n=this.nextElementSibling; if(n) n.classList.remove('d-none');">
+                                                <div class="d-none bg-light d-flex align-items-center justify-content-center position-absolute top-0 start-0"
+                                                     style="width: 60px; height: 60px; border-radius: 8px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                                 style="width: 60px; height: 60px; border-radius: 8px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    @endif
                                     <td>
                                         <div class="fw-semibold">{{ $category->name }}</div>
                                         @if($category->description)
@@ -122,7 +147,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="{{ isset($subOnly) && $subOnly ? 10 : 9 }}" class="text-center py-4">
                                         <p class="text-muted mb-0">No categories found.</p>
                                         <a href="{{{ route('admin.categories.create') }}}" class="btn btn-sm btn-primary mt-2">
                                             Create First Category

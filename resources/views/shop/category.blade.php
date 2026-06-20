@@ -4,7 +4,11 @@
 
 @section('content')
 @php
-    $heroImage = $category->hero_image ?? ($mainCategory->hero_image ?? null);
+    $isSubCategoryPage = ! empty($category->parent_id);
+    $heroImage = $category->hero_image;
+    if (! $heroImage && ! $isSubCategoryPage) {
+        $heroImage = $mainCategory->hero_image ?? null;
+    }
     $heroText = $category->hero_text ?? ($mainCategory->hero_text ?? null);
     $heroButtonText = $category->hero_button_text ?? ($mainCategory->hero_button_text ?? 'Shop Now');
     $subCategoriesList = $subCategories ?? collect();

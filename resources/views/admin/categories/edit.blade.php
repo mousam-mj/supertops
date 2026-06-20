@@ -1,19 +1,28 @@
 @extends('admin.layout')
 
-@section('title', 'Edit Category')
-@section('page-title', 'Edit Category: ' . $category->name)
+@section('title', !empty($isSubCategory) ? 'Edit Sub Category' : 'Edit Category')
+@section('page-title', (!empty($isSubCategory) ? 'Edit Sub Category' : 'Edit Category') . ': ' . $category->name)
 
 @section('content')
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Category Information</h5>
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">{{ !empty($isSubCategory) ? 'Edit Sub Category' : 'Category Information' }}: {{ $category->name }}</h5>
+                @if(!empty($isSubCategory) && $category->slug)
+                    <a href="{{ route('category', $category->slug) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> View on site
+                    </a>
+                @endif
             </div>
             <div class="card-body">
                 <form action="{{{ route('admin.categories.update', $category) }}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+
+                    @if(!empty($isSubCategory))
+                        @include('admin.categories.partials.subcategory-banner-fields')
+                    @endif
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -60,6 +69,7 @@
                         @enderror
                     </div>
 
+                    @if(empty($isSubCategory))
                     <div class="mb-3">
                         <label for="image" class="form-label">Category Thumbnail Image</label>
                         @if($category->image)
@@ -308,6 +318,7 @@
                         @enderror
                         <small class="form-text text-muted">Text displayed on additional banner</small>
                     </div>
+                    @endif
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -355,7 +366,7 @@
                             <i class="bi bi-arrow-left me-2"></i>Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle me-2"></i>Update Category
+                            <i class="bi bi-check-circle me-2"></i>{{ !empty($isSubCategory) ? 'Update Sub Category' : 'Update Category' }}
                         </button>
                     </div>
                 </form>

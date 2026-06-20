@@ -144,7 +144,11 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get();
         
-        return view('admin.categories.edit', compact('category', 'parentCategories'));
+        return view('admin.categories.edit', [
+            'category' => $category,
+            'parentCategories' => $parentCategories,
+            'isSubCategory' => (bool) $category->parent_id,
+        ]);
     }
 
     /**
