@@ -141,6 +141,59 @@
         .compare-btn {
             display: none !important;
         }
+        .modal-search-block .search-modal-top {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+        }
+        .modal-search-block .search-modal-top form {
+            position: relative;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .modal-search-block .search-modal-submit {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2.25rem;
+            height: 2.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 9999px;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modal-search-block .search-modal-submit:hover {
+            background-color: rgba(0, 0, 0, 0.06);
+            color: #111;
+        }
+        .modal-search-block .search-modal-close {
+            flex-shrink: 0;
+            width: 2.75rem;
+            height: 2.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 9999px;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modal-search-block .search-modal-close:hover {
+            background-color: #111;
+            color: #fff;
+        }
+        .modal-search-block #searchModalInput {
+            padding-right: 3.25rem;
+        }
         /* Mobile bottom tab bar — override global span/body line-height so labels don’t stack/overlap */
         .mobile-app-nav {
             box-sizing: border-box;
@@ -397,6 +450,11 @@
             var main = document.querySelector('.modal-search-block .modal-search-main');
             if (main) { main.classList.add('open'); document.body.style.overflow='hidden'; }
         }
+        function closeSearch() {
+            var main = document.querySelector('.modal-search-block .modal-search-main');
+            if (main) { main.classList.remove('open'); document.body.style.overflow=''; }
+        }
+        window.closeSearch = closeSearch;
         function openMobileMenuFromBottom() {
             var mm = document.getElementById('menu-mobile');
             if (mm) { mm.classList.add('open'); document.body.style.overflow='hidden'; document.body.classList.add('mobile-menu-open'); }
@@ -496,16 +554,16 @@
     <!-- Search Modal - Dynamic live search -->
     <div class="modal-search-block">
         <div class="modal-search-main md:p-10 p-6 rounded-[32px] relative">
-            <div class="close-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-surface flex items-center justify-center duration-300 cursor-pointer hover:bg-black hover:text-white z-10" onclick="document.querySelector('.modal-search-block .modal-search-main')?.classList.remove('open');document.body.style.overflow=''">
-                <i class="ph ph-x text-xl"></i>
-            </div>
-            <div class="form-search relative w-full">
+            <div class="form-search search-modal-top">
                 <form method="GET" action="{{{ route('search') }}}" id="searchModalForm">
-                    <input type="text" name="q" id="searchModalInput" placeholder="What are you looking for?" class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6 pr-14" autocomplete="off" />
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/5 rounded-full">
-                        <i class="ph ph-magnifying-glass heading5"></i>
+                    <input type="text" name="q" id="searchModalInput" placeholder="What are you looking for?" class="text-button-lg h-14 rounded-2xl border border-line w-full pl-6" autocomplete="off" />
+                    <button type="submit" class="search-modal-submit" aria-label="Search">
+                        <i class="ph ph-magnifying-glass text-xl leading-none"></i>
                     </button>
                 </form>
+                <button type="button" class="search-modal-close" aria-label="Close search" onclick="closeSearch()">
+                    <i class="ph ph-x text-lg leading-none"></i>
+                </button>
             </div>
             <div class="keyword mt-8">
                 <div class="heading5">Popular searches</div>

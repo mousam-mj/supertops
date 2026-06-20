@@ -206,7 +206,8 @@
                     </div>
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Promotional Banners (3 Blocks)</h5>
+                    <h5 class="mb-3">Promotional Banners (3 small blocks)</h5>
+                    <p class="text-muted small mb-3">Shown at the bottom of Drinkware / Barware category pages (after Testimonial).</p>
 
                     @php
                         $bannerImages = old('banner_images', is_array($category->banner_images) ? $category->banner_images : []);
@@ -258,7 +259,7 @@
                     @endfor
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Bottom Banner Section</h5>
+                    <h5 class="mb-3 text-muted">Bottom Banner Section <span class="badge bg-secondary ms-1">Not used on site</span></h5>
 
                     <div class="mb-3">
                         <label for="bottom_banner_image" class="form-label">Bottom Banner Image</label>
@@ -320,7 +321,7 @@
                     </div>
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Additional Banner (Optional)</h5>
+                    <h5 class="mb-3 text-muted">Additional Banner (Optional) <span class="badge bg-secondary ms-1">Not used on site</span></h5>
 
                     <div class="mb-3">
                         <label for="additional_banner_image" class="form-label">Additional Banner Image</label>

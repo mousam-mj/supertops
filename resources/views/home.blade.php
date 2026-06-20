@@ -5,7 +5,7 @@
 @section('content')
 <div id="home-content">
 <!-- Slider (dynamic from admin Hero Banners) -->
-            <div class="slider-block style-two xl:h-[820px] lg:h-[700px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] sm:-mt-[75px] w-full">
+            <div class="slider-block style-two xl:h-[820px] lg:h-[700px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] w-full">
                 <div class="slider-main h-full w-full">
                     <div class="swiper swiper-slider h-full relative">
                         <div class="swiper-wrapper">
@@ -51,23 +51,20 @@
                             <div class="banner-img w-full">
                                 <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full duration-500" />
                             </div>
-                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">{{ $category->name }}</div>
                             <a href="{{ $category->storefrontUrl() }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
                         </div>
                     @empty
                         {{-- Fallback if no categories --}}
                         <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="bg-img" class="w-full duration-500" />
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full duration-500" />
                             </div>
-                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Drinkware</div>
                             <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
                         </div>
                         <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
                             <div class="banner-img w-full">
-                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="bg-img" class="w-full duration-500" />
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full duration-500" />
                             </div>
-                            <div class="heading4 absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">Barware</div>
                             <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
                         </div>
                     @endforelse
