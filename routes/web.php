@@ -773,6 +773,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'additional_banner_image' => 'nullable|image|max:5120',
                 'remove_additional_banner_image' => 'nullable|boolean',
                 'additional_banner_text' => 'nullable|string|max:255',
+                'promo_banner_count' => 'nullable|integer|min:1|max:6',
+                'bottom_banner_images' => 'nullable|array|max:4',
+                'bottom_banner_images.*' => 'nullable|image|max:5120',
+                'remove_bottom_banner_images' => 'nullable|array',
             ]);
 
             // Handle image removal
@@ -845,6 +849,29 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 }
                 $validated['bottom_banner_image'] = $request->file('bottom_banner_image')->store('main-categories/bottom-banner', 'public');
             }
+
+            $bottomBannerImages = is_array($category->bottom_banner_images) ? $category->bottom_banner_images : [];
+            while (count($bottomBannerImages) < 4) {
+                $bottomBannerImages[] = null;
+            }
+            if ($request->has('bottom_banner_images')) {
+                foreach ($request->file('bottom_banner_images', []) as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        if (! empty($bottomBannerImages[$index])) {
+                            Storage::disk('public')->delete($bottomBannerImages[$index]);
+                        }
+                        $bottomBannerImages[$index] = $file->store('main-categories/bottom-blocks', 'public');
+                    }
+                }
+            }
+            foreach ($request->input('remove_bottom_banner_images', []) as $index => $remove) {
+                if ($remove == '1' && ! empty($bottomBannerImages[$index])) {
+                    Storage::disk('public')->delete($bottomBannerImages[$index]);
+                    $bottomBannerImages[$index] = null;
+                }
+            }
+            $validated['bottom_banner_images'] = array_values(array_filter($bottomBannerImages)) ?: null;
+            $validated['promo_banner_count'] = (int) ($request->input('promo_banner_count', $category->promo_banner_count ?? 3));
 
             // Handle additional banner image
             if ($request->filled('remove_additional_banner_image') && $request->remove_additional_banner_image == '1') {

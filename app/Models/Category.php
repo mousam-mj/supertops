@@ -29,10 +29,12 @@ class Category extends Model
         'main_category_id',
         'sort_order',
         'is_active',
+        'show_on_parent_page',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'show_on_parent_page' => 'boolean',
         'banner_images' => 'array',
         'banner_texts' => 'array',
     ];

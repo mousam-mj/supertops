@@ -21,7 +21,9 @@ class MainCategory extends Model
         'banner_texts',
         'bottom_banner_image',
         'bottom_banner_text',
+        'bottom_banner_images',
         'testimonial_text',
+        'promo_banner_count',
         'additional_banner_image',
         'additional_banner_text',
         'is_active',
@@ -33,6 +35,8 @@ class MainCategory extends Model
         'sort_order' => 'integer',
         'banner_images' => 'array',
         'banner_texts' => 'array',
+        'bottom_banner_images' => 'array',
+        'promo_banner_count' => 'integer',
     ];
 
     /**

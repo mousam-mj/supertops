@@ -170,6 +170,80 @@
                             </div>
 
                             <hr class="my-4">
+                            <h6 class="mb-2">Homepage sections — show / hide</h6>
+                            <p class="text-muted small mb-3">Turn sections on or off without removing content.</p>
+                            @php
+                                $sectionToggles = [
+                                    'home_section_best_sellers_banner_enabled' => 'Best Sellers wide banner',
+                                    'home_section_best_sellers_tabs_enabled' => 'Best Sellers product tabs',
+                                    'home_section_lookbook_enabled' => 'Discover collection block',
+                                    'home_section_flash_sale_enabled' => 'Flash sale block',
+                                    'home_section_benefits_enabled' => 'Company perks (4 icons)',
+                                    'home_section_instagram_enabled' => 'Instagram slider',
+                                    'home_best_sellers_show_text' => 'Show text overlay on Best Sellers banner',
+                                    'show_customize_nav' => 'Show Customize in header navigation',
+                                    'show_customize_product_button' => 'Show Customize button on product pages',
+                                ];
+                            @endphp
+                            <div class="row g-2 mb-4">
+                                @foreach($sectionToggles as $toggleKey => $toggleLabel)
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="{{ $toggleKey }}" id="{{ $toggleKey }}" value="1" {{ setting_flag($toggleKey, ($flagSettingDefaults[$toggleKey] ?? '1') === '1') ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="{{ $toggleKey }}">{{ $toggleLabel }}</label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="mb-2">About Us — hero banner</h6>
+                            <p class="text-muted small mb-3">Background for the About Us page hero. Content is edited under <a href="{{ route('admin.policy-pages.index') }}">Policy Pages → About Us</a>.</p>
+                            @include('admin.settings.partials.homepage-image-field', ['key' => 'about_us_banner_image', 'previewMaxHeight' => 120])
+
+                            <hr class="my-4">
+                            <h6 class="mb-2">Flash sale (homepage)</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Heading</label>
+                                    <input type="text" name="home_flash_sale_heading" class="form-control" value="{{ $settings['home_flash_sale_heading'] ?? 'Flash Sale!' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Subtext</label>
+                                    <input type="text" name="home_flash_sale_text" class="form-control" value="{{ $settings['home_flash_sale_text'] ?? 'Get 20% off on selected items!' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Button text</label>
+                                    <input type="text" name="home_flash_sale_button_text" class="form-control" value="{{ $settings['home_flash_sale_button_text'] ?? 'Shop Now' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Button link</label>
+                                    <input type="text" name="home_flash_sale_button_url" class="form-control" value="{{ $settings['home_flash_sale_button_url'] ?? '/shop' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Product image</label>
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_image'])
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Background image</label>
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_bg_image'])
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="mb-2">Recommended image sizes</h6>
+                            <ul class="small text-muted mb-4">
+                                <li>Homepage hero slider: 1920×820px</li>
+                                <li>Homepage category cards: 800×1000px (4:5)</li>
+                                <li>Best Sellers banner: 1920×600px</li>
+                                <li>Discover collection images: 900×1100px each</li>
+                                <li>Category page hero: 1920×600px</li>
+                                <li>Subcategory cards: 800×1000px</li>
+                                <li>Promo blocks: 600×750px</li>
+                                <li>Product images: 1200×1600px (3:4)</li>
+                            </ul>
+
+                            <hr class="my-4">
                             <h6 class="mb-2">Homepage benefit icons</h6>
                             <p class="text-muted small mb-3">The four icon boxes on the homepage and category pages (24/7 Customer Service, Money Back, etc.). Leave blank to keep the default text.</p>
                             @php

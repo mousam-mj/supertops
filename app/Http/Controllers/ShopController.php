@@ -207,13 +207,21 @@ class ShopController extends Controller
 
         $products = $products->paginate(16)->withQueryString();
 
-        // Get subcategories for category page
-        $subCategories = $category->children()->where('is_active', true)->get();
-        
-        // Get featured products for "What's new" section (with main category for tabs)
-        $featuredProducts = Product::whereIn('category_id', $categoryIds)
+        // Get subcategories for category page (admin can hide via show_on_parent_page)
+        $subCategories = $category->children()
             ->where('is_active', true)
+            ->where('show_on_parent_page', true)
+            ->orderBy('sort_order')
+            ->get();
+        
+        // Featured products for this main category only
+        $featuredProducts = Product::where('is_active', true)
             ->where('is_featured', true)
+            ->when($mainCategory, function ($query) use ($mainCategory) {
+                $query->whereHas('category', function ($q) use ($mainCategory) {
+                    $q->where('main_category_id', $mainCategory->id);
+                });
+            })
             ->with('category.mainCategory')
             ->limit(12)
             ->get();

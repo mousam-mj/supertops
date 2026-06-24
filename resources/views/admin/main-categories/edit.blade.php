@@ -206,8 +206,16 @@
                     </div>
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Promotional Banners (3 small blocks)</h5>
-                    <p class="text-muted small mb-3">Shown at the bottom of Drinkware / Barware category pages (after Testimonial).</p>
+                    <h5 class="mb-3">Promotional Banners (small blocks)</h5>
+                    <p class="text-muted small mb-3">Shown on Drinkware / Barware pages after Testimonial. Set count (e.g. 2 for Drinkware, 6 for Barware).</p>
+                    <div class="mb-3" style="max-width: 220px;">
+                        <label for="promo_banner_count" class="form-label">Number of promo blocks</label>
+                        <select class="form-select" id="promo_banner_count" name="promo_banner_count">
+                            @for($n = 1; $n <= 6; $n++)
+                                <option value="{{ $n }}" {{ (int) old('promo_banner_count', $category->promo_banner_count ?? 3) === $n ? 'selected' : '' }}>{{ $n }}</option>
+                            @endfor
+                        </select>
+                    </div>
 
                     @php
                         $bannerImages = old('banner_images', is_array($category->banner_images) ? $category->banner_images : []);
@@ -259,10 +267,33 @@
                     @endfor
 
                     <hr class="my-4">
-                    <h5 class="mb-3 text-muted">Bottom Banner Section <span class="badge bg-secondary ms-1">Not used on site</span></h5>
+                    <h5 class="mb-3">Bottom Banner Section (4 image blocks)</h5>
+                    <p class="text-muted small mb-3">Four-card row shown near the bottom of Drinkware / Barware pages. Recommended: 600×750px each.</p>
+
+                    @php
+                        $bottomBannerImages = old('bottom_banner_images', is_array($category->bottom_banner_images ?? null) ? $category->bottom_banner_images : []);
+                        while (count($bottomBannerImages) < 4) { $bottomBannerImages[] = null; }
+                    @endphp
+                    @for($bi = 0; $bi < 4; $bi++)
+                    <div class="card mb-3">
+                        <div class="card-header bg-light py-2"><h6 class="mb-0">Bottom block {{ $bi + 1 }}</h6></div>
+                        <div class="card-body">
+                            @if(!empty($bottomBannerImages[$bi]))
+                                <div class="mb-2">
+                                    <img src="{{ storage_asset($bottomBannerImages[$bi]) }}" alt="" class="img-thumbnail" style="max-height: 140px; object-fit: cover;">
+                                    <input type="hidden" name="remove_bottom_banner_images[{{ $bi }}]" value="0">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="this.previousElementSibling.value='1'">Remove</button>
+                                </div>
+                            @else
+                                <input type="hidden" name="remove_bottom_banner_images[{{ $bi }}]" value="0">
+                            @endif
+                            <input type="file" class="form-control" name="bottom_banner_images[]" accept="image/*">
+                        </div>
+                    </div>
+                    @endfor
 
                     <div class="mb-3">
-                        <label for="bottom_banner_image" class="form-label">Bottom Banner Image</label>
+                        <label for="bottom_banner_image" class="form-label">Legacy single bottom banner (fallback)</label>
                         @if($category->bottom_banner_image)
                             <div class="mb-2 position-relative d-inline-block">
                                 <img src="{{ storage_asset($category->bottom_banner_image) }}" 

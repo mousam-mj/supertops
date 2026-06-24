@@ -60,7 +60,9 @@
                                     <a href="{{ route('contact') }}" class="text-button-uppercase duration-300 h-full flex items-center justify-center">Contact Us</a>
                                 </li>
                                 <li class="h-full flex items-center gap-2">
+                                    @if(setting_flag('show_customize_nav', true))
                                     <a href="{{ route('customize') }}" class="text-button-uppercase bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 duration-300">Customize</a>
+                                    @endif
                                 </li>
                             </ul>
                         </div>
@@ -208,7 +210,9 @@
                                 <a href="{{{ route('faqs') }}}" class="text-lg font-semibold flex items-center py-3 px-4 rounded-lg transition-all">FAQs</a>
                                                             </li>
                                                             <li class="px-4 mt-2">
+                                @if(setting_flag('show_customize_nav', true))
                                 <a href="{{ route('customize') }}" class="text-lg font-semibold flex items-center justify-center py-3 px-4 rounded-lg transition-all bg-black text-white">Customize</a>
+                                @endif
                                                             </li>
                                                         </ul>
                                                     </div>

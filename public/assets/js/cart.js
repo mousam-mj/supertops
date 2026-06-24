@@ -247,7 +247,7 @@
         return (typeof window !== 'undefined' && window.STORAGE_PATH) ? '/' + window.STORAGE_PATH : '/storage';
     }
     function getImageUrl(path) {
-        if (!path) return '/assets/images/product/perch-bottal.webp';
+        if (!path) return '/assets/images/product/placeholder.svg';
         if (path.startsWith('http')) return path;
         if (path.startsWith('assets/') || path.startsWith('/assets/')) return path.startsWith('/') ? path : '/' + path;
         var base = getStorageBase();
@@ -370,7 +370,7 @@
                     entries.forEach(function(item) {
                         const label = item.key || item.name || item[0];
                         const value = item.value || item[1];
-                        if (label != null && value != null) html += '<div class="flex justify-between gap-2 py-0.5"><span class="text-secondary2">' + String(label).replace(/</g, '&lt;') + '</span><span>' + String(value).replace(/</g, '&lt;') + '</span></div>';
+                        if (label != null && value != null) html += '<div class="py-0.5"><span class="text-secondary2 block">' + String(label).replace(/</g, '&lt;') + '</span><span class="block text-right break-words">' + String(value).replace(/</g, '&lt;') + '</span></div>';
                     });
                 }
             }

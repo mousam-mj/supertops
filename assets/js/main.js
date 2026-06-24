@@ -855,6 +855,10 @@ var swiperSlider = new Swiper(".swiper-slider", {
     el: ".swiper-pagination",
     clickable: true,
   },
+  navigation: {
+    nextEl: ".swiper-slider .swiper-button-next",
+    prevEl: ".swiper-slider .swiper-button-prev",
+  },
   loop: true,
   autoplay: {
     delay: 4000,

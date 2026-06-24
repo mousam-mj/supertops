@@ -180,6 +180,7 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|exists:categories,id|different:id',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'show_on_parent_page' => 'nullable|boolean',
         ]);
 
         // Prevent setting itself as parent
@@ -305,6 +306,9 @@ class CategoryController extends Controller
 
         // Remove remove flags from validated
         unset($validated['remove_image'], $validated['remove_hero_image'], $validated['remove_bottom_banner_image'], $validated['remove_additional_banner_image'], $validated['remove_banner_image']);
+
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['show_on_parent_page'] = $request->boolean('show_on_parent_page', true);
 
         $category->update($validated);
 

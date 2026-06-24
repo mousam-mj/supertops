@@ -124,44 +124,6 @@ class AboutPageContent
     </div>
 </div>
 <!--PERCH_BENEFIT_BLOCK-->
-<div class="flash-sale-block relative mt-14">
-    <div class="bg-img absolute top-0 left-0 w-full h-full z-[-1]">
-        <img src="/assets/images/banner/bg-flash-sale-organic.png" alt="" class="w-full h-full object-cover">
-    </div>
-    <div class="container relative z-[1] flex max-md:flex-wrap items-center md:justify-end justify-center">
-        <div class="bg-img sm:w-7/12 max-md:pt-8 w-[90%] relative md:pr-[100px] md:absolute md:top-1/2 md:-translate-y-1/2 md:left-0 z-[0]">
-            <img src="/assets/images/image-flash-sale-organic.png" alt="" class="w-full object-cover">
-        </div>
-        <div class="right flex items-center md:justify-center md:w-5/12 w-full lg:py-[156px] md:py-24 max-md:pt-3 max-md:pb-8">
-            <div class="text-content">
-                <div class="heading2">Flash Sale!</div>
-                <div class="body1 mt-3">Get 20% off if you spend 120$ or more!</div>
-                <div class="countdown-time flex items-center gap-5 max-sm:gap-[14px] lg:mt-9 md:mt-6 mt-4">
-                    <div class="item flex flex-col items-center">
-                        <div class="countdown-day time heading1">0-489</div>
-                        <div class="text-button-uppercase font-medium">Days</div>
-                    </div>
-                    <span class="heading4">:</span>
-                    <div class="item flex flex-col items-center">
-                        <div class="countdown-hour time heading1">0-15</div>
-                        <div class="text-button-uppercase font-medium">Hours</div>
-                    </div>
-                    <span class="heading4">:</span>
-                    <div class="item flex flex-col items-center">
-                        <div class="countdown-minute time heading1">0-49</div>
-                        <div class="text-button-uppercase font-medium">Minutes</div>
-                    </div>
-                    <span class="heading4">:</span>
-                    <div class="item flex flex-col items-center">
-                        <div class="countdown-second time heading1">0-23</div>
-                        <div class="text-button-uppercase font-medium">Seconds</div>
-                    </div>
-                </div>
-                <a href="/shop" class="button-main lg:mt-9 md:mt-6 mt-4">Get it now</a>
-            </div>
-        </div>
-    </div>
-</div>
 HTML;
     }
 

@@ -10,19 +10,28 @@
                     <div class="swiper swiper-slider h-full relative">
                         <div class="swiper-wrapper">
                             @forelse($heroBanners as $banner)
+                                @php
+                                    $bannerLink = trim((string) ($banner->deeplink ?? ''));
+                                    $bannerHref = $bannerLink !== '' ? setting_link_url($bannerLink, '#') : '';
+                                @endphp
                                 <div class="swiper-slide">
-                                    <div class="slider-item h-full w-full relative overflow-hidden">
-                                        <div class=" w-full h-full relative">
-                                            
-                                            <div class="sub-img absolute inset-0 w-full h-full">
-                                                @if($banner->banner_image)
-                                                    <img src="{{ storage_asset($banner->banner_image) }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
-                                                @else
-                                                    <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
-                                                @endif
-                                            </div>
+                                    @if($bannerHref && $bannerHref !== '#')
+                                        <a href="{{ $bannerHref }}" class="slider-item h-full w-full relative overflow-hidden block">
+                                    @else
+                                        <div class="slider-item h-full w-full relative overflow-hidden">
+                                    @endif
+                                        <div class="sub-img absolute inset-0 w-full h-full">
+                                            @if($banner->banner_image)
+                                                <img src="{{ storage_asset($banner->banner_image) }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
+                                            @else
+                                                <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
+                                            @endif
                                         </div>
-                                    </div>
+                                    @if($bannerHref && $bannerHref !== '#')
+                                        </a>
+                                    @else
+                                        </div>
+                                    @endif
                                 </div>
                             @empty
                                 <div class="swiper-slide">
@@ -36,6 +45,8 @@
                                 </div>
                             @endforelse
                         </div>
+                        <div class="swiper-button-prev hero-slider-nav"></div>
+                        <div class="swiper-button-next hero-slider-nav"></div>
                     </div>
                 </div>
             </div>
@@ -45,28 +56,25 @@
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
                 <div class="banner-block md:pt-20 pt-10">
             <div class="container">
-                <div class="list-banner grid md:grid-cols-3 gap-[20px]">
+                <div class="list-banner grid md:grid-cols-2 gap-[20px] max-w-4xl mx-auto justify-items-center">
                     @forelse($homeCategories as $category)
-                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                            <div class="banner-img w-full">
-                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full duration-500" />
+                        <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                            <div class="banner-img w-full overflow-hidden">
+                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full duration-500 aspect-[4/5] object-cover" />
                             </div>
-                            <a href="{{ $category->storefrontUrl() }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
-                        </div>
+                        </a>
                     @empty
                         {{-- Fallback if no categories --}}
-                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                            <div class="banner-img w-full">
-                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full duration-500" />
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                            <div class="banner-img w-full overflow-hidden">
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full duration-500 aspect-[4/5] object-cover" />
                             </div>
-                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
-                        </div>
-                        <div class="banner-item relative bg-surface block rounded-[20px] overflow-hidden duration-500">
-                            <div class="banner-img w-full">
-                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full duration-500" />
+                        </a>
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                            <div class="banner-img w-full overflow-hidden">
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full duration-500 aspect-[4/5] object-cover" />
                             </div>
-                            <a href="{{ route('shop') }}" class="button-main absolute bottom-8 left-1/2 -translate-x-1/2">Shop Now</a>
-                        </div>
+                        </a>
                     @endforelse
                 </div>
             </div>
@@ -75,149 +83,23 @@
             </div>
         </div>
 
-        <div class="what-new-block filter-product-block md:pt-20 pt-10" data-filter-type="main-category">
-            <div class="container">
-                <div class="heading flex flex-col items-center text-center">
-                    <div class="heading3">What's new</div>
-                    <div class="menu-tab bg-surface rounded-2xl mt-6">
-                        <div class="menu flex items-center gap-2 p-1 relative">
-                            <div class="indicator absolute top-1 bottom-1 bg-white rounded-full shadow-md duration-300"></div>
-                            <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black active" data-item="all">All</div>
-                            @foreach($mainCategories ?? [] as $mainCat)
-                                <div class="tab-item relative text-secondary text-button-uppercase py-2 px-5 cursor-pointer duration-300 hover:text-black" data-item="{{ $mainCat->slug }}">{{ $mainCat->name }}</div>
-                            @endforeach
-                        </div>
-                    </div>
+        @if(setting_flag('home_section_best_sellers_banner_enabled'))
+        <div class="banner-block style-one grid sm:grid-cols-1 home-best-sellers-banner">
+            <a href="{{ setting_link_url(\App\Models\Setting::get('home_best_sellers_button_url'), route('shop')) }}" class="banner-item relative block overflow-hidden duration-500 banner-zoom-only">
+                <div class="banner-img overflow-hidden">
+                    <img src="{{ setting_image_url(\App\Models\Setting::get('home_best_sellers_banner_image'), 'assets/images/banner/Blog-3.webp') }}" alt="" class="w-full h-full object-cover" />
                 </div>
-                <div class="list-product four-product hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 md:mt-10 mt-6">
-                    @forelse($featuredProducts as $product)
-                        <div class="what-new-product-wrap" data-main-category="{{ $product->category->mainCategory->slug ?? 'all' }}">
-                            @include('partials.product-card', ['product' => $product])
-                        </div>
-                    @empty
-                        <div class="col-span-full text-center py-10">
-                            <p class="text-secondary">No products available</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-        @push('scripts')
-        <script>
-        (function() {
-            var block = document.querySelector('.what-new-block[data-filter-type="main-category"]');
-            if (!block) return;
-            var tabs = block.querySelectorAll('.menu-tab .tab-item[data-item]');
-            var wraps = block.querySelectorAll('.what-new-product-wrap');
-            function syncIndicator() {
-                var menu = block.querySelector('.menu-tab .menu');
-                if (menu && typeof window.syncMenuTabIndicator === 'function') {
-                    window.syncMenuTabIndicator(menu);
-                }
-            }
-            tabs.forEach(function(tab) {
-                tab.addEventListener('click', function() {
-                    var slug = this.getAttribute('data-item');
-                    block.querySelectorAll('.menu-tab .tab-item').forEach(function(t){ t.classList.remove('active'); });
-                    this.classList.add('active');
-                    syncIndicator();
-                    wraps.forEach(function(w) {
-                        var cat = w.getAttribute('data-main-category');
-                        if (slug === 'all' || cat === slug) {
-                            w.style.display = '';
-                        } else {
-                            w.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            syncIndicator();
-        })();
-        </script>
-        @endpush
-
-        <div class="look-book-block md:mt-20 mt-10 lg:py-20 md:py-14 py-10 bg-linear">
-            <div class="container">
-                <div class="main-content relative flex max-lg:flex-wrap gap-y-5 items-center lg:justify-end justify-center">
-                    <div class="heading bg-white xl:py-20 py-10 xl:px-10 px-8 rounded-2xl lg:w-[30%] lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-0 z-[1] max-lg:text-center">
-                        <div class="heading3">{{ \App\Models\Setting::get('home_lookbook_heading', 'Discover the latest collection') }}</div>
-                        <a href="{{ setting_link_url(\App\Models\Setting::get('home_lookbook_button_url'), route('shop.collection')) }}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">{{ \App\Models\Setting::get('home_lookbook_button_text', 'Shop Collection') }}</a>
-                    </div>
-                    <div class="list popular-product w-3/4 grid sm:grid-cols-2 gap-4 max-lg:w-full">
-                        <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_1'), 'assets/images/banner/perch123(1).webp') }}" alt="" class="w-full h-full object-cover" />
-                            <!--<div class="dots absolute top-[22%] left-[55%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">gold necklace</div>
-                                    <div class="price text-center">₹60.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>
-                            <div class="dots absolute top-[42%] left-[32%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">golden ring</div>
-                                    <div class="price text-center">₹50.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>
-                            <div class="dots bottom-dot absolute bottom-[20%] left-[58%] cursor-pointer">
-                                <div class="bottom-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Ruby Ring</div>
-                                    <div class="price text-center">₹40.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>-->
-                        </div>
-                        <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_2'), 'assets/images/banner/perch123(2).webp') }}" alt="" class="w-full h-full object-cover" />
-                           <!-- <div class="dots absolute top-[26%] left-[54%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                        </div>
-                                <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Snake Ring</div>
-                                    <div class="price text-center">₹45.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                    </div>
-                            <div class="dots absolute top-[29%] left-[30%] cursor-pointer">
-                                <div class="top-dot w-8 h-8 rounded-full bg-outline flex items-center justify-center">
-                                    <span class="bg-white w-3 h-3 rounded-full duration-300"></span>
-                                </div>
-                                <a href="{{{ route('shop') }}}" class="product-infor bg-white rounded-2xl p-4 cursor-pointer">
-                                    <div class="text-title name">Golden Ring</div>
-                                    <div class="price text-center">$48.00</div>
-                                    <div class="text-center underline mt-1 text-button-uppercase duration-300 text-secondary2 hover:text-black">View</div>
-                                </a>
-                            </div>-->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="banner-block style-one grid sm:grid-cols-1 ">
-            <a href="{{ setting_link_url(\App\Models\Setting::get('home_best_sellers_button_url'), route('shop')) }}" class="banner-item relative block overflow-hidden duration-500">
-                <div class="banner-img">
-                    <img src="{{ setting_image_url(\App\Models\Setting::get('home_best_sellers_banner_image'), 'assets/images/banner/Blog-3.webp') }}" alt="" />
-                </div>
-                <div class="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center">
+                @if(setting_flag('home_best_sellers_show_text', false))
+                <div class="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center pointer-events-none">
                     <div class="heading2 text-white">{{ \App\Models\Setting::get('home_best_sellers_heading', 'Best Sellers') }}</div>
                     <div class="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">{{ \App\Models\Setting::get('home_best_sellers_button_text', 'Shop Now') }}</div>
                 </div>
+                @endif
             </a>
-            
         </div>
+        @endif
 
+        @if(setting_flag('home_section_best_sellers_tabs_enabled'))
         <div class="tab-features-block filter-prodduct-block md:pt-20 pt-10" id="home-best-sellers-section">
             <div class="container">
                 <div class="heading flex flex-col items-center text-center">
@@ -230,7 +112,6 @@
                         </div>
                     </div>
                 </div>
-                {{-- Dynamic from DB: use home-tab-products so main.js does not replace with Product.json --}}
                 <div class="list-product home-tab-products hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6" data-tab="best sellers">
                     @forelse($bestSellers->take(8) as $product)
                         @include('partials.product-card', ['product' => $product])
@@ -291,19 +172,40 @@
         })();
         </script>
         @endpush
+        @endif
+
+        @if(setting_flag('home_section_lookbook_enabled'))
+        <div class="look-book-block md:mt-20 mt-10 lg:py-20 md:py-14 py-10 bg-linear">
+            <div class="container">
+                <div class="main-content relative flex max-lg:flex-wrap gap-y-5 items-center lg:justify-end justify-center">
+                    <div class="heading bg-white xl:py-20 py-10 xl:px-10 px-8 rounded-2xl lg:w-[30%] lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-0 z-[1] max-lg:text-center">
+                        <div class="heading3">{{ \App\Models\Setting::get('home_lookbook_heading', 'Discover the latest collection') }}</div>
+                        <a href="{{ setting_link_url(\App\Models\Setting::get('home_lookbook_button_url'), route('shop.collection')) }}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">{{ \App\Models\Setting::get('home_lookbook_button_text', 'Shop Collection') }}</a>
+                    </div>
+                    <div class="list popular-product w-3/4 grid sm:grid-cols-2 gap-4 max-lg:w-full">
+                        <div class="item relative rounded-xl overflow-hidden">
+                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_1'), 'assets/images/banner/perch123(1).webp') }}" alt="" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="item relative rounded-xl overflow-hidden">
+                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_2'), 'assets/images/banner/perch123(2).webp') }}" alt="" class="w-full h-full object-cover" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @endif
 
-        <div class="container">
+        @include('partials.flash-sale-block')
+
+        @if(setting_flag('home_section_benefits_enabled'))
             <div class="benefit-block md:mt-20 mt-10 py-10 px-2.5 bg-surface rounded-3xl">
                 @include('partials.benefit-items')
             </div>
-        </div>
+        @endif
 
+        @if(setting_flag('home_section_instagram_enabled'))
         @include('partials.instagram-feed-slider')
+        @endif
 
         <!-- Modal Newsletter - hidden to prevent click/interference issues -->
         <div class="modal-newsletter" style="display: none !important; pointer-events: none !important;">

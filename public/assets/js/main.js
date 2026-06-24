@@ -855,6 +855,10 @@ var swiperSlider = new Swiper(".swiper-slider", {
     el: ".swiper-pagination",
     clickable: true,
   },
+  navigation: {
+    nextEl: ".swiper-slider .swiper-button-next",
+    prevEl: ".swiper-slider .swiper-button-prev",
+  },
   loop: true,
   autoplay: {
     delay: 4000,
@@ -3089,13 +3093,10 @@ if (document.querySelector(".list-testimonial-yoga")) {
   });
 }
 
-// list-instagram (touchStartPreventDefault off so Instagram iframe gets taps / play)
+// list-instagram
 var swiperListInstagram = new Swiper(".swiper-list-instagram", {
   pagination: { clickable: true, el: ".swiper-pagination" },
   loop: true,
-  touchStartPreventDefault: false,
-  preventClicks: false,
-  preventClicksPropagation: false,
   autoplay: {
     delay: 4000,
     disableOnInteraction: false,

@@ -49,6 +49,22 @@ if (! function_exists('setting_image_url')) {
     }
 }
 
+if (! function_exists('setting_flag')) {
+    /**
+     * Boolean setting (1/0, true/false, yes/no).
+     */
+    function setting_flag(string $key, bool $default = true): bool
+    {
+        $value = \App\Models\Setting::get($key);
+
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
+    }
+}
+
 if (! function_exists('setting_link_url')) {
     /**
      * Admin-entered link (path or full URL) with fallback.

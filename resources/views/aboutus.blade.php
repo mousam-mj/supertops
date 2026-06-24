@@ -3,6 +3,9 @@
 @section('title', ($page->title ?? 'About Us') . ' - Perch Bottle')
 
 @section('content')
+@php
+    $aboutHeroBg = setting_image_url(\App\Models\Setting::get('about_us_banner_image'), 'assets/images/banner/bg-feature-pet1.png');
+@endphp
 <style>
     .about-page-hero.about-hero--fullbg {
         --about-hero-minh: clamp(22rem, 48vh, 38rem);
@@ -40,6 +43,9 @@
             margin-left: auto;
             margin-right: auto;
         }
+    }
+    .about-page-content .about-page-hero.about-hero--fullbg {
+        background-image: url('{{ $aboutHeroBg }}') !important;
     }
 </style>
 <div class="page-content about-page-content">

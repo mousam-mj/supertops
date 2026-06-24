@@ -94,6 +94,12 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="show_on_parent_page" name="show_on_parent_page" value="1" {{ old('show_on_parent_page', $category->show_on_parent_page ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="show_on_parent_page">Show card on parent category page (Drinkware / Barware grid)</label>
+                </div>
+            </div>
         </div>
     </div>
 </div>

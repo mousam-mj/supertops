@@ -69,14 +69,20 @@
             <div class="breadcrumb-product">
                 <div class="main bg-linear md:pt-[88px] pt-[70px] pb-[14px]">
                     <div class="container flex items-center justify-between flex-wrap gap-3">
-                        <div class="left flex items-center gap-1">
+                        <div class="left flex items-center gap-1 flex-wrap min-w-0">
                             <a href="{{ route('home') }}" class="caption1 text-secondary2 hover:underline">Homepage</a>
                             <i class="ph ph-caret-right text-xs text-secondary2"></i>
-                            <div class="caption1 text-secondary2">Product</div>
-                            <i class="ph ph-caret-right text-xs text-secondary2"></i>
+                            @if($product->category)
+                                @php
+                                    $cat = $product->category;
+                                    $catUrl = $cat->slug ? route('category', $cat->slug) : route('shop');
+                                @endphp
+                                <a href="{{ $catUrl }}" class="caption1 text-secondary2 hover:underline">{{ $cat->name }}</a>
+                                <i class="ph ph-caret-right text-xs text-secondary2"></i>
+                            @endif
                             <div class="caption1 capitalize">{{ $product->name }}</div>
                         </div>
-                        <div class="right flex items-center gap-3">
+                        <div class="right flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto product-nav-links">
                             @if($prevProduct)
                                 <a href="{{ route('product.show', $prevProduct->slug) }}" class="prev-btn flex items-center cursor-pointer text-secondary hover:text-black pr-3 border-r border-line">
                                     <i class="ph ph-caret-circle-left text-2xl text-black"></i>
@@ -267,9 +273,14 @@
                                     </div>
                                 </div>
 
-                                <div class="button-block mt-5 flex gap-3">
-                                    <a href="{{ route('customize') }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline">Customize</a>
-                                    <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
+                                <div class="button-block mt-5 flex gap-3 flex-wrap">
+                                    @if(setting_flag('show_customize_product_button', true))
+                                    <a href="{{ route('customize') }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline min-w-[140px]">Customize</a>
+                                    @endif
+                                    <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase min-w-[140px]" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
+                                    <button type="button" class="share-product-btn w-12 h-12 flex-shrink-0 flex items-center justify-center border border-line rounded-lg cursor-pointer hover:bg-black hover:text-white duration-300" data-share-url="{{ route('product.show', $product->slug) }}" data-share-title="{{ $product->name }}" title="Share">
+                                        <i class="ph ph-share-network text-xl"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="get-it mt-6">
@@ -379,9 +390,9 @@
                                         @endif
                                         @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
                                             @foreach($product->specifications as $key => $value)
-                                            <div class="item flex gap-1 text-secondary mt-1">
-                                                <i class="ph ph-dot text-2xl"></i>
-                                                <p><strong>{{ $key }}:</strong> {{ $value }}</p>
+                                            <div class="item flex items-start gap-1 text-secondary mt-1">
+                                                <i class="ph ph-dot text-2xl flex-shrink-0 leading-none"></i>
+                                                <p class="min-w-0"><strong>{{ $key }}:</strong> {{ $value }}</p>
                                             </div>
                                             @endforeach
                                         @endif
@@ -482,14 +493,14 @@
         <div class="tab-features-block filter-product-block md:py-20 py-10">
             <div class="container">
                 <div class="heading3 text-center">Related Products</div>
-                <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6">
+                <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6 related-products-slider">
                     <div class="swiper-button-prev2 sm:left-10 left-6">
                         <i class="ph-bold ph-caret-left text-xl"></i>
                 </div>
                     <div class="swiper swiper-list-product h-full relative">
                         <div class="swiper-wrapper">
                             @forelse($relatedProducts as $relatedProduct)
-                                <div class="swiper-slide">
+                                <div class="swiper-slide h-auto">
                         @include('partials.product-card', ['product' => $relatedProduct])
                 </div>
                             @empty

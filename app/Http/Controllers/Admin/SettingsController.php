@@ -13,12 +13,18 @@ class SettingsController extends Controller
         'home_lookbook_image_1',
         'home_lookbook_image_2',
         'home_best_sellers_banner_image',
+        'about_us_banner_image',
+        'home_flash_sale_image',
+        'home_flash_sale_bg_image',
     ];
 
     protected array $homepageImageDefaults = [
         'home_lookbook_image_1' => 'assets/images/banner/perch123(1).webp',
         'home_lookbook_image_2' => 'assets/images/banner/perch123(2).webp',
         'home_best_sellers_banner_image' => 'assets/images/banner/Blog-3.webp',
+        'about_us_banner_image' => 'assets/images/banner/bg-feature-pet1.png',
+        'home_flash_sale_image' => 'assets/images/image-flash-sale-organic.png',
+        'home_flash_sale_bg_image' => 'assets/images/banner/bg-flash-sale-organic.png',
     ];
 
     /** Empty save = theme default (row removed so Setting::get falls back). */
@@ -29,6 +35,18 @@ class SettingsController extends Controller
         'home_best_sellers_heading' => 'Best Sellers',
         'home_best_sellers_button_text' => 'Shop Now',
         'home_best_sellers_button_url' => '/shop',
+    ];
+
+    protected array $flagSettingDefaults = [
+        'home_section_best_sellers_banner_enabled' => '1',
+        'home_section_best_sellers_tabs_enabled' => '1',
+        'home_section_lookbook_enabled' => '1',
+        'home_section_benefits_enabled' => '1',
+        'home_section_instagram_enabled' => '1',
+        'home_section_flash_sale_enabled' => '0',
+        'home_best_sellers_show_text' => '0',
+        'show_customize_nav' => '1',
+        'show_customize_product_button' => '1',
     ];
 
     protected array $settingKeys = [
@@ -60,6 +78,22 @@ class SettingsController extends Controller
             'home_best_sellers_button_text',
             'home_best_sellers_button_url',
             'home_best_sellers_banner_image',
+            'home_section_best_sellers_banner_enabled',
+            'home_section_best_sellers_tabs_enabled',
+            'home_section_lookbook_enabled',
+            'home_section_benefits_enabled',
+            'home_section_instagram_enabled',
+            'home_section_flash_sale_enabled',
+            'home_best_sellers_show_text',
+            'show_customize_nav',
+            'show_customize_product_button',
+            'about_us_banner_image',
+            'home_flash_sale_heading',
+            'home_flash_sale_text',
+            'home_flash_sale_button_text',
+            'home_flash_sale_button_url',
+            'home_flash_sale_image',
+            'home_flash_sale_bg_image',
             'benefit_1_icon',
             'benefit_1_title',
             'benefit_1_text',
@@ -104,6 +138,7 @@ class SettingsController extends Controller
             'settingKeys' => $this->settingKeys,
             'homepageImageDefaults' => $this->homepageImageDefaults,
             'textSettingDefaults' => $this->textSettingDefaults,
+            'flagSettingDefaults' => $this->flagSettingDefaults,
         ]);
     }
 
@@ -135,6 +170,13 @@ class SettingsController extends Controller
             'home_best_sellers_button_text' => 'nullable|string|max:100',
             'home_best_sellers_button_url' => 'nullable|string|max:500',
             'home_best_sellers_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_flash_sale_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_flash_sale_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_flash_sale_heading' => 'nullable|string|max:255',
+            'home_flash_sale_text' => 'nullable|string|max:500',
+            'home_flash_sale_button_text' => 'nullable|string|max:100',
+            'home_flash_sale_button_url' => 'nullable|string|max:500',
             'benefit_1_icon' => 'nullable|string|max:100',
             'benefit_1_title' => 'nullable|string|max:255',
             'benefit_1_text' => 'nullable|string|max:1000',
@@ -206,6 +248,11 @@ class SettingsController extends Controller
 
         foreach ($allKeys as $key) {
             if (in_array($key, $this->homepageImageKeys, true)) {
+                continue;
+            }
+            if (array_key_exists($key, $this->flagSettingDefaults)) {
+                Setting::set($key, $request->boolean($key) ? '1' : '0');
+
                 continue;
             }
             $value = $validated[$key] ?? $request->input($key, '');

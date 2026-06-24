@@ -424,6 +424,94 @@
                 min-height: 112px !important;
             }
         }
+        .modal-quickview-block .modal-quickview-main .product-infor > .flex.justify-between {
+            align-items: flex-start;
+        }
+        .modal-quickview-block .add-wishlist-btn {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .qv-specs > div {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 0.5rem 1rem;
+            align-items: start;
+        }
+        .banner-block .banner-item.banner-zoom-only::before,
+        .banner-block .banner-item.banner-card-stable::before {
+            background-color: transparent !important;
+        }
+        .banner-block .banner-item.banner-zoom-only:hover::before,
+        .banner-block .banner-item.banner-card-stable:hover::before {
+            background-color: transparent !important;
+        }
+        .banner-block .banner-item.banner-zoom-only:hover .heading4,
+        .banner-block .banner-item.banner-zoom-only:hover .text-button,
+        .banner-block .banner-item.banner-zoom-only:hover .banner-content,
+        .banner-block .banner-item.banner-zoom-only:hover .button-main,
+        .banner-block .banner-item.banner-card-stable:hover .button-main {
+            opacity: 1 !important;
+            transform: none !important;
+            color: inherit;
+            background-color: var(--black, #000) !important;
+            border: none !important;
+        }
+        .banner-block .banner-item.banner-card-stable .banner-img,
+        .banner-block .banner-item.banner-zoom-only .banner-img,
+        .home-best-sellers-banner .banner-img {
+            overflow: hidden;
+        }
+        .banner-block .banner-item.banner-zoom-only:hover .banner-img img,
+        .banner-block .banner-item.banner-zoom-only:focus-within .banner-img img,
+        .banner-block .banner-item.banner-card-stable:hover .banner-img img,
+        .home-best-sellers-banner .banner-item:hover .banner-img img {
+            transform: scale(1.05);
+            transition: transform 0.45s ease;
+        }
+        .home-best-sellers-banner .banner-item::before {
+            background-color: transparent !important;
+        }
+        .hero-slider-nav {
+            color: #fff;
+            background: rgba(0,0,0,0.35);
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+        }
+        .hero-slider-nav::after {
+            font-size: 18px;
+        }
+        .breadcrumb-product .product-nav-links {
+            flex: 1 1 auto;
+        }
+        @media (max-width: 639.98px) {
+            .breadcrumb-product .product-nav-links {
+                justify-content: space-between;
+            }
+            .breadcrumb-product .prev-btn,
+            .breadcrumb-product .next-btn {
+                border: 0 !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            .quantity-block {
+                align-items: center !important;
+            }
+            .quantity-block i {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+        .modal-cart-block .modal-cart-main .list-product .item .infor > div:not(.bg-img) {
+            min-width: 0;
+            flex: 1;
+        }
+        .modal-cart-block .modal-cart-main .list-product .item .name {
+            word-break: break-word;
+        }
     </style>
     </head>
 
@@ -826,6 +914,21 @@
                 });
             }
             
+            document.querySelectorAll('.share-product-btn, .share-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var url = btn.getAttribute('data-share-url') || window.location.href;
+                    var title = btn.getAttribute('data-share-title') || document.title;
+                    if (navigator.share) {
+                        navigator.share({ title: title, url: url }).catch(function(){});
+                    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(function() { alert('Link copied to clipboard'); });
+                    } else {
+                        prompt('Copy this link:', url);
+                    }
+                });
+            });
+
         });
     </script>
 </body>
