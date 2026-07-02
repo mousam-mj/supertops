@@ -101,7 +101,15 @@
 .customize-page .prev-btn,.customize-page .next-btn{border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer}
 .customize-page .prev-btn{background:#fff;border:1px solid #161616;color:#161616}
 .customize-page .next-btn{background:#161616;border:1px solid #161616;color:#fff}
-.customize-page .qty-select{padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff}
+.customize-page .qty-select{padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff;text-align:center;text-align-last:center}
+.customize-page .mobile-qty-wrap{display:none;align-items:center;justify-content:center;height:56px;border:1.5px solid #d7d7d7;border-radius:18px;background:#fff;overflow:hidden;box-sizing:border-box}
+.customize-page .mobile-qty-wrap .mobile-qty-select{display:block;width:100%;height:100%;border:none;border-radius:0;background:transparent;font-size:22px;font-weight:600;line-height:1;text-align:center;text-align-last:center;padding:0 10px;margin:0;appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer}
+.customize-page .customize-reset-link{display:none;margin:10px auto 0;padding:8px 14px;font-size:12px;font-weight:600;color:#161616;background:#fff;border:1px solid #cfcfcf;border-radius:999px;cursor:pointer;text-align:center}
+.customize-page .customize-reset-link.is-visible{display:block;width:fit-content;max-width:100%}
+.customize-page .customize-reset-link:hover{background:#f5f5f3;border-color:#161616}
+.customize-page .customize-reset-all-btn{display:none;align-items:center;justify-content:center;height:56px;padding:0 14px;border:1.5px solid #d7d7d7;border-radius:18px;background:#fff;color:#161616;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.customize-page .customize-reset-all-btn.is-visible{display:inline-flex}
+.customize-page .customize-reset-all-btn:hover{background:#f5f5f3;border-color:#161616}
 .customize-page .customize-engraving-block{margin-top:1.25rem;padding:14px 16px;border:1px solid #e2e2dc;border-radius:12px;background:#fafaf8}
 .customize-page .engraving-label{font-size:14px;font-weight:600;color:#161616;margin-bottom:6px}
 .customize-page .engraving-hint{font-size:12px;color:#666;margin:0 0 10px;line-height:1.45}
@@ -189,7 +197,8 @@
   .customize-page .nav-steps{display:none}
   .customize-page .nav-right{width:100%;justify-content:stretch}
   .customize-page .nav-cart-wrap{width:100%;align-items:stretch;gap:0}
-  .customize-page .nav-cart-actions{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:stretch;width:100%}
+  .customize-page .nav-cart-actions{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:10px;align-items:stretch;width:100%}
+  .customize-page .mobile-qty-wrap{display:flex}
   .customize-page .mobile-qty-select{display:block;padding:0 12px;height:56px;border:1.5px solid #d7d7d7;border-radius:18px;background:#fff;font-size:24px;font-weight:500}
   .customize-page .add-cart-btn{height:56px;border-radius:18px;font-size:16px;font-weight:700;padding:0 18px}
   .customize-page .customize-checkout-btn{display:none}
@@ -245,8 +254,10 @@
 }
 @media(max-width:520px){
   .customize-page .top-nav{padding:12px 12px 8px}
-  .customize-page .nav-cart-actions{grid-template-columns:64px minmax(0,1fr);gap:8px}
-  .customize-page .mobile-qty-select{height:52px;padding:0 10px;font-size:20px;border-radius:16px}
+  .customize-page .nav-cart-actions{grid-template-columns:64px minmax(0,1fr) auto;gap:8px}
+  .customize-page .mobile-qty-wrap{height:52px;border-radius:16px}
+  .customize-page .mobile-qty-wrap .mobile-qty-select{font-size:20px}
+  .customize-page .customize-reset-all-btn{height:52px;border-radius:16px;font-size:12px;padding:0 10px}
   .customize-page .add-cart-btn{height:52px;font-size:14px;border-radius:16px}
   .customize-page .close-btn{width:40px;height:52px;font-size:24px}
   .customize-page #three-wrap{min-height:360px}
@@ -279,14 +290,17 @@
       <div class="nav-right">
         <div class="nav-cart-wrap">
           <div class="nav-cart-actions">
-            <select class="qty-select customize-qty-select mobile-qty-select" title="Quantity" onchange="onCustomizeQtyChange(this)">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
+            <div class="mobile-qty-wrap">
+              <select class="qty-select customize-qty-select mobile-qty-select" title="Quantity" onchange="onCustomizeQtyChange(this)">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
             <button type="button" class="add-cart-btn" id="top-cart-btn" onclick="addToCart()">Add to Cart – <span id="top-cart-price" class="customize-price-el">{{ $config['currency'] }}{{ number_format($config['base_price'], 2) }}</span></button>
+            <button type="button" class="customize-reset-all-btn" data-customize-reset="all" onclick="confirmResetCustomizeDesign()" title="Reset all customizations" aria-label="Reset all customizations">Reset</button>
             <button type="button" class="customize-checkout-btn" onclick="buyItNow()">Buy it now</button>
           </div>
           <span class="price-hint" id="price-hint"></span>
@@ -372,6 +386,7 @@
             <button type="button" class="color-arrow" onclick="shiftS('bottle',1)" aria-label="Next colors">&#8250;</button>
           </div>
           <div class="color-name-label" id="bottle-color-label">{{ ($config['bottle_colors'][0]['name'] ?? 'Lavender') }}</div>
+          <button type="button" class="customize-reset-link" data-customize-reset="step-color" onclick="resetCurrentStepColor()">Reset color</button>
           <div class="bottom-nav"><button class="next-btn" onclick="goTo(2)">Next – {{ $stepLabels[2] }}</button></div>
           <p class="flow-hint">{{ $sc['body']['flow_hint'] ?? '' }}</p>
         </div>
@@ -392,6 +407,7 @@
             <button class="color-arrow" onclick="shiftS('cap',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="cap-color-label">{{ ($config['cap_colors'][0]['name'] ?? 'Lavender') }}</div>
+          <button type="button" class="customize-reset-link" data-customize-reset="step-color" onclick="resetCurrentStepColor()">Reset color</button>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(1)">Previous – {{ $stepLabels[1] }}</button>
             <button class="next-btn" onclick="goTo(3)">Next – {{ $stepLabels[3] }}</button>
@@ -414,6 +430,7 @@
             <button class="color-arrow" onclick="shiftS('strap',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="strap-color-label">{{ ($config['strap_colors'][0]['name'] ?? 'Lavender') }}</div>
+          <button type="button" class="customize-reset-link" data-customize-reset="step-color" onclick="resetCurrentStepColor()">Reset color</button>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(2)">Previous – {{ $stepLabels[2] }}</button>
             <button class="next-btn" onclick="goTo(4)">Next – {{ $stepLabels[4] }}</button>
@@ -436,6 +453,7 @@
             <button class="color-arrow" onclick="shiftS('handle',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="handle-color-label">{{ ($config['handle_colors'][0]['name'] ?? 'Lavender') }}</div>
+          <button type="button" class="customize-reset-link" data-customize-reset="step-color" onclick="resetCurrentStepColor()">Reset color</button>
           <div class="bottom-nav">
             <button class="prev-btn" onclick="goTo(3)">Previous – {{ $stepLabels[3] }}</button>
             <button class="next-btn" onclick="goTo(5)">Next – {{ $stepLabels[5] }}</button>
@@ -458,6 +476,7 @@
             <button class="color-arrow" onclick="shiftS('boot',1)">&#8250;</button>
           </div>
           <div class="color-name-label" id="boot-color-label">{{ ($config['boot_colors'][0]['name'] ?? 'Lavender') }}</div>
+          <button type="button" class="customize-reset-link" data-customize-reset="step-color" onclick="resetCurrentStepColor()">Reset color</button>
           @if($engrOn && !$engrCatMode)
           <div class="customize-engraving-block" id="customize-engraving-wrap">
             <div class="engraving-label">{{ $config['engraving_label'] ?? 'Engraving' }}</div>
@@ -465,6 +484,7 @@
             <p class="engraving-hint">Optional.@if($engrP > 0) Add {{ $config['currency'] ?? '₹' }}{{ number_format($engrP, 2) }} when you enter text.@endif Max {{ (int) ($config['engraving_max_chars'] ?? 40) }} characters.</p>
             <label class="engraving-check-wrap"><input type="checkbox" id="customize-engraving-check" autocomplete="off"> <span>Add engraving</span></label>
             <textarea id="customize-engraving-text" class="engraving-textarea" rows="2" maxlength="{{ (int) ($config['engraving_max_chars'] ?? 40) }}" placeholder="e.g. your name" autocomplete="off"></textarea>
+            <button type="button" class="customize-reset-link" data-customize-reset="engraving" onclick="clearCustomizeEngraving()">Clear engraving</button>
           </div>
           @endif
           <div class="bottom-nav">
@@ -510,6 +530,7 @@
           <div id="engraving-grid-view">
             <div class="engraving-card-list" id="engraving-card-grid"></div>
           </div>
+          <button type="button" class="customize-reset-link" data-customize-reset="engraving" onclick="clearCustomizeEngraving()">Clear engraving</button>
           <div id="engraving-detail-view" style="display:none">
             <button type="button" class="engraving-detail-back" id="engraving-detail-back">← Back to options</button>
             <div class="engraving-detail-title" id="engraving-detail-title"></div>

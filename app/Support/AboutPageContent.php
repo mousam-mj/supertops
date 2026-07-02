@@ -7,20 +7,73 @@ class AboutPageContent
     /** Inserted in stored HTML; replaced on render with admin benefit icons. */
     public const BENEFIT_MARKER = '<!--PERCH_BENEFIT_BLOCK-->';
 
+    /** @return array<string, string> Theme asset paths for About Us image settings. */
+    public static function imageDefaults(): array
+    {
+        return [
+            'about_us_banner_image' => 'assets/images/banner/bg-feature-pet1.png',
+            'about_us_choose_image' => 'assets/images/instagram/p1(1).webp',
+            'about_us_growth_image' => 'assets/images/instagram/p1(3).webp',
+        ];
+    }
+
+    /** @return array<string, string> Default copy for About Us settings fields. */
+    public static function settingsDefaults(): array
+    {
+        return [
+            'about_us_hero_subtitle' => 'Welcome to Perch.',
+            'about_us_hero_heading' => 'Everyday lifestyle essentials. Thoughtfully designed.',
+            'about_us_hero_text_color' => '',
+            'about_us_hero_text_align' => 'center',
+            'about_us_intro_heading' => 'About Perch',
+            'about_us_intro_subheading' => 'Modern Lifestyle Brand for Everyday Essentials',
+            'about_us_intro_body' => "Perch is a modern lifestyle brand creating thoughtfully designed everyday essentials for work, home, travel, and everything in between. What started with premium insulated bottles has evolved into a growing collection across drinkware, barware, kitchenware, tiffin boxes, and utility essentials — with many more categories launching soon.\n\nBuilt for people who value design, functionality, and quality, Perch brings together products that look good, feel premium, and perform effortlessly in everyday life.",
+            'about_us_choose_heading' => 'Designed for Modern Living',
+            'about_us_choose_body' => 'At Perch, we believe everyday products should simplify life while elevating it. Every product is designed with a clear purpose - to blend seamlessly into your routine.',
+            'about_us_choose_feature_label' => 'Our range is: -',
+            'about_us_feature_1_title' => 'Functional & durable',
+            'about_us_feature_1_text' => 'made for daily, long-term use',
+            'about_us_feature_2_title' => 'Minimal & modern',
+            'about_us_feature_2_text' => 'clean designs that never go out of style',
+            'about_us_feature_3_title' => 'Safe & reliable',
+            'about_us_feature_3_text' => 'crafted using high-quality, food-grade materials',
+            'about_us_choose_footer' => 'From keeping beverages hot or cold, to organising meals, upgrading your bar setup, or improving your kitchen experience - Perch products are made to work beautifully, every day.',
+            'about_us_quote_heading' => 'A Lifestyle Brand, Not Just Products',
+            'about_us_quote_body' => "Perch goes beyond utility. We're building a lifestyle brand rooted in conscious choices, modern aesthetics, and everyday practicality. Our focus is on: - Premium materials that are safe, sustainable, and long-lasting - Thoughtful innovation that solves real-life needs - Timeless designs that complement modern homes and lifestyles",
+            'about_us_quote_subheading' => "We design essentials you'll reach for every day — not trends you'll replace tomorrow.",
+            'about_us_growth_heading' => 'Growing With You',
+            'about_us_growth_body' => "As lifestyles evolve, so do we. Perch is continuously expanding into new categories while staying true to our core values of quality, functionality, and design.\n\nWhether it's your morning coffee, office lunch, home bar, kitchen shelf, or travel bag — Perch is designed to be a part of your everyday moments.",
+            'about_us_why_choose_label' => 'Why Choose Perch?',
+            'about_us_why_1' => 'Premium lifestyle brand for everyday essentials',
+            'about_us_why_2' => 'Designed in India for modern, urban living',
+            'about_us_why_3' => 'High-quality drinkware, barware, kitchenware & more',
+            'about_us_why_4' => 'Functional, minimal, and durable products',
+            'about_us_why_5' => 'Built for work, home, travel, and gifting',
+        ];
+    }
+
+    public static function setting(string $key): string
+    {
+        $defaults = array_merge(self::imageDefaults(), self::settingsDefaults());
+
+        return (string) \App\Models\Setting::get($key, $defaults[$key] ?? '');
+    }
+
+    public static function settingImage(string $key): string
+    {
+        $stored = trim((string) \App\Models\Setting::get($key, ''));
+
+        return setting_image_url($stored, self::imageDefaults()[$key] ?? '');
+    }
+
     public static function defaultHtml(): string
     {
         return <<<'HTML'
 <div class="slider-block style-one about-page-hero about-hero--fullbg relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full" style="background-image: url('/assets/images/banner/bg-feature-pet1.png');">
-    <div class="slider-main relative z-[1] h-full w-full flex items-center justify-center gap-10">
-        <div class="sub-img w-[440px] max-md:w-1/2 rounded-b-full overflow-hidden max-md:hidden">
-            <img src="/assets/images/product/Bottle-1.webp" alt="" class="w-full">
-        </div>
-        <div class="text-content w-fit">
+    <div class="slider-main relative z-[1] h-full w-full flex flex-col {{ $heroTextFlexClass }} {{ $heroTextColorClass }}">
+        <div class="text-content w-full max-w-4xl px-4">
             <div class="text-sub-display text-center">Welcome to Perch.</div>
             <div class="heading2 text-center md:mt-4 mt-2">Everyday lifestyle essentials. Thoughtfully designed.</div>
-        </div>
-        <div class="sub-img w-[440px] max-md:w-1/2 rounded-t-full overflow-hidden">
-            <img src="/assets/images/product/Bottle-4.webp" alt="" class="w-full">
         </div>
     </div>
 </div>

@@ -194,6 +194,45 @@
         .modal-search-block #searchModalInput {
             padding-right: 3.25rem;
         }
+        .modal-search-block .modal-search-main {
+            display: flex;
+            flex-direction: column;
+            max-height: min(90vh, calc(100vh - 2rem));
+            overflow: hidden;
+            overscroll-behavior: contain;
+        }
+        .modal-search-block .modal-search-main.open {
+            overflow: hidden;
+        }
+        .modal-search-block .search-modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .modal-search-block .search-modal-results-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 0.25rem;
+        }
+        .modal-search-block .search-modal-results-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-search-block .search-modal-results-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 999px;
+        }
+        body.search-modal-open {
+            overflow: hidden !important;
+        }
+        .modal-search-block .search-modal-results-scroll {
+            touch-action: pan-y;
+        }
         /* Mobile bottom tab bar — override global span/body line-height so labels don’t stack/overlap */
         .mobile-app-nav {
             box-sizing: border-box;
@@ -322,9 +361,47 @@
                 position: relative;
                 z-index: 0 !important;
             }
-            #main-content .product-item .product-thumb .list-action {
-                z-index: 1 !important;
+        }
+        /* Product card: action buttons below thumbnail (not over the image) */
+        .product-item.grid-type .product-card-actions {
+            position: static;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+            pointer-events: auto;
+            width: 100%;
+            padding: 0;
+        }
+        .product-item.grid-type .product-card-actions .add-cart-btn,
+        .product-item.grid-type .product-card-actions .buy-now-btn {
+            width: 100%;
+            height: auto;
+            min-height: 40px;
+            min-width: 0;
+            flex: 1 1 0;
+            padding: 10px 12px !important;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            line-height: 1.2;
+        }
+        @media (min-width: 640px) {
+            .product-item.grid-type .product-card-actions .add-cart-btn,
+            .product-item.grid-type .product-card-actions .buy-now-btn {
+                font-size: 0.75rem;
             }
+        }
+        /* Product page Related Products: Swiper h-full was stretching thumbs past 3:4 ratio */
+        .tab-features-block .list-product.six-product .swiper-list-product,
+        .tab-features-block .list-product.six-product .swiper-slide {
+            height: auto !important;
+        }
+        .tab-features-block .list-product.six-product .product-item .product-thumb .product-img {
+            height: auto !important;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+        }
+        .tab-features-block .list-product.six-product .product-item .product-main {
+            height: auto;
         }
         /* Shopping cart drawer uses .list-cart (not .list-product); thumb size + object-fit */
         .modal-cart-block .modal-cart-main .list-product .item,
@@ -424,6 +501,51 @@
                 min-height: 112px !important;
             }
         }
+        /* Cart drawer — You May Also Like cards */
+        .modal-cart-block .modal-cart-main .left .list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-items: stretch;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card {
+            border: 1px solid var(--line, #e9e9e9);
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+            background: #fff;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card .product-main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card .product-infor {
+            position: static;
+            padding: 12px;
+            margin-top: 0 !important;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card .product-name {
+            font-size: 13px;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin: 0;
+            width: 100%;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card .product-price {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            width: 100%;
+        }
+        .modal-cart-block .modal-cart-main .left .list .cart-upsell-card .list-action {
+            display: none !important;
+        }
         .modal-quickview-block .modal-quickview-main .product-infor > .flex.justify-between {
             align-items: flex-start;
         }
@@ -437,6 +559,88 @@
             gap: 0.5rem 1rem;
             align-items: start;
         }
+        /* Two-block category cards (Home + Drinkware/Barware subcategories) */
+        .two-block-category-grid {
+            width: 100%;
+            max-width: 22rem;
+            justify-items: stretch;
+        }
+        @media (min-width: 640px) {
+            .two-block-category-grid {
+                max-width: 28rem;
+            }
+        }
+        @media (min-width: 768px) {
+            .two-block-category-grid {
+                max-width: 32rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .two-block-category-grid {
+                max-width: 36rem;
+            }
+        }
+        .home-two-categories .banner-item,
+        .category-subcategory-blocks .two-block-category-grid .banner-item {
+            max-width: 100%;
+        }
+        .home-two-categories .banner-item .banner-img img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img img {
+            display: block;
+            width: 100%;
+        }
+        /* Best Sellers wide banner — zoom only, no dark hover overlay */
+        .home-best-sellers-banner.banner-block .banner-item {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            line-height: 0;
+        }
+        .home-best-sellers-banner.banner-block .banner-item::before,
+        .home-best-sellers-banner.banner-block .banner-item:hover::before,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within::before {
+            display: none !important;
+            content: none !important;
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
+        .home-best-sellers-banner.banner-block .banner-item .banner-img {
+            overflow: hidden;
+            line-height: 0;
+        }
+        .home-best-sellers-banner.banner-block .banner-item .banner-img img {
+            display: block;
+            width: 100%;
+            height: auto;
+            transform: scale(1);
+            transform-origin: center center;
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            opacity: 1 !important;
+        }
+        .home-best-sellers-banner.banner-block .banner-item:hover .banner-img img,
+        .home-best-sellers-banner.banner-block .banner-item:focus-visible .banner-img img,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within .banner-img img {
+            transform: scale(1.04);
+            opacity: 1 !important;
+        }
+        .home-best-sellers-banner--show-text .banner-content {
+            line-height: normal;
+        }
+        .home-best-sellers-banner--show-text .banner-content .heading2,
+        .home-best-sellers-banner--show-text .banner-content .text-button,
+        .home-best-sellers-banner.banner-block .banner-item:hover .heading2,
+        .home-best-sellers-banner.banner-block .banner-item:hover .heading4,
+        .home-best-sellers-banner.banner-block .banner-item:hover .text-button,
+        .home-best-sellers-banner.banner-block .banner-item:hover .button-main,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within .heading2,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within .heading4,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within .text-button,
+        .home-best-sellers-banner.banner-block .banner-item:focus-within .button-main {
+            background-color: transparent !important;
+            opacity: 1 !important;
+            transform: none !important;
+        }
         .banner-block .banner-item.banner-zoom-only::before,
         .banner-block .banner-item.banner-card-stable::before {
             background-color: transparent !important;
@@ -445,31 +649,239 @@
         .banner-block .banner-item.banner-card-stable:hover::before {
             background-color: transparent !important;
         }
-        .banner-block .banner-item.banner-zoom-only:hover .heading4,
-        .banner-block .banner-item.banner-zoom-only:hover .text-button,
-        .banner-block .banner-item.banner-zoom-only:hover .banner-content,
-        .banner-block .banner-item.banner-zoom-only:hover .button-main,
-        .banner-block .banner-item.banner-card-stable:hover .button-main {
+        /* Keep centered banner CTAs fixed during hover (preserve -translate-x-1/2) */
+        .banner-block .banner-item .button-main.absolute.left-1\/2,
+        .banner-block .banner-item .heading4.absolute.left-1\/2 {
+            transform: translateX(-50%);
+        }
+        .banner-block .banner-item:hover .button-main.absolute.left-1\/2,
+        .banner-block .banner-item:focus-within .button-main.absolute.left-1\/2,
+        .banner-block .banner-item:hover .heading4.absolute.left-1\/2,
+        .banner-block .banner-item:focus-within .heading4.absolute.left-1\/2 {
+            transform: translateX(-50%) !important;
+        }
+        .banner-block .banner-item.banner-card-stable:hover .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .button-main {
             opacity: 1 !important;
-            transform: none !important;
+            transform: translateX(-50%) !important;
             color: inherit;
             background-color: var(--black, #000) !important;
             border: none !important;
         }
         .banner-block .banner-item.banner-card-stable .banner-img,
-        .banner-block .banner-item.banner-zoom-only .banner-img,
-        .home-best-sellers-banner .banner-img {
+        .banner-block .banner-item.banner-zoom-only .banner-img {
             overflow: hidden;
+        }
+        .banner-block .banner-item.banner-zoom-only .banner-img img,
+        .banner-block .banner-item.banner-card-stable .banner-img img {
+            transform: scale(1);
+            transform-origin: center center;
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .banner-block .banner-item.banner-zoom-only:hover .banner-img img,
         .banner-block .banner-item.banner-zoom-only:focus-within .banner-img img,
-        .banner-block .banner-item.banner-card-stable:hover .banner-img img,
-        .home-best-sellers-banner .banner-item:hover .banner-img img {
-            transform: scale(1.05);
-            transition: transform 0.45s ease;
+        .banner-block .banner-item.banner-card-stable:hover .banner-img img {
+            transform: scale(1.04);
         }
-        .home-best-sellers-banner .banner-item::before {
-            background-color: transparent !important;
+        /* Fixed-size banner cards: text overlays must not change block height */
+        .banner-block .banner-item.banner-size-fixed,
+        .category-hero-banner.list-banner {
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner-block .banner-item.banner-size-fixed {
+            aspect-ratio: 4 / 5;
+        }
+        .category-hero-banner.list-banner {
+            aspect-ratio: 16 / 5;
+        }
+        @media (max-width: 767.98px) {
+            .category-hero-banner.list-banner {
+                aspect-ratio: 4 / 5;
+            }
+        }
+        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
+            aspect-ratio: 16 / 5;
+        }
+        @media (max-width: 767.98px) {
+            .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
+                aspect-ratio: 4 / 5;
+            }
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-img,
+        .category-hero-banner .banner-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            line-height: 0;
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-img img,
+        .banner-block .banner-item.banner-size-fixed .banner-img picture,
+        .banner-block .banner-item.banner-size-fixed .banner-img picture img,
+        .category-hero-banner .banner-img img,
+        .category-hero-banner .banner-img picture,
+        .category-hero-banner .banner-img picture img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
+            display: block;
+            aspect-ratio: unset !important;
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-text-overlay,
+        .category-hero-banner .banner-text-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1.5rem 1rem 2rem;
+            pointer-events: none;
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-text-overlay .banner-overlay-heading,
+        .category-hero-banner .banner-text-overlay .banner-overlay-heading {
+            margin: 0;
+            max-width: 100%;
+            text-align: center;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+        .banner-text-tone-white .banner-overlay-heading,
+        .banner-text-tone-white .heading1,
+        .banner-text-tone-white .heading2,
+        .banner-text-tone-white .heading3,
+        .banner-text-tone-white .heading4,
+        .banner-text-tone-white .body1,
+        .banner-text-tone-white .text-sub-display,
+        .flash-sale-block .banner-text-tone-white .heading2,
+        .flash-sale-block .banner-text-tone-white .body1 {
+            color: #fff !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+        }
+        .banner-text-tone-black .banner-overlay-heading,
+        .banner-text-tone-black .heading1,
+        .banner-text-tone-black .heading2,
+        .banner-text-tone-black .heading3,
+        .banner-text-tone-black .heading4,
+        .banner-text-tone-black .body1,
+        .banner-text-tone-black .text-sub-display,
+        .flash-sale-block .banner-text-tone-black .heading2,
+        .flash-sale-block .banner-text-tone-black .body1 {
+            color: #000 !important;
+            text-shadow: none;
+        }
+        .banner-text-tone-white .text-button {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+        .banner-text-tone-black .text-button {
+            color: #000 !important;
+            border-color: #000 !important;
+        }
+        .banner-text-tone-white .button-main {
+            background: #fff !important;
+            color: #000 !important;
+            border-color: #fff !important;
+        }
+        .banner-text-tone-white .button-main:hover {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000 !important;
+        }
+        .banner-text-tone-black .button-main {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000 !important;
+        }
+        .banner-text-tone-black .button-main:hover {
+            background: #fff !important;
+            color: #000 !important;
+            border-color: #000 !important;
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-text-overlay .button-main,
+        .category-hero-banner .banner-text-overlay .button-main {
+            pointer-events: auto;
+            flex-shrink: 0;
+        }
+        .banner-block .banner-item.banner-size-fixed.banner-aspect-3-4 {
+            aspect-ratio: 3 / 4;
+        }
+        .home-best-sellers-banner .banner-text-overlay {
+            justify-content: center;
+        }
+        /* Product page: horizontal thumb strip below main image on mobile */
+        @media (max-width: 639.98px) {
+            .product-detail.style-grouped .product-gallery-wrap {
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+            }
+            .product-detail.style-grouped .product-gallery-inner {
+                position: relative !important;
+                top: auto !important;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+            .product-detail.style-grouped .product-gallery-main {
+                order: 1;
+                width: 100%;
+                margin-left: 0 !important;
+            }
+            .product-detail.style-grouped .product-gallery-main .swiper-slide img {
+                width: 100%;
+                aspect-ratio: 3 / 4;
+                object-fit: cover;
+                display: block;
+            }
+            .product-detail.style-grouped .product-gallery-thumbs {
+                order: 2;
+                position: relative !important;
+                width: 100% !important;
+                max-width: 100%;
+                margin: 0 !important;
+                overflow: hidden;
+            }
+            .product-detail.style-grouped .product-gallery-thumbs .swiper-wrapper {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                flex-direction: row !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            .product-detail.style-grouped .product-gallery-thumbs .swiper-slide {
+                width: 68px !important;
+                height: 85px !important;
+                flex-shrink: 0;
+                border-radius: 12px;
+                overflow: hidden;
+                opacity: 0.55;
+            }
+            .product-detail.style-grouped .product-gallery-thumbs .swiper-slide-thumb-active {
+                opacity: 1;
+                border: 2px solid var(--black, #000);
+            }
+            .product-detail.style-grouped .product-gallery-thumbs .swiper-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+            .product-detail.style-grouped .featured-product.underwear .mySwiper .swiper-wrapper,
+            .product-detail.style-grouped .featured-product.cosmetic .mySwiper .swiper-wrapper {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+            }
         }
         .hero-slider-nav {
             color: #fff;
@@ -536,11 +948,19 @@
         }
         function openSearch() {
             var main = document.querySelector('.modal-search-block .modal-search-main');
-            if (main) { main.classList.add('open'); document.body.style.overflow='hidden'; }
+            if (main) {
+                main.classList.add('open');
+                document.body.classList.add('search-modal-open');
+                document.body.style.overflow = 'hidden';
+            }
         }
         function closeSearch() {
             var main = document.querySelector('.modal-search-block .modal-search-main');
-            if (main) { main.classList.remove('open'); document.body.style.overflow=''; }
+            if (main) {
+                main.classList.remove('open');
+                document.body.classList.remove('search-modal-open');
+                document.body.style.overflow = '';
+            }
         }
         window.closeSearch = closeSearch;
         function openMobileMenuFromBottom() {
@@ -653,7 +1073,7 @@
                     <i class="ph ph-x text-lg leading-none"></i>
                 </button>
             </div>
-            <div class="keyword mt-8">
+            <div class="keyword mt-8 shrink-0">
                 <div class="heading5">Popular searches</div>
                 <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
                     <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Dress']) }}}'">Dress</button>
@@ -662,9 +1082,11 @@
                     <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Top']) }}}'">Top</button>
                 </div>
             </div>
-            <div class="search-results-dynamic mt-8" id="searchModalResults">
-                <div class="heading6" id="searchResultsTitle">Latest products</div>
-                <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4 mt-4" id="searchModalProductList">
+            <div class="search-modal-body mt-8 min-h-0">
+            <div class="search-results-dynamic flex flex-col min-h-0 flex-1" id="searchModalResults">
+                <div class="heading6 shrink-0" id="searchResultsTitle">Latest products</div>
+                <div class="search-modal-results-scroll mt-4">
+                <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4" id="searchModalProductList">
                     @php
                         $recentProducts = \App\Models\Product::where('is_active', true)
                             ->orderBy('created_at', 'desc')
@@ -681,10 +1103,12 @@
                         </div>
                     @endforelse
                 </div>
-                <div class="search-loading hidden text-center py-6" id="searchModalLoading">
+                </div>
+                <div class="search-loading hidden text-center py-6 shrink-0" id="searchModalLoading">
                     <span class="body1 text-secondary">Searching...</span>
                 </div>
-                <a href="{{{ route('search') }}}" class="button-main w-full text-center mt-4 hidden" id="searchModalViewAll">View all results</a>
+                <a href="{{{ route('search') }}}" class="button-main w-full text-center mt-4 hidden shrink-0" id="searchModalViewAll">View all results</a>
+            </div>
             </div>
         </div>
     </div>
@@ -840,6 +1264,7 @@
                 searchModal.addEventListener('click', function(e) {
                     if (e.target === searchModal) {
                         searchModalMain.classList.remove('open');
+                        document.body.classList.remove('search-modal-open');
                         document.body.style.overflow = '';
                     }
                 });
@@ -851,6 +1276,7 @@
                     const sm = document.querySelector('.modal-search-block .modal-search-main');
                     if (sm && sm.classList.contains('open')) {
                         sm.classList.remove('open');
+                        document.body.classList.remove('search-modal-open');
                         document.body.style.overflow = '';
                     }
                     if (menuMobile && menuMobile.classList.contains('active')) {
@@ -885,6 +1311,8 @@
                                     searchTitle.textContent = 'Search results for "' + q + '"';
                                     searchViewAll.href = '{{ url("/search") }}?q=' + encodeURIComponent(q);
                                     searchViewAll.classList.remove('hidden');
+                                    var scrollArea = document.querySelector('.search-modal-results-scroll');
+                                    if (scrollArea) scrollArea.scrollTop = 0;
                                 })
                                 .catch(function() {
                                     searchList.innerHTML = '<div class="col-span-full text-center py-8"><p class="body1 text-secondary">Search failed. Try again.</p></div>';

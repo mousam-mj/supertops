@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\InstagramReel;
 use App\Models\Order;
 use App\Models\Product;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::defaultView('vendor.pagination.perch');
+
         // Share alerts count with all views
         view()->composer('admin.layout', function ($view) {
             $lowStockCount = Product::where('stock_quantity', '<', 10)

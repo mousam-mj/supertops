@@ -31,25 +31,23 @@
                     if ($mainImage === $placeholderImg && isset($product->images) && is_array($product->images) && count($product->images) > 0 && is_string($product->images[0])) {
                         $mainImage = $getImageUrl($product->images[0]);
                     }
-                    $hoverImage = (isset($product->images) && is_array($product->images) && count($product->images) > 0) ? $getImageUrl($product->images[0]) : $mainImage;
                 @endphp
-                <img class="w-full h-full object-cover duration-700 absolute inset-0" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
-                <img class="w-full h-full object-cover duration-700 absolute inset-0 opacity-0 hover:opacity-100" src="{{ $hoverImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
+                <img class="w-full h-full object-cover duration-700 block" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
-            
-            <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5 opacity-0 group-hover:opacity-100 max-md:opacity-100 max-md:group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-auto">
-                <div class="add-cart-btn w-full text-button-uppercase py-2 text-center rounded-full duration-300 bg-white hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center" data-product-id="{{ $product->id ?? '' }}">
-                    <span class="max-lg:hidden">Add To Cart</span>
-                    <i class="ph ph-shopping-bag-open lg:hidden text-xl"></i>
-                </div>
-                <a href="{{ route('product.show', $product->slug ?? '#') }}?buy=1" class="buy-now-btn w-full text-button-uppercase py-2 text-center rounded-full duration-500 bg-white hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center no-underline text-inherit" data-product-slug="{{ $product->slug ?? '' }}">
-                    <span class="max-lg:hidden">Buy Now</span>
-                    <i class="ph ph-lightning lg:hidden text-xl"></i>
-                </a>
+        </div>
+
+        <div class="product-card-actions list-action grid grid-cols-2 gap-2 mt-3">
+            <div class="add-cart-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2" data-product-id="{{ $product->id ?? '' }}">
+                <i class="ph ph-shopping-cart-simple text-lg shrink-0" aria-hidden="true"></i>
+                <span>Add To Cart</span>
             </div>
+            <a href="{{ route('product.show', $product->slug ?? '#') }}?buy=1" class="buy-now-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2 no-underline text-inherit" data-product-slug="{{ $product->slug ?? '' }}">
+                <i class="ph ph-lightning text-lg shrink-0" aria-hidden="true"></i>
+                <span>Buy Now</span>
+            </a>
         </div>
         
-        <div class="product-infor mt-4 lg:mb-7">
+        <div class="product-infor mt-3 lg:mb-7">
             <div class="product-sold sm:pb-4 pb-2">
                 @php
                     $stockQuantity = max(1, (int) ($product->stock_quantity ?? 100));

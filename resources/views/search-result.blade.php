@@ -33,10 +33,15 @@
                     @endif
                 </div>
                 <div class="input-block lg:w-1/2 sm:w-3/5 w-full md:h-[52px] h-[44px] sm:mt-8 mt-5">
-                    <form method="GET" action="{{ route('search') }}" class="form-search w-full h-full relative">
-                        <input type="text" name="q" placeholder="Search products..." value="{{ e($query ?? '') }}" class="caption1 w-full h-full pl-4 md:pr-[150px] pr-32 rounded-xl border border-line" />
+                    <form method="GET" action="{{ route('search') }}" class="form-search w-full h-full relative" id="search-page-form">
+                        <input type="text" name="q" id="search-page-query" placeholder="Search products..." value="{{ e($query ?? '') }}" class="caption1 w-full h-full pl-4 md:pr-[150px] pr-32 rounded-xl border border-line" />
                         <button type="submit" class="button-main absolute top-1 bottom-1 right-1 flex items-center justify-center px-4">Search</button>
                     </form>
+                    @if($query)
+                        <div class="text-center mt-3">
+                            <a href="{{ route('search') }}" id="search-clear-link" class="caption1 text-red duration-300 hover:underline">Clear search</a>
+                        </div>
+                    @endif
                 </div>
             </div>
 

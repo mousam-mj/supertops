@@ -16,6 +16,8 @@ class Product extends Model
         'description',
         'short_description',
         'category_id',
+        'parent_product_id',
+        'variant_color_label',
         'price',
         'sale_price',
         'sku',
@@ -28,6 +30,8 @@ class Product extends Model
         'image',
         'images',
         'color_images',
+        'color_swatch_images',
+        'color_variant_names',
         'video',
         'sizes',
         'colors',
@@ -48,6 +52,8 @@ class Product extends Model
         'is_new_arrival' => 'boolean',
         'images' => 'array',
         'color_images' => 'array',
+        'color_swatch_images' => 'array',
+        'color_variant_names' => 'array',
         'sizes' => 'array',
         'colors' => 'array',
         'specifications' => 'array',
@@ -72,6 +78,74 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function parentProduct()
+    {
+        return $this->belongsTo(Product::class, 'parent_product_id');
+    }
+
+    public function childVariants()
+    {
+        return $this->hasMany(Product::class, 'parent_product_id')->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function variantGroupRoot(): self
+    {
+        if ($this->parent_product_id && $this->relationLoaded('parentProduct') && $this->parentProduct) {
+            return $this->parentProduct->variantGroupRoot();
+        }
+
+        if ($this->parent_product_id && ! $this->relationLoaded('parentProduct')) {
+            $parent = static::find($this->parent_product_id);
+
+            return $parent ? $parent->variantGroupRoot() : $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Main product plus all linked variant products in this color group.
+     */
+    public function variantGroupMembers()
+    {
+        $root = $this->variantGroupRoot();
+        $root->loadMissing(['childVariants.inventories']);
+
+        return collect([$root])->merge($root->childVariants)->unique('id')->values();
+    }
+
+    public function getDisplayColorLabel(): string
+    {
+        $label = trim((string) ($this->variant_color_label ?? ''));
+        if ($label !== '') {
+            return $label;
+        }
+
+        $inventoryColor = $this->inventories->pluck('color')->filter()->map(fn ($c) => trim((string) $c))->first();
+        if ($inventoryColor) {
+            return $inventoryColor;
+        }
+
+        if (str_contains($this->name, ',')) {
+            return trim(substr($this->name, strrpos($this->name, ',') + 1));
+        }
+
+        return $this->name;
+    }
+
+    public function getSwatchUrlForDisplayColor(): ?string
+    {
+        $label = $this->getDisplayColorLabel();
+        $swatch = $this->getSwatchImageForColor($label);
+        if ($swatch) {
+            return $swatch;
+        }
+
+        $inventory = $this->inventories->first(fn ($inv) => trim((string) ($inv->color ?? '')) === $label);
+
+        return $inventory?->image;
     }
 
     /**
@@ -193,6 +267,21 @@ class Product extends Model
             return $colorImages[$key];
         }
         return $this->image;
+    }
+
+    /**
+     * Small swatch image for the color picker (supports dual-tone uploads).
+     */
+    public function getSwatchImageForColor($color): ?string
+    {
+        if (! $color) {
+            return null;
+        }
+
+        $swatches = $this->color_swatch_images ?? [];
+        $key = trim((string) $color);
+
+        return ! empty($swatches[$key]) ? $swatches[$key] : null;
     }
 }
 

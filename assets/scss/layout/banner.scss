@@ -38,6 +38,14 @@
                 color: var(--white);
                 background-color: transparent;
                 border: 1px solid var(--white);
+
+                &.absolute.left-1\/2 {
+                    transform: translateX(-50%);
+                }
+            }
+
+            .heading4.absolute.left-1\/2 {
+                transform: translateX(-50%);
             }
 
             .text-button {

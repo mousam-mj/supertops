@@ -51,17 +51,34 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="priority" class="form-label">Priority (order)</label>
-                            <input type="number" class="form-control @error('priority') is-invalid @enderror" id="priority" name="priority" value="{{ old('priority', $heroBanner->priority) }}" min="0">
-                            @error('priority')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="hidden" name="show_text" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_text" id="show_text" value="1" {{ old('show_text', $heroBanner->show_text ?? false) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="show_text">Show title, subtitle &amp; button text on slide</label>
+                            </div>
                         </div>
                         <div class="col-md-6 mb-3 d-flex align-items-end">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $heroBanner->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">Active (show on homepage)</label>
                             </div>
+                        </div>
+                    </div>
+
+                    @include('admin.partials.banner-text-color-select', [
+                        'name' => 'text_color',
+                        'id' => 'text_color',
+                        'label' => 'Slide text color',
+                        'value' => old('text_color', $heroBanner->text_color ?? ''),
+                    ])
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="priority" class="form-label">Priority (order)</label>
+                            <input type="number" class="form-control @error('priority') is-invalid @enderror" id="priority" name="priority" value="{{ old('priority', $heroBanner->priority) }}" min="0">
+                            @error('priority')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -76,10 +93,28 @@
                         @error('banner_image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Leave empty to keep current image. Max 5MB.</small>
+                        <small class="text-muted">Recommended: 1920×820px. Leave empty to keep current image. Max 5MB.</small>
                         <div id="imagePreview" class="mt-2" style="display: none;">
                             <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 150px; object-fit: cover; border-radius: 8px;">
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image_mobile" class="form-label">Mobile banner image <span class="text-muted">(optional)</span></label>
+                        @if($heroBanner->banner_image_mobile)
+                            <div class="mb-2">
+                                <img src="{{ storage_asset($heroBanner->banner_image_mobile) }}" alt="Mobile" style="max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 8px;">
+                                <input type="hidden" name="remove_banner_image_mobile" value="0" id="removeBannerImageMobileInput">
+                                <button type="button" class="btn btn-sm btn-outline-danger mt-1 d-block" onclick="document.getElementById('removeBannerImageMobileInput').value='1'; this.previousElementSibling.previousElementSibling?.remove(); this.remove();">Remove mobile image</button>
+                            </div>
+                        @else
+                            <input type="hidden" name="remove_banner_image_mobile" value="0" id="removeBannerImageMobileInput">
+                        @endif
+                        <input type="file" class="form-control @error('banner_image_mobile') is-invalid @enderror" id="banner_image_mobile" name="banner_image_mobile" accept="image/*">
+                        @error('banner_image_mobile')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Recommended: 750×1000px. Shown on screens under 768px.</small>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">

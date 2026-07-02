@@ -323,4 +323,75 @@ class InventoryController extends Controller
         $salePrice = $first->sale_price !== null && $first->sale_price > 0 ? (float) $first->sale_price : null;
         $product->update(['price' => $price, 'sale_price' => $salePrice]);
     }
+
+    /**
+     * Upload small swatch images for each product color (dual-tone friendly).
+     */
+    public function updateColorSwatches(Request $request, $productId)
+    {
+        $product = Product::with('inventories')->findOrFail($productId);
+
+        $validated = $request->validate([
+            'swatch_color_keys' => 'nullable|array',
+            'swatch_color_keys.*' => 'nullable|string|max:100',
+            'swatch_images' => 'nullable|array',
+            'swatch_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'remove_swatch' => 'nullable|array',
+            'remove_swatch.*' => 'nullable|boolean',
+            'variant_names' => 'nullable|array',
+            'variant_names.*' => 'nullable|string|max:255',
+        ]);
+
+        $allowedColors = $product->inventories
+            ->pluck('color')
+            ->filter(fn ($c) => trim((string) $c) !== '')
+            ->map(fn ($c) => trim((string) $c))
+            ->unique()
+            ->values()
+            ->all();
+
+        $swatches = is_array($product->color_swatch_images) ? $product->color_swatch_images : [];
+        $variantNames = is_array($product->color_variant_names) ? $product->color_variant_names : [];
+        $colorKeys = $validated['swatch_color_keys'] ?? [];
+        $submittedVariantNames = $validated['variant_names'] ?? [];
+
+        foreach ($colorKeys as $index => $colorName) {
+            $colorName = trim((string) $colorName);
+            if ($colorName === '' || ! in_array($colorName, $allowedColors, true)) {
+                continue;
+            }
+
+            $variantTitle = trim((string) ($submittedVariantNames[$index] ?? ''));
+            if ($variantTitle !== '') {
+                $variantNames[$colorName] = $variantTitle;
+            } else {
+                unset($variantNames[$colorName]);
+            }
+
+            if ($request->boolean("remove_swatch.{$index}")) {
+                if (! empty($swatches[$colorName])) {
+                    Storage::disk('public')->delete($swatches[$colorName]);
+                }
+                unset($swatches[$colorName]);
+
+                continue;
+            }
+
+            $file = $request->file("swatch_images.{$index}");
+            if ($file && $file->isValid()) {
+                if (! empty($swatches[$colorName])) {
+                    Storage::disk('public')->delete($swatches[$colorName]);
+                }
+                $swatches[$colorName] = $file->store('products/color-swatches', 'public');
+            }
+        }
+
+        $product->update([
+            'color_swatch_images' => count($swatches) > 0 ? $swatches : null,
+            'color_variant_names' => count($variantNames) > 0 ? $variantNames : null,
+        ]);
+
+        return redirect()->route('admin.inventory.product', $product->id)
+            ->with('success', 'Color display settings updated successfully.');
+    }
 }

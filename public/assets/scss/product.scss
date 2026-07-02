@@ -190,15 +190,8 @@
             }
         }
 
-        .product-img img:nth-child(2) {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            visibility: hidden;
-            z-index: 0;
+        .product-img img {
+            transition: transform 0.7s ease;
         }
 
         .countdown-time-block,
@@ -228,6 +221,26 @@
     }
 
     &.grid-type {
+        .product-card-actions {
+            position: static;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            width: 100%;
+            padding: 0;
+
+            .add-cart-btn,
+            .buy-now-btn {
+                width: 100%;
+                height: auto;
+                min-height: 40px;
+                min-width: 0;
+                flex: 1 1 0;
+                padding: 10px 12px !important;
+                border-radius: 9999px;
+            }
+        }
+
         &:hover {
             .product-thumb {
                 .list-action {
@@ -238,15 +251,6 @@
 
                 .product-img img {
                     transform: scale(1.05);
-
-                    &:first-child {
-                        opacity: 0;
-                    }
-
-                    &:last-child {
-                        opacity: 1;
-                        visibility: visible;
-                    }
                 }
 
                 .countdown-time-block,
@@ -280,15 +284,6 @@
             &:hover {
                 .product-img img {
                     transform: scale(1.05);
-
-                    &:first-child {
-                        opacity: 0;
-                    }
-
-                    &:last-child {
-                        opacity: 1;
-                        visibility: visible;
-                    }
                 }
             }
         }
@@ -766,6 +761,36 @@
 
     &.style-grouped {
         .list-img {
+            @media (max-width: 639.98px) {
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+                min-width: 0;
+
+                .sticky {
+                    width: 100%;
+                    max-width: 100%;
+                }
+
+                .mySwiper2 {
+                    margin-left: 0 !important;
+                    width: 100%;
+                    max-width: 100%;
+
+                    .swiper-slide {
+                        height: auto;
+                    }
+
+                    .swiper-slide img {
+                        width: 100%;
+                        height: auto;
+                        aspect-ratio: 3 / 4;
+                        object-fit: cover;
+                        display: block;
+                    }
+                }
+            }
+
             @media (min-width: 640px) {
                 .mySwiper2 {
                     margin-left: 130px;
@@ -781,6 +806,43 @@
                     .swiper-wrapper {
                         top: 0;
                         left: 0;
+                    }
+                }
+            }
+        }
+
+        .featured-product.underwear,
+        .featured-product.cosmetic {
+            @media (max-width: 639.98px) {
+                .mySwiper {
+                    width: 100%;
+                    max-width: 100%;
+                    margin-top: 16px;
+                    overflow: hidden;
+
+                    .swiper-wrapper {
+                        position: relative !important;
+                        top: auto !important;
+                        left: auto !important;
+                        flex-direction: row !important;
+                        width: 100% !important;
+                        max-width: 100%;
+                        gap: 12px;
+                    }
+
+                    .swiper-slide {
+                        width: 72px !important;
+                        max-width: 72px;
+                        flex-shrink: 0;
+                        height: auto;
+                        aspect-ratio: 3 / 4;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            display: block;
+                        }
                     }
                 }
             }

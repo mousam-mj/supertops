@@ -15,10 +15,15 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'image_mobile',
         'hero_image',
+        'hero_image_mobile',
         'hero_text',
         'hero_button_text',
+        'hero_show_text',
+        'hero_text_color',
         'banner_images',
+        'banner_images_mobile',
         'banner_texts',
         'bottom_banner_image',
         'bottom_banner_text',
@@ -35,7 +40,9 @@ class Category extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'show_on_parent_page' => 'boolean',
+        'hero_show_text' => 'boolean',
         'banner_images' => 'array',
+        'banner_images_mobile' => 'array',
         'banner_texts' => 'array',
     ];
 

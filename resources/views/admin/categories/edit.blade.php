@@ -159,6 +159,13 @@
                         </div>
                     </div>
 
+                    @include('admin.partials.banner-text-color-select', [
+                        'name' => 'hero_text_color',
+                        'id' => 'hero_text_color',
+                        'label' => 'Hero banner text color',
+                        'value' => old('hero_text_color', $category->hero_text_color),
+                    ])
+
                     <hr class="my-4">
                     <h5 class="mb-3">Promotional Banners (3 Blocks)</h5>
 

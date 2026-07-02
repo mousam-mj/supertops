@@ -42,10 +42,17 @@
                 @error('image')
                     <div class="invalid-feedback d-block">{{ $message }}</div>
                 @enderror
-                <small class="form-text text-muted">Recommended: 800×1000px (portrait). Max 2MB.</small>
+                <small class="form-text text-muted">Recommended: 750×1000px (3:4 portrait). Max 2MB.</small>
                 <div id="imagePreview" class="mt-2" style="display: none;">
                     <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 220px; object-fit: cover;">
                 </div>
+                @include('admin.partials.banner-mobile-upload', [
+                    'name' => 'image_mobile',
+                    'inputId' => 'image_mobile',
+                    'removeName' => 'remove_image_mobile',
+                    'currentMobile' => $category->image_mobile ?? null,
+                    'recommended' => '750×1000px',
+                ])
             </div>
             <div class="col-lg-6">
                 <label for="hero_image" class="form-label fw-semibold">Subcategory page top banner</label>
@@ -81,6 +88,13 @@
                 <div id="heroImagePreview" class="mt-2" style="display: none;">
                     <img id="heroPreviewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 220px; object-fit: cover;">
                 </div>
+                @include('admin.partials.banner-mobile-upload', [
+                    'name' => 'hero_image_mobile',
+                    'inputId' => 'hero_image_mobile',
+                    'removeName' => 'remove_hero_image_mobile',
+                    'currentMobile' => $category->hero_image_mobile ?? null,
+                    'recommended' => '750×1000px',
+                ])
             </div>
             <div class="col-12">
                 <label for="hero_button_text" class="form-label">Shop button text</label>
@@ -93,6 +107,13 @@
                 @error('hero_button_text')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+            <div class="col-12">
+                <input type="hidden" name="hero_show_text" value="0">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hero_show_text" name="hero_show_text" value="1" {{ old('hero_show_text', $category->hero_show_text ?? true) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="hero_show_text">Show Shop button on subcategory page hero banner</label>
+                </div>
             </div>
             <div class="col-12">
                 <div class="form-check form-switch">

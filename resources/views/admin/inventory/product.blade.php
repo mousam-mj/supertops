@@ -135,6 +135,12 @@
     sort($sizeOptions);
 @endphp
 
+@include('admin.inventory.partials.color-swatch-fields', [
+    'product' => $product,
+    'inventoryColors' => $inventoryColors,
+    'masterColorCodes' => $masterColorCodes ?? [],
+])
+
 {{-- Add Inventory --}}
 <div class="row mb-4">
     <div class="col-12">
@@ -374,6 +380,18 @@
 @push('scripts')
 <script>
 (function() {
+    document.querySelectorAll('.swatch-remove-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var inputId = btn.getAttribute('data-remove-input');
+            var input = inputId ? document.getElementById(inputId) : null;
+            if (input) {
+                input.value = '1';
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-trash me-1"></i>Will remove on save';
+        });
+    });
+
     var table = document.getElementById('bulk-inventory-table');
     var tbody = table && table.querySelector('tbody');
     var addBtn = document.getElementById('add-bulk-row');

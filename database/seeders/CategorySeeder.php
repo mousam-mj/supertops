@@ -30,6 +30,7 @@ class CategorySeeder extends Seeder
                 'name' => 'Barware',
                 'is_active' => true,
                 'sort_order' => 2,
+                'subcategory_cards_section_enabled' => false,
             ]
         );
 

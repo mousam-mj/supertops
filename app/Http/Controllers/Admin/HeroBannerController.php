@@ -28,15 +28,23 @@ class HeroBannerController extends Controller
             'priority' => 'nullable|integer|min:0',
             'deeplink' => 'nullable|string|max:500',
             'button_text' => 'nullable|string|max:100',
+            'show_text' => 'nullable|boolean',
+            'text_color' => 'nullable|string|in:black,white',
             'banner_image' => 'required|image|max:5120',
+            'banner_image_mobile' => 'nullable|image|max:5120',
             'is_active' => 'nullable|boolean',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['show_text'] = $request->boolean('show_text', false);
+        $validated['text_color'] = normalize_banner_text_color($request->input('text_color'));
         $validated['priority'] = (int) ($validated['priority'] ?? 0);
 
         if ($request->hasFile('banner_image')) {
             $validated['banner_image'] = $request->file('banner_image')->store('hero-banners', 'public');
+        }
+        if ($request->hasFile('banner_image_mobile')) {
+            $validated['banner_image_mobile'] = $request->file('banner_image_mobile')->store('hero-banners', 'public');
         }
 
         HeroBanner::create($validated);
@@ -58,11 +66,17 @@ class HeroBannerController extends Controller
             'priority' => 'nullable|integer|min:0',
             'deeplink' => 'nullable|string|max:500',
             'button_text' => 'nullable|string|max:100',
+            'show_text' => 'nullable|boolean',
+            'text_color' => 'nullable|string|in:black,white',
             'banner_image' => 'sometimes|nullable|image|max:5120',
+            'banner_image_mobile' => 'nullable|image|max:5120',
+            'remove_banner_image_mobile' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['show_text'] = $request->boolean('show_text', false);
+        $validated['text_color'] = normalize_banner_text_color($request->input('text_color'));
         $validated['priority'] = (int) ($validated['priority'] ?? 0);
 
         if ($request->hasFile('banner_image')) {
@@ -71,6 +85,18 @@ class HeroBannerController extends Controller
             }
             $validated['banner_image'] = $request->file('banner_image')->store('hero-banners', 'public');
         }
+
+        if ($request->boolean('remove_banner_image_mobile') && $heroBanner->banner_image_mobile) {
+            Storage::disk('public')->delete($heroBanner->banner_image_mobile);
+            $validated['banner_image_mobile'] = null;
+        } elseif ($request->hasFile('banner_image_mobile')) {
+            if ($heroBanner->banner_image_mobile) {
+                Storage::disk('public')->delete($heroBanner->banner_image_mobile);
+            }
+            $validated['banner_image_mobile'] = $request->file('banner_image_mobile')->store('hero-banners', 'public');
+        }
+
+        unset($validated['remove_banner_image_mobile']);
 
         $heroBanner->update($validated);
 
@@ -82,6 +108,9 @@ class HeroBannerController extends Controller
     {
         if ($heroBanner->banner_image) {
             Storage::disk('public')->delete($heroBanner->banner_image);
+        }
+        if ($heroBanner->banner_image_mobile) {
+            Storage::disk('public')->delete($heroBanner->banner_image_mobile);
         }
         $heroBanner->delete();
 

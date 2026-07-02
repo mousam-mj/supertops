@@ -43,6 +43,14 @@
         border-color: #e0e0e0;
     }
 </style>
+@php
+    $shopHasActiveFilters = request()->filled('category')
+        || request()->filled('size')
+        || request()->filled('color')
+        || request()->filled('search')
+        || request()->filled('min_price')
+        || request()->filled('max_price');
+@endphp
 <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
                     <div class="container h-full">
@@ -601,9 +609,9 @@
             <div class="container">
                 <div class="flex max-md:flex-wrap max-md:flex-col gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                        @if(request()->hasAny(['category', 'size', 'color', 'min_price', 'max_price', 'search']))
-                        <a href="{{ route('shop') }}" class="btn-clear-filters mb-6 shop-filter-link">Clear all filters</a>
-                        @endif
+                        <div id="shop-clear-filters-wrap" class="mb-6" @if(! $shopHasActiveFilters) style="display: none;" @endif>
+                            <a href="{{ route('shop') }}" class="btn-clear-filters shop-filter-link">Clear all filters</a>
+                        </div>
                         <div class="filter-type-block pb-8 border-b border-line">
                             <div class="heading6">Category</div>
                             <div class="list-type filter-type menu-tab mt-4">
@@ -717,9 +725,13 @@
                         </div>
 
                         @if($products->hasPages())
-                        <div class="list-pagination w-full flex items-center justify-center gap-4 mt-10">
+                        <div class="list-pagination w-full flex items-center justify-center gap-4 mt-10 pb-4">
                             {{ $products->links() }}
                         </div>
+                        @elseif($products->total() > 0)
+                        <p class="caption1 text-secondary text-center w-full mt-8 mb-4">
+                            Showing all {{ $products->total() }} products
+                        </p>
                         @endif
                         </div>
                     </div>
@@ -732,18 +744,48 @@ document.addEventListener('DOMContentLoaded', function() {
     var shopBaseUrl = '{{ route("shop") }}';
     var container = document.getElementById('shop-products-container');
     var sidebar = document.querySelector('.shop-product .sidebar');
+    var priceDefaults = { min: {{ (int) $priceMin }}, max: {{ (int) max($priceMax, $priceMin + 1) }} };
+    var filterPrice = document.querySelector('.filter-price');
+    var rangeMin = filterPrice ? filterPrice.querySelector('.range-min') : null;
+    var rangeMax = filterPrice ? filterPrice.querySelector('.range-max') : null;
+    var minPriceEl = filterPrice ? filterPrice.querySelector('.min-price') : null;
+    var maxPriceEl = filterPrice ? filterPrice.querySelector('.max-price') : null;
+    var applyBtn = document.getElementById('shop-apply-price');
 
-    function updateSidebarActive(queryString) {
-        var params = new URLSearchParams(queryString);
+    function formatPrice(v) { return '₹' + parseInt(v, 10).toLocaleString('en-IN'); }
+
+    function updatePriceDisplay() {
+        if (rangeMin && minPriceEl) minPriceEl.textContent = formatPrice(rangeMin.value);
+        if (rangeMax && maxPriceEl) maxPriceEl.textContent = formatPrice(rangeMax.value);
+    }
+
+    function hasActiveShopFilters(params) {
+        return !!(params.get('category') || params.get('size') || params.get('color') || params.get('search')
+            || params.get('min_price') || params.get('max_price'));
+    }
+
+    function updateShopFilterUI(queryString) {
+        var params = new URLSearchParams(queryString || window.location.search);
         var cat = params.get('category');
         var size = params.get('size');
         var color = params.get('color');
+        var hasFilters = hasActiveShopFilters(params);
+
+        var clearWrap = document.getElementById('shop-clear-filters-wrap');
+        if (clearWrap) {
+            clearWrap.style.display = hasFilters ? '' : 'none';
+        }
+
+        document.querySelectorAll('.breadcrumb-block .filter-type .tab-item[data-item]').forEach(function(el) {
+            el.classList.toggle('active', !!cat && el.getAttribute('data-item') === cat);
+        });
+
         if (sidebar) {
             sidebar.querySelectorAll('.filter-type-block .tab-item[data-item]').forEach(function(el) {
-                el.classList.toggle('active', el.getAttribute('data-item') === cat);
+                el.classList.toggle('active', !!cat && el.getAttribute('data-item') === cat);
             });
             sidebar.querySelectorAll('.size-item[data-item]').forEach(function(el) {
-                var isActive = el.getAttribute('data-item') === size;
+                var isActive = !!size && el.getAttribute('data-item') === size;
                 el.classList.toggle('active', isActive);
                 el.classList.toggle('border-black', isActive);
                 el.classList.toggle('bg-black', isActive);
@@ -751,12 +793,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             sidebar.querySelectorAll('.color-item[data-item]').forEach(function(el) {
                 var cName = (el.getAttribute('data-item') || '').toLowerCase();
-                var isActive = color && cName === color.toLowerCase();
+                var isActive = !!color && cName === color.toLowerCase();
                 el.classList.toggle('active', isActive);
                 el.classList.toggle('border-black', isActive);
                 el.classList.toggle('ring-2', isActive);
                 el.classList.toggle('ring-black', isActive);
             });
+        }
+
+        if (rangeMin && rangeMax) {
+            rangeMin.value = params.has('min_price') ? params.get('min_price') : String(priceDefaults.min);
+            rangeMax.value = params.has('max_price') ? params.get('max_price') : String(priceDefaults.max);
+            updatePriceDisplay();
         }
     }
 
@@ -769,11 +817,11 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
         }).then(function(r) { return r.text(); }).then(function(html) {
             container.innerHTML = html;
+            var u = new URL(fullUrl, window.location.origin);
             if (pushState !== false) {
-                var u = new URL(fullUrl, window.location.origin);
                 history.pushState({}, '', u.pathname + (u.search || ''));
-                updateSidebarActive(u.search || '');
             }
+            updateShopFilterUI(u.search || '');
         }).catch(function() {
             window.location.href = fullUrl;
         }).finally(function() {
@@ -782,6 +830,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    updateShopFilterUI(window.location.search);
+
     document.addEventListener('click', function(e) {
         var link = e.target.closest('a.shop-filter-link');
         if (link && link.href && link.href.indexOf(shopBaseUrl) !== -1) {
@@ -789,10 +839,14 @@ document.addEventListener('DOMContentLoaded', function() {
             loadShopProducts(link.href);
             return;
         }
-        var paginationLink = e.target.closest('#shop-products-container a[href*="/shop"]');
+        var paginationLink = e.target.closest('#shop-products-container a.shop-page-btn, #shop-products-container .shop-pagination-nav a[href]');
         if (paginationLink && paginationLink.href) {
             e.preventDefault();
             loadShopProducts(paginationLink.href);
+            var shopBlock = document.querySelector('.shop-product');
+            if (shopBlock) {
+                shopBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 
@@ -800,34 +854,19 @@ document.addEventListener('DOMContentLoaded', function() {
         loadShopProducts(shopBaseUrl + window.location.search, false);
     });
 
-    var filterPrice = document.querySelector('.filter-price');
-    if (filterPrice) {
-        var rangeMin = filterPrice.querySelector('.range-min');
-        var rangeMax = filterPrice.querySelector('.range-max');
-        var minPriceEl = filterPrice.querySelector('.min-price');
-        var maxPriceEl = filterPrice.querySelector('.max-price');
-        var applyBtn = document.getElementById('shop-apply-price');
+    if (rangeMin) rangeMin.addEventListener('input', updatePriceDisplay);
+    if (rangeMax) rangeMax.addEventListener('input', updatePriceDisplay);
 
-        function formatPrice(v) { return '₹' + parseInt(v, 10).toLocaleString('en-IN'); }
-        function updatePriceDisplay() {
-            if (rangeMin && minPriceEl) minPriceEl.textContent = formatPrice(rangeMin.value);
-            if (rangeMax && maxPriceEl) maxPriceEl.textContent = formatPrice(rangeMax.value);
-        }
-        if (rangeMin) rangeMin.addEventListener('input', updatePriceDisplay);
-        if (rangeMax) rangeMax.addEventListener('input', updatePriceDisplay);
-
-        if (applyBtn && rangeMin && rangeMax) {
-            applyBtn.addEventListener('click', function() {
-                var minVal = parseInt(rangeMin.value, 10);
-                var maxVal = parseInt(rangeMax.value, 10);
-                if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
-                var params = new URLSearchParams(window.location.search);
-                params.set('min_price', String(minVal));
-                params.set('max_price', String(maxVal));
-                var sep = shopBaseUrl.indexOf('?') !== -1 ? '&' : '?';
-                loadShopProducts(shopBaseUrl + sep + params.toString());
-            });
-        }
+    if (applyBtn && rangeMin && rangeMax) {
+        applyBtn.addEventListener('click', function() {
+            var minVal = parseInt(rangeMin.value, 10);
+            var maxVal = parseInt(rangeMax.value, 10);
+            if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
+            var params = new URLSearchParams(window.location.search);
+            params.set('min_price', String(minVal));
+            params.set('max_price', String(maxVal));
+            loadShopProducts(shopBaseUrl + '?' + params.toString());
+        });
     }
 });
 </script>

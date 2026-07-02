@@ -330,9 +330,12 @@ class ProductController extends Controller
         $validated['sizes'] = [];
         $validated['colors'] = [];
         $validated['stock_quantity'] = 0;
-        $validated['in_stock'] = false;
         $validated['price'] = 0;
         $validated['sale_price'] = null;
+        $validated['in_stock'] = $request->boolean('in_stock');
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_new_arrival'] = $request->boolean('is_new_arrival');
         
         // Process specifications
         $specifications = [];
@@ -396,8 +399,40 @@ class ProductController extends Controller
         $categories = Category::where('is_active', true)
             ->orderBy('name')
             ->get();
-        
-        return view('admin.products.edit', compact('product', 'categories'));
+
+        $product->load(['parentProduct', 'childVariants']);
+
+        $parentProduct = $product->parentProduct;
+        $linkedVariants = $product->parent_product_id
+            ? collect()
+            : $product->childVariants;
+
+        $rootProduct = $product->variantGroupRoot();
+        $excludeIds = $rootProduct->variantGroupMembers()->pluck('id')->all();
+
+        $linkableProducts = Product::where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->where(function ($query) use ($product) {
+                $query->whereNull('parent_product_id')
+                    ->orWhere('parent_product_id', $product->id);
+            })
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $mainProductOptions = Product::where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->whereNull('parent_product_id')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('admin.products.edit', compact(
+            'product',
+            'categories',
+            'parentProduct',
+            'linkedVariants',
+            'linkableProducts',
+            'mainProductOptions'
+        ));
     }
 
     /**
@@ -423,6 +458,12 @@ class ProductController extends Controller
             'specifications' => 'nullable|array',
             'specifications.*.key' => 'nullable|string|max:255',
             'specifications.*.value' => 'nullable|string|max:500',
+            'parent_product_id' => 'nullable|integer|exists:products,id',
+            'variant_color_label' => 'nullable|string|max:100',
+            'variant_links' => 'nullable|array',
+            'variant_links.*.product_id' => 'nullable|integer|exists:products,id',
+            'variant_links.*.color_label' => 'nullable|string|max:100',
+            'variant_mode' => 'nullable|in:main,linked',
         ]);
         
         // Process specifications
@@ -501,10 +542,81 @@ class ProductController extends Controller
             $validated['video'] = $request->file('video')->store('products/videos', 'public');
         }
 
+        $validated['in_stock'] = $request->boolean('in_stock');
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_new_arrival'] = $request->boolean('is_new_arrival');
+
         $product->update($validated);
+
+        $this->syncProductVariantLinks($product, $request);
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully.');
+    }
+
+    protected function syncProductVariantLinks(Product $product, Request $request): void
+    {
+        $product->refresh();
+        $variantMode = $request->input('variant_mode', $product->parent_product_id ? 'linked' : 'main');
+
+        if ($variantMode === 'linked') {
+            $parentId = (int) $request->input('parent_product_id');
+            if ($parentId <= 0 || $parentId === $product->id) {
+                return;
+            }
+
+            if (Product::where('parent_product_id', $product->id)->exists()) {
+                Product::where('parent_product_id', $product->id)->update([
+                    'parent_product_id' => null,
+                    'variant_color_label' => null,
+                ]);
+            }
+
+            $product->update([
+                'parent_product_id' => $parentId,
+                'variant_color_label' => trim((string) $request->input('variant_color_label', '')) ?: null,
+            ]);
+
+            return;
+        }
+
+        $product->update([
+            'parent_product_id' => null,
+            'variant_color_label' => trim((string) $request->input('main_variant_color_label', '')) ?: null,
+        ]);
+
+        $links = $request->input('variant_links', []);
+        $linkedIds = [];
+
+        foreach ($links as $link) {
+            $linkedId = (int) ($link['product_id'] ?? 0);
+            if ($linkedId <= 0 || $linkedId === $product->id) {
+                continue;
+            }
+
+            if (Product::where('id', $linkedId)->whereNotNull('parent_product_id')->where('parent_product_id', '!=', $product->id)->exists()) {
+                continue;
+            }
+
+            $linked = Product::find($linkedId);
+            if (! $linked) {
+                continue;
+            }
+
+            $linked->update([
+                'parent_product_id' => $product->id,
+                'variant_color_label' => trim((string) ($link['color_label'] ?? '')) ?: null,
+            ]);
+            $linkedIds[] = $linkedId;
+        }
+
+        Product::where('parent_product_id', $product->id)
+            ->whereNotIn('id', $linkedIds)
+            ->update([
+                'parent_product_id' => null,
+                'variant_color_label' => null,
+            ]);
     }
 
     /**
@@ -521,6 +633,14 @@ class ProductController extends Controller
         if (is_array($product->images)) {
             foreach ($product->images as $img) {
                 Storage::disk('public')->delete($img);
+            }
+        }
+
+        if (is_array($product->color_swatch_images)) {
+            foreach ($product->color_swatch_images as $img) {
+                if ($img) {
+                    Storage::disk('public')->delete($img);
+                }
             }
         }
 

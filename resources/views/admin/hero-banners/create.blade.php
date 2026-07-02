@@ -50,6 +50,13 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <input type="hidden" name="show_text" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="show_text" id="show_text" value="1" {{ old('show_text') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="show_text">Show title, subtitle &amp; button text on slide</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label for="priority" class="form-label">Priority (order)</label>
                             <input type="number" class="form-control @error('priority') is-invalid @enderror" id="priority" name="priority" value="{{ old('priority', 0) }}" min="0">
                             @error('priority')
@@ -57,6 +64,16 @@
                             @enderror
                             <small class="text-muted">Lower number = shown first</small>
                         </div>
+                    </div>
+
+                    @include('admin.partials.banner-text-color-select', [
+                        'name' => 'text_color',
+                        'id' => 'text_color',
+                        'label' => 'Slide text color',
+                        'value' => old('text_color', ''),
+                    ])
+
+                    <div class="row">
                         <div class="col-md-6 mb-3 d-flex align-items-end">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
@@ -71,10 +88,19 @@
                         @error('banner_image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">Recommended: wide image (e.g. 1920×800). Max 5MB.</small>
+                        <small class="text-muted">Recommended: 1920×820px (desktop). Max 5MB.</small>
                         <div id="imagePreview" class="mt-2" style="display: none;">
                             <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 150px; object-fit: cover; border-radius: 8px;">
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image_mobile" class="form-label">Mobile banner image <span class="text-muted">(optional)</span></label>
+                        <input type="file" class="form-control @error('banner_image_mobile') is-invalid @enderror" id="banner_image_mobile" name="banner_image_mobile" accept="image/*">
+                        @error('banner_image_mobile')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Recommended: 750×1000px. Shown on screens under 768px. Falls back to desktop image if empty.</small>
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">

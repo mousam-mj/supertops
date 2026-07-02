@@ -14,7 +14,7 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
-        if (Auth::check() && Auth::user()->role === 'admin') {
+        if (Auth::check() && Auth::user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
         return view('admin.login');
@@ -41,7 +41,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Check if user is admin
-            if ($user->role !== 'admin') {
+            if (! $user->isAdmin()) {
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'You do not have admin access.',

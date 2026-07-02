@@ -128,10 +128,32 @@
                                         </td>
                                         <td>{{ $color->sort_order }}</td>
                                         <td>
-                                            <form action="{{ route('admin.color-size-master.destroy-color', $color) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this color?');">
+                                            <div class="d-flex gap-1">
+                                                <button type="button" class="btn btn-sm btn-outline-primary color-edit-toggle" title="Edit"><i class="bi bi-pencil"></i></button>
+                                                <form action="{{ route('admin.color-size-master.destroy-color', $color) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this color?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
+                                            <form action="{{ route('admin.color-size-master.update-color', $color) }}" method="POST" class="color-edit-form mt-2 d-none">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                @method('PUT')
+                                                <div class="row g-2 align-items-end">
+                                                    <div class="col-12">
+                                                        <input type="text" name="name" class="form-control form-control-sm" value="{{ $color->name }}" required>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="text" name="color_code" class="form-control form-control-sm" value="{{ $color->color_code }}" placeholder="#FF0000">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input type="number" name="sort_order" class="form-control form-control-sm" value="{{ $color->sort_order }}" min="0">
+                                                    </div>
+                                                    <div class="col-12 d-flex gap-1">
+                                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary color-edit-cancel">Cancel</button>
+                                                    </div>
+                                                </div>
                                             </form>
                                         </td>
                                     </tr>
@@ -183,10 +205,29 @@
                                         <td>{{ $size->name }}</td>
                                         <td>{{ $size->sort_order }}</td>
                                         <td>
-                                            <form action="{{ route('admin.color-size-master.destroy-size', $size) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this size?');">
+                                            <div class="d-flex gap-1">
+                                                <button type="button" class="btn btn-sm btn-outline-primary size-edit-toggle" title="Edit"><i class="bi bi-pencil"></i></button>
+                                                <form action="{{ route('admin.color-size-master.destroy-size', $size) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this size?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
+                                            <form action="{{ route('admin.color-size-master.update-size', $size) }}" method="POST" class="size-edit-form mt-2 d-none">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                                @method('PUT')
+                                                <div class="row g-2 align-items-end">
+                                                    <div class="col-8">
+                                                        <input type="text" name="name" class="form-control form-control-sm" value="{{ $size->name }}" required>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input type="number" name="sort_order" class="form-control form-control-sm" value="{{ $size->sort_order }}" min="0">
+                                                    </div>
+                                                    <div class="col-12 d-flex gap-1">
+                                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary size-edit-cancel">Cancel</button>
+                                                    </div>
+                                                </div>
                                             </form>
                                         </td>
                                     </tr>
@@ -203,3 +244,36 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.color-edit-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = btn.closest('td').querySelector('.color-edit-form');
+            if (form) {
+                form.classList.toggle('d-none');
+            }
+        });
+    });
+    document.querySelectorAll('.color-edit-cancel').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.closest('.color-edit-form').classList.add('d-none');
+        });
+    });
+    document.querySelectorAll('.size-edit-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var form = btn.closest('td').querySelector('.size-edit-form');
+            if (form) {
+                form.classList.toggle('d-none');
+            }
+        });
+    });
+    document.querySelectorAll('.size-edit-cancel').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.closest('.size-edit-form').classList.add('d-none');
+        });
+    });
+});
+</script>
+@endpush

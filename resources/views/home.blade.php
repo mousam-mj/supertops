@@ -22,11 +22,29 @@
                                     @endif
                                         <div class="sub-img absolute inset-0 w-full h-full">
                                             @if($banner->banner_image)
-                                                <img src="{{ storage_asset($banner->banner_image) }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
+                                                @include('partials.responsive-banner-img', [
+                                                    'desktop' => $banner->banner_image,
+                                                    'mobile' => $banner->banner_image_mobile,
+                                                    'alt' => $banner->name,
+                                                    'class' => 'w-full h-full object-cover',
+                                                ])
                                             @else
                                                 <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
                                             @endif
                                         </div>
+                                        @if($banner->show_text)
+                                        <div class="absolute inset-0 z-[2] flex flex-col items-center justify-center text-center px-6 pointer-events-none {{ banner_text_color_class($banner->text_color ?? null) }}">
+                                            @if($banner->name)
+                                                <div class="heading1 drop-shadow-md">{{ $banner->name }}</div>
+                                            @endif
+                                            @if($banner->subtitle)
+                                                <div class="body1 mt-3 drop-shadow-md">{{ $banner->subtitle }}</div>
+                                            @endif
+                                            @if($banner->button_text)
+                                                <span class="button-main mt-5 pointer-events-auto">{{ $banner->button_text }}</span>
+                                            @endif
+                                        </div>
+                                        @endif
                                     @if($bannerHref && $bannerHref !== '#')
                                         </a>
                                     @else
@@ -48,31 +66,38 @@
                         <div class="swiper-button-prev hero-slider-nav"></div>
                         <div class="swiper-button-next hero-slider-nav"></div>
                     </div>
+                    @php
+                        $heroBannerCount = $heroBanners->count() > 0 ? $heroBanners->count() : 1;
+                    @endphp
+                    @if($heroBannerCount > 1)
+                        <div class="swiper-pagination hero-slider-pagination"></div>
+                    @endif
                 </div>
             </div>
             <!-- Slider -->
 
-<div class="collection-block mt-5">
+<div class="collection-block home-two-categories mt-5">
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
-                <div class="banner-block md:pt-20 pt-10">
+                <div class="banner-block md:pt-12 pt-8 md:pb-6 pb-4">
             <div class="container">
-                <div class="list-banner grid md:grid-cols-2 gap-[20px] max-w-4xl mx-auto justify-items-center">
+                <div class="two-block-category-grid list-banner grid grid-cols-2 gap-4 md:gap-6 mx-auto">
                     @forelse($homeCategories as $category)
-                        <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                        <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable banner-size-fixed banner-aspect-3-4 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full duration-500 aspect-[4/5] object-cover" />
+                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center hidden md:block" />
+                                <img src="{{ $category->homepageMobileImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center md:hidden" />
                             </div>
                         </a>
                     @empty
                         {{-- Fallback if no categories --}}
-                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full duration-500 aspect-[4/5] object-cover" />
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full aspect-[3/4] object-cover object-center" />
                             </div>
                         </a>
-                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full duration-500 aspect-[4/5] object-cover" />
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full aspect-[3/4] object-cover object-center" />
                             </div>
                         </a>
                     @endforelse
@@ -84,23 +109,35 @@
         </div>
 
         @if(setting_flag('home_section_best_sellers_banner_enabled'))
-        <div class="banner-block style-one grid sm:grid-cols-1 home-best-sellers-banner">
-            <a href="{{ setting_link_url(\App\Models\Setting::get('home_best_sellers_button_url'), route('shop')) }}" class="banner-item relative block overflow-hidden duration-500 banner-zoom-only">
-                <div class="banner-img overflow-hidden">
-                    <img src="{{ setting_image_url(\App\Models\Setting::get('home_best_sellers_banner_image'), 'assets/images/banner/Blog-3.webp') }}" alt="" class="w-full h-full object-cover" />
-                </div>
-                @if(setting_flag('home_best_sellers_show_text', false))
-                <div class="banner-content absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center pointer-events-none">
-                    <div class="heading2 text-white">{{ \App\Models\Setting::get('home_best_sellers_heading', 'Best Sellers') }}</div>
-                    <div class="text-button text-white relative inline-block pb-1 border-b-2 border-white duration-500 mt-2">{{ \App\Models\Setting::get('home_best_sellers_button_text', 'Shop Now') }}</div>
-                </div>
-                @endif
-            </a>
+        @php
+            $bestSellersShowText = setting_flag('home_best_sellers_show_text', false);
+            $bestSellersTextColor = banner_text_color_class(\App\Models\Setting::get('home_best_sellers_text_color'));
+        @endphp
+        <div class="banner-block style-one home-best-sellers-banner px-4 sm:px-5 md:mt-14 mt-8{{ $bestSellersShowText ? ' home-best-sellers-banner--show-text' : '' }}">
+            <div class="container">
+                <a href="{{ setting_link_url(\App\Models\Setting::get('home_best_sellers_button_url'), route('shop')) }}" class="banner-item banner-zoom-only banner-size-fixed relative block overflow-hidden rounded-[20px]">
+                    <div class="banner-img">
+                        @php
+                            $bestSellersBanner = setting_banner_picture_urls('home_best_sellers_banner_image', 'home_best_sellers_banner_image_mobile', 'assets/images/banner/Blog-3.webp');
+                        @endphp
+                        <picture>
+                            <source media="(max-width: 767px)" srcset="{{ $bestSellersBanner['mobile'] }}">
+                            <img src="{{ $bestSellersBanner['desktop'] }}" alt="{{ \App\Models\Setting::get('home_best_sellers_heading', 'Best Sellers') }}" class="w-full h-full object-cover" />
+                        </picture>
+                    </div>
+                    @if($bestSellersShowText)
+                    <div class="banner-content banner-text-overlay absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-[2] {{ $bestSellersTextColor }}">
+                        <div class="heading2 banner-overlay-heading">{{ \App\Models\Setting::get('home_best_sellers_heading', 'Best Sellers') }}</div>
+                        <div class="text-button inline-block pb-1 border-b-2 mt-2">{{ \App\Models\Setting::get('home_best_sellers_button_text', 'Shop Now') }}</div>
+                    </div>
+                    @endif
+                </a>
+            </div>
         </div>
         @endif
 
         @if(setting_flag('home_section_best_sellers_tabs_enabled'))
-        <div class="tab-features-block filter-prodduct-block md:pt-20 pt-10" id="home-best-sellers-section">
+        <div class="tab-features-block filter-prodduct-block md:pt-10 pt-6 md:pb-4 pb-2" id="home-best-sellers-section">
             <div class="container">
                 <div class="heading flex flex-col items-center text-center">
                     <div class="menu-tab bg-surface rounded-2xl">
@@ -178,16 +215,30 @@
         <div class="look-book-block md:mt-20 mt-10 lg:py-20 md:py-14 py-10 bg-linear">
             <div class="container">
                 <div class="main-content relative flex max-lg:flex-wrap gap-y-5 items-center lg:justify-end justify-center">
+                    @if(setting_flag('home_lookbook_show_text', true))
                     <div class="heading bg-white xl:py-20 py-10 xl:px-10 px-8 rounded-2xl lg:w-[30%] lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-0 z-[1] max-lg:text-center">
                         <div class="heading3">{{ \App\Models\Setting::get('home_lookbook_heading', 'Discover the latest collection') }}</div>
                         <a href="{{ setting_link_url(\App\Models\Setting::get('home_lookbook_button_url'), route('shop.collection')) }}" class="button-main bg-green lg:w-full text-center lg:mt-8 mt-5 text-black hover:bg-black hover:text-white">{{ \App\Models\Setting::get('home_lookbook_button_text', 'Shop Collection') }}</a>
                     </div>
-                    <div class="list popular-product w-3/4 grid sm:grid-cols-2 gap-4 max-lg:w-full">
+                    @endif
+                    <div class="list popular-product {{ setting_flag('home_lookbook_show_text', true) ? 'w-3/4 max-lg:w-full' : 'w-full' }} grid sm:grid-cols-2 gap-4">
                         <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_1'), 'assets/images/banner/perch123(1).webp') }}" alt="" class="w-full h-full object-cover" />
+                            @include('partials.responsive-banner-img', [
+                                'desktop' => \App\Models\Setting::get('home_lookbook_image_1'),
+                                'mobile' => \App\Models\Setting::get('home_lookbook_image_1_mobile'),
+                                'default' => 'assets/images/banner/perch123(1).webp',
+                                'alt' => '',
+                                'class' => 'w-full h-full object-cover',
+                            ])
                         </div>
                         <div class="item relative rounded-xl overflow-hidden">
-                            <img src="{{ setting_image_url(\App\Models\Setting::get('home_lookbook_image_2'), 'assets/images/banner/perch123(2).webp') }}" alt="" class="w-full h-full object-cover" />
+                            @include('partials.responsive-banner-img', [
+                                'desktop' => \App\Models\Setting::get('home_lookbook_image_2'),
+                                'mobile' => \App\Models\Setting::get('home_lookbook_image_2_mobile'),
+                                'default' => 'assets/images/banner/perch123(2).webp',
+                                'alt' => '',
+                                'class' => 'w-full h-full object-cover',
+                            ])
                         </div>
                     </div>
                 </div>

@@ -75,7 +75,7 @@
                     </div>
 
                     <div class="alert alert-info mb-4">
-                        <i class="bi bi-box-seam me-2"></i><strong>Inventory:</strong> Manage <strong>price</strong>, quantity, color &amp; size from the <a href="{{ route('admin.inventory.index') }}">Inventory</a> module. Open a product there to add variants, pricing, stock, and color-specific images.
+                        <i class="bi bi-box-seam me-2"></i><strong>Inventory:</strong> Manage <strong>price</strong>, quantity, color &amp; size from the <a href="{{ route('admin.inventory.index') }}">Inventory</a> module. Upload <strong>color swatch images</strong> (for dual-tone colors) on the product’s <a href="{{ route('admin.inventory.product', $product->id) }}">Inventory page</a>.
                     </div>
 
                     <div class="mb-3">
@@ -171,7 +171,7 @@
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Leave empty to keep current image. Recommended size: 800x800px. Max size: 2MB</small>
+                            <small class="form-text text-muted">Recommended: 1200×1600px (3:4). Leave empty to keep current. Max 2MB</small>
                             <div id="imagePreview" class="mt-2" style="display: none;">
                                 <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </div>
@@ -208,7 +208,7 @@
                             @error('gallery_images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Click "Add Image" to upload images one by one. Click × on thumbnails to remove.</small>
+                            <small class="form-text text-muted">Recommended: 1200×1600px (3:4) each. Click "Add Image" to upload one by one.</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="video" class="form-label">Product Video</label>
@@ -234,7 +234,15 @@
                     </div>
 
                     <div class="row mb-3">
+                        <div class="col-12 mb-2">
+                            <small class="text-muted d-block">
+                                <strong>Featured</strong> → homepage Best Sellers tab &amp; category What&apos;s New.
+                                <strong>New Arrival</strong> → homepage New Arrivals tab.
+                                <strong>On Sale</strong> → set a <em>sale price</em> lower than regular price in <a href="{{ route('admin.inventory.index') }}">Inventory</a>.
+                            </small>
+                        </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="in_stock" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -248,6 +256,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="is_active" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -261,6 +270,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="is_featured" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -277,6 +287,7 @@
 
                     <div class="row mb-3">
                         <div class="col-md-4">
+                            <input type="hidden" name="is_new_arrival" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -287,6 +298,123 @@
                                 <label class="form-check-label" for="is_new_arrival">
                                     New Arrival
                                 </label>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="small text-muted pt-2">
+                                Current pricing:
+                                @if($product->sale_price && $product->price > $product->sale_price)
+                                    <span class="badge bg-danger ms-1">On Sale</span>
+                                    ₹{{ number_format($product->sale_price, 2) }}
+                                    <del class="text-secondary ms-1">₹{{ number_format($product->price, 2) }}</del>
+                                @else
+                                    ₹{{ number_format($product->price ?? 0, 2) }}
+                                    <span class="text-secondary ms-1">(edit sale price in Inventory to appear under On Sale)</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    @php
+                        $variantMode = old('variant_mode', $product->parent_product_id ? 'linked' : 'main');
+                        $variantLinkRows = old('variant_links');
+                        if (! is_array($variantLinkRows)) {
+                            $variantLinkRows = $linkedVariants->map(fn ($v) => [
+                                'product_id' => $v->id,
+                                'color_label' => $v->variant_color_label ?: $v->getDisplayColorLabel(),
+                            ])->values()->all();
+                        }
+                        if (empty($variantLinkRows)) {
+                            $variantLinkRows = [['product_id' => '', 'color_label' => '']];
+                        }
+                    @endphp
+
+                    <div class="card border-info mb-4">
+                        <div class="card-header bg-info-subtle">
+                            <h6 class="mb-0 fw-bold"><i class="bi bi-link-45deg me-2"></i>Connected Color Variants</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                Link separate products as color variants of one main product. Each linked product stays visible in the shop and appears as a color option on the product page.
+                            </p>
+
+                            <div class="mb-3">
+                                <label class="form-label">Variant setup</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="variant_mode" id="variant_mode_main" value="main" {{ $variantMode === 'main' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="variant_mode_main">This is the main product (connect other products as color variants)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="variant_mode" id="variant_mode_linked" value="linked" {{ $variantMode === 'linked' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="variant_mode_linked">This product is a color variant of another product</label>
+                                </div>
+                            </div>
+
+                            <div id="variant-main-panel" class="{{ $variantMode === 'linked' ? 'd-none' : '' }}">
+                                <div class="mb-3">
+                                    <label for="main_variant_color_label" class="form-label">Color label for this product</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="main_variant_color_label"
+                                           name="main_variant_color_label"
+                                           value="{{ old('main_variant_color_label', $product->variant_color_label) }}"
+                                           placeholder="e.g. Amber Brown">
+                                    <small class="text-muted">Shown in the color picker on the product page.</small>
+                                </div>
+
+                                <label class="form-label">Linked variant products</label>
+                                <div id="variant-links-container" class="d-flex flex-column gap-2">
+                                    @foreach($variantLinkRows as $idx => $row)
+                                        <div class="variant-link-row d-flex gap-2 align-items-start flex-wrap">
+                                            <div class="flex-grow-1" style="min-width: 220px;">
+                                                <select name="variant_links[{{ $idx }}][product_id]" class="form-select form-select-sm">
+                                                    <option value="">Select product to link</option>
+                                                    @foreach($linkableProducts as $linkProduct)
+                                                        <option value="{{ $linkProduct->id }}" {{ (string) ($row['product_id'] ?? '') === (string) $linkProduct->id ? 'selected' : '' }}>
+                                                            {{ $linkProduct->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div style="min-width: 180px;">
+                                                <input type="text"
+                                                       name="variant_links[{{ $idx }}][color_label]"
+                                                       class="form-control form-control-sm"
+                                                       value="{{ $row['color_label'] ?? '' }}"
+                                                       placeholder="Color label (e.g. Cyan)">
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-variant-link-btn" title="Remove row">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="add-variant-link-btn">
+                                    <i class="bi bi-plus-lg me-1"></i>Add linked product
+                                </button>
+                            </div>
+
+                            <div id="variant-linked-panel" class="{{ $variantMode === 'main' ? 'd-none' : '' }}">
+                                <div class="mb-3">
+                                    <label for="parent_product_id" class="form-label">Main product</label>
+                                    <select class="form-select" id="parent_product_id" name="parent_product_id">
+                                        <option value="">Select main product</option>
+                                        @foreach($mainProductOptions as $mainProduct)
+                                            <option value="{{ $mainProduct->id }}" {{ (string) old('parent_product_id', $product->parent_product_id) === (string) $mainProduct->id ? 'selected' : '' }}>
+                                                {{ $mainProduct->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-0">
+                                    <label for="variant_color_label" class="form-label">Color label for this product</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="variant_color_label"
+                                           name="variant_color_label"
+                                           value="{{ old('variant_color_label', $product->variant_color_label) }}"
+                                           placeholder="e.g. Cyan">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -471,6 +599,50 @@
                 }
             });
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var mainPanel = document.getElementById('variant-main-panel');
+        var linkedPanel = document.getElementById('variant-linked-panel');
+        var modeMain = document.getElementById('variant_mode_main');
+        var modeLinked = document.getElementById('variant_mode_linked');
+        var linksContainer = document.getElementById('variant-links-container');
+        var addBtn = document.getElementById('add-variant-link-btn');
+        var linkIndex = linksContainer ? linksContainer.querySelectorAll('.variant-link-row').length : 0;
+
+        function toggleVariantPanels() {
+            var isMain = modeMain && modeMain.checked;
+            if (mainPanel) mainPanel.classList.toggle('d-none', !isMain);
+            if (linkedPanel) linkedPanel.classList.toggle('d-none', isMain);
+        }
+
+        if (modeMain) modeMain.addEventListener('change', toggleVariantPanels);
+        if (modeLinked) modeLinked.addEventListener('change', toggleVariantPanels);
+
+        if (addBtn && linksContainer) {
+            addBtn.addEventListener('click', function() {
+                var template = linksContainer.querySelector('.variant-link-row');
+                if (!template) return;
+                var row = template.cloneNode(true);
+                row.querySelectorAll('select, input').forEach(function(el) {
+                    el.name = el.name.replace(/\[\d+\]/, '[' + linkIndex + ']');
+                    el.value = '';
+                });
+                linksContainer.appendChild(row);
+                linkIndex++;
+            });
+
+            linksContainer.addEventListener('click', function(e) {
+                if (!e.target.closest('.remove-variant-link-btn')) return;
+                var rows = linksContainer.querySelectorAll('.variant-link-row');
+                if (rows.length <= 1) {
+                    rows[0].querySelectorAll('select, input').forEach(function(el) { el.value = ''; });
+                    return;
+                }
+                e.target.closest('.variant-link-row').remove();
+            });
+        }
     });
 </script>
 @endpush

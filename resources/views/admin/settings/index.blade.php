@@ -45,6 +45,7 @@
                                         </div>
                                     @endif
                                     <input type="file" name="site_logo" class="form-control" accept="image/*">
+                                    <small class="text-muted">Recommended: 280×80px PNG with transparent background. Max 2MB.</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Contact Email</label>
@@ -107,15 +108,17 @@
                             </div>
                         </div>
 
-                        {{-- Content Tab (Contact page text only; About Us & Policy pages are in Policy Pages) --}}
+                        {{-- Content Tab --}}
                         <div class="tab-pane fade" id="content" role="tabpanel">
-                            <p class="text-muted small mb-3">Edit About Us, Privacy Policy, Terms, Return & Refund, and Cancellation Policy from <a href="{{ route('admin.policy-pages.index') }}">Policy Pages</a>.</p>
+                            <p class="text-muted small mb-3">Privacy Policy, Terms, Return & Refund, and Cancellation Policy are edited under <a href="{{ route('admin.policy-pages.index') }}">Policy Pages</a>. About Us can also be edited there, or below.</p>
                             <div class="mb-3">
-                                <label class="form-label">Footer About Us Text</label>
+                                <label class="form-label">Contact page intro text</label>
                                 <div id="editor-contact-page-text" class="bg-white border rounded" style="min-height: 120px;"></div>
                                 <textarea name="contact_page_text" id="settings-contact-page-text" class="d-none" rows="3">{{ old('contact_page_text', $settings['contact_page_text'] ?? '') }}</textarea>
                                 <small class="text-muted">Short text for the contact page (e.g. "We're Here To Help").</small>
                             </div>
+
+                            @include('admin.settings.partials.about-us-fields')
 
                             <hr class="my-4">
                             <h6 class="mb-2">Homepage — Discover collection block</h6>
@@ -136,11 +139,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Left image</label>
-                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_1'])
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_1', 'mobileKey' => 'home_lookbook_image_1_mobile', 'mobileRecommended' => '750×1000px'])
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Right image</label>
-                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_2'])
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_lookbook_image_2', 'mobileKey' => 'home_lookbook_image_2_mobile', 'mobileRecommended' => '750×1000px'])
+                                </div>
+                                <div class="col-12">
+                                    <input type="hidden" name="home_lookbook_show_text" value="0">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="home_lookbook_show_text" id="home_lookbook_show_text" value="1" {{ setting_flag('home_lookbook_show_text', true) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="home_lookbook_show_text">Show heading and Shop Collection button</label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -164,7 +174,25 @@
                                     <label class="form-label">Banner image</label>
                                     @include('admin.settings.partials.homepage-image-field', [
                                         'key' => 'home_best_sellers_banner_image',
+                                        'mobileKey' => 'home_best_sellers_banner_image_mobile',
+                                        'mobileRecommended' => '750×1000px',
                                         'previewMaxHeight' => 140,
+                                    ])
+                                </div>
+                                <div class="col-12">
+                                    <input type="hidden" name="home_best_sellers_show_text" value="0">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="home_best_sellers_show_text" id="home_best_sellers_show_text" value="1" {{ setting_flag('home_best_sellers_show_text', false) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="home_best_sellers_show_text">Show Best Sellers heading and Shop text on banner</label>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">When off, only the banner image shows with a zoom hover effect (no dark overlay).</small>
+                                </div>
+                                <div class="col-md-4">
+                                    @include('admin.partials.banner-text-color-select', [
+                                        'name' => 'home_best_sellers_text_color',
+                                        'id' => 'home_best_sellers_text_color',
+                                        'label' => 'Best Sellers text color',
+                                        'value' => $settings['home_best_sellers_text_color'] ?? '',
                                     ])
                                 </div>
                             </div>
@@ -180,7 +208,6 @@
                                     'home_section_flash_sale_enabled' => 'Flash sale block',
                                     'home_section_benefits_enabled' => 'Company perks (4 icons)',
                                     'home_section_instagram_enabled' => 'Instagram slider',
-                                    'home_best_sellers_show_text' => 'Show text overlay on Best Sellers banner',
                                     'show_customize_nav' => 'Show Customize in header navigation',
                                     'show_customize_product_button' => 'Show Customize button on product pages',
                                 ];
@@ -189,6 +216,7 @@
                                 @foreach($sectionToggles as $toggleKey => $toggleLabel)
                                     <div class="col-md-6">
                                         <div class="form-check form-switch">
+                                            <input type="hidden" name="{{ $toggleKey }}" value="0">
                                             <input class="form-check-input" type="checkbox" name="{{ $toggleKey }}" id="{{ $toggleKey }}" value="1" {{ setting_flag($toggleKey, ($flagSettingDefaults[$toggleKey] ?? '1') === '1') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="{{ $toggleKey }}">{{ $toggleLabel }}</label>
                                         </div>
@@ -197,9 +225,19 @@
                             </div>
 
                             <hr class="my-4">
-                            <h6 class="mb-2">About Us — hero banner</h6>
-                            <p class="text-muted small mb-3">Background for the About Us page hero. Content is edited under <a href="{{ route('admin.policy-pages.index') }}">Policy Pages → About Us</a>.</p>
-                            @include('admin.settings.partials.homepage-image-field', ['key' => 'about_us_banner_image', 'previewMaxHeight' => 120])
+                            <h6 class="mb-2">Banner text color</h6>
+                            <p class="text-muted small mb-3">Control heading and subtext color on banner overlays. Use <strong>white</strong> on dark images and <strong>black</strong> on light backgrounds.</p>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    @include('admin.partials.banner-text-color-select', [
+                                        'name' => 'banner_text_color_default',
+                                        'id' => 'banner_text_color_default',
+                                        'label' => 'Site default (all banners)',
+                                        'value' => $settings['banner_text_color_default'] ?? 'black',
+                                        'allowDefault' => false,
+                                    ])
+                                </div>
+                            </div>
 
                             <hr class="my-4">
                             <h6 class="mb-2">Flash sale (homepage)</h6>
@@ -220,28 +258,34 @@
                                     <label class="form-label">Button link</label>
                                     <input type="text" name="home_flash_sale_button_url" class="form-control" value="{{ $settings['home_flash_sale_button_url'] ?? '/shop' }}">
                                 </div>
+                                <div class="col-md-4">
+                                    @include('admin.partials.banner-text-color-select', [
+                                        'name' => 'home_flash_sale_text_color',
+                                        'id' => 'home_flash_sale_text_color',
+                                        'label' => 'Flash sale text color',
+                                        'value' => $settings['home_flash_sale_text_color'] ?? '',
+                                    ])
+                                </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Product image</label>
-                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_image'])
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_image', 'mobileKey' => 'home_flash_sale_image_mobile', 'mobileRecommended' => '800×800px'])
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Background image</label>
-                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_bg_image'])
+                                    @include('admin.settings.partials.homepage-image-field', ['key' => 'home_flash_sale_bg_image', 'mobileKey' => 'home_flash_sale_bg_image_mobile', 'mobileRecommended' => '750×1000px'])
+                                </div>
+                                <div class="col-12">
+                                    <input type="hidden" name="home_flash_sale_show_text" value="0">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="home_flash_sale_show_text" id="home_flash_sale_show_text" value="1" {{ setting_flag('home_flash_sale_show_text', true) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="home_flash_sale_show_text">Show heading, subtext and Shop Now button</label>
+                                    </div>
                                 </div>
                             </div>
 
                             <hr class="my-4">
-                            <h6 class="mb-2">Recommended image sizes</h6>
-                            <ul class="small text-muted mb-4">
-                                <li>Homepage hero slider: 1920×820px</li>
-                                <li>Homepage category cards: 800×1000px (4:5)</li>
-                                <li>Best Sellers banner: 1920×600px</li>
-                                <li>Discover collection images: 900×1100px each</li>
-                                <li>Category page hero: 1920×600px</li>
-                                <li>Subcategory cards: 800×1000px</li>
-                                <li>Promo blocks: 600×750px</li>
-                                <li>Product images: 1200×1600px (3:4)</li>
-                            </ul>
+                            <h6 class="mb-2">Image &amp; banner size guide (all pages)</h6>
+                            @include('admin.partials.image-size-guide')
 
                             <hr class="my-4">
                             <h6 class="mb-2">Homepage benefit icons</h6>

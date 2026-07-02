@@ -8,7 +8,7 @@
     <div class="col-12">
         <div>
             <h4 class="mb-1 fw-bold" style="color: #2d3748;">Policy & Legal Pages</h4>
-            <p class="text-muted mb-0">Edit About Us, Terms & Conditions, Privacy Policy, Return & Refund, and Cancellation Policy. Content is shown on the frontend.</p>
+            <p class="text-muted mb-0">Edit About Us, Terms & Conditions, Privacy Policy, Return & Refund, and Cancellation Policy. About Us uses simple text fields and image uploads; other pages use a rich text editor.</p>
         </div>
     </div>
 </div>

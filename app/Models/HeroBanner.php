@@ -15,13 +15,17 @@ class HeroBanner extends Model
         'priority',
         'deeplink',
         'button_text',
+        'show_text',
+        'text_color',
         'banner_image',
+        'banner_image_mobile',
         'is_active',
     ];
 
     protected $casts = [
         'priority' => 'integer',
         'is_active' => 'boolean',
+        'show_text' => 'boolean',
     ];
 
     /**

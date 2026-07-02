@@ -74,16 +74,53 @@
         position: unset;
         cursor: pointer;
 
-        .swiper-wrapper {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            flex-direction: column;
-            gap: 12px;
-            width: fit-content;
+        @media (min-width: 640px) {
+            .swiper-wrapper {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                flex-direction: column;
+                gap: 12px;
+                width: fit-content;
+
+                .swiper-slide {
+                    width: 100px !important;
+                    border: 1px solid #A0A0A0;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    opacity: 0.5;
+
+                    &.swiper-slide-thumb-active {
+                        opacity: 1;
+                        border-color: var(--black);
+                    }
+
+                    @media (max-width: 1024px) {
+                        width: 60px !important;
+                    }
+                }
+            }
+        }
+
+        @media (max-width: 639.98px) {
+            position: relative;
+            width: 100%;
+            margin-top: 12px;
+            overflow: hidden;
+
+            .swiper-wrapper {
+                position: relative;
+                top: auto;
+                left: auto;
+                flex-direction: row;
+                width: 100%;
+                gap: 10px;
+            }
 
             .swiper-slide {
-                width: 100px !important;
+                width: 68px !important;
+                height: 85px;
+                flex-shrink: 0;
                 border: 1px solid #A0A0A0;
                 border-radius: 12px;
                 overflow: hidden;
@@ -94,8 +131,11 @@
                     border-color: var(--black);
                 }
 
-                @media (max-width: 1024px) {
-                    width: 60px !important;
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
                 }
             }
         }

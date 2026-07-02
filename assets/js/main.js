@@ -848,23 +848,29 @@ var swiperBannerTop = new Swiper(".swiper-banner-top", {
 });
 
 // Slider
-var swiperSlider = new Swiper(".swiper-slider", {
-  spaceBetween: 0,
-  slidesPerView: 1,
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  navigation: {
-    nextEl: ".swiper-slider .swiper-button-next",
-    prevEl: ".swiper-slider .swiper-button-prev",
-  },
-  loop: true,
-  autoplay: {
-    delay: 4000,
-    disableOnInteraction: false,
-  },
-});
+var heroSliderEl = document.querySelector(".swiper-slider");
+if (heroSliderEl) {
+  var heroSliderPagination = document.querySelector(".hero-slider-pagination");
+  var swiperSlider = new Swiper(".swiper-slider", {
+    spaceBetween: 0,
+    slidesPerView: 1,
+    pagination: heroSliderPagination
+      ? {
+          el: heroSliderPagination,
+          clickable: true,
+        }
+      : false,
+    navigation: {
+      nextEl: ".swiper-slider .swiper-button-next",
+      prevEl: ".swiper-slider .swiper-button-prev",
+    },
+    loop: true,
+    autoplay: {
+      delay: 4000,
+      disableOnInteraction: false,
+    },
+  });
+}
 
 // Slider Toys kid
 if (document.querySelector(".slider-toys-kid")) {
@@ -1238,35 +1244,48 @@ if (lookbookUnderwear) {
     .catch((error) => console.error("Error loading products:", error));
 }
 
-// list-feature-product Underwear
-var swiperUnderwear = new Swiper(".mySwiper", {
-  spaceBetween: 0,
-  slidesPerView: 1,
-  // freeMode: true,
-  watchSlidesProgress: true,
-});
-var swiper2 = new Swiper(".mySwiper2", {
-  spaceBetween: 0,
-  thumbs: {
-    swiper: swiperUnderwear,
-  },
-  on: {
-    slideChange: function () {
-      // Get index of current slide in swiper 1
-      let activeIndex = this.activeIndex;
+// Product detail image gallery (scoped to avoid affecting other swipers)
+var swiperUnderwearEl = document.querySelector(".product-detail .mySwiper");
+var swiper2El = document.querySelector(".product-detail .mySwiper2");
+var swiperUnderwear = swiperUnderwearEl
+  ? new Swiper(swiperUnderwearEl, {
+      spaceBetween: 12,
+      slidesPerView: "auto",
+      freeMode: true,
+      watchSlidesProgress: true,
+      breakpoints: {
+        640: {
+          slidesPerView: 1,
+          spaceBetween: 0,
+          freeMode: false,
+        },
+      },
+    })
+  : null;
+var swiper2 = swiper2El
+  ? new Swiper(swiper2El, {
+      spaceBetween: 0,
+      thumbs: swiperUnderwear ? { swiper: swiperUnderwear } : undefined,
+      on: {
+        slideChange: function () {
+          let activeIndex = this.activeIndex;
 
-      // Remove class 'swiper-slide-thumb-active' from all slide in swiper 2
-      document.querySelectorAll(".mySwiper .swiper-slide").forEach((slide) => {
-        slide.classList.remove("swiper-slide-thumb-active");
-      });
+          document
+            .querySelectorAll(".product-detail .mySwiper .swiper-slide")
+            .forEach((slide) => {
+              slide.classList.remove("swiper-slide-thumb-active");
+            });
 
-      // Add class 'swiper-slide-thumb-active' to slide in swiper 2
-      document
-        .querySelectorAll(".mySwiper .swiper-slide")
-      [activeIndex].classList.add("swiper-slide-thumb-active");
-    },
-  },
-});
+          const thumbSlides = document.querySelectorAll(
+            ".product-detail .mySwiper .swiper-slide"
+          );
+          if (thumbSlides[activeIndex]) {
+            thumbSlides[activeIndex].classList.add("swiper-slide-thumb-active");
+          }
+        },
+      },
+    })
+  : null;
 
 // Product detail image popup (Laravel version)
 document.addEventListener("DOMContentLoaded", function () {
@@ -2007,7 +2026,7 @@ function addEventToProductItem(products) {
       if (productMain && !productMain._wishlistClickBound) {
         productMain._wishlistClickBound = true;
         productMain.addEventListener("click", (e) => {
-          if (e.target.closest(".remove-from-wishlist") || e.target.closest(".add-wishlist-btn") || e.target.closest(".compare-btn") || e.target.closest(".add-cart-btn") || e.target.closest(".quick-view-btn") || e.target.closest(".quick-shop-btn")) return;
+          if (e.target.closest(".remove-from-wishlist") || e.target.closest(".add-wishlist-btn") || e.target.closest(".compare-btn") || e.target.closest(".add-cart-btn") || e.target.closest(".buy-now-btn") || e.target.closest(".quick-view-btn") || e.target.closest(".quick-shop-btn")) return;
           if (slug) window.location.href = window.location.origin + "/product/" + slug;
           else window.location.href = `product-default.html?id=${productId}`;
         });

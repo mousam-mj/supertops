@@ -2890,15 +2890,8 @@ input[type=file]::-webkit-file-upload-button {
     white-space: nowrap;
   }
 }
-.product-item .product-thumb .product-img img:nth-child(2) {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  visibility: hidden;
-  z-index: 0;
+.product-item .product-thumb .product-img img {
+  transition: transform 0.7s ease;
 }
 .product-item .product-thumb .countdown-time-block,
 .product-item .product-thumb .marquee-sale-block {
@@ -2926,13 +2919,6 @@ input[type=file]::-webkit-file-upload-button {
 .product-item.grid-type:hover .product-thumb .product-img img {
   transform: scale(1.05);
 }
-.product-item.grid-type:hover .product-thumb .product-img img:first-child {
-  opacity: 0;
-}
-.product-item.grid-type:hover .product-thumb .product-img img:last-child {
-  opacity: 1;
-  visibility: visible;
-}
 .product-item.grid-type:hover .product-thumb .countdown-time-block,
 .product-item.grid-type:hover .product-thumb .marquee-sale-block {
   opacity: 0;
@@ -2951,13 +2937,6 @@ input[type=file]::-webkit-file-upload-button {
 }
 .product-item.list-type .product-thumb:hover .product-img img {
   transform: scale(1.05);
-}
-.product-item.list-type .product-thumb:hover .product-img img:first-child {
-  opacity: 0;
-}
-.product-item.list-type .product-thumb:hover .product-img img:last-child {
-  opacity: 1;
-  visibility: visible;
 }
 .product-item .product-main .product-infor {
   position: relative;
@@ -3289,6 +3268,65 @@ input[type=file]::-webkit-file-upload-button {
   top: unset;
   gap: 16px;
   margin-top: 20px;
+}
+@media (max-width: 639.98px) {
+  .product-detail.style-grouped .list-img {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .product-detail.style-grouped .list-img .sticky {
+    width: 100%;
+    max-width: 100%;
+  }
+  .product-detail.style-grouped .list-img .mySwiper2 {
+    margin-left: 0 !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  .product-detail.style-grouped .list-img .mySwiper2 .swiper-slide {
+    height: auto;
+  }
+  .product-detail.style-grouped .list-img .mySwiper2 .swiper-slide img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+  }
+  .product-detail.style-grouped .featured-product.underwear .mySwiper,
+  .product-detail.style-grouped .featured-product.cosmetic .mySwiper {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .product-detail.style-grouped .featured-product.underwear .mySwiper .swiper-wrapper,
+  .product-detail.style-grouped .featured-product.cosmetic .mySwiper .swiper-wrapper {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    max-width: 100%;
+    gap: 12px;
+  }
+  .product-detail.style-grouped .featured-product.underwear .mySwiper .swiper-slide,
+  .product-detail.style-grouped .featured-product.cosmetic .mySwiper .swiper-slide {
+    width: 72px !important;
+    max-width: 72px;
+    flex-shrink: 0;
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+  .product-detail.style-grouped .featured-product.underwear .mySwiper .swiper-slide img,
+  .product-detail.style-grouped .featured-product.cosmetic .mySwiper .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 }
 @media (min-width: 640px) {
   .product-detail.style-grouped .list-img .mySwiper2 {
@@ -3647,6 +3685,11 @@ input[type=file]::-webkit-file-upload-button {
   opacity: 1;
 }
 
+.list-pagination {
+  flex-direction: column;
+  align-items: center;
+}
+.list-pagination .shop-page-btn,
 .list-pagination button {
   width: 44px;
   height: 44px;
@@ -3656,15 +3699,32 @@ input[type=file]::-webkit-file-upload-button {
   border-radius: 6px;
   border: 1px solid var(--line);
   transition: all ease 0.4s;
+  text-decoration: none;
+  color: inherit;
+  background-color: var(--white);
+  font-weight: 600;
+  line-height: 1;
 }
+.list-pagination .shop-page-btn:hover, .list-pagination .shop-page-btn.active,
 .list-pagination button:hover, .list-pagination button.active {
   background-color: var(--black);
   color: var(--white);
+  border-color: var(--black);
 }
+.list-pagination .shop-page-btn.disabled, .list-pagination .shop-page-btn--disabled,
 .list-pagination button.disabled {
-  display: none;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.list-pagination .shop-page-btn--ellipsis {
+  width: auto;
+  min-width: 28px;
+  border: none;
+  background: transparent;
+  pointer-events: none;
 }
 @media (max-width: 767.99px) {
+  .list-pagination .shop-page-btn,
   .list-pagination button {
     width: 36px;
     height: 36px;
@@ -4659,32 +4719,74 @@ input[type=file]::-webkit-file-upload-button {
   position: unset;
   cursor: pointer;
 }
-.featured-product.underwear .mySwiper .swiper-wrapper,
-.featured-product.cosmetic .mySwiper .swiper-wrapper {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  flex-direction: column;
-  gap: 12px;
-  width: fit-content;
+@media (min-width: 640px) {
+  .featured-product.underwear .mySwiper .swiper-wrapper,
+  .featured-product.cosmetic .mySwiper .swiper-wrapper {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    flex-direction: column;
+    gap: 12px;
+    width: fit-content;
+  }
+  .featured-product.underwear .mySwiper .swiper-wrapper .swiper-slide,
+  .featured-product.cosmetic .mySwiper .swiper-wrapper .swiper-slide {
+    width: 100px !important;
+    border: 1px solid #A0A0A0;
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0.5;
+  }
+  .featured-product.underwear .mySwiper .swiper-wrapper .swiper-slide.swiper-slide-thumb-active,
+  .featured-product.cosmetic .mySwiper .swiper-wrapper .swiper-slide.swiper-slide-thumb-active {
+    opacity: 1;
+    border-color: var(--black);
+  }
 }
-.featured-product.underwear .mySwiper .swiper-wrapper .swiper-slide,
-.featured-product.cosmetic .mySwiper .swiper-wrapper .swiper-slide {
-  width: 100px !important;
-  border: 1px solid #A0A0A0;
-  border-radius: 12px;
-  overflow: hidden;
-  opacity: 0.5;
-}
-.featured-product.underwear .mySwiper .swiper-wrapper .swiper-slide.swiper-slide-thumb-active,
-.featured-product.cosmetic .mySwiper .swiper-wrapper .swiper-slide.swiper-slide-thumb-active {
-  opacity: 1;
-  border-color: var(--black);
-}
-@media (max-width: 1024px) {
+@media (min-width: 640px) and (max-width: 1024px) {
   .featured-product.underwear .mySwiper .swiper-wrapper .swiper-slide,
   .featured-product.cosmetic .mySwiper .swiper-wrapper .swiper-slide {
     width: 60px !important;
+  }
+}
+@media (max-width: 639.98px) {
+  .featured-product.underwear .mySwiper,
+  .featured-product.cosmetic .mySwiper {
+    position: relative;
+    width: 100%;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .featured-product.underwear .mySwiper .swiper-wrapper,
+  .featured-product.cosmetic .mySwiper .swiper-wrapper {
+    position: relative;
+    top: auto;
+    left: auto;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+  }
+  .featured-product.underwear .mySwiper .swiper-slide,
+  .featured-product.cosmetic .mySwiper .swiper-slide {
+    width: 68px !important;
+    height: 85px;
+    flex-shrink: 0;
+    border: 1px solid #A0A0A0;
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0.5;
+  }
+  .featured-product.underwear .mySwiper .swiper-slide.swiper-slide-thumb-active,
+  .featured-product.cosmetic .mySwiper .swiper-slide.swiper-slide-thumb-active {
+    opacity: 1;
+    border-color: var(--black);
+  }
+  .featured-product.underwear .mySwiper .swiper-slide img,
+  .featured-product.cosmetic .mySwiper .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 }
 .featured-product.underwear .quantity-block .disabled,

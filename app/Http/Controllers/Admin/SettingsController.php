@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\AboutPageContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,11 +12,21 @@ class SettingsController extends Controller
 {
     protected array $homepageImageKeys = [
         'home_lookbook_image_1',
+        'home_lookbook_image_1_mobile',
         'home_lookbook_image_2',
+        'home_lookbook_image_2_mobile',
         'home_best_sellers_banner_image',
+        'home_best_sellers_banner_image_mobile',
         'about_us_banner_image',
+        'about_us_banner_image_mobile',
+        'about_us_choose_image',
+        'about_us_choose_image_mobile',
+        'about_us_growth_image',
+        'about_us_growth_image_mobile',
         'home_flash_sale_image',
+        'home_flash_sale_image_mobile',
         'home_flash_sale_bg_image',
+        'home_flash_sale_bg_image_mobile',
     ];
 
     protected array $homepageImageDefaults = [
@@ -23,6 +34,8 @@ class SettingsController extends Controller
         'home_lookbook_image_2' => 'assets/images/banner/perch123(2).webp',
         'home_best_sellers_banner_image' => 'assets/images/banner/Blog-3.webp',
         'about_us_banner_image' => 'assets/images/banner/bg-feature-pet1.png',
+        'about_us_choose_image' => 'assets/images/instagram/p1(1).webp',
+        'about_us_growth_image' => 'assets/images/instagram/p1(3).webp',
         'home_flash_sale_image' => 'assets/images/image-flash-sale-organic.png',
         'home_flash_sale_bg_image' => 'assets/images/banner/bg-flash-sale-organic.png',
     ];
@@ -45,6 +58,9 @@ class SettingsController extends Controller
         'home_section_instagram_enabled' => '1',
         'home_section_flash_sale_enabled' => '0',
         'home_best_sellers_show_text' => '0',
+        'home_lookbook_show_text' => '1',
+        'home_flash_sale_show_text' => '1',
+        'banner_text_color_default' => 'black',
         'show_customize_nav' => '1',
         'show_customize_product_button' => '1',
     ];
@@ -85,15 +101,25 @@ class SettingsController extends Controller
             'home_section_instagram_enabled',
             'home_section_flash_sale_enabled',
             'home_best_sellers_show_text',
+            'home_lookbook_show_text',
+            'home_flash_sale_show_text',
+            'banner_text_color_default',
+            'home_flash_sale_text_color',
+            'home_best_sellers_text_color',
             'show_customize_nav',
             'show_customize_product_button',
             'about_us_banner_image',
+            'about_us_choose_image',
+            'about_us_growth_image',
             'home_flash_sale_heading',
             'home_flash_sale_text',
             'home_flash_sale_button_text',
             'home_flash_sale_button_url',
             'home_flash_sale_image',
             'home_flash_sale_bg_image',
+            'banner_text_color_default',
+            'home_flash_sale_text_color',
+            'home_best_sellers_text_color',
             'benefit_1_icon',
             'benefit_1_title',
             'benefit_1_text',
@@ -106,6 +132,34 @@ class SettingsController extends Controller
             'benefit_4_icon',
             'benefit_4_title',
             'benefit_4_text',
+            'about_us_hero_subtitle',
+            'about_us_hero_heading',
+            'about_us_hero_text_color',
+            'about_us_hero_text_align',
+            'about_us_intro_heading',
+            'about_us_intro_subheading',
+            'about_us_intro_body',
+            'about_us_choose_heading',
+            'about_us_choose_body',
+            'about_us_choose_feature_label',
+            'about_us_feature_1_title',
+            'about_us_feature_1_text',
+            'about_us_feature_2_title',
+            'about_us_feature_2_text',
+            'about_us_feature_3_title',
+            'about_us_feature_3_text',
+            'about_us_choose_footer',
+            'about_us_quote_heading',
+            'about_us_quote_body',
+            'about_us_quote_subheading',
+            'about_us_growth_heading',
+            'about_us_growth_body',
+            'about_us_why_choose_label',
+            'about_us_why_1',
+            'about_us_why_2',
+            'about_us_why_3',
+            'about_us_why_4',
+            'about_us_why_5',
         ],
         'social' => [
             'facebook_url',
@@ -137,7 +191,7 @@ class SettingsController extends Controller
             'settings' => $settings,
             'settingKeys' => $this->settingKeys,
             'homepageImageDefaults' => $this->homepageImageDefaults,
-            'textSettingDefaults' => $this->textSettingDefaults,
+            'textSettingDefaults' => array_merge($this->textSettingDefaults, AboutPageContent::settingsDefaults()),
             'flagSettingDefaults' => $this->flagSettingDefaults,
         ]);
     }
@@ -165,18 +219,59 @@ class SettingsController extends Controller
             'home_lookbook_button_text' => 'nullable|string|max:100',
             'home_lookbook_button_url' => 'nullable|string|max:500',
             'home_lookbook_image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_lookbook_image_1_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'home_lookbook_image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_lookbook_image_2_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'home_best_sellers_heading' => 'nullable|string|max:255',
             'home_best_sellers_button_text' => 'nullable|string|max:100',
             'home_best_sellers_button_url' => 'nullable|string|max:500',
             'home_best_sellers_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_best_sellers_banner_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'about_us_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_banner_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_choose_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_choose_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_growth_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_growth_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'about_us_hero_subtitle' => 'nullable|string|max:255',
+            'about_us_hero_heading' => 'nullable|string|max:500',
+            'about_us_hero_text_color' => 'nullable|string|in:black,white',
+            'about_us_hero_text_align' => 'nullable|string|in:left,center,right',
+            'about_us_intro_heading' => 'nullable|string|max:255',
+            'about_us_intro_subheading' => 'nullable|string|max:255',
+            'about_us_intro_body' => 'nullable|string|max:5000',
+            'about_us_choose_heading' => 'nullable|string|max:255',
+            'about_us_choose_body' => 'nullable|string|max:2000',
+            'about_us_choose_feature_label' => 'nullable|string|max:255',
+            'about_us_feature_1_title' => 'nullable|string|max:255',
+            'about_us_feature_1_text' => 'nullable|string|max:500',
+            'about_us_feature_2_title' => 'nullable|string|max:255',
+            'about_us_feature_2_text' => 'nullable|string|max:500',
+            'about_us_feature_3_title' => 'nullable|string|max:255',
+            'about_us_feature_3_text' => 'nullable|string|max:500',
+            'about_us_choose_footer' => 'nullable|string|max:2000',
+            'about_us_quote_heading' => 'nullable|string|max:255',
+            'about_us_quote_body' => 'nullable|string|max:3000',
+            'about_us_quote_subheading' => 'nullable|string|max:500',
+            'about_us_growth_heading' => 'nullable|string|max:255',
+            'about_us_growth_body' => 'nullable|string|max:5000',
+            'about_us_why_choose_label' => 'nullable|string|max:255',
+            'about_us_why_1' => 'nullable|string|max:500',
+            'about_us_why_2' => 'nullable|string|max:500',
+            'about_us_why_3' => 'nullable|string|max:500',
+            'about_us_why_4' => 'nullable|string|max:500',
+            'about_us_why_5' => 'nullable|string|max:500',
             'home_flash_sale_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_flash_sale_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'home_flash_sale_bg_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'home_flash_sale_bg_image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'home_flash_sale_heading' => 'nullable|string|max:255',
             'home_flash_sale_text' => 'nullable|string|max:500',
             'home_flash_sale_button_text' => 'nullable|string|max:100',
             'home_flash_sale_button_url' => 'nullable|string|max:500',
+            'banner_text_color_default' => 'nullable|string|in:black,white',
+            'home_flash_sale_text_color' => 'nullable|string|in:black,white',
+            'home_best_sellers_text_color' => 'nullable|string|in:black,white',
             'benefit_1_icon' => 'nullable|string|max:100',
             'benefit_1_title' => 'nullable|string|max:255',
             'benefit_1_text' => 'nullable|string|max:1000',
@@ -246,6 +341,8 @@ class SettingsController extends Controller
             $this->settingKeys['other']
         );
 
+        $textDefaults = array_merge($this->textSettingDefaults, AboutPageContent::settingsDefaults());
+
         foreach ($allKeys as $key) {
             if (in_array($key, $this->homepageImageKeys, true)) {
                 continue;
@@ -260,7 +357,7 @@ class SettingsController extends Controller
                 $value = $this->normalizeWorkingHours($value);
             }
 
-            if (array_key_exists($key, $this->textSettingDefaults) && trim((string) $value) === '') {
+            if (array_key_exists($key, $textDefaults) && trim((string) $value) === '') {
                 $this->clearSetting($key);
 
                 continue;

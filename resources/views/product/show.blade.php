@@ -4,6 +4,8 @@
 
 @section('content')
 @php
+    use App\Models\MasterColor;
+
     $product->loadMissing('inventories');
     $availableColors = $product->inventories->pluck('color')->unique()->filter()->values()->toArray();
     $allSizes = $product->inventories->pluck('size')->unique()->filter()->values()->toArray();
@@ -36,6 +38,16 @@
             if ($path) $colorImageUrls[$cName] = str_starts_with($path, 'http') ? $path : storage_asset($path);
         }
     }
+    $colorSwatchUrls = [];
+    $swatchImages = is_array($product->color_swatch_images ?? null) ? $product->color_swatch_images : [];
+    foreach ($availableColors as $colorName) {
+        $swatchPath = $swatchImages[$colorName] ?? $product->getSwatchImageForColor($colorName);
+        if ($swatchPath) {
+            $colorSwatchUrls[$colorName] = str_starts_with($swatchPath, 'http') ? $swatchPath : storage_asset($swatchPath);
+        }
+    }
+    $masterColorCodes = MasterColor::pluck('color_code', 'name')->toArray();
+    $hasColorSwatchImages = count($colorSwatchUrls) > 0;
     $variantPrices = [];
     $productPrice = (float) ($product->price ?? 0);
     $productSalePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
@@ -56,14 +68,78 @@
         }
     }
     $initialDisplayPrice = ($initialSalePrice !== null && $initialSalePrice > 0 && $initialSalePrice < $initialPrice) ? $initialSalePrice : $initialPrice;
+    $colorVariantNames = is_array($product->color_variant_names ?? null) ? $product->color_variant_names : [];
+    $productBaseName = $product->name;
+    foreach ($availableColors as $c) {
+        $suffix = ', ' . $c;
+        if (str_ends_with($productBaseName, $suffix)) {
+            $productBaseName = substr($productBaseName, 0, -strlen($suffix));
+            break;
+        }
+    }
+    $colorTitles = [];
+    foreach ($availableColors as $c) {
+        $custom = trim((string) ($colorVariantNames[$c] ?? ''));
+        $colorTitles[$c] = $custom !== '' ? $custom : trim($productBaseName) . ', ' . $c;
+    }
+    $initialProductTitle = ($firstColor && isset($colorTitles[$firstColor])) ? $colorTitles[$firstColor] : $product->name;
+    $linkedVariantProducts = [];
+    $variantGroupMembers = $product->variantGroupMembers();
+    if ($variantGroupMembers->count() > 1) {
+        foreach ($variantGroupMembers as $variantProduct) {
+            $colorLabel = $variantProduct->getDisplayColorLabel();
+            $variantCustomNames = is_array($variantProduct->color_variant_names ?? null) ? $variantProduct->color_variant_names : [];
+            $variantCustomTitle = trim((string) ($variantCustomNames[$colorLabel] ?? ''));
+            $swatchPath = $variantProduct->getSwatchUrlForDisplayColor();
+            $variantImagePath = $variantProduct->image;
+            foreach ($variantProduct->inventories as $inv) {
+                if ($inv->color && trim((string) $inv->color) === $colorLabel && $inv->image) {
+                    $variantImagePath = $inv->image;
+                    break;
+                }
+            }
+            $linkedVariantProducts[] = [
+                'product_id' => $variantProduct->id,
+                'color' => $colorLabel,
+                'url' => route('product.show', $variantProduct->slug),
+                'is_current' => $variantProduct->id === $product->id,
+                'title' => $variantCustomTitle !== '' ? $variantCustomTitle : $variantProduct->name,
+                'swatch_url' => $swatchPath ? (str_starts_with($swatchPath, 'http') ? $swatchPath : storage_asset($swatchPath)) : null,
+                'image_url' => $variantImagePath ? storage_asset($variantImagePath) : null,
+            ];
+        }
+        $linkedColorKeys = collect($linkedVariantProducts)->pluck('color')->map(fn ($c) => strtolower(trim($c)))->all();
+        $availableColors = array_values(array_filter($availableColors, fn ($c) => ! in_array(strtolower(trim($c)), $linkedColorKeys, true)));
+        $currentLinked = collect($linkedVariantProducts)->firstWhere('is_current', true);
+        if ($currentLinked) {
+            $initialProductTitle = $currentLinked['title'];
+        }
+    }
+    $initialSelectedColor = $product->getDisplayColorLabel() ?: ($firstColor ?? '');
+    $showColorPicker = count($linkedVariantProducts) > 0 || count($availableColors) > 0;
 @endphp
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
 .about-truncated { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.product-detail .desc-tab .desc-block .desc-item:not(.open) { pointer-events: none; overflow: hidden; }
+.see-more-btn { display: none; }
+.see-more-btn.is-visible { display: inline-block; }
 .product-description-html p { margin-bottom: 0.5rem; }
 .product-description-html h5, .product-description-html h6 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; }
 .product-description-html ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
 .product-description-html a { text-decoration: underline; }
+.choose-color .list-color-image .color-item { overflow: hidden; padding: 0; background: transparent !important; }
+.choose-color .list-color-image .color-item img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 9999px; }
+.pincode-checker .delivery-result-box { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--line, #d4d4d4); }
+.pincode-checker .delivery-result-box--success { background: #f0fdf4; border-color: #86efac; }
+.pincode-checker .delivery-result-box--error { background: #fef2f2; border-color: #fca5a5; }
+.pincode-checker .delivery-result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.875rem; font-weight: 600; }
+.pincode-checker .delivery-result-box--success .delivery-result-header { color: #166534; }
+.pincode-checker .delivery-result-box--error .delivery-result-header { color: #991b1b; font-weight: 500; }
+.pincode-checker .delivery-result-rows { display: flex; flex-direction: column; gap: 8px; }
+.pincode-checker .delivery-result-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-size: 0.875rem; line-height: 1.4; }
+.pincode-checker .delivery-result-row span:first-child { color: #525252; }
+.pincode-checker .delivery-result-row span:last-child { font-weight: 600; text-align: right; }
 </style>
 <div class="product-page-content">
             <div class="breadcrumb-product">
@@ -103,11 +179,8 @@
         <div class="product-detail discount style-grouped">
             <div class="featured-product underwear filter-product-img bg-linear pt-7 md:pb-20 pb-10">
                 <div class="container flex justify-between gap-y-6 flex-wrap">
-                    <div class="list-img md:w-1/2 md:pr-[45px] w-full flex-shrink-0">
-                        <div class="sticky">
-                            <div class="swiper mySwiper2 rounded-2xl overflow-hidden">
-                                <div class="swiper-wrapper">
-                                    @php
+                    <div class="list-img product-gallery-wrap md:w-1/2 md:pr-[45px] w-full flex-shrink-0">
+                        @php
                     $getImageUrl = function($path) {
                         if (!$path) return asset('assets/images/product/perch-bottal.webp');
                         if (str_starts_with($path, 'http')) return $path;
@@ -128,36 +201,39 @@
                     }
                     $allImages = array_unique($allImages);
                 @endphp
+                        <div class="product-gallery-inner md:sticky">
+                            <div class="swiper mySwiper2 product-gallery-main rounded-2xl overflow-hidden">
+                                <div class="swiper-wrapper">
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
                                             <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
-                </div>
+                                        </div>
                                     @endforeach
+                                </div>
                             </div>
-                            </div>
-                            <div class="swiper mySwiper">
+                            <div class="swiper mySwiper product-gallery-thumbs">
                                 <div class="swiper-wrapper">
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
                                             <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover cursor-pointer" />
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                        @endforeach
-                    </div>
-            </div>
-                    </div>
-                        <div class="swiper popup-img">
-                            <span class="close-popup-btn absolute top-4 right-4 z-[2]">
-                                <i class="ph ph-x text-3xl text-white"></i>
-                            </span>
-                            <div class="swiper-wrapper">
-                                @foreach($allImages as $img)
-                                    <div class="swiper-slide">
-                                        <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
-                                    </div>
-                                @endforeach
+                            <div class="swiper popup-img">
+                                <span class="close-popup-btn absolute top-4 right-4 z-[2]">
+                                    <i class="ph ph-x text-3xl text-white"></i>
+                                </span>
+                                <div class="swiper-wrapper">
+                                    @foreach($allImages as $img)
+                                        <div class="swiper-slide">
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="swiper-button-prev"></div>
+                                <div class="swiper-button-next"></div>
                             </div>
-                            <div class="swiper-button-prev"></div>
-                            <div class="swiper-button-next"></div>
                         </div>
                     </div>
                     <div class="product-infor md:w-1/2 w-full lg:pl-[15px] md:pl-2" data-default-size="{{ $firstSize ?? $availableSizes[0] ?? '' }}">
@@ -165,7 +241,7 @@
                             <div class="flex justify-between">
                                 <div>
                                     <div class="product-category caption2 text-secondary font-semibold uppercase">{{ $product->category->name ?? 'Product' }}</div>
-                                    <div class="product-name heading4 mt-1">{{ $product->name }}</div>
+                                    <div class="product-name heading4 mt-1" @if(!empty($colorTitles)) data-color-titles="{{ e(json_encode($colorTitles)) }}" @endif>{{ $initialProductTitle }}</div>
                                 </div>
                                 <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white" data-product-id="{{ $product->id }}">
                                     <i class="ph ph-heart text-xl"></i>
@@ -226,15 +302,42 @@
                     </div>
                 @endif
                                 </div>
-                                @if(count($availableColors) > 0)
+                                @if($showColorPicker)
                                     <div class="choose-color mt-5" data-color-images="{{ json_encode($colorImageUrls) }}">
-                                        <div class="text-title">Colors: <span class="text-title color selected-color">{{ $availableColors[0] ?? '' }}</span></div>
-                                        <div class="list-color flex items-center gap-2 flex-wrap mt-3">
+                                        <div class="text-title">Colors: <span class="text-title color selected-color">{{ $initialSelectedColor }}</span></div>
+                                        <div class="list-color {{ $hasColorSwatchImages ? 'list-color-image' : '' }} flex items-center gap-2 flex-wrap mt-3">
+                                            @foreach($linkedVariantProducts as $variant)
+                                                @php
+                                                    $color = $variant['color'];
+                                                    $swatchUrl = $variant['swatch_url'] ?? null;
+                                                    $hexCode = trim((string) ($masterColorCodes[$color] ?? ''));
+                                                    $isValidHex = $hexCode !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $hexCode);
+                                                    $swatchStyle = (!$swatchUrl && $isValidHex) ? 'background-color: '.$hexCode.';' : ((!$swatchUrl) ? 'background-color: #e5e7eb;' : '');
+                                                @endphp
+                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $variant['is_current'] ? 'active border-black' : '' }}"
+                                                     @if($swatchStyle !== '') style="{{ $swatchStyle }}" @endif
+                                                     data-color="{{ $color }}"
+                                                     @if(!$variant['is_current']) data-product-url="{{ $variant['url'] }}" @endif
+                                                     title="{{ $color }}">
+                                                    @if($swatchUrl)
+                                                        <img src="{{ $swatchUrl }}" alt="{{ $color }}" class="w-full h-full object-cover rounded-full">
+                                                    @endif
+                                                </div>
+                                            @endforeach
                                             @foreach($availableColors as $color)
-                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $loop->first ? 'active border-black' : '' }}" 
-                                                     style="background-color: {{ $color }};"
+                                                @php
+                                                    $swatchUrl = $colorSwatchUrls[$color] ?? null;
+                                                    $hexCode = trim((string) ($masterColorCodes[$color] ?? ''));
+                                                    $isValidHex = $hexCode !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $hexCode);
+                                                    $swatchStyle = (!$swatchUrl && $isValidHex) ? 'background-color: '.$hexCode.';' : ((!$swatchUrl) ? 'background-color: #e5e7eb;' : '');
+                                                @endphp
+                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $loop->first ? 'active border-black' : '' }}"
+                                                     @if($swatchStyle !== '') style="{{ $swatchStyle }}" @endif
                                                      data-color="{{ $color }}"
                                                      title="{{ $color }}">
+                                                    @if($swatchUrl)
+                                                        <img src="{{ $swatchUrl }}" alt="{{ $color }}" class="w-full h-full object-cover rounded-full">
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
@@ -325,11 +428,10 @@
                                 <div class="left">
                                     <div class="heading6">Detailed Description</div>
                                     @php
-                                        $detailedText = $product->description ?: ($product->short_description ?: 'No detailed description has been added for this product.');
                                         $isHtml = $product->description && (str_contains($product->description, '<') && str_contains($product->description, '>'));
                                     @endphp
-                                    <div class="desc-detail-wrapper">
-                                        <div class="text-secondary mt-2 desc-detail-content {{ !$isHtml && strlen(strip_tags($detailedText)) > 300 ? 'desc-truncated' : '' }} @if($isHtml) product-description-html @endif">
+                                    <div class="desc-detail-wrapper see-more-wrap" data-truncate-class="desc-truncated">
+                                        <div class="text-secondary mt-2 desc-detail-content {{ !$isHtml ? 'desc-truncated' : '' }} @if($isHtml) product-description-html @endif" data-see-more-content>
                                             @if($product->description)
                                                 @if($isHtml)
                                                     {!! $product->description !!}
@@ -340,8 +442,8 @@
                                                 <span class="text-secondary2">{{ $product->short_description ?: 'No detailed description has been added for this product.' }}</span>
                                             @endif
                                         </div>
-                                        @if(!$isHtml && strlen(strip_tags($detailedText)) > 300)
-                                            <button type="button" class="see-more-btn text-button text-black hover:underline mt-2 cursor-pointer font-semibold" data-target=".desc-detail-content">See more</button>
+                                        @if(!$isHtml)
+                                            <button type="button" class="see-more-btn text-button text-black hover:underline mt-2 cursor-pointer font-semibold">See more</button>
                                         @endif
                                     </div>
                                 </div>
@@ -349,13 +451,11 @@
                                     <div class="heading6">About This Product</div>
                                     <div class="list-feature">
                                         @if($product->short_description)
-                                            <div class="item flex gap-1 text-secondary mt-1 about-short-wrap">
+                                            <div class="item flex gap-1 text-secondary mt-1 about-short-wrap see-more-wrap" data-truncate-class="about-truncated">
                                                 <i class="ph ph-dot text-2xl flex-shrink-0"></i>
                                                 <div>
-                                                    <p class="about-short-content {{ strlen($product->short_description) > 120 ? 'about-truncated' : '' }}">{{ $product->short_description }}</p>
-                                                    @if(strlen($product->short_description) > 120)
-                                                        <button type="button" class="see-more-btn text-button text-black hover:underline mt-1 cursor-pointer font-semibold text-sm" data-target=".about-short-content">See more</button>
-                                                    @endif
+                                                    <p class="about-short-content about-truncated" data-see-more-content>{{ $product->short_description }}</p>
+                                                    <button type="button" class="see-more-btn text-button text-black hover:underline mt-1 cursor-pointer font-semibold text-sm">See more</button>
                                                 </div>
                                             </div>
                                         @endif
@@ -497,7 +597,7 @@
                     <div class="swiper-button-prev2 sm:left-10 left-6">
                         <i class="ph-bold ph-caret-left text-xl"></i>
                 </div>
-                    <div class="swiper swiper-list-product h-full relative">
+                    <div class="swiper swiper-list-product relative">
                         <div class="swiper-wrapper">
                             @forelse($relatedProducts as $relatedProduct)
                                 <div class="swiper-slide h-auto">
@@ -520,6 +620,66 @@
 @section('scripts')
 <script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
+(function () {
+    function setupProductGallery() {
+        var productDetail = document.querySelector('.product-detail.style-grouped');
+        if (!productDetail || typeof Swiper === 'undefined') return;
+
+        var thumbEl = productDetail.querySelector('.product-gallery-thumbs') || productDetail.querySelector('.mySwiper');
+        var mainEl = productDetail.querySelector('.product-gallery-main') || productDetail.querySelector('.mySwiper2');
+        if (!thumbEl || !mainEl) return;
+
+        if (thumbEl.swiper) thumbEl.swiper.destroy(true, true);
+        if (mainEl.swiper) mainEl.swiper.destroy(true, true);
+
+        var isMobile = window.matchMedia('(max-width: 639.98px)').matches;
+
+        var thumbSwiper = new Swiper(thumbEl, {
+            spaceBetween: isMobile ? 10 : 0,
+            slidesPerView: isMobile ? 'auto' : 1,
+            freeMode: isMobile,
+            watchSlidesProgress: true,
+            slideToClickedSlide: true,
+            breakpoints: {
+                640: {
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    freeMode: false,
+                },
+            },
+        });
+
+        var mainSwiper = new Swiper(mainEl, {
+            spaceBetween: 0,
+            thumbs: { swiper: thumbSwiper },
+            on: {
+                slideChange: function () {
+                    var activeIndex = this.activeIndex;
+                    thumbEl.querySelectorAll('.swiper-slide').forEach(function (slide, index) {
+                        slide.classList.toggle('swiper-slide-thumb-active', index === activeIndex);
+                    });
+                },
+            },
+        });
+
+        window.swiperUnderwear = thumbSwiper;
+        window.swiper2 = mainSwiper;
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupProductGallery);
+    } else {
+        setupProductGallery();
+    }
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(setupProductGallery, 250);
+    });
+})();
+</script>
+<script>
     // Description / Specifications / Review tabs — work without full reload (reliable on server)
     function initDescTabs() {
         var descTab = document.querySelector('.desc-tab');
@@ -541,6 +701,9 @@
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-item') === dataItem) btn.classList.add('active');
             });
+            if (dataItem === 'Description' && typeof window.refreshProductSeeMore === 'function') {
+                window.refreshProductSeeMore();
+            }
         }
 
         // Event delegation: one listener on container so tabs work even if script runs early
@@ -573,23 +736,91 @@
         initDescTabs();
     }
 
-    // See more / See less for descriptions
-    document.querySelectorAll('.see-more-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var targetSel = this.getAttribute('data-target');
-            var target = this.closest('.desc-detail-wrapper, .about-short-wrap')?.querySelector(targetSel);
-            if (!target) return;
-            var isDesc = target.classList.contains('desc-detail-content');
-            var truncatedClass = isDesc ? 'desc-truncated' : 'about-truncated';
-            if (target.classList.contains(truncatedClass)) {
-                target.classList.remove(truncatedClass);
-                this.textContent = 'See less';
+    function initSeeMoreBlocks() {
+        function contentOverflows(content, truncateClass) {
+            if (!content || !truncateClass) return false;
+            content.classList.remove(truncateClass);
+            var fullHeight = content.scrollHeight;
+            content.classList.add(truncateClass);
+            var clampedHeight = content.scrollHeight;
+            return fullHeight > clampedHeight + 2;
+        }
+
+        function syncSeeMoreWrap(wrap) {
+            var content = wrap.querySelector('[data-see-more-content]');
+            var btn = wrap.querySelector('.see-more-btn');
+            var truncateClass = wrap.getAttribute('data-truncate-class') || 'about-truncated';
+            if (!content || !btn) return;
+
+            if (content.classList.contains('is-expanded')) {
+                btn.classList.add('is-visible');
+                btn.textContent = 'See less';
+                return;
+            }
+
+            if (contentOverflows(content, truncateClass)) {
+                content.classList.add(truncateClass);
+                btn.classList.add('is-visible');
+                btn.textContent = 'See more';
             } else {
-                target.classList.add(truncatedClass);
-                this.textContent = 'See more';
+                content.classList.remove(truncateClass);
+                content.classList.remove('is-expanded');
+                btn.classList.remove('is-visible');
+                btn.textContent = 'See more';
+            }
+        }
+
+        document.querySelectorAll('.see-more-wrap').forEach(syncSeeMoreWrap);
+
+        requestAnimationFrame(function() {
+            document.querySelectorAll('.see-more-wrap').forEach(syncSeeMoreWrap);
+        });
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.see-more-wrap').forEach(syncSeeMoreWrap);
+        });
+
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.see-more-btn');
+            if (!btn) return;
+            var wrap = btn.closest('.see-more-wrap');
+            if (!wrap) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var content = wrap.querySelector('[data-see-more-content]');
+            var truncateClass = wrap.getAttribute('data-truncate-class') || 'about-truncated';
+            if (!content) return;
+
+            var expanded = content.classList.contains('is-expanded');
+            if (expanded) {
+                content.classList.remove('is-expanded');
+                content.classList.add(truncateClass);
+                btn.textContent = 'See more';
+            } else {
+                content.classList.add('is-expanded');
+                content.classList.remove(truncateClass);
+                btn.textContent = 'See less';
             }
         });
-    });
+
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                document.querySelectorAll('.see-more-wrap').forEach(syncSeeMoreWrap);
+            }, 150);
+        });
+
+        window.refreshProductSeeMore = function() {
+            document.querySelectorAll('.see-more-wrap').forEach(syncSeeMoreWrap);
+        };
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSeeMoreBlocks);
+    } else {
+        initSeeMoreBlocks();
+    }
 
     // Product detail page functionality
     (function() {
@@ -655,6 +886,12 @@
             
             e.preventDefault();
             e.stopPropagation();
+
+            const linkedProductUrl = colorItem.getAttribute('data-product-url');
+            if (linkedProductUrl) {
+                window.location.href = linkedProductUrl;
+                return;
+            }
             
             const siblings = colorItem.parentElement.querySelectorAll('.color-item');
             siblings.forEach(sib => sib.classList.remove('active', 'border-black'));
@@ -663,6 +900,19 @@
             const selectedColor = colorItem.getAttribute('data-color');
             const colorText = document.querySelector('.selected-color');
             if (colorText) colorText.textContent = selectedColor;
+
+            const nameEl = document.querySelector('.product-name');
+            if (nameEl && selectedColor) {
+                const titlesJson = nameEl.getAttribute('data-color-titles');
+                if (titlesJson) {
+                    try {
+                        const titles = JSON.parse(titlesJson);
+                        if (titles[selectedColor]) {
+                            nameEl.textContent = titles[selectedColor];
+                        }
+                    } catch (err) { /* ignore */ }
+                }
+            }
             
             if (typeof window.updateProductVariantPrice === 'function') {
                 window.updateProductVariantPrice();
@@ -1285,23 +1535,23 @@
             const provider = deliveryData.provider || 'Standard';
 
             deliveryInfo.innerHTML = `
-                <div class="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <div class="flex items-center gap-2 mb-2">
+                <div class="delivery-result-box delivery-result-box--success">
+                    <div class="delivery-result-header">
                         <i class="ph ph-check-circle text-green-600"></i>
-                        <span class="text-green-800 font-semibold text-sm">Delivery Available</span>
+                        <span>Delivery Available</span>
                     </div>
-                    <div class="space-y-1 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Shipping Charge:</span>
-                            <span class="font-semibold">${shippingCharge > 0 ? '₹' + shippingCharge.toFixed(2) : 'Free'}</span>
+                    <div class="delivery-result-rows">
+                        <div class="delivery-result-row">
+                            <span>Shipping Charge:</span>
+                            <span>${shippingCharge > 0 ? '₹' + shippingCharge.toFixed(2) : 'Free'}</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Estimated Delivery:</span>
-                            <span class="font-semibold">${estimatedDelivery}</span>
+                        <div class="delivery-result-row">
+                            <span>Estimated Delivery:</span>
+                            <span>${estimatedDelivery}</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Service Provider:</span>
-                            <span class="font-semibold capitalize">${provider}</span>
+                        <div class="delivery-result-row">
+                            <span>Service Provider:</span>
+                            <span class="capitalize">${provider}</span>
                         </div>
                     </div>
                 </div>
@@ -1315,10 +1565,10 @@
 
         function showDeliveryError(message) {
             deliveryInfo.innerHTML = `
-                <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <div class="flex items-center gap-2">
+                <div class="delivery-result-box delivery-result-box--error">
+                    <div class="delivery-result-header">
                         <i class="ph ph-x-circle text-red-600"></i>
-                        <span class="text-red-800 text-sm">${message}</span>
+                        <span>${message}</span>
                     </div>
                 </div>
             `;

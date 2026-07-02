@@ -10,7 +10,11 @@
 </div>
 
 @if($products->hasPages())
-<div class="list-pagination w-full flex items-center justify-center gap-4 mt-10">
+<div class="list-pagination w-full flex items-center justify-center gap-4 mt-10 pb-4">
     {{ $products->links() }}
 </div>
+@elseif($products->total() > 0)
+<p class="caption1 text-secondary text-center w-full mt-8 mb-4">
+    Showing all {{ $products->total() }} products
+</p>
 @endif

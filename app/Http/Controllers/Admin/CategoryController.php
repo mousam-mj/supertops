@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\BannerMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -57,6 +58,8 @@ class CategoryController extends Controller
             'hero_image' => 'nullable|image|max:5120',
             'hero_text' => 'nullable|string|max:255',
             'hero_button_text' => 'nullable|string|max:100',
+            'hero_show_text' => 'nullable|boolean',
+            'hero_text_color' => 'nullable|string|in:black,white',
             'banner_images' => 'nullable|array|max:3',
             'banner_images.*' => 'nullable|image|max:2048',
             'banner_texts' => 'nullable|array|max:3',
@@ -118,6 +121,8 @@ class CategoryController extends Controller
             $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('categories/additional-banner', 'public');
         }
 
+        $validated['hero_text_color'] = normalize_banner_text_color($request->input('hero_text_color'));
+
         Category::create($validated);
 
         return redirect()->route('admin.categories.index')
@@ -160,11 +165,17 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
+            'image_mobile' => 'nullable|image|max:2048',
             'remove_image' => 'nullable|boolean',
+            'remove_image_mobile' => 'nullable|boolean',
             'hero_image' => 'nullable|image|max:5120',
+            'hero_image_mobile' => 'nullable|image|max:5120',
             'remove_hero_image' => 'nullable|boolean',
+            'remove_hero_image_mobile' => 'nullable|boolean',
             'hero_text' => 'nullable|string|max:255',
             'hero_button_text' => 'nullable|string|max:100',
+            'hero_show_text' => 'nullable|boolean',
+            'hero_text_color' => 'nullable|string|in:black,white',
             'banner_images' => 'nullable|array|max:3',
             'banner_images.*' => 'nullable|image|max:2048',
             'remove_banner_image' => 'nullable|array',
@@ -181,6 +192,8 @@ class CategoryController extends Controller
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'show_on_parent_page' => 'nullable|boolean',
+            'hero_show_text' => 'nullable|boolean',
+            'hero_text_color' => 'nullable|string|in:black,white',
         ]);
 
         // Prevent setting itself as parent
@@ -223,6 +236,13 @@ class CategoryController extends Controller
             $validated['image'] = $request->file('image')->store('categories', 'public');
         }
 
+        $imageMobile = BannerMedia::removeIfRequested($request, 'remove_image_mobile', $category->image_mobile);
+        $replacedImageMobile = BannerMedia::replaceUploaded($request, 'image_mobile', $category->image_mobile, 'categories');
+        if ($replacedImageMobile !== null) {
+            $imageMobile = $replacedImageMobile;
+        }
+        $validated['image_mobile'] = $imageMobile;
+
         // Handle hero image
         if ($request->filled('remove_hero_image') && $request->remove_hero_image == '1') {
             if ($category->hero_image) {
@@ -235,6 +255,13 @@ class CategoryController extends Controller
             }
             $validated['hero_image'] = $request->file('hero_image')->store('categories/hero', 'public');
         }
+
+        $heroImageMobile = BannerMedia::removeIfRequested($request, 'remove_hero_image_mobile', $category->hero_image_mobile);
+        $replacedHeroImageMobile = BannerMedia::replaceUploaded($request, 'hero_image_mobile', $category->hero_image_mobile, 'categories/hero');
+        if ($replacedHeroImageMobile !== null) {
+            $heroImageMobile = $replacedHeroImageMobile;
+        }
+        $validated['hero_image_mobile'] = $heroImageMobile;
 
         // Handle banner images
         $existingBannerImages = is_array($category->banner_images) ? $category->banner_images : [];
@@ -305,10 +332,12 @@ class CategoryController extends Controller
         }
 
         // Remove remove flags from validated
-        unset($validated['remove_image'], $validated['remove_hero_image'], $validated['remove_bottom_banner_image'], $validated['remove_additional_banner_image'], $validated['remove_banner_image']);
+        unset($validated['remove_image'], $validated['remove_image_mobile'], $validated['remove_hero_image'], $validated['remove_hero_image_mobile'], $validated['remove_bottom_banner_image'], $validated['remove_additional_banner_image'], $validated['remove_banner_image']);
 
         $validated['is_active'] = $request->boolean('is_active');
         $validated['show_on_parent_page'] = $request->boolean('show_on_parent_page', true);
+        $validated['hero_show_text'] = $request->boolean('hero_show_text', true);
+        $validated['hero_text_color'] = normalize_banner_text_color($request->input('hero_text_color'));
 
         $category->update($validated);
 

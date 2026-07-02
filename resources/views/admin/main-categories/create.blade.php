@@ -80,7 +80,7 @@
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="form-text text-muted">Recommended size: 800x400px. Max size: 2MB</small>
+                        <small class="form-text text-muted">Recommended size: 750×1000px (3:4 portrait). Max size: 2MB</small>
                         <div id="imagePreview" class="mt-2" style="display: none;">
                             <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;">
                         </div>
@@ -90,8 +90,18 @@
                     <h5 class="mb-3 fw-bold">Category Page UI/Content Settings</h5>
                     <p class="text-muted mb-4">Configure the content and images displayed on the category page (optional).</p>
 
+                    @include('admin.main-categories.partials.section-toggles')
+
                     <hr class="my-4">
                     <h5 class="mb-3">Hero Section</h5>
+
+                    <div class="mb-3">
+                        <input type="hidden" name="hero_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="hero_show_text" id="hero_show_text" value="1" {{ old('hero_show_text', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="hero_show_text">Show Shop button on category hero banner</label>
+                        </div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="hero_image" class="form-label">Hero Image</label>
@@ -139,38 +149,27 @@
                     </div>
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Promotional Banners (3 Blocks)</h5>
-
-                    @for($i = 0; $i < 3; $i++)
-                    <div class="card mb-3">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Banner {{ $i + 1 }}</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Banner Image {{ $i + 1 }}</label>
-                                <input type="file" 
-                                       class="form-control" 
-                                       name="banner_images[]" 
-                                       accept="image/*"
-                                       onchange="previewBannerImage(this, {{ $i }})">
-                                <small class="form-text text-muted">Recommended size: 600x400px. Max size: 2MB</small>
-                                <div id="bannerImagePreview{{ $i }}" class="mt-2" style="display: none;">
-                                    <img id="bannerPreviewImg{{ $i }}" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Banner Text {{ $i + 1 }}</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       name="banner_texts[]" 
-                                       value="{{ old('banner_texts.' . $i, '') }}"
-                                       placeholder="e.g. Drinkware, Barware, Kitchenware">
-                                <small class="form-text text-muted">Text to display on this banner</small>
-                            </div>
+                    <h5 class="mb-3">Promotional Banners</h5>
+                    <p class="text-muted small mb-3">Small promo blocks on Drinkware / Barware pages (after testimonial).</p>
+                    <div class="mb-3">
+                        <input type="hidden" name="promo_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="promo_show_text">Show Shop Now text on promo blocks</label>
                         </div>
                     </div>
-                    @endfor
+
+                    @include('admin.main-categories.partials.promo-banner-fields')
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Subcategory cards</h5>
+                    <div class="mb-4">
+                        <input type="hidden" name="subcategory_cards_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="subcategory_cards_show_text" id="subcategory_cards_show_text" value="1" {{ old('subcategory_cards_show_text', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="subcategory_cards_show_text">Show Shop button on subcategory grid cards</label>
+                        </div>
+                    </div>
 
                     <hr class="my-4">
                     <h5 class="mb-3">Bottom Banner Section</h5>
@@ -297,6 +296,27 @@
 
     function previewBannerImage(input, index) {
         previewImage(input, 'bannerImagePreview' + index, 'bannerPreviewImg' + index);
+    }
+
+    function toggleRemoveBannerImage(index) {
+        const input = document.getElementById('removeBannerImageInput' + index);
+        const removeBtn = document.querySelector('[onclick*="toggleRemoveBannerImage(' + index + ')"]');
+        if (!input) return;
+        if (input.value === '0') {
+            input.value = '1';
+            if (removeBtn) {
+                removeBtn.classList.remove('btn-outline-danger');
+                removeBtn.classList.add('btn-danger');
+                removeBtn.innerHTML = '<i class="bi bi-trash me-1"></i>Will remove on save';
+            }
+        } else {
+            input.value = '0';
+            if (removeBtn) {
+                removeBtn.classList.remove('btn-danger');
+                removeBtn.classList.add('btn-outline-danger');
+                removeBtn.innerHTML = '<i class="bi bi-trash me-1"></i>Remove';
+            }
+        }
     }
 
     function resetForm() {

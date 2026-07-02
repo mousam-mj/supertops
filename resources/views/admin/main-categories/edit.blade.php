@@ -130,7 +130,7 @@
                             @enderror
                         </div>
                         <small class="form-text text-muted d-block mb-2">
-                            <i class="bi bi-info-circle me-1"></i>Recommended size: 800x400px. Max size: 2MB. 
+                            <i class="bi bi-info-circle me-1"></i>Recommended size: 750×1000px (3:4 portrait). Max size: 2MB. 
                             @if($hasImage && $imageExists)
                                 Leave empty to keep current image.
                             @endif
@@ -139,14 +139,31 @@
                             <label class="form-label text-muted small mb-2 fw-semibold">Preview:</label>
                             <img id="previewImg" src="" alt="Preview" class="img-thumbnail border" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover; display: block; border: 2px solid #dee2e6 !important;">
                         </div>
+                        @include('admin.partials.banner-mobile-upload', [
+                            'name' => 'image_mobile',
+                            'inputId' => 'image_mobile',
+                            'removeName' => 'remove_image_mobile',
+                            'currentMobile' => $category->image_mobile ?? null,
+                            'recommended' => '750×1000px',
+                        ])
                     </div>
 
                     <hr class="my-4">
                     <h5 class="mb-3 fw-bold">Category Page UI/Content Settings</h5>
                     <p class="text-muted mb-4">Configure the content and images displayed on the category page.</p>
 
+                    @include('admin.main-categories.partials.section-toggles', ['category' => $category])
+
                     <hr class="my-4">
                     <h5 class="mb-3">Hero Section</h5>
+
+                    <div class="mb-3">
+                        <input type="hidden" name="hero_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="hero_show_text" id="hero_show_text" value="1" {{ old('hero_show_text', $category->hero_show_text ?? true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="hero_show_text">Show Shop button on category hero banner</label>
+                        </div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="hero_image" class="form-label">Hero Image</label>
@@ -171,10 +188,17 @@
                         @error('hero_image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="form-text text-muted">Main banner image for category page. Recommended size: 1920x600px. Max size: 5MB</small>
+                        <small class="form-text text-muted">Main banner image for category page. Recommended size: 1920×600px. Max size: 5MB. Banner height stays fixed when text is added.</small>
                         <div id="heroImagePreview" class="mt-2" style="display: none;">
                             <img id="heroPreviewImg" src="" alt="Preview" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
                         </div>
+                        @include('admin.partials.banner-mobile-upload', [
+                            'name' => 'hero_image_mobile',
+                            'inputId' => 'hero_image_mobile',
+                            'removeName' => 'remove_hero_image_mobile',
+                            'currentMobile' => $category->hero_image_mobile ?? null,
+                            'recommended' => '750×1000px',
+                        ])
                     </div>
 
                     <div class="row">
@@ -205,135 +229,163 @@
                         </div>
                     </div>
 
+                    @include('admin.partials.banner-text-color-select', [
+                        'name' => 'hero_text_color',
+                        'id' => 'hero_text_color',
+                        'label' => 'Hero banner text color',
+                        'value' => old('hero_text_color', $category->hero_text_color),
+                    ])
+
                     <hr class="my-4">
                     <h5 class="mb-3">Promotional Banners (small blocks)</h5>
                     <p class="text-muted small mb-3">Shown on Drinkware / Barware pages after Testimonial. Set count (e.g. 2 for Drinkware, 6 for Barware).</p>
-                    <div class="mb-3" style="max-width: 220px;">
-                        <label for="promo_banner_count" class="form-label">Number of promo blocks</label>
-                        <select class="form-select" id="promo_banner_count" name="promo_banner_count">
-                            @for($n = 1; $n <= 6; $n++)
-                                <option value="{{ $n }}" {{ (int) old('promo_banner_count', $category->promo_banner_count ?? 3) === $n ? 'selected' : '' }}>{{ $n }}</option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    @php
-                        $bannerImages = old('banner_images', is_array($category->banner_images) ? $category->banner_images : []);
-                        $bannerTexts = old('banner_texts', is_array($category->banner_texts) ? $category->banner_texts : []);
-                        while(count($bannerImages) < 3) $bannerImages[] = null;
-                        while(count($bannerTexts) < 3) $bannerTexts[] = '';
-                    @endphp
-
-                    @for($i = 0; $i < 3; $i++)
-                    <div class="card mb-3">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Banner {{ $i + 1 }}</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Banner Image {{ $i + 1 }}</label>
-                                @if(!empty($bannerImages[$i]))
-                                    <div class="mb-2 position-relative d-inline-block">
-                                        <img src="{{ storage_asset($bannerImages[$i]) }}" 
-                                             alt="Banner {{ $i + 1 }}" 
-                                             style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
-                                        <input type="hidden" name="remove_banner_image[{{ $i }}]" value="0" id="removeBannerImageInput{{ $i }}">
-                                        <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="toggleRemoveBannerImage({{ $i }})">
-                                            <i class="bi bi-trash me-1"></i>Remove
-                                        </button>
-                                    </div>
-                                @endif
-                                <input type="file" 
-                                       class="form-control" 
-                                       name="banner_images[]" 
-                                       accept="image/*"
-                                       onchange="previewBannerImage(this, {{ $i }})">
-                                <small class="form-text text-muted">Recommended size: 600x400px. Max size: 2MB</small>
-                                <div id="bannerImagePreview{{ $i }}" class="mt-2" style="display: none;">
-                                    <img id="bannerPreviewImg{{ $i }}" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Banner Text {{ $i + 1 }}</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       name="banner_texts[]" 
-                                       value="{{ $bannerTexts[$i] ?? '' }}"
-                                       placeholder="e.g. Drinkware, Barware, Kitchenware">
-                                <small class="form-text text-muted">Text to display on this banner</small>
-                            </div>
+                    <div class="mb-3">
+                        <input type="hidden" name="promo_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', $category->promo_show_text ?? true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="promo_show_text">Show Shop Now text on promo blocks</label>
                         </div>
                     </div>
-                    @endfor
+
+                    @include('admin.partials.banner-text-color-select', [
+                        'name' => 'promo_text_color',
+                        'id' => 'promo_text_color',
+                        'label' => 'Promo block text color',
+                        'value' => old('promo_text_color', $category->promo_text_color),
+                    ])
+
+                    @include('admin.main-categories.partials.promo-banner-fields', ['category' => $category])
 
                     <hr class="my-4">
-                    <h5 class="mb-3">Bottom Banner Section (4 image blocks)</h5>
-                    <p class="text-muted small mb-3">Four-card row shown near the bottom of Drinkware / Barware pages. Recommended: 600×750px each.</p>
+                    <h5 class="mb-3">Subcategory cards</h5>
+                    <div class="mb-4">
+                        <input type="hidden" name="subcategory_cards_show_text" value="0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="subcategory_cards_show_text" id="subcategory_cards_show_text" value="1" {{ old('subcategory_cards_show_text', $category->subcategory_cards_show_text ?? true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="subcategory_cards_show_text">Show Shop button on subcategory grid cards</label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Bottom Banner Section (sale banner)</h5>
+                    <p class="text-muted small mb-3">Wide split banner on Drinkware / Barware pages — text on the left, product image on the right (above the 4 image blocks). Enable/disable under <strong>Category page sections</strong> above.</p>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <input type="hidden" name="bottom_banner_show_text" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="bottom_banner_show_text" id="bottom_banner_show_text" value="1" {{ old('bottom_banner_show_text', $category->bottom_banner_show_text ?? true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="bottom_banner_show_text">Show text on banner</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bottom_banner_subtext" class="form-label">Subheading</label>
+                            <input type="text" class="form-control" id="bottom_banner_subtext" name="bottom_banner_subtext" value="{{ old('bottom_banner_subtext', $category->bottom_banner_subtext) }}" placeholder="e.g. Sale! Up To 50% Off!">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bottom_banner_text" class="form-label">Main heading</label>
+                            <input type="text" class="form-control @error('bottom_banner_text') is-invalid @enderror" id="bottom_banner_text" name="bottom_banner_text" value="{{ old('bottom_banner_text', $category->bottom_banner_text) }}" placeholder="e.g. Perch Bottle on sale">
+                            @error('bottom_banner_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="bottom_banner_button_text" class="form-label">Button text</label>
+                            <input type="text" class="form-control" id="bottom_banner_button_text" name="bottom_banner_button_text" value="{{ old('bottom_banner_button_text', $category->bottom_banner_button_text ?? 'Shop Now') }}">
+                        </div>
+                        <div class="col-md-8">
+                            <label for="bottom_banner_button_url" class="form-label">Button link (product URL or path)</label>
+                            <input type="text" class="form-control" id="bottom_banner_button_url" name="bottom_banner_button_url" value="{{ old('bottom_banner_button_url', $category->bottom_banner_button_url) }}" placeholder="/product/your-product-slug or full URL">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bottom_banner_bg_image" class="form-label">Background image (left side)</label>
+                            @if($category->bottom_banner_bg_image)
+                                <div class="mb-2">
+                                    <img src="{{ storage_asset($category->bottom_banner_bg_image) }}" alt="" class="img-thumbnail" style="max-height: 120px; object-fit: cover;">
+                                    <input type="hidden" name="remove_bottom_banner_bg_image" value="0" id="removeBottomBannerBgInput">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="toggleRemoveImage('bottom_banner_bg_image')">Remove</button>
+                                </div>
+                            @else
+                                <input type="hidden" name="remove_bottom_banner_bg_image" value="0" id="removeBottomBannerBgInput">
+                            @endif
+                            <input type="file" class="form-control" id="bottom_banner_bg_image" name="bottom_banner_bg_image" accept="image/*">
+                            <small class="text-muted">Recommended: 1920×700px. Default theme background used if empty.</small>
+                            @include('admin.partials.banner-mobile-upload', [
+                                'name' => 'bottom_banner_bg_image_mobile',
+                                'inputId' => 'bottom_banner_bg_image_mobile',
+                                'removeName' => 'remove_bottom_banner_bg_image_mobile',
+                                'currentMobile' => $category->bottom_banner_bg_image_mobile ?? null,
+                                'recommended' => '750×1000px',
+                            ])
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bottom_banner_image" class="form-label">Product image (right side)</label>
+                            @if($category->bottom_banner_image)
+                                <div class="mb-2 position-relative d-inline-block">
+                                    <img src="{{ storage_asset($category->bottom_banner_image) }}" alt="Bottom Banner" id="currentBottomBannerImage" style="max-width: 100%; max-height: 140px; object-fit: cover;" class="img-thumbnail">
+                                    <input type="hidden" name="remove_bottom_banner_image" value="0" id="removeBottomBannerImageInput">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="toggleRemoveImage('bottom_banner_image')"><i class="bi bi-trash me-1"></i>Remove</button>
+                                </div>
+                            @else
+                                <input type="hidden" name="remove_bottom_banner_image" value="0" id="removeBottomBannerImageInput">
+                            @endif
+                            <input type="file" class="form-control @error('bottom_banner_image') is-invalid @enderror" id="bottom_banner_image" name="bottom_banner_image" accept="image/*" onchange="previewImage(this, 'bottomBannerImagePreview', 'bottomBannerPreviewImg')">
+                            @error('bottom_banner_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <small class="text-muted">Recommended: 900×700px. Default product image used if empty.</small>
+                            <div id="bottomBannerImagePreview" class="mt-2" style="display: none;">
+                                <img id="bottomBannerPreviewImg" src="" alt="Preview" style="max-height: 140px; object-fit: cover;" class="img-thumbnail">
+                            </div>
+                            @include('admin.partials.banner-mobile-upload', [
+                                'name' => 'bottom_banner_image_mobile',
+                                'inputId' => 'bottom_banner_image_mobile',
+                                'removeName' => 'remove_bottom_banner_image_mobile',
+                                'currentMobile' => $category->bottom_banner_image_mobile ?? null,
+                                'recommended' => '750×1000px',
+                            ])
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Bottom 4 Image Blocks</h5>
+                    <p class="text-muted small mb-3">Four-card row below the sale banner on Drinkware / Barware pages. Recommended: 600×750px each. Enable/disable the row under <strong>Category page sections</strong> above.</p>
 
                     @php
                         $bottomBannerImages = old('bottom_banner_images', is_array($category->bottom_banner_images ?? null) ? $category->bottom_banner_images : []);
+                        $bottomBannerImagesMobile = old('bottom_banner_images_mobile', is_array($category->bottom_banner_images_mobile ?? null) ? $category->bottom_banner_images_mobile : []);
                         while (count($bottomBannerImages) < 4) { $bottomBannerImages[] = null; }
+                        while (count($bottomBannerImagesMobile) < 4) { $bottomBannerImagesMobile[] = null; }
+                        $bottomBannerBlockUrls = old('bottom_banner_block_urls', is_array($category->bottom_banner_block_urls ?? null) ? $category->bottom_banner_block_urls : []);
+                        while (count($bottomBannerBlockUrls) < 4) { $bottomBannerBlockUrls[] = ''; }
                     @endphp
                     @for($bi = 0; $bi < 4; $bi++)
                     <div class="card mb-3">
-                        <div class="card-header bg-light py-2"><h6 class="mb-0">Bottom block {{ $bi + 1 }}</h6></div>
+                        <div class="card-header bg-light py-2"><h6 class="mb-0">Image block {{ $bi + 1 }}</h6></div>
                         <div class="card-body">
                             @if(!empty($bottomBannerImages[$bi]))
                                 <div class="mb-2">
                                     <img src="{{ storage_asset($bottomBannerImages[$bi]) }}" alt="" class="img-thumbnail" style="max-height: 140px; object-fit: cover;">
                                     <input type="hidden" name="remove_bottom_banner_images[{{ $bi }}]" value="0">
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="this.previousElementSibling.value='1'">Remove</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="this.previousElementSibling.value='1'">Remove image</button>
                                 </div>
                             @else
                                 <input type="hidden" name="remove_bottom_banner_images[{{ $bi }}]" value="0">
                             @endif
-                            <input type="file" class="form-control" name="bottom_banner_images[]" accept="image/*">
+                            <div class="mb-3">
+                                <label class="form-label">Upload image</label>
+                                <input type="file" class="form-control" name="bottom_banner_images[]" accept="image/*">
+                                @include('admin.partials.banner-mobile-upload', [
+                                    'name' => 'bottom_banner_images_mobile['.$bi.']',
+                                    'inputId' => 'bottomBannerImageMobile'.$bi,
+                                    'removeName' => 'remove_bottom_banner_images_mobile['.$bi.']',
+                                    'currentMobile' => $bottomBannerImagesMobile[$bi] ?? null,
+                                    'recommended' => '600×750px',
+                                ])
+                            </div>
+                            <div>
+                                <label class="form-label">Link URL (product or page)</label>
+                                <input type="text" class="form-control" name="bottom_banner_block_urls[]" value="{{ $bottomBannerBlockUrls[$bi] ?? '' }}" placeholder="/product/slug or /shop">
+                            </div>
                         </div>
                     </div>
                     @endfor
-
-                    <div class="mb-3">
-                        <label for="bottom_banner_image" class="form-label">Legacy single bottom banner (fallback)</label>
-                        @if($category->bottom_banner_image)
-                            <div class="mb-2 position-relative d-inline-block">
-                                <img src="{{ storage_asset($category->bottom_banner_image) }}" 
-                                     alt="Bottom Banner" 
-                                     id="currentBottomBannerImage"
-                                     style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
-                                <input type="hidden" name="remove_bottom_banner_image" value="0" id="removeBottomBannerImageInput">
-                                <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="toggleRemoveImage('bottom_banner_image')">
-                                    <i class="bi bi-trash me-1"></i>Remove
-                                </button>
-                            </div>
-                        @endif
-                        <input type="file" 
-                               class="form-control @error('bottom_banner_image') is-invalid @enderror" 
-                               id="bottom_banner_image" 
-                               name="bottom_banner_image" 
-                               accept="image/*"
-                               onchange="previewImage(this, 'bottomBannerImagePreview', 'bottomBannerPreviewImg')">
-                        @error('bottom_banner_image')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">Bottom section banner. Recommended size: 1920x400px. Max size: 5MB</small>
-                        <div id="bottomBannerImagePreview" class="mt-2" style="display: none;">
-                            <img id="bottomBannerPreviewImg" src="" alt="Preview" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="bottom_banner_text" class="form-label">Bottom Banner Text</label>
-                        <input type="text" 
-                               class="form-control @error('bottom_banner_text') is-invalid @enderror" 
-                               id="bottom_banner_text" 
-                               name="bottom_banner_text" 
-                               value="{{ old('bottom_banner_text', $category->bottom_banner_text) }}"
-                               placeholder="e.g. Created to be loved for a lifetime">
-                        @error('bottom_banner_text')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">Text displayed on bottom banner</small>
-                    </div>
 
                     <hr class="my-4">
                     <h5 class="mb-3">Testimonial Section</h5>
@@ -475,6 +527,10 @@
             removeInput = document.getElementById('removeBottomBannerImageInput');
             removeBtn = document.querySelector('[onclick*="bottom_banner_image"]');
             currentImg = document.getElementById('currentBottomBannerImage');
+        } else if (type === 'bottom_banner_bg_image') {
+            removeInput = document.getElementById('removeBottomBannerBgInput');
+            removeBtn = document.querySelector('[onclick*="bottom_banner_bg_image"]');
+            currentImg = document.querySelector('[id="bottom_banner_bg_image"]')?.closest('.col-md-6')?.querySelector('img.img-thumbnail');
         } else if (type === 'additional_banner_image') {
             removeInput = document.getElementById('removeAdditionalBannerImageInput');
             removeBtn = document.querySelector('[onclick*="additional_banner_image"]');

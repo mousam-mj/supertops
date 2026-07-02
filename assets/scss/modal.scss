@@ -366,7 +366,10 @@
         transition: all ease 0.5s;
         opacity: 0;
         visibility: hidden;
-        overflow: auto;
+        overflow: hidden;
+        max-height: min(90vh, calc(100vh - 2rem));
+        display: flex;
+        flex-direction: column;
 
         &.open {
             opacity: 1;

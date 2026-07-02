@@ -545,6 +545,33 @@ function resetCam(){
   camera.position.set(0,0,390);
   autoRot=true;
 }
+function setCustomizeFrontView(){
+  if(flipGroup) flipGroup.rotation.x=Math.PI;
+  if(group) group.rotation.set(0,0.55,0);
+  if(camera){
+    camera.position.set(0,0,390);
+    camera.lookAt(0,0,0);
+    camera.updateProjectionMatrix();
+  }
+}
+function saveCustomizeViewState(){
+  return {
+    autoRot:autoRot,
+    flipX:flipGroup?flipGroup.rotation.x:Math.PI,
+    gx:group?group.rotation.x:0,
+    gy:group?group.rotation.y:0.55,
+    gz:group?group.rotation.z:0,
+    camZ:camera?camera.position.z:390
+  };
+}
+function restoreCustomizeViewState(saved){
+  if(!saved||!group||!camera) return;
+  autoRot=!!saved.autoRot;
+  if(flipGroup) flipGroup.rotation.x=saved.flipX;
+  group.rotation.set(saved.gx,saved.gy,saved.gz);
+  camera.position.z=saved.camZ;
+  camera.lookAt(0,0,0);
+}
 function zoomIn()  { camera.position.z=Math.max(80,  camera.position.z-35); }
 function zoomOut() { camera.position.z=Math.min(700, camera.position.z+35); }
 function toggleWish(){
@@ -652,12 +679,14 @@ function renderAll(){
   syncColorArrows();
   syncAllPartsFromState();
   updatePrice();
+  updateCustomizeResetUi();
 }
 function selectSize(idx){
   S.sizeIdx=idx;
   document.querySelectorAll('.size-card').forEach((c,i)=>{ c.classList.toggle('selected',i===idx); });
   if(sizes[idx]&&typeof sizes[idx].price==='number'){ basePrice=sizes[idx].price; updatePrice(); }
   syncAllPartsFromState();
+  updateCustomizeResetUi();
 }
 
 function fmtMoney(n){
@@ -1010,6 +1039,7 @@ function setActiveEngrSel(sel){
   if(!S.engrSlots) S.engrSlots={top:null,bottom:null};
   S.engrSlots[s]=sel;
   updateEngravingSlotUi();
+  updateCustomizeResetUi();
 }
 function slotEnabled(slot){
   if(slot==='bottom') return S.engrMode==='double';
@@ -1187,10 +1217,11 @@ function openEngravingCategory(cat){
   var tp=normEngraveType(cat.type);
   if(tp==='simple'){
     setActiveEngrSel({slug:cat.slug,name:cat.name,price:cat.price,type:tp});
-    renderEngravingGrid();
-    updatePrice();
-    showEngravingGridView();
-    return;
+      renderEngravingGrid();
+      updatePrice();
+      showEngravingGridView();
+      updateCustomizeResetUi();
+      return;
   }
   showEngravingDetailView();
   if(tp==='text'){
@@ -1314,6 +1345,7 @@ function openEngravingCategory(cat){
       renderEngravingGrid();
       updatePrice();
       showEngravingGridView();
+      updateCustomizeResetUi();
     });
     body.appendChild(ta);
     body.appendChild(opts);
@@ -1431,6 +1463,7 @@ function goTo(s){
   if(engrCatMode&&s===6) syncEngraving3dPreview();
   renderAll();
   syncPriceVisibility();
+  updateCustomizeResetUi();
 }
 
 function initCustomizeMobileStepSwipe(){
@@ -1517,6 +1550,96 @@ function startOverCustomize(){
   updatePrice();
   goTo(1);
   if(typeof resetCam==='function') resetCam();
+  updateCustomizeResetUi();
+}
+
+function getDefaultSizeIdx(){
+  var staticSz=document.getElementById('size-static-only');
+  if(staticSz) return parseInt(staticSz.getAttribute('data-size-idx')||'0',10);
+  return Math.max(0,sizes.length-1);
+}
+function hasCustomizeColorChanges(){
+  return S.bIdx!==0||S.cIdx!==0||S.sIdx!==0||S.hIdx!==0||S.boIdx!==0;
+}
+function hasCurrentStepColorChange(){
+  var step=S.step;
+  if(step===1) return S.bIdx!==0;
+  if(step===2) return S.cIdx!==0;
+  if(step===3) return S.sIdx!==0;
+  if(step===4) return S.hIdx!==0;
+  if(step===5) return S.boIdx!==0;
+  return false;
+}
+function hasCustomizeEngravingSelection(){
+  if(!engrEnabled) return false;
+  if(engrCatMode){
+    var top=S.engrSlots&&S.engrSlots.top;
+    var bottom=S.engrSlots&&S.engrSlots.bottom;
+    if(top&&top.slug) return true;
+    if(bottom&&bottom.slug) return true;
+    return false;
+  }
+  var ch=document.getElementById('customize-engraving-check');
+  var ta=document.getElementById('customize-engraving-text');
+  return !!(ch&&ch.checked&&ta&&String(ta.value||'').trim());
+}
+function hasCustomizeDesignChanges(){
+  return hasCustomizeColorChanges()||hasCustomizeEngravingSelection()||S.sizeIdx!==getDefaultSizeIdx();
+}
+function updateCustomizeResetUi(){
+  var colorDirty=hasCurrentStepColorChange();
+  document.querySelectorAll('[data-customize-reset="step-color"]').forEach(function(btn){
+    btn.classList.toggle('is-visible',colorDirty);
+    btn.disabled=!colorDirty;
+  });
+  var engrDirty=hasCustomizeEngravingSelection();
+  document.querySelectorAll('[data-customize-reset="engraving"]').forEach(function(btn){
+    btn.classList.toggle('is-visible',engrDirty);
+    btn.disabled=!engrDirty;
+  });
+  var allDirty=hasCustomizeDesignChanges();
+  document.querySelectorAll('[data-customize-reset="all"]').forEach(function(btn){
+    btn.classList.toggle('is-visible',allDirty);
+    btn.disabled=!allDirty;
+  });
+}
+function resetCurrentStepColor(){
+  var step=S.step;
+  if(step===1){ S.bIdx=0; S.bOff=0; }
+  else if(step===2){ S.cIdx=0; S.cOff=0; }
+  else if(step===3){ S.sIdx=0; S.sOff=0; }
+  else if(step===4){ S.hIdx=0; S.hOff=0; }
+  else if(step===5){ S.boIdx=0; S.boOff=0; }
+  else return;
+  renderAll();
+  updateCustomizeResetUi();
+}
+function clearCustomizeEngraving(){
+  S.engrMode='single';
+  S.engrSlot='top';
+  S.engrSlots={top:null,bottom:null};
+  var r1=document.getElementById('engr-mode-single');
+  var r2=document.getElementById('engr-mode-double');
+  if(r1) r1.checked=true;
+  if(r2) r2.checked=false;
+  var ech=document.getElementById('customize-engraving-check');
+  var eta=document.getElementById('customize-engraving-text');
+  if(ech){ ech.checked=false; }
+  if(eta){ eta.value=''; eta.disabled=true; }
+  if(engrCatMode){
+    renderEngravingGrid();
+    showEngravingGridView();
+    updateEngravingSlotUi();
+  }
+  syncEngraving3dPreview();
+  updatePrice();
+  updateCustomizeResetUi();
+}
+function confirmResetCustomizeDesign(){
+  if(!hasCustomizeDesignChanges()) return;
+  if(window.confirm('Reset all colors and engraving?')){
+    startOverCustomize();
+  }
 }
 
 function getCustomizeQtySelects(){
@@ -1564,12 +1687,20 @@ function onCustomizeQtyChange(sel){
 
 function captureCustomizePreviewDataUrl(){
   if(!renderer||!scene||!camera) return null;
+  var saved=saveCustomizeViewState();
   try{
+    autoRot=false;
+    setCustomizeFrontView();
+    if(flipGroup) flipGroup.updateMatrixWorld(true);
+    if(group) group.updateMatrixWorld(true);
     renderer.render(scene,camera);
     return renderer.domElement.toDataURL('image/png',0.92);
   }catch(e){
     console.warn(e);
     return null;
+  }finally{
+    restoreCustomizeViewState(saved);
+    if(renderer&&scene&&camera) renderer.render(scene,camera);
   }
 }
 

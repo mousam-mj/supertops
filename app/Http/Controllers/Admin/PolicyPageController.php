@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PolicyPage;
+use App\Models\Setting;
 use App\Support\AboutPageContent;
+use App\Support\AboutUsSettings;
 use App\Support\PolicyPageDefaults;
 use Illuminate\Http\Request;
 
@@ -52,8 +54,9 @@ class PolicyPageController extends Controller
         }
 
         $pageDefault = PolicyPageDefaults::forSlug($policy_page->slug);
+        $settings = Setting::allAsArray();
 
-        return view('admin.policy-pages.edit', compact('policy_page', 'pageDefault'));
+        return view('admin.policy-pages.edit', compact('policy_page', 'pageDefault', 'settings'));
     }
 
     /**
@@ -61,6 +64,10 @@ class PolicyPageController extends Controller
      */
     public function update(Request $request, PolicyPage $policy_page)
     {
+        if ($policy_page->slug === 'about-us') {
+            return $this->updateAboutUs($request, $policy_page);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string|max:100000',
@@ -85,5 +92,37 @@ class PolicyPageController extends Controller
 
         return redirect()->route('admin.policy-pages.edit', $policy_page)
             ->with('success', $message);
+    }
+
+    protected function updateAboutUs(Request $request, PolicyPage $policy_page)
+    {
+        $rules = array_merge([
+            'title' => 'required|string|max:255',
+            'is_active' => 'nullable|boolean',
+        ], AboutUsSettings::validationRules());
+
+        $validated = $request->validate($rules);
+
+        if ($request->boolean('reset_to_default')) {
+            AboutUsSettings::resetToDefaults();
+            $policy_page->update([
+                'title' => PolicyPageDefaults::forSlug('about-us')['title'] ?? 'About Us',
+                'content' => AboutPageContent::defaultHtml(),
+                'is_active' => $request->boolean('is_active'),
+            ]);
+
+            return redirect()->route('admin.policy-pages.edit', $policy_page)
+                ->with('success', 'About Us page reset to default content.');
+        }
+
+        AboutUsSettings::saveFromRequest($request, $validated);
+
+        $policy_page->update([
+            'title' => $validated['title'],
+            'is_active' => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->route('admin.policy-pages.edit', $policy_page)
+            ->with('success', 'About Us page updated successfully!');
     }
 }

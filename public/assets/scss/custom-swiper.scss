@@ -80,6 +80,40 @@
     padding-top: 40px;
 }
 
+/* Home hero — line-style slide indicators below banner */
+.hero-slider-pagination.swiper-pagination-horizontal {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px 22px;
+    margin: 0;
+}
+
+.hero-slider-pagination .swiper-pagination-bullet {
+    width: clamp(36px, 8vw, 56px);
+    height: 3px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(0, 0, 0, 0.18);
+    margin: 0 !important;
+    opacity: 1 !important;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.hero-slider-pagination .swiper-pagination-bullet::before {
+    display: none;
+}
+
+.hero-slider-pagination .swiper-pagination-bullet-active {
+    background: var(--black);
+    transform: scaleY(1.35);
+}
+
 .list-testimonial.section-swiper-navigation .swiper {
     padding-bottom: 84px;
 }

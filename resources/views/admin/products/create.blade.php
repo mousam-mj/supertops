@@ -153,7 +153,7 @@
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Recommended size: 800x800px. Max size: 2MB</small>
+                            <small class="form-text text-muted">Recommended size: 1200×1600px (3:4 portrait). Max size: 2MB</small>
                             <div id="imagePreview" class="mt-2" style="display: none;">
                                 <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             </div>
@@ -177,7 +177,7 @@
                             @error('gallery_images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">You can select multiple images for the product gallery. Max size: 2MB each.</small>
+                            <small class="form-text text-muted">Recommended: 1200×1600px (3:4) each. Max size: 2MB per image.</small>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="video" class="form-label">Product Video</label>
@@ -194,7 +194,15 @@
                     </div>
 
                     <div class="row mb-3">
+                        <div class="col-12 mb-2">
+                            <small class="text-muted d-block">
+                                <strong>Featured</strong> → homepage Best Sellers tab.
+                                <strong>New Arrival</strong> → homepage New Arrivals tab.
+                                <strong>On Sale</strong> → set sale price in Inventory after creating the product.
+                            </small>
+                        </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="in_stock" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -208,6 +216,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="is_active" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -221,6 +230,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <input type="hidden" name="is_featured" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 
@@ -237,6 +247,7 @@
 
                     <div class="row mb-3">
                         <div class="col-md-4">
+                            <input type="hidden" name="is_new_arrival" value="0">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 

@@ -101,6 +101,79 @@
         filter: none;
         border-color: #000 !important;
     }
+
+    /* Payment Method — explicit spacing (utility padding may not compile) */
+    .checkout-page-content .payment-block .payment-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .checkout-page-content .payment-block .payment-card-body {
+        padding: 20px 22px;
+    }
+    .checkout-page-content .payment-block .payment-card-footer {
+        padding: 0 22px 22px;
+    }
+    .checkout-page-content .payment-block .payment-card-intro {
+        margin: 0 0 18px;
+        line-height: 1.55;
+        color: #4b5563;
+    }
+    .checkout-page-content .payment-block .payment-methods-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+    @media (min-width: 768px) {
+        .checkout-page-content .payment-block .payment-methods-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+    .checkout-page-content .payment-block .payment-method-card {
+        padding: 14px 12px;
+        background: #f9fafb;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+    .checkout-page-content .payment-block .payment-method-card i {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.5rem;
+        color: #374151;
+    }
+    .checkout-page-content .payment-block .payment-method-card span {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    .checkout-page-content .payment-block .payment-branding {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        background: #f9fafb;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+    }
+    .checkout-page-content .payment-block .payment-delivery-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: #4b5563;
+        font-size: 0.875rem;
+        line-height: 1.45;
+    }
+    .checkout-page-content .payment-block .payment-delivery-note i {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: #2563eb;
+    }
 </style>
 <div class="page-content checkout-page-content">
     <!-- Menu bar (mobile) -->
@@ -211,7 +284,7 @@
                                                 <input type="hidden" name="payment" value="razorpay" />
                                                 
                                                 <!-- Header -->
-                                                <div class="p-6 border-b border-gray-100">
+                                                <div class="payment-card-header">
                                                     <div class="flex items-center justify-between">
                                                         <div class="flex items-center gap-4">
                                                             <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center">
@@ -230,33 +303,33 @@
                                                 </div>
                                                 
                                                 <!-- Content -->
-                                                <div class="p-6">
-                                                    <p class="text-gray-600 mb-6 leading-relaxed">
+                                                <div class="payment-card-body">
+                                                    <p class="payment-card-intro">
                                                         Pay securely using Credit Card, Debit Card, Net Banking, UPI (GPay/PhonePe/Paytm), or Digital Wallets.
                                                     </p>
                                                     
                                                     <!-- Payment Methods Grid -->
-                                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
-                                                            <i class="ph ph-credit-card text-2xl text-gray-700 mb-2 block"></i>
-                                                            <span class="text-xs font-medium text-gray-700">Cards</span>
+                                                    <div class="payment-methods-grid">
+                                                        <div class="payment-method-card">
+                                                            <i class="ph ph-credit-card"></i>
+                                                            <span>Cards</span>
                                                         </div>
-                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
-                                                            <i class="ph ph-bank text-2xl text-gray-700 mb-2 block"></i>
-                                                            <span class="text-xs font-medium text-gray-700">Net Banking</span>
+                                                        <div class="payment-method-card">
+                                                            <i class="ph ph-bank"></i>
+                                                            <span>Net Banking</span>
                                                         </div>
-                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
-                                                            <i class="ph ph-device-mobile text-2xl text-gray-700 mb-2 block"></i>
-                                                            <span class="text-xs font-medium text-gray-700">UPI</span>
+                                                        <div class="payment-method-card">
+                                                            <i class="ph ph-device-mobile"></i>
+                                                            <span>UPI</span>
                                                         </div>
-                                                        <div class="payment-method-card p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-black transition-colors text-center">
-                                                            <i class="ph ph-wallet text-2xl text-gray-700 mb-2 block"></i>
-                                                            <span class="text-xs font-medium text-gray-700">Wallets</span>
+                                                        <div class="payment-method-card">
+                                                            <i class="ph ph-wallet"></i>
+                                                            <span>Wallets</span>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Razorpay Branding -->
-                                                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                                                    <div class="payment-branding">
                                                         <div class="flex items-center gap-3">
                                                             <img src="https://cdn.razorpay.com/static/assets/logo/payment.svg" alt="Razorpay" class="h-8">
                                                             <span class="text-sm font-medium text-gray-600">Powered by Razorpay</span>
@@ -269,9 +342,9 @@
                                                 </div>
                                                 
                                                 <!-- Footer -->
-                                                <div class="px-6 pb-6">
-                                                    <div class="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                                                        <i class="ph ph-truck text-blue-600"></i>
+                                                <div class="payment-card-footer">
+                                                    <div class="payment-delivery-note">
+                                                        <i class="ph ph-truck"></i>
                                                         <span>Delivery charges calculated based on your pincode</span>
                                                     </div>
                                                 </div>

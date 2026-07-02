@@ -4,6 +4,71 @@
 @section('page-title', 'Edit ' . $policy_page->title)
 
 @section('content')
+@if($policy_page->slug === 'about-us')
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ $policy_page->title }}</h5>
+                    <a href="{{ route('about-us') }}" target="_blank" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> View on site
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <form id="policy-page-form" action="{{ route('admin.policy-pages.update', $policy_page) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="reset_to_default" id="reset_to_default" value="0">
+
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Page Title <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control @error('title') is-invalid @enderror"
+                                   id="title"
+                                   name="title"
+                                   value="{{ old('title', $policy_page->title) }}"
+                                   required>
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <p class="text-muted small mb-3">
+                            Update each section below with plain text and image uploads. No HTML required — changes appear on the
+                            <a href="{{ route('about-us') }}" target="_blank">About Us page</a>.
+                        </p>
+
+                        @include('admin.settings.partials.about-us-fields', ['settings' => $settings, 'showHeader' => false])
+
+                        <div class="mb-0 mt-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
+                                       {{ old('is_active', $policy_page->is_active) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">Active (show this page on the website)</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light border-top py-3 d-flex gap-2 flex-wrap align-items-center">
+                    <button type="submit" form="policy-page-form" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i> Save changes
+                    </button>
+                    <button type="button" id="reset-default-btn" class="btn btn-outline-danger">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to default
+                    </button>
+                    <a href="{{ route('admin.policy-pages.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+@else
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <div class="row">
     <div class="col-12">
@@ -54,13 +119,7 @@
                                       rows="18"
                                       placeholder="Paste or type HTML here (e.g. <p>, <strong>, <a>, <ul>)">{{ old('content', $policy_page->content) }}</textarea>
                         </div>
-                        <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML. Content saved while in <strong>Edit as HTML</strong> is stored exactly as entered (no code change).</small>
-                        @if($policy_page->slug === 'about-us')
-                            <small class="text-muted d-block mt-2">
-                                This page uses the full About Us layout (hero, images, sections). Use <strong>Edit as HTML</strong> for layout changes.
-                                The line <code>&lt;!--PERCH_BENEFIT_BLOCK--&gt;</code> is replaced on the site with the four benefit icons from <a href="{{ route('admin.settings.index') }}">Settings → Content</a>.
-                            </small>
-                        @endif
+                        <small class="text-muted d-block mt-1">Use the toolbar for formatting, or switch to <strong>Edit as HTML</strong> to paste raw HTML.</small>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -89,9 +148,30 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('scripts')
+@if($policy_page->slug === 'about-us')
+    @include('admin.partials.setting-image-scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var resetFlag = document.getElementById('reset_to_default');
+        var resetBtn = document.getElementById('reset-default-btn');
+        var form = document.getElementById('policy-page-form');
+
+        if (resetBtn && resetFlag && form) {
+            resetBtn.addEventListener('click', function () {
+                if (!confirm('Reset all About Us text and images to the original defaults? Your current edits will be replaced.')) {
+                    return;
+                }
+                resetFlag.value = '1';
+                form.requestSubmit();
+            });
+        }
+    });
+    </script>
+@else
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -113,13 +193,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     if (textarea && textarea.value.trim()) quill.clipboard.dangerouslyPasteHTML(textarea.value);
-    var isHtmlMode = @json($policy_page->slug === 'about-us');
+    var isHtmlMode = false;
     var editorEl = document.getElementById('editor');
-    if (isHtmlMode) {
-        editorEl.classList.add('d-none');
-        textarea.classList.remove('d-none');
-        toggleLabel.textContent = 'Visual editor';
-    }
     var resetFlag = document.getElementById('reset_to_default');
     var resetBtn = document.getElementById('reset-default-btn');
     var titleInput = document.getElementById('title');
@@ -127,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleBtn.addEventListener('click', function() {
         isHtmlMode = !isHtmlMode;
         if (isHtmlMode) {
-            // Do NOT overwrite textarea with Quill HTML – preserve raw HTML (like CKEditor HTML support)
             editorEl.classList.add('d-none');
             textarea.classList.remove('d-none');
             toggleLabel.textContent = 'Visual editor';
@@ -173,4 +247,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+@endif
 @endpush

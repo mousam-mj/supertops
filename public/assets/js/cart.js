@@ -255,6 +255,14 @@
         return base + '/' + path.replace(/^\/+/, '');
     }
 
+    function escapeHtml(str) {
+        return String(str == null ? '' : str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     function showQuickViewModal(product) {
         const main = getQuickViewModal();
         if (!main) return;
@@ -540,10 +548,18 @@
                     var url = getImageUrl(img);
                     var price = parseFloat(p.sale_price || p.price || 0);
                     var slug = p.slug || ('product-' + p.id);
-                    return '<a href="/product/' + slug + '" class="product-item grid-type block mb-4 rounded-xl overflow-hidden border border-line hover:border-black duration-300">' +
-                        '<div class="aspect-square bg-surface"><img src="' + url + '" alt="" class="w-full h-full object-cover" /></div>' +
-                        '<div class="p-3"><div class="name text-button truncate">' + (p.name || '') + '</div>' +
-                        '<div class="product-price text-title mt-1">₹' + price.toFixed(2) + '</div></div></a>';
+                    var name = escapeHtml(p.name || '');
+                    return '<a href="/product/' + slug + '" class="product-item grid-type cart-upsell-card block no-underline text-inherit">' +
+                        '<div class="product-main">' +
+                            '<div class="product-thumb bg-surface">' +
+                                '<img src="' + url + '" alt="' + name + '" loading="lazy" />' +
+                            '</div>' +
+                            '<div class="product-infor">' +
+                                '<div class="product-name">' + name + '</div>' +
+                                '<div class="product-price">₹' + price.toFixed(2) + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '</a>';
                 }).join('');
             })
             .catch(function() {
