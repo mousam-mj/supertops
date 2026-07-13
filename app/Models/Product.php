@@ -236,21 +236,40 @@ class Product extends Model
     }
 
     /**
-     * Get stock for specific color and size
+     * Get stock for specific color and size.
+     * Falls back to product-level stock when no inventory row exists for that combo
+     * (common for linked color variants that track stock only on the product).
      */
     public function getStockForColorSize($color = null, $size = null)
     {
+        $color = is_string($color) ? trim($color) : $color;
+        $size = is_string($size) ? trim($size) : $size;
+        if ($color === '') {
+            $color = null;
+        }
+        if ($size === '') {
+            $size = null;
+        }
+
         $query = $this->inventories();
-        
+
         if ($color) {
             $query->where('color', $color);
         }
-        
+
         if ($size) {
             $query->where('size', $size);
         }
-        
-        return $query->sum('quantity');
+
+        $hasMatchingRows = (clone $query)->exists();
+        $qty = (int) $query->sum('quantity');
+
+        if ($hasMatchingRows) {
+            return $qty;
+        }
+
+        // No inventory rows for this color/size — use product stock
+        return (int) ($this->stock_quantity ?? 0);
     }
 
     /**

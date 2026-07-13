@@ -14,10 +14,16 @@
         $heroImageMobile = $mainCategory->hero_image_mobile ?? null;
     }
     $heroButtonText = $category->hero_button_text ?? ($mainCategory->hero_button_text ?? 'Shop Now');
+    $shopCategoryDefault = route('shop', ['category' => $category->slug]);
+    $heroButtonUrl = setting_link_url(
+        $category->hero_button_url ?? ($mainCategory->hero_button_url ?? null),
+        $shopCategoryDefault
+    );
     $heroShowText = $isSubCategoryPage
         ? ($category->hero_show_text ?? true)
         : ($mainCategory->hero_show_text ?? true);
     $promoShowText = $mainCategory->promo_show_text ?? true;
+    $promoButtonText = trim((string) ($mainCategory->promo_button_text ?? '')) ?: 'Shop Now';
     $subcategoryCardsShowText = $mainCategory->subcategory_cards_show_text ?? true;
     $heroTextColorClass = banner_text_color_class(
         $isSubCategoryPage
@@ -39,9 +45,11 @@
     $promoBannerImages = $category->banner_images ?? ($mainCategory->banner_images ?? []);
     $promoBannerImagesMobile = $category->banner_images_mobile ?? ($mainCategory->banner_images_mobile ?? []);
     $promoBannerTexts = $category->banner_texts ?? ($mainCategory->banner_texts ?? []);
+    $promoBannerUrls = $category->banner_urls ?? ($mainCategory->banner_urls ?? []);
     $promoBannerImages = is_array($promoBannerImages) ? $promoBannerImages : [];
     $promoBannerImagesMobile = is_array($promoBannerImagesMobile) ? $promoBannerImagesMobile : [];
     $promoBannerTexts = is_array($promoBannerTexts) ? $promoBannerTexts : [];
+    $promoBannerUrls = is_array($promoBannerUrls) ? $promoBannerUrls : [];
     $promoCount = (int) ($mainCategory->promo_banner_count ?? 3);
     $promoCount = max(1, min(6, $promoCount));
     $promoBannerDefaults = [
@@ -99,7 +107,7 @@
         @if($heroOverlayText !== '')
             <div class="heading3 banner-overlay-heading">{{ $heroOverlayText }}</div>
         @endif
-        <a href="{{ route('shop') }}" class="button-main">{{ $heroButtonText }}</a>
+        <a href="{{ $heroButtonUrl }}" class="button-main">{{ $heroButtonText }}</a>
     </div>
     @endif
 </div>
@@ -137,8 +145,12 @@
                             $subImageMobile = $subCat->image_mobile ?: $subCat->image;
                             $subImage = $subCat->image ? storage_asset($subCat->image) : asset('assets/images/product/Bottle-1.webp');
                             $subImageMobileUrl = $subImageMobile ? storage_asset($subImageMobile) : $subImage;
+                            $subShopUrl = setting_link_url(
+                                $subCat->hero_button_url ?? null,
+                                route('shop', ['category' => $subCat->slug])
+                            );
                         @endphp
-                        <a href="{{ route('category', $subCat->slug) }}" class="banner-item banner-card-stable banner-size-fixed banner-aspect-3-4 relative bg-surface block rounded-[20px] overflow-hidden w-full">
+                        <a href="{{ $subShopUrl }}" class="banner-item banner-card-stable banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
                                 @if($subCat->image_mobile)
                                     <img src="{{ $subImage }}" alt="{{ $subCat->name }}" class="w-full h-full object-cover object-center hidden md:block">
@@ -185,8 +197,9 @@
                         $promoAlt = $category->name;
                     }
                     $promoDisplayText = trim((string) ($promoBannerTexts[$i] ?? ''));
+                    $promoHref = setting_link_url($promoBannerUrls[$i] ?? null, $shopCategoryDefault);
                 @endphp
-                <a href="{{ route('shop') }}" class="banner-item banner-card-stable banner-size-fixed relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
+                <a href="{{ $promoHref }}" class="banner-item banner-card-stable banner-size-fixed relative bg-surface block rounded-[20px] overflow-hidden duration-500 w-full">
                     <div class="banner-img w-full overflow-hidden">
                         @if(! empty($promoImagePath))
                             @include('partials.responsive-banner-img', [
@@ -204,7 +217,7 @@
                         @if($promoDisplayText !== '')
                             <div class="heading4 banner-overlay-heading">{{ $promoDisplayText }}</div>
                         @endif
-                        <span class="button-main">Shop Now</span>
+                        <span class="button-main">{{ $promoButtonText }}</span>
                     </div>
                     @endif
                 </a>
@@ -227,7 +240,7 @@
             @for($i = 0; $i < 4; $i++)
                 @if(! empty($bottomBannerImages[$i]))
                     @php
-                        $blockUrl = setting_link_url($bottomBannerBlockUrls[$i] ?? null, route('shop'));
+                        $blockUrl = setting_link_url($bottomBannerBlockUrls[$i] ?? null, $shopCategoryDefault);
                     @endphp
                     <a href="{{ $blockUrl }}" class="banner-item banner-card-stable banner-size-fixed relative bg-surface block rounded-[20px] overflow-hidden duration-500 banner-zoom-only w-full">
                         <div class="banner-img w-full overflow-hidden">

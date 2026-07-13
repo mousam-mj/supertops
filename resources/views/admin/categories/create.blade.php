@@ -96,7 +96,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="hero_text" class="form-label">Hero Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_text') is-invalid @enderror" 
@@ -109,7 +109,7 @@
                             @enderror
                             <small class="form-text text-muted">Main heading text displayed on hero banner</small>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="hero_button_text" class="form-label">Button Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_button_text') is-invalid @enderror" 
@@ -119,7 +119,20 @@
                             @error('hero_button_text')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Text for hero button (default: Shop Now)</small>
+                            <small class="form-text text-muted">Default: Shop Now</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="hero_button_url" class="form-label">Button link</label>
+                            <input type="text"
+                                   class="form-control @error('hero_button_url') is-invalid @enderror"
+                                   id="hero_button_url"
+                                   name="hero_button_url"
+                                   value="{{ old('hero_button_url') }}"
+                                   placeholder="/shop or full URL">
+                            @error('hero_button_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Leave blank for /shop</small>
                         </div>
                     </div>
 
@@ -152,6 +165,15 @@
                                        value="{{ old('banner_texts.' . $i, '') }}"
                                        placeholder="e.g. Drinkware, Barware, Kitchenware">
                                 <small class="form-text text-muted">Text to display on this banner</small>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Banner link {{ $i + 1 }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="banner_urls[]"
+                                       value="{{ old('banner_urls.' . $i, '') }}"
+                                       placeholder="/shop or full URL">
+                                <small class="form-text text-muted">Leave blank for /shop</small>
                             </div>
                         </div>
                     </div>

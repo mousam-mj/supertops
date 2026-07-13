@@ -39,11 +39,13 @@
         <div class="product-card-actions list-action grid grid-cols-2 gap-2 mt-3">
             <div class="add-cart-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2" data-product-id="{{ $product->id ?? '' }}">
                 <i class="ph ph-shopping-cart-simple text-lg shrink-0" aria-hidden="true"></i>
-                <span>Add To Cart</span>
+                <span class="btn-label-full">Add To Cart</span>
+                <span class="btn-label-short">Cart</span>
             </div>
             <a href="{{ route('product.show', $product->slug ?? '#') }}?buy=1" class="buy-now-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2 no-underline text-inherit" data-product-slug="{{ $product->slug ?? '' }}">
                 <i class="ph ph-lightning text-lg shrink-0" aria-hidden="true"></i>
-                <span>Buy Now</span>
+                <span class="btn-label-full">Buy Now</span>
+                <span class="btn-label-short">Buy</span>
             </a>
         </div>
         

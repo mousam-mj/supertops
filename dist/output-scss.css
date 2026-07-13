@@ -716,6 +716,7 @@ input[type=file]::-webkit-file-upload-button {
   height: 100%;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: all ease 0.4s;
   background: rgba(0, 0, 0, 0.6);
   z-index: 101;
@@ -779,6 +780,7 @@ input[type=file]::-webkit-file-upload-button {
 .modal-search-block:has(.modal-search-main.open) {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 .modal-newsletter .modal-newsletter-main,
 .modal-video-block .modal-newsletter-main,

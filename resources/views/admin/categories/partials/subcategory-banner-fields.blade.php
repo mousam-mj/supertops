@@ -42,7 +42,7 @@
                 @error('image')
                     <div class="invalid-feedback d-block">{{ $message }}</div>
                 @enderror
-                <small class="form-text text-muted">Recommended: 750×1000px (3:4 portrait). Max 2MB.</small>
+                <small class="form-text text-muted">Recommended: 1500×1500px (1:1 square). Max 2MB.</small>
                 <div id="imagePreview" class="mt-2" style="display: none;">
                     <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 220px; object-fit: cover;">
                 </div>
@@ -51,7 +51,7 @@
                     'inputId' => 'image_mobile',
                     'removeName' => 'remove_image_mobile',
                     'currentMobile' => $category->image_mobile ?? null,
-                    'recommended' => '750×1000px',
+                    'recommended' => '1500×1500px',
                 ])
             </div>
             <div class="col-lg-6">
@@ -96,17 +96,29 @@
                     'recommended' => '750×1000px',
                 ])
             </div>
-            <div class="col-12">
+            <div class="col-md-6">
                 <label for="hero_button_text" class="form-label">Shop button text</label>
                 <input type="text"
                        class="form-control @error('hero_button_text') is-invalid @enderror"
                        id="hero_button_text"
                        name="hero_button_text"
-                       value="{{ old('hero_button_text', $category->hero_button_text ?? 'Shop Now') }}"
-                       style="max-width: 280px;">
+                       value="{{ old('hero_button_text', $category->hero_button_text ?? 'Shop Now') }}">
                 @error('hero_button_text')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+            <div class="col-md-6">
+                <label for="hero_button_url" class="form-label">Shop button link</label>
+                <input type="text"
+                       class="form-control @error('hero_button_url') is-invalid @enderror"
+                       id="hero_button_url"
+                       name="hero_button_url"
+                       value="{{ old('hero_button_url', $category->hero_button_url) }}"
+                       placeholder="/shop?category=barware-essentials">
+                @error('hero_button_url')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-text text-muted">Leave blank to open shop with this subcategory selected</small>
             </div>
             <div class="col-12">
                 <input type="hidden" name="hero_show_text" value="0">

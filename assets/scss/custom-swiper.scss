@@ -80,29 +80,32 @@
     padding-top: 40px;
 }
 
-/* Home hero — line-style slide indicators below banner */
+/* Home hero — small clickable line indicators on banner */
 .hero-slider-pagination.swiper-pagination-horizontal {
-    position: relative;
-    bottom: auto;
-    left: auto;
-    width: 100%;
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: auto;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
-    padding: 18px 16px 22px;
+    gap: 6px;
+    padding: 0;
     margin: 0;
+    z-index: 8;
 }
 
 .hero-slider-pagination .swiper-pagination-bullet {
-    width: clamp(36px, 8vw, 56px);
+    width: 16px;
     height: 3px;
     border-radius: 999px;
     border: none;
-    background: rgba(0, 0, 0, 0.18);
+    background: rgba(255, 255, 255, 0.45);
     margin: 0 !important;
     opacity: 1 !important;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    transition: width 0.25s ease, background-color 0.25s ease;
 }
 
 .hero-slider-pagination .swiper-pagination-bullet::before {
@@ -110,8 +113,9 @@
 }
 
 .hero-slider-pagination .swiper-pagination-bullet-active {
-    background: var(--black);
-    transform: scaleY(1.35);
+    width: 28px;
+    background: #fff;
+    transform: none;
 }
 
 .list-testimonial.section-swiper-navigation .swiper {

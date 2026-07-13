@@ -80,7 +80,7 @@
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <small class="form-text text-muted">Recommended size: 750×1000px (3:4 portrait). Max size: 2MB</small>
+                        <small class="form-text text-muted">Recommended size: 1500×1500px (1:1 square). Max size: 2MB</small>
                         <div id="imagePreview" class="mt-2" style="display: none;">
                             <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;">
                         </div>
@@ -121,7 +121,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="hero_text" class="form-label">Hero Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_text') is-invalid @enderror" 
@@ -134,7 +134,7 @@
                             @enderror
                             <small class="form-text text-muted">Main heading text displayed on hero banner</small>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="hero_button_text" class="form-label">Button Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_button_text') is-invalid @enderror" 
@@ -144,18 +144,43 @@
                             @error('hero_button_text')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Text for hero button (default: Shop Now)</small>
+                            <small class="form-text text-muted">Default: Shop Now</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="hero_button_url" class="form-label">Button link</label>
+                            <input type="text"
+                                   class="form-control @error('hero_button_url') is-invalid @enderror"
+                                   id="hero_button_url"
+                                   name="hero_button_url"
+                                   value="{{ old('hero_button_url') }}"
+                                   placeholder="/shop?category=drinkware">
+                            @error('hero_button_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Leave blank to open shop with this category selected</small>
                         </div>
                     </div>
 
                     <hr class="my-4">
                     <h5 class="mb-3">Promotional Banners</h5>
                     <p class="text-muted small mb-3">Small promo blocks on Drinkware / Barware pages (after testimonial).</p>
-                    <div class="mb-3">
-                        <input type="hidden" name="promo_show_text" value="0">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="promo_show_text">Show Shop Now text on promo blocks</label>
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <input type="hidden" name="promo_show_text" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="promo_show_text">Show button text on promo blocks</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="promo_button_text" class="form-label">Promo button text</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="promo_button_text"
+                                   name="promo_button_text"
+                                   value="{{ old('promo_button_text', 'Shop Now') }}"
+                                   placeholder="Shop Now"
+                                   style="max-width: 280px;">
                         </div>
                     </div>
 

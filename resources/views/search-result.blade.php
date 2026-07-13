@@ -38,7 +38,11 @@
                         <button type="submit" class="button-main absolute top-1 bottom-1 right-1 flex items-center justify-center px-4">Search</button>
                     </form>
                     @if($query)
-                        <div class="text-center mt-3">
+                        <div class="text-center mt-3" id="search-clear-wrap">
+                            <a href="{{ route('search') }}" id="search-clear-link" class="caption1 text-red duration-300 hover:underline">Clear search</a>
+                        </div>
+                    @else
+                        <div class="text-center mt-3" id="search-clear-wrap" hidden>
                             <a href="{{ route('search') }}" id="search-clear-link" class="caption1 text-red duration-300 hover:underline">Clear search</a>
                         </div>
                     @endif
@@ -77,4 +81,37 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('search-page-query');
+    var clearWrap = document.getElementById('search-clear-wrap');
+    var clearLink = document.getElementById('search-clear-link');
+    var searchUrl = @json(route('search'));
+
+    function syncSearchClearButton() {
+        var params = new URLSearchParams(window.location.search);
+        var q = (params.get('q') || '').trim();
+        if (clearWrap) {
+            clearWrap.hidden = !q;
+        }
+        if (input && !q && document.activeElement !== input) {
+            input.value = '';
+        }
+    }
+
+    syncSearchClearButton();
+    window.addEventListener('pageshow', syncSearchClearButton);
+
+    if (clearLink) {
+        clearLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (input) input.value = '';
+            if (clearWrap) clearWrap.hidden = true;
+            window.location.href = searchUrl;
+        });
+    }
+});
+</script>
+@endpush
 @endsection

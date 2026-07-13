@@ -20,11 +20,13 @@ class Category extends Model
         'hero_image_mobile',
         'hero_text',
         'hero_button_text',
+        'hero_button_url',
         'hero_show_text',
         'hero_text_color',
         'banner_images',
         'banner_images_mobile',
         'banner_texts',
+        'banner_urls',
         'bottom_banner_image',
         'bottom_banner_text',
         'testimonial_text',
@@ -44,6 +46,7 @@ class Category extends Model
         'banner_images' => 'array',
         'banner_images_mobile' => 'array',
         'banner_texts' => 'array',
+        'banner_urls' => 'array',
     ];
 
     /**

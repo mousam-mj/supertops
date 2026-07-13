@@ -58,12 +58,15 @@ class CategoryController extends Controller
             'hero_image' => 'nullable|image|max:5120',
             'hero_text' => 'nullable|string|max:255',
             'hero_button_text' => 'nullable|string|max:100',
+            'hero_button_url' => 'nullable|string|max:500',
             'hero_show_text' => 'nullable|boolean',
             'hero_text_color' => 'nullable|string|in:black,white',
             'banner_images' => 'nullable|array|max:3',
             'banner_images.*' => 'nullable|image|max:2048',
             'banner_texts' => 'nullable|array|max:3',
             'banner_texts.*' => 'nullable|string|max:255',
+            'banner_urls' => 'nullable|array|max:3',
+            'banner_urls.*' => 'nullable|string|max:500',
             'bottom_banner_image' => 'nullable|image|max:5120',
             'bottom_banner_text' => 'nullable|string|max:255',
             'testimonial_text' => 'nullable|string|max:1000',
@@ -109,6 +112,16 @@ class CategoryController extends Controller
         // Handle banner texts
         if ($request->has('banner_texts')) {
             $validated['banner_texts'] = array_values(array_filter($request->input('banner_texts', [])));
+        }
+
+        if ($request->has('banner_urls')) {
+            $validated['banner_urls'] = array_values(array_map(
+                fn ($url) => ($url = trim((string) $url)) !== '' ? $url : null,
+                $request->input('banner_urls', [])
+            ));
+            if (count(array_filter($validated['banner_urls'])) === 0) {
+                $validated['banner_urls'] = null;
+            }
         }
 
         // Handle bottom banner image
@@ -174,6 +187,7 @@ class CategoryController extends Controller
             'remove_hero_image_mobile' => 'nullable|boolean',
             'hero_text' => 'nullable|string|max:255',
             'hero_button_text' => 'nullable|string|max:100',
+            'hero_button_url' => 'nullable|string|max:500',
             'hero_show_text' => 'nullable|boolean',
             'hero_text_color' => 'nullable|string|in:black,white',
             'banner_images' => 'nullable|array|max:3',
@@ -181,6 +195,8 @@ class CategoryController extends Controller
             'remove_banner_image' => 'nullable|array',
             'banner_texts' => 'nullable|array|max:3',
             'banner_texts.*' => 'nullable|string|max:255',
+            'banner_urls' => 'nullable|array|max:3',
+            'banner_urls.*' => 'nullable|string|max:500',
             'bottom_banner_image' => 'nullable|image|max:5120',
             'remove_bottom_banner_image' => 'nullable|boolean',
             'bottom_banner_text' => 'nullable|string|max:255',
@@ -303,6 +319,16 @@ class CategoryController extends Controller
         // Handle banner texts
         if ($request->has('banner_texts')) {
             $validated['banner_texts'] = array_values(array_filter($request->input('banner_texts', [])));
+        }
+
+        if ($request->has('banner_urls')) {
+            $validated['banner_urls'] = array_values(array_map(
+                fn ($url) => ($url = trim((string) $url)) !== '' ? $url : null,
+                $request->input('banner_urls', [])
+            ));
+            if (count(array_filter($validated['banner_urls'])) === 0) {
+                $validated['banner_urls'] = null;
+            }
         }
 
         // Handle bottom banner image

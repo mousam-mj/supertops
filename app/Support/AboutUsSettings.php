@@ -20,6 +20,12 @@ class AboutUsSettings
         return array_keys(AboutPageContent::settingsDefaults());
     }
 
+    /** @return list<string> */
+    public static function flagKeys(): array
+    {
+        return ['about_us_hero_show_text'];
+    }
+
     /** @return array<string, string> */
     public static function validationRules(): array
     {
@@ -29,6 +35,7 @@ class AboutUsSettings
             'about_us_growth_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'about_us_hero_text_color' => 'nullable|string|in:black,white',
             'about_us_hero_text_align' => 'nullable|string|in:left,center,right',
+            'about_us_hero_show_text' => 'nullable|boolean',
         ];
 
         foreach (self::textKeys() as $key) {
@@ -43,6 +50,10 @@ class AboutUsSettings
 
     public static function saveFromRequest(Request $request, array $validated = []): void
     {
+        foreach (self::flagKeys() as $flagKey) {
+            Setting::set($flagKey, $request->boolean($flagKey) ? '1' : '0');
+        }
+
         foreach (self::imageKeys() as $imageKey) {
             if ($request->boolean('reset_'.$imageKey)) {
                 $oldImage = Setting::get($imageKey);
@@ -106,6 +117,10 @@ class AboutUsSettings
         }
 
         foreach (self::textKeys() as $key) {
+            self::clearSetting($key);
+        }
+
+        foreach (self::flagKeys() as $key) {
             self::clearSetting($key);
         }
     }

@@ -48,8 +48,8 @@
         || request()->filled('size')
         || request()->filled('color')
         || request()->filled('search')
-        || request()->filled('min_price')
-        || request()->filled('max_price');
+        || (request()->filled('min_price') && (int) request('min_price') > (int) $priceMin)
+        || (request()->filled('max_price') && (int) request('max_price') < (int) $priceMax);
 @endphp
 <div id="menu-mobile" class="">
                 <div class="menu-container bg-white h-full">
@@ -609,18 +609,32 @@
             <div class="container">
                 <div class="flex max-md:flex-wrap max-md:flex-col gap-y-8">
                     <div class="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-                        <div id="shop-clear-filters-wrap" class="mb-6" @if(! $shopHasActiveFilters) style="display: none;" @endif>
-                            <a href="{{ route('shop') }}" class="btn-clear-filters shop-filter-link">Clear all filters</a>
+                        <div id="shop-clear-filters-wrap" class="mb-6" @if(! $shopHasActiveFilters) hidden @endif>
+                            <a href="{{ route('shop') }}" id="shop-clear-filters" class="btn-clear-filters shop-filter-link" data-shop-clear="1">Clear all filters</a>
                         </div>
                         <div class="filter-type-block pb-8 border-b border-line">
                             <div class="heading6">Category</div>
                             <div class="list-type filter-type menu-tab mt-4">
                                 @foreach($categories as $cat)
-                                    @if(($categoryProductCounts[$cat->id] ?? 0) > 0)
-                                    <a href="{{ route('shop', ['category' => $cat->slug]) }}" class="item tab-item flex items-center justify-between cursor-pointer shop-filter-link {{ ($category && $category->id === $cat->id) ? 'active' : '' }}" data-item="{{ $cat->slug }}">
+                                    @php
+                                        $parentCount = $categoryProductCounts[$cat->id] ?? 0;
+                                        $activeChildren = $cat->children->where('is_active', true);
+                                    @endphp
+                                    @if($parentCount > 0 || $activeChildren->isNotEmpty())
+                                    <a href="{{ route('shop', array_merge(request()->except(['page']), ['category' => $cat->slug])) }}" class="item tab-item flex items-center justify-between cursor-pointer shop-filter-link {{ ($category && $category->id === $cat->id) ? 'active' : '' }}" data-item="{{ $cat->slug }}">
                                         <div class="type-name text-secondary has-line-before hover:text-black capitalize">{{ $cat->name }}</div>
-                                        <div class="text-secondary2 number">{{ $categoryProductCounts[$cat->id] ?? 0 }}</div>
+                                        <div class="text-secondary2 number">{{ $parentCount }}</div>
                                     </a>
+                                    @foreach($activeChildren as $child)
+                                    <a href="{{ route('shop', array_merge(request()->except(['page']), ['category' => $child->slug])) }}" class="item tab-item flex items-center justify-between cursor-pointer shop-filter-link pl-3 {{ ($category && $category->id === $child->id) ? 'active' : '' }}" data-item="{{ $child->slug }}">
+                                        <div class="type-name text-secondary has-line-before hover:text-black capitalize">
+                                            <span class="text-secondary2">{{ $cat->name }}</span>
+                                            <span class="text-secondary2 mx-1">›</span>
+                                            <span>{{ $child->name }}</span>
+                                        </div>
+                                        <div class="text-secondary2 number">{{ $categoryProductCounts[$child->id] ?? 0 }}</div>
+                                    </a>
+                                    @endforeach
                                     @endif
                                 @endforeach
                             </div>
@@ -760,8 +774,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function hasActiveShopFilters(params) {
-        return !!(params.get('category') || params.get('size') || params.get('color') || params.get('search')
-            || params.get('min_price') || params.get('max_price'));
+        if (params.get('category') || params.get('size') || params.get('color') || params.get('search')) {
+            return true;
+        }
+        if (params.has('min_price') && parseInt(params.get('min_price'), 10) > priceDefaults.min) {
+            return true;
+        }
+        if (params.has('max_price') && parseInt(params.get('max_price'), 10) < priceDefaults.max) {
+            return true;
+        }
+        return false;
+    }
+
+    function resetShopFilterControls() {
+        if (sidebar) {
+            sidebar.querySelectorAll('.filter-type-block .tab-item.active').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            sidebar.querySelectorAll('.size-item.active').forEach(function(el) {
+                el.classList.remove('active', 'border-black', 'bg-black', 'text-white');
+            });
+            sidebar.querySelectorAll('.color-item.active').forEach(function(el) {
+                el.classList.remove('active', 'border-black', 'ring-2', 'ring-black');
+            });
+        }
+        document.querySelectorAll('.breadcrumb-block .filter-type .tab-item.active').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        if (rangeMin && rangeMax) {
+            rangeMin.value = String(priceDefaults.min);
+            rangeMax.value = String(priceDefaults.max);
+            updatePriceDisplay();
+        }
+        var listFiltered = document.querySelector('.list-filtered');
+        if (listFiltered) {
+            listFiltered.innerHTML = '';
+        }
     }
 
     function updateShopFilterUI(queryString) {
@@ -773,7 +821,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var clearWrap = document.getElementById('shop-clear-filters-wrap');
         if (clearWrap) {
-            clearWrap.style.display = hasFilters ? '' : 'none';
+            if (hasFilters) {
+                clearWrap.hidden = false;
+                clearWrap.style.display = '';
+            } else {
+                clearWrap.hidden = true;
+                clearWrap.style.display = 'none';
+            }
         }
 
         document.querySelectorAll('.breadcrumb-block .filter-type .tab-item[data-item]').forEach(function(el) {
@@ -806,6 +860,13 @@ document.addEventListener('DOMContentLoaded', function() {
             rangeMax.value = params.has('max_price') ? params.get('max_price') : String(priceDefaults.max);
             updatePriceDisplay();
         }
+
+        if (!hasFilters) {
+            var listFiltered = document.querySelector('.list-filtered');
+            if (listFiltered) {
+                listFiltered.innerHTML = '';
+            }
+        }
     }
 
     function loadShopProducts(url, pushState) {
@@ -830,9 +891,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function clearAllShopFilters() {
+        resetShopFilterControls();
+        updateShopFilterUI('');
+        // Hard navigate so refresh always matches a clean /shop URL
+        window.location.href = shopBaseUrl;
+    }
+
     updateShopFilterUI(window.location.search);
 
+    // bfcache / refresh: re-sync Clear button with the real URL
+    window.addEventListener('pageshow', function() {
+        updateShopFilterUI(window.location.search);
+    });
+
     document.addEventListener('click', function(e) {
+        var clearBtn = e.target.closest('[data-shop-clear="1"], #shop-clear-filters');
+        if (clearBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            clearAllShopFilters();
+            return;
+        }
         var link = e.target.closest('a.shop-filter-link');
         if (link && link.href && link.href.indexOf(shopBaseUrl) !== -1) {
             e.preventDefault();
@@ -863,9 +943,18 @@ document.addEventListener('DOMContentLoaded', function() {
             var maxVal = parseInt(rangeMax.value, 10);
             if (minVal > maxVal) { var t = minVal; minVal = maxVal; maxVal = t; }
             var params = new URLSearchParams(window.location.search);
-            params.set('min_price', String(minVal));
-            params.set('max_price', String(maxVal));
-            loadShopProducts(shopBaseUrl + '?' + params.toString());
+            if (minVal > priceDefaults.min) {
+                params.set('min_price', String(minVal));
+            } else {
+                params.delete('min_price');
+            }
+            if (maxVal < priceDefaults.max) {
+                params.set('max_price', String(maxVal));
+            } else {
+                params.delete('max_price');
+            }
+            var qs = params.toString();
+            loadShopProducts(shopBaseUrl + (qs ? '?' + qs : ''));
         });
     }
 });

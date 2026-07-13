@@ -65,13 +65,13 @@
                         </div>
                         <div class="swiper-button-prev hero-slider-nav"></div>
                         <div class="swiper-button-next hero-slider-nav"></div>
+                        @php
+                            $heroBannerCount = $heroBanners->count() > 0 ? $heroBanners->count() : 1;
+                        @endphp
+                        @if($heroBannerCount > 1)
+                            <div class="swiper-pagination hero-slider-pagination"></div>
+                        @endif
                     </div>
-                    @php
-                        $heroBannerCount = $heroBanners->count() > 0 ? $heroBanners->count() : 1;
-                    @endphp
-                    @if($heroBannerCount > 1)
-                        <div class="swiper-pagination hero-slider-pagination"></div>
-                    @endif
                 </div>
             </div>
             <!-- Slider -->
@@ -80,9 +80,9 @@
             <div class="list-collection relative section-swiper-navigation sm:px-5 px-4">
                 <div class="banner-block md:pt-12 pt-8 md:pb-6 pb-4">
             <div class="container">
-                <div class="two-block-category-grid list-banner grid grid-cols-2 gap-4 md:gap-6 mx-auto">
+                <div class="two-block-category-grid list-banner grid grid-cols-2 gap-4 md:gap-8 mx-auto">
                     @forelse($homeCategories as $category)
-                        <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable banner-size-fixed banner-aspect-3-4 relative bg-surface block rounded-[20px] overflow-hidden w-full">
+                        <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
                                 <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center hidden md:block" />
                                 <img src="{{ $category->homepageMobileImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center md:hidden" />
@@ -90,14 +90,14 @@
                         </a>
                     @empty
                         {{-- Fallback if no categories --}}
-                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden w-full">
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full aspect-[3/4] object-cover object-center" />
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full h-full object-cover object-center" />
                             </div>
                         </a>
-                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable relative bg-surface block rounded-[20px] overflow-hidden w-full">
+                        <a href="{{ route('shop') }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full aspect-[3/4] object-cover object-center" />
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full h-full object-cover object-center" />
                             </div>
                         </a>
                     @endforelse

@@ -92,10 +92,14 @@ class ShopController extends Controller
                 $products = $products->orderBy('sort_order')->orderBy('created_at', 'desc');
         }
 
-        $products = $products->paginate(16)->withQueryString();
+        $products = $products->paginate(15)->withQueryString();
 
         $categories = Category::whereNull('parent_id')
-            ->with(['children.children'])
+            ->with(['children' => function ($q) {
+                $q->where('is_active', true)->orderBy('sort_order')->with(['children' => function ($q2) {
+                    $q2->where('is_active', true)->orderBy('sort_order');
+                }]);
+            }])
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get();
@@ -104,6 +108,10 @@ class ShopController extends Controller
         foreach ($categories as $c) {
             $ids = $this->getCategoryIds($c);
             $categoryProductCounts[$c->id] = Product::whereIn('category_id', $ids)->where('is_active', true)->count();
+            foreach ($c->children as $child) {
+                $childIds = $this->getCategoryIds($child);
+                $categoryProductCounts[$child->id] = Product::whereIn('category_id', $childIds)->where('is_active', true)->count();
+            }
         }
 
         $filterSizes = MasterSize::orderBy('sort_order')->orderBy('name')->get();
@@ -205,7 +213,7 @@ class ShopController extends Controller
                 $products = $products->orderBy('sort_order')->orderBy('created_at', 'desc');
         }
 
-        $products = $products->paginate(16)->withQueryString();
+        $products = $products->paginate(15)->withQueryString();
 
         // Get subcategories for category page (admin can hide via show_on_parent_page)
         $subCategories = $category->children()
@@ -250,12 +258,12 @@ class ShopController extends Controller
             //     abort(404, 'Product not available');
             // }
 
-            // Get related products from the same category
+            // Get related products from the same category (enough for carousel scroll)
             $relatedProducts = Product::where('category_id', $product->category_id)
                 ->where('id', '!=', $product->id)
                 ->where('is_active', true)
                 ->with('category')
-                ->limit(4)
+                ->limit(12)
                 ->get();
 
             // If no related products, get from featured products
@@ -264,7 +272,7 @@ class ShopController extends Controller
                     ->where('is_featured', true)
                     ->where('id', '!=', $product->id)
                     ->with('category')
-                    ->limit(4)
+                    ->limit(12)
                     ->get();
             }
 

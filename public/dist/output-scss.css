@@ -683,6 +683,7 @@ input[type=file]::-webkit-file-upload-button {
   height: 100%;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: all ease 0.4s;
   background: rgba(0, 0, 0, 0.6);
   z-index: 101;
@@ -746,6 +747,7 @@ input[type=file]::-webkit-file-upload-button {
 .modal-search-block:has(.modal-search-main.open) {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 .modal-newsletter .modal-newsletter-main,
 .modal-video-block .modal-newsletter-main,
@@ -1648,7 +1650,11 @@ input[type=file]::-webkit-file-upload-button {
   transition: all ease 0.5s;
   opacity: 0;
   visibility: hidden;
-  overflow: auto;
+  overflow: hidden;
+  max-height: min(90vh, calc(100vh - 2rem));
+  height: min(90vh, calc(100vh - 2rem));
+  display: flex;
+  flex-direction: column;
 }
 .modal-newsletter .modal-search-main.open,
 .modal-video-block .modal-search-main.open,
@@ -1691,8 +1697,8 @@ input[type=file]::-webkit-file-upload-button {
   .modal-cart-block .modal-search-main,
   .modal-wishlist-block .modal-search-main,
   .modal-search-block .modal-search-main {
-    max-height: calc(100vh - 400px);
-    height: 100%;
+    max-height: calc(100vh - 4rem);
+    height: calc(100vh - 4rem);
     width: calc(100vw - 200px);
   }
 }
@@ -1705,8 +1711,8 @@ input[type=file]::-webkit-file-upload-button {
   .modal-cart-block .modal-search-main,
   .modal-wishlist-block .modal-search-main,
   .modal-search-block .modal-search-main {
-    max-height: calc(100vh - 200px);
-    height: 100%;
+    max-height: calc(100vh - 3rem);
+    height: calc(100vh - 3rem);
     width: calc(100vw - 80px);
     border-radius: 16px;
   }
@@ -3204,8 +3210,9 @@ input[type=file]::-webkit-file-upload-button {
 }
 .product-detail .popup-img img {
   width: auto;
-  height: 100vh;
-  max-width: 90vw;
+  height: auto;
+  max-width: min(92vw, 1100px);
+  max-height: 88vh;
   object-fit: contain;
   margin: 0 auto;
 }
@@ -3233,8 +3240,11 @@ input[type=file]::-webkit-file-upload-button {
     right: 6px;
   }
   .product-detail .popup-img img {
-    width: 80vw;
+    width: auto;
     height: auto;
+    max-width: 92vw;
+    max-height: 80vh;
+    object-fit: contain;
   }
 }
 .product-detail .desc-tab .desc-block .tab-item svg {
@@ -4045,6 +4055,12 @@ input[type=file]::-webkit-file-upload-button {
     max-width: 100%;
     width: 100%;
     overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .menu-tab::-webkit-scrollbar {
+    display: none;
+    height: 0;
   }
 }
 .menu-tab.style-pet .tab-item.active {

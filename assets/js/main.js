@@ -222,8 +222,12 @@ const modalSearchMain = document.querySelector(
 if (modalSearch && modalSearchMain) {
   modalSearch.addEventListener("click", (e) => {
     if (e.target === modalSearch) {
-      modalSearchMain.classList.remove("open");
-      document.body.style.overflow = "";
+      if (typeof window.closeSearch === "function") {
+        window.closeSearch();
+      } else {
+        modalSearchMain.classList.remove("open");
+        document.body.style.overflow = "";
+      }
     }
   });
 
@@ -574,6 +578,10 @@ if (addCartBtns && addCartBtns.length > 0) {
     if (item.closest(".customize-page")) {
       return;
     }
+    // Product detail page has its own add-to-cart handler (show.blade.php)
+    if (item.closest(".product-detail .product-infor")) {
+      return;
+    }
     item.addEventListener("click", () => {
       openModalCart();
     });
@@ -848,27 +856,32 @@ var swiperBannerTop = new Swiper(".swiper-banner-top", {
 });
 
 // Slider
-var heroSliderEl = document.querySelector(".swiper-slider");
+var heroSliderEl = document.querySelector("#home-content .swiper-slider, .swiper-slider");
 if (heroSliderEl) {
-  var heroSliderPagination = document.querySelector(".hero-slider-pagination");
-  var swiperSlider = new Swiper(".swiper-slider", {
+  var heroSliderPagination = heroSliderEl.querySelector(".hero-slider-pagination") || document.querySelector(".hero-slider-pagination");
+  var heroSlideCount = heroSliderEl.querySelectorAll(".swiper-slide").length;
+  var swiperSlider = new Swiper(heroSliderEl, {
     spaceBetween: 0,
     slidesPerView: 1,
+    watchOverflow: true,
     pagination: heroSliderPagination
       ? {
           el: heroSliderPagination,
           clickable: true,
+          type: "bullets",
         }
       : false,
     navigation: {
-      nextEl: ".swiper-slider .swiper-button-next",
-      prevEl: ".swiper-slider .swiper-button-prev",
+      nextEl: heroSliderEl.querySelector(".swiper-button-next"),
+      prevEl: heroSliderEl.querySelector(".swiper-button-prev"),
     },
-    loop: true,
-    autoplay: {
-      delay: 4000,
-      disableOnInteraction: false,
-    },
+    loop: heroSlideCount > 1,
+    autoplay: heroSlideCount > 1
+      ? {
+          delay: 4000,
+          disableOnInteraction: false,
+        }
+      : false,
   });
 }
 
@@ -1150,14 +1163,17 @@ if (document.querySelector(".swiper-collection-eight")) {
   });
 }
 
-// list-product
-if (document.querySelector(".swiper-list-product")) {
-  var swiperListProduct = new Swiper(".swiper-list-product", {
+// list-product (skip product-page related slider — owned by show.blade.php)
+document.querySelectorAll(".swiper-list-product").forEach(function (el) {
+  if (el.closest(".related-products-slider")) return;
+  var root = el.closest(".section-swiper-navigation") || el.parentElement;
+  new Swiper(el, {
     navigation: {
-      prevEl: ".swiper-button-prev2",
-      nextEl: ".swiper-button-next2",
+      prevEl: root ? root.querySelector(".swiper-button-prev2") : ".swiper-button-prev2",
+      nextEl: root ? root.querySelector(".swiper-button-next2") : ".swiper-button-next2",
     },
     loop: true,
+    watchOverflow: true,
     slidesPerView: 2,
     spaceBetween: 16,
     breakpoints: {
@@ -1175,7 +1191,7 @@ if (document.querySelector(".swiper-list-product")) {
       },
     },
   });
-}
+});
 
 // list-three-product
 if (document.querySelector(".swiper-list-three-product")) {
@@ -1287,10 +1303,12 @@ var swiper2 = swiper2El
     })
   : null;
 
-// Product detail image popup (Laravel version)
+// Product detail image popup (theme demos only — Laravel product page uses show.blade.php)
 document.addEventListener("DOMContentLoaded", function () {
   const productDetail = document.querySelector(".product-detail");
   if (!productDetail) return;
+  // Laravel product page owns its own lightbox (avoids double handlers / wrong slide on mobile)
+  if (productDetail.classList.contains("style-grouped")) return;
 
   // Popup wrapper lives inside product-detail
   const popupImg = productDetail.querySelector(".popup-img");
@@ -1306,20 +1324,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ".list-img .mySwiper .swiper-slide img"
   );
 
-  console.log("Popup setup:", {
-    popupImg: !!popupImg,
-    mainImages: mainImages.length,
-    thumbImages: thumbImages.length,
-    closePopupBtn: !!closePopupBtn
-  });
-
   if (!popupImg) {
-    console.log("Popup element not found");
     return;
   }
 
   if (mainImages.length === 0 && thumbImages.length === 0) {
-    console.log("No images found to click");
     return;
   }
 
@@ -1327,9 +1336,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to open popup with specific image index
   function openPopup(index) {
-    console.log("Opening popup at index:", index);
     if (!popupImg) {
-      console.error("Popup element not available");
       return;
     }
     popupImg.classList.add("open");
@@ -1338,10 +1345,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!popupSwiper) {
       const nextBtn = popupImg.querySelector(".swiper-button-next");
       const prevBtn = popupImg.querySelector(".swiper-button-prev");
-      console.log("Initializing Swiper:", { nextBtn: !!nextBtn, prevBtn: !!prevBtn });
       
       popupSwiper = new Swiper(popupImg, {
-        loop: true,
+        loop: false,
         slidesPerView: 1,
         spaceBetween: 0,
         centeredSlides: true,
@@ -1351,13 +1357,8 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         initialSlide: index,
       });
-      console.log("Swiper initialized");
     } else {
-      if (popupSwiper.slideToLoop) {
-        popupSwiper.slideToLoop(index);
-      } else {
-        popupSwiper.slideTo(index);
-      }
+      popupSwiper.slideTo(index, 0);
     }
   }
 
@@ -1367,7 +1368,6 @@ document.addEventListener("DOMContentLoaded", function () {
     img.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Main image clicked:", index);
       openPopup(index);
     });
   });
@@ -1389,7 +1389,6 @@ document.addEventListener("DOMContentLoaded", function () {
     closePopupBtn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Close button clicked");
       popupImg.classList.remove("open");
       document.body.style.overflow = ""; // Restore scrolling
       if (popupSwiper) {
@@ -1402,7 +1401,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Close popup on background click
   popupImg.addEventListener("click", function (e) {
     if (e.target === popupImg || e.target.closest('.swiper-wrapper') === null) {
-      console.log("Background clicked, closing popup");
       popupImg.classList.remove("open");
       document.body.style.overflow = ""; // Restore scrolling
       if (popupSwiper) {
@@ -1415,7 +1413,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Close popup on Escape key
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && popupImg.classList.contains("open")) {
-      console.log("Escape key pressed, closing popup");
       popupImg.classList.remove("open");
       document.body.style.overflow = ""; // Restore scrolling
       if (popupSwiper) {
@@ -2368,7 +2365,7 @@ const handleActiveImgWhenColorChange = (products) => {
 // Append child
 const listFourProduct = document.querySelectorAll(".list-product.four-product");
 const listSixProduct = document.querySelector(
-  ".list-product.six-product .swiper .swiper-wrapper"
+  ".list-product.six-product:not(.related-products-slider) .swiper .swiper-wrapper"
 );
 const listEightProduct = document.querySelector(".list-product.eight-product");
 const listThreeProduct = document.querySelectorAll(

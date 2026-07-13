@@ -24,6 +24,7 @@
     <div class="col-md-6">
         <label class="form-label">Background image</label>
         @include('admin.settings.partials.homepage-image-field', ['key' => 'about_us_banner_image', 'mobileKey' => 'about_us_banner_image_mobile', 'mobileRecommended' => '750×1000px', 'previewMaxHeight' => 120, 'homepageImageDefaults' => $homepageImageDefaults])
+        <small class="form-text text-muted d-block mt-1">Desktop recommended: 1920×700px (wide). The banner shows the full image without cropping/zoom.</small>
         <small class="text-muted">Recommended: 1920×700px wide banner.</small>
     </div>
     <div class="col-md-6">
@@ -51,6 +52,15 @@
             <option value="center" @selected($heroAlign === 'center')>Center</option>
             <option value="right" @selected($heroAlign === 'right')>Right</option>
         </select>
+    </div>
+    <div class="col-12">
+        <input type="hidden" name="about_us_hero_show_text" value="0">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="about_us_hero_show_text" id="about_us_hero_show_text" value="1"
+                   {{ old('about_us_hero_show_text', setting_flag('about_us_hero_show_text', true)) ? 'checked' : '' }}>
+            <label class="form-check-label" for="about_us_hero_show_text">Show banner text (subtitle &amp; heading)</label>
+        </div>
+        <small class="text-muted">Turn off to show the hero image only, with no overlay text.</small>
     </div>
 </div>
 

@@ -691,9 +691,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'hero_image_mobile' => 'nullable|image|max:5120',
                 'hero_text' => 'nullable|string|max:255',
                 'hero_button_text' => 'nullable|string|max:100',
+                'hero_button_url' => 'nullable|string|max:500',
                 'hero_show_text' => 'nullable|boolean',
                 'hero_text_color' => 'nullable|string|in:black,white',
                 'promo_show_text' => 'nullable|boolean',
+                'promo_button_text' => 'nullable|string|max:100',
                 'promo_text_color' => 'nullable|string|in:black,white',
                 'subcategory_cards_show_text' => 'nullable|boolean',
                 'banner_images' => 'nullable|array|max:6',
@@ -702,6 +704,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'banner_images_mobile.*' => 'nullable|image|max:2048',
                 'banner_texts' => 'nullable|array|max:6',
                 'banner_texts.*' => 'nullable|string|max:255',
+                'banner_urls' => 'nullable|array|max:6',
+                'banner_urls.*' => 'nullable|string|max:500',
                 'promo_banner_count' => 'nullable|integer|min:1|max:6',
                 'bottom_banner_image' => 'nullable|image|max:5120',
                 'bottom_banner_image_mobile' => 'nullable|image|max:5120',
@@ -767,6 +771,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     $bannerTexts[(int) $index] = $text !== '' ? $text : null;
                 }
                 $validated['banner_texts'] = count(array_filter($bannerTexts)) > 0 ? $bannerTexts : null;
+            }
+
+            if ($request->has('banner_urls')) {
+                $bannerUrls = [];
+                foreach ($request->input('banner_urls', []) as $index => $url) {
+                    if ($index >= 6) {
+                        break;
+                    }
+                    $url = trim((string) $url);
+                    $bannerUrls[(int) $index] = $url !== '' ? $url : null;
+                }
+                $validated['banner_urls'] = count(array_filter($bannerUrls)) > 0 ? $bannerUrls : null;
             }
 
             $validated['promo_banner_count'] = max(1, min(6, (int) $request->input('promo_banner_count', 3)));
@@ -839,9 +855,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'remove_hero_image_mobile' => 'nullable|boolean',
                 'hero_text' => 'nullable|string|max:255',
                 'hero_button_text' => 'nullable|string|max:100',
+                'hero_button_url' => 'nullable|string|max:500',
                 'hero_show_text' => 'nullable|boolean',
                 'hero_text_color' => 'nullable|string|in:black,white',
                 'promo_show_text' => 'nullable|boolean',
+                'promo_button_text' => 'nullable|string|max:100',
                 'promo_text_color' => 'nullable|string|in:black,white',
                 'subcategory_cards_show_text' => 'nullable|boolean',
                 'banner_images' => 'nullable|array|max:6',
@@ -852,6 +870,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'remove_banner_image_mobile' => 'nullable|array',
                 'banner_texts' => 'nullable|array|max:6',
                 'banner_texts.*' => 'nullable|string|max:255',
+                'banner_urls' => 'nullable|array|max:6',
+                'banner_urls.*' => 'nullable|string|max:500',
                 'bottom_banner_image' => 'nullable|image|max:5120',
                 'bottom_banner_image_mobile' => 'nullable|image|max:5120',
                 'remove_bottom_banner_image' => 'nullable|boolean',
@@ -968,6 +988,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     $bannerTexts[(int) $index] = $text !== '' ? $text : null;
                 }
                 $validated['banner_texts'] = count(array_filter($bannerTexts)) > 0 ? $bannerTexts : null;
+            }
+
+            if ($request->has('banner_urls')) {
+                $bannerUrls = [];
+                foreach ($request->input('banner_urls', []) as $index => $url) {
+                    if ($index >= 6) {
+                        break;
+                    }
+                    $url = trim((string) $url);
+                    $bannerUrls[(int) $index] = $url !== '' ? $url : null;
+                }
+                $validated['banner_urls'] = count(array_filter($bannerUrls)) > 0 ? $bannerUrls : null;
             }
 
             // Handle bottom banner image

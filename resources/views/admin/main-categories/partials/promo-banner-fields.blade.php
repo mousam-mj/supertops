@@ -3,6 +3,7 @@
     $bannerImages = old('banner_images', isset($category) && is_array($category->banner_images ?? null) ? $category->banner_images : []);
     $bannerImagesMobile = old('banner_images_mobile', isset($category) && is_array($category->banner_images_mobile ?? null) ? $category->banner_images_mobile : []);
     $bannerTexts = old('banner_texts', isset($category) && is_array($category->banner_texts ?? null) ? $category->banner_texts : []);
+    $bannerUrls = old('banner_urls', isset($category) && is_array($category->banner_urls ?? null) ? $category->banner_urls : []);
     while (count($bannerImages) < $promoSlotCount) {
         $bannerImages[] = null;
     }
@@ -12,9 +13,13 @@
     while (count($bannerTexts) < $promoSlotCount) {
         $bannerTexts[] = '';
     }
+    while (count($bannerUrls) < $promoSlotCount) {
+        $bannerUrls[] = '';
+    }
     $bannerImages = array_slice($bannerImages, 0, $promoSlotCount);
     $bannerImagesMobile = array_slice($bannerImagesMobile, 0, $promoSlotCount);
     $bannerTexts = array_slice($bannerTexts, 0, $promoSlotCount);
+    $bannerUrls = array_slice($bannerUrls, 0, $promoSlotCount);
     $currentPromoCount = (int) old('promo_banner_count', isset($category) ? ($category->promo_banner_count ?? 3) : 3);
 @endphp
 
@@ -55,7 +60,7 @@
                            name="banner_images[{{ $i }}]"
                            accept="image/*"
                            onchange="previewBannerImage(this, {{ $i }})">
-                    <small class="form-text text-muted">Recommended size: 600×750px (desktop). Max size: 2MB</small>
+                    <small class="form-text text-muted">Recommended size: 1500×1500px (1:1 square, desktop). Max size: 2MB</small>
                     <div id="bannerImagePreview{{ $i }}" class="mt-2" style="display: none;">
                         <img id="bannerPreviewImg{{ $i }}" src="" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: cover;">
                     </div>
@@ -64,10 +69,10 @@
                         'inputId' => 'bannerImageMobile'.$i,
                         'removeName' => 'remove_banner_image_mobile['.$i.']',
                         'currentMobile' => $bannerImagesMobile[$i] ?? null,
-                        'recommended' => '600×750px',
+                        'recommended' => '1500×1500px',
                     ])
                 </div>
-                <div class="mb-0">
+                <div class="mb-3">
                     <label class="form-label">Banner Text {{ $i + 1 }}</label>
                     <input type="text"
                            class="form-control"
@@ -76,6 +81,17 @@
                            maxlength="120"
                            placeholder="e.g. Drinkware, Barware, Kitchenware">
                     <small class="form-text text-muted">Optional overlay text (max 120 characters). Banner size stays fixed — long text is clamped to 3 lines on the site.</small>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-semibold">Shop Now button link {{ $i + 1 }}</label>
+                    <input type="text"
+                           class="form-control"
+                           name="banner_urls[{{ $i }}]"
+                           value="{{ $bannerUrls[$i] ?? '' }}"
+                           maxlength="500"
+                           placeholder="/shop?category=drinkware">
+                    <small class="form-text text-muted">Opens shop with that category selected. Leave blank to use this main category.</small>
+                    <small class="form-text text-muted">Where this block goes when clicked (e.g. <code>/category/drinkware</code>, <code>/category/barware</code>, or a product URL). Leave blank for /shop.</small>
                 </div>
             </div>
         </div>

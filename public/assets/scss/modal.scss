@@ -36,6 +36,8 @@
     height: 100%;
     opacity: 0;
     visibility: hidden;
+    /* Closed modals must not capture clicks — product CTAs set visibility:visible and punch through */
+    pointer-events: none;
     transition: all ease 0.4s;
     background: rgba($color: #000000, $alpha: 0.6);
     z-index: 101;
@@ -50,6 +52,7 @@
     &:has(.modal-search-main.open) {
         opacity: 1;
         visibility: visible;
+        pointer-events: auto;
     }
 
     .modal-newsletter-main {
@@ -375,6 +378,7 @@
         visibility: hidden;
         overflow: hidden;
         max-height: min(90vh, calc(100vh - 2rem));
+        height: min(90vh, calc(100vh - 2rem));
         display: flex;
         flex-direction: column;
 
@@ -397,14 +401,14 @@
         }
 
         @media (max-width: 1400px) {
-            max-height: calc(100vh - 400px);
-            height: 100%;
+            max-height: calc(100vh - 4rem);
+            height: calc(100vh - 4rem);
             width: calc(100vw - 200px);
         }
 
         @media (max-width: 640px) {
-            max-height: calc(100vh - 200px);
-            height: 100%;
+            max-height: calc(100vh - 3rem);
+            height: calc(100vh - 3rem);
             width: calc(100vw - 80px);
             border-radius: 16px;
         }

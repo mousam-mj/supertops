@@ -22,22 +22,78 @@
     }
 @endphp
 <style>
-    .about-page-hero.about-hero--fullbg {
-        background-image: url('{{ $heroBg['mobile'] }}') !important;
+    .about-page-hero {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background-color: #0a0a0a;
+        border-radius: 0 0 28px 28px;
     }
     @media (min-width: 768px) {
-        .about-page-hero.about-hero--fullbg {
-            background-image: url('{{ $heroBg['desktop'] }}') !important;
+        .about-page-hero {
+            border-radius: 0 0 40px 40px;
+        }
+    }
+    .about-page-hero__media {
+        width: 100%;
+        line-height: 0;
+    }
+    .about-page-hero__media picture,
+    .about-page-hero__media img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+    }
+    .about-page-hero__media img {
+        object-fit: contain;
+        object-position: center center;
+    }
+    .about-page-hero__content {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 2.5rem 1rem 2rem;
+        pointer-events: none;
+    }
+    @media (min-width: 768px) {
+        .about-page-hero__content {
+            padding: 3.5rem 1.5rem 3rem;
+        }
+    }
+    @media (min-width: 1280px) {
+        .about-page-hero__content {
+            padding: 4.5rem 2rem 3.5rem;
         }
     }
 </style>
-<div class="slider-block style-one about-page-hero about-hero--fullbg relative z-0 overflow-hidden rounded-b-[28px] md:rounded-b-[40px] xl:py-[100px] px-4 md:py-20 py-14 w-full">
-    <div class="slider-main relative z-[1] h-full w-full flex flex-col {{ $heroTextFlexClass }} {{ $heroTextColorClass }}">
+<div class="about-page-hero about-hero--fullbg relative z-0 w-full">
+    <div class="about-page-hero__media">
+        <picture>
+            <source media="(max-width: 767px)" srcset="{{ $heroBg['mobile'] }}">
+            <img src="{{ $heroBg['desktop'] }}" alt="{{ AboutPageContent::setting('about_us_hero_heading') ?: 'About Perch' }}" width="1920" height="700" loading="eager" decoding="async">
+        </picture>
+    </div>
+    @php
+        $heroShowText = setting_flag('about_us_hero_show_text', true);
+        $heroSubtitle = trim(AboutPageContent::setting('about_us_hero_subtitle'));
+        $heroHeading = trim(AboutPageContent::setting('about_us_hero_heading'));
+    @endphp
+    @if($heroShowText && ($heroSubtitle !== '' || $heroHeading !== ''))
+    <div class="about-page-hero__content {{ $heroTextFlexClass }} {{ $heroTextColorClass }}">
         <div class="text-content w-full max-w-4xl px-4">
-            <div class="text-sub-display {{ $heroTextAlignClass }}">{{ AboutPageContent::setting('about_us_hero_subtitle') }}</div>
-            <div class="heading2 {{ $heroTextAlignClass }} md:mt-4 mt-2">{{ AboutPageContent::setting('about_us_hero_heading') }}</div>
+            @if($heroSubtitle !== '')
+                <div class="text-sub-display {{ $heroTextAlignClass }}">{{ $heroSubtitle }}</div>
+            @endif
+            @if($heroHeading !== '')
+                <div class="heading2 {{ $heroTextAlignClass }} {{ $heroSubtitle !== '' ? 'md:mt-4 mt-2' : '' }}">{{ $heroHeading }}</div>
+            @endif
         </div>
     </div>
+    @endif
 </div>
 <div class="about md:pt-20 pt-10">
     <div class="about-us-block">

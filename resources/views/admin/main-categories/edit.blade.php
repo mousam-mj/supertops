@@ -130,7 +130,7 @@
                             @enderror
                         </div>
                         <small class="form-text text-muted d-block mb-2">
-                            <i class="bi bi-info-circle me-1"></i>Recommended size: 750×1000px (3:4 portrait). Max size: 2MB. 
+                            <i class="bi bi-info-circle me-1"></i>Recommended size: 1500×1500px (1:1 square). Max size: 2MB. 
                             @if($hasImage && $imageExists)
                                 Leave empty to keep current image.
                             @endif
@@ -144,7 +144,7 @@
                             'inputId' => 'image_mobile',
                             'removeName' => 'remove_image_mobile',
                             'currentMobile' => $category->image_mobile ?? null,
-                            'recommended' => '750×1000px',
+                            'recommended' => '1500×1500px',
                         ])
                     </div>
 
@@ -202,7 +202,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="hero_text" class="form-label">Hero Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_text') is-invalid @enderror" 
@@ -215,7 +215,7 @@
                             @enderror
                             <small class="form-text text-muted">Main heading text displayed on hero banner</small>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="hero_button_text" class="form-label">Button Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_button_text') is-invalid @enderror" 
@@ -225,7 +225,20 @@
                             @error('hero_button_text')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Text for hero button (default: Shop Now)</small>
+                            <small class="form-text text-muted">Default: Shop Now</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="hero_button_url" class="form-label">Button link</label>
+                            <input type="text"
+                                   class="form-control @error('hero_button_url') is-invalid @enderror"
+                                   id="hero_button_url"
+                                   name="hero_button_url"
+                                   value="{{ old('hero_button_url', $category->hero_button_url) }}"
+                                   placeholder="/shop?category=drinkware"
+                            @error('hero_button_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Leave blank to open shop with this category selected (e.g. /shop?category=drinkware)</small>
                         </div>
                     </div>
 
@@ -238,12 +251,25 @@
 
                     <hr class="my-4">
                     <h5 class="mb-3">Promotional Banners (small blocks)</h5>
-                    <p class="text-muted small mb-3">Shown on Drinkware / Barware pages after Testimonial. Set count (e.g. 2 for Drinkware, 6 for Barware).</p>
-                    <div class="mb-3">
-                        <input type="hidden" name="promo_show_text" value="0">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', $category->promo_show_text ?? true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="promo_show_text">Show Shop Now text on promo blocks</label>
+                    <p class="text-muted small mb-3">Shown on Drinkware / Barware pages after Testimonial. Set count (e.g. 2 for Drinkware, 6 for Barware). <strong>Set each block’s Shop Now link</strong> so it opens the right category instead of the full shop mix.</p>
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <input type="hidden" name="promo_show_text" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="promo_show_text" id="promo_show_text" value="1" {{ old('promo_show_text', $category->promo_show_text ?? true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="promo_show_text">Show button text on promo blocks</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="promo_button_text" class="form-label">Promo button text</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="promo_button_text"
+                                   name="promo_button_text"
+                                   value="{{ old('promo_button_text', $category->promo_button_text ?? 'Shop Now') }}"
+                                   placeholder="Shop Now"
+                                   style="max-width: 280px;">
+                            <small class="form-text text-muted">Shown on all promo blocks (default: Shop Now)</small>
                         </div>
                     </div>
 
@@ -345,7 +371,7 @@
 
                     <hr class="my-4">
                     <h5 class="mb-3">Bottom 4 Image Blocks</h5>
-                    <p class="text-muted small mb-3">Four-card row below the sale banner on Drinkware / Barware pages. Recommended: 600×750px each. Enable/disable the row under <strong>Category page sections</strong> above.</p>
+                    <p class="text-muted small mb-3">Four-card row below the sale banner on Drinkware / Barware pages. Recommended: 1500×1500px (1:1) each. Enable/disable the row under <strong>Category page sections</strong> above.</p>
 
                     @php
                         $bottomBannerImages = old('bottom_banner_images', is_array($category->bottom_banner_images ?? null) ? $category->bottom_banner_images : []);
@@ -376,7 +402,7 @@
                                     'inputId' => 'bottomBannerImageMobile'.$bi,
                                     'removeName' => 'remove_bottom_banner_images_mobile['.$bi.']',
                                     'currentMobile' => $bottomBannerImagesMobile[$bi] ?? null,
-                                    'recommended' => '600×750px',
+                                    'recommended' => '1500×1500px',
                                 ])
                             </div>
                             <div>
@@ -484,6 +510,8 @@
         is_active: @json(old('is_active', $category->is_active ? 1 : 0)),
         hero_text: @json(old('hero_text', $category->hero_text ?? '')),
         hero_button_text: @json(old('hero_button_text', $category->hero_button_text ?? 'Shop Now')),
+        hero_button_url: @json(old('hero_button_url', $category->hero_button_url ?? '')),
+        promo_button_text: @json(old('promo_button_text', $category->promo_button_text ?? 'Shop Now')),
         bottom_banner_text: @json(old('bottom_banner_text', $category->bottom_banner_text ?? '')),
         testimonial_text: @json(old('testimonial_text', $category->testimonial_text ?? '')),
         additional_banner_text: @json(old('additional_banner_text', $category->additional_banner_text ?? '')),
@@ -602,6 +630,12 @@
             
             const heroButtonText = document.getElementById('hero_button_text');
             if (heroButtonText) heroButtonText.value = originalFormValues.hero_button_text || 'Shop Now';
+
+            const heroButtonUrl = document.getElementById('hero_button_url');
+            if (heroButtonUrl) heroButtonUrl.value = originalFormValues.hero_button_url || '';
+
+            const promoButtonText = document.getElementById('promo_button_text');
+            if (promoButtonText) promoButtonText.value = originalFormValues.promo_button_text || 'Shop Now';
             
             const bottomBannerText = document.getElementById('bottom_banner_text');
             if (bottomBannerText) bottomBannerText.value = originalFormValues.bottom_banner_text || '';

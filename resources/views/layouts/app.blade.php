@@ -195,14 +195,29 @@
             padding-right: 3.25rem;
         }
         .modal-search-block .modal-search-main {
-            display: flex;
+            display: flex !important;
             flex-direction: column;
-            max-height: min(90vh, calc(100vh - 2rem));
-            overflow: hidden;
+            max-height: min(90vh, calc(100dvh - 2rem));
+            height: auto;
+            overflow: hidden !important;
             overscroll-behavior: contain;
         }
-        .modal-search-block .modal-search-main.open {
-            overflow: hidden;
+        /* Prevent closed search modal product CTAs from capturing clicks through the page */
+        .modal-search-block {
+            pointer-events: none !important;
+        }
+        .modal-search-block:has(.modal-search-main.open) {
+            pointer-events: auto !important;
+        }
+        .modal-cart-block,
+        .modal-wishlist-block,
+        .modal-quickview-block {
+            pointer-events: none !important;
+        }
+        .modal-cart-block:has(.modal-cart-main.open),
+        .modal-wishlist-block:has(.modal-wishlist-main.open),
+        .modal-quickview-block:has(.modal-quickview-main.open) {
+            pointer-events: auto !important;
         }
         .modal-search-block .search-modal-body {
             flex: 1 1 auto;
@@ -211,27 +226,43 @@
             flex-direction: column;
             overflow: hidden;
         }
+        .modal-search-block .search-results-dynamic {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
         .modal-search-block .search-modal-results-scroll {
             flex: 1 1 auto;
             min-height: 0;
+            /* Explicit cap so results scroll even when flex height is content-sized */
+            max-height: min(52vh, calc(100dvh - 18rem));
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: auto !important;
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
             padding-right: 0.25rem;
         }
         .modal-search-block .search-modal-results-scroll::-webkit-scrollbar {
             width: 6px;
         }
         .modal-search-block .search-modal-results-scroll::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             border-radius: 999px;
         }
         body.search-modal-open {
             overflow: hidden !important;
+            touch-action: none;
         }
-        .modal-search-block .search-modal-results-scroll {
-            touch-action: pan-y;
+        @media (max-width: 640px) {
+            .modal-search-block .modal-search-main {
+                max-height: min(92vh, calc(100dvh - 1.5rem));
+            }
+            .modal-search-block .search-modal-results-scroll {
+                max-height: min(48vh, calc(100dvh - 16rem));
+            }
         }
         /* Mobile bottom tab bar — override global span/body line-height so labels don’t stack/overlap */
         .mobile-app-nav {
@@ -371,6 +402,7 @@
             pointer-events: auto;
             width: 100%;
             padding: 0;
+            gap: 0.5rem;
         }
         .product-item.grid-type .product-card-actions .add-cart-btn,
         .product-item.grid-type .product-card-actions .buy-now-btn {
@@ -383,6 +415,37 @@
             border-radius: 9999px;
             font-size: 0.6875rem;
             line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+        .product-item.grid-type .product-card-actions .btn-label-short {
+            display: none;
+        }
+        .product-item.grid-type .product-card-actions .btn-label-full {
+            display: inline;
+        }
+        @media (max-width: 639.98px) {
+            .product-item.grid-type .product-card-actions {
+                gap: 0.375rem;
+            }
+            .product-item.grid-type .product-card-actions .add-cart-btn,
+            .product-item.grid-type .product-card-actions .buy-now-btn {
+                min-height: 36px;
+                padding: 8px 6px !important;
+                font-size: 0.625rem;
+                gap: 0.25rem !important;
+            }
+            .product-item.grid-type .product-card-actions .add-cart-btn i,
+            .product-item.grid-type .product-card-actions .buy-now-btn i {
+                font-size: 0.9375rem;
+            }
+            .product-item.grid-type .product-card-actions .btn-label-full {
+                display: none;
+            }
+            .product-item.grid-type .product-card-actions .btn-label-short {
+                display: inline;
+            }
         }
         @media (min-width: 640px) {
             .product-item.grid-type .product-card-actions .add-cart-btn,
@@ -390,8 +453,43 @@
                 font-size: 0.75rem;
             }
         }
+        /* Best Sellers tabs: hide mobile scrollbar under the pill menu */
+        #home-best-sellers-section .menu-tab {
+            max-width: 100%;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #home-best-sellers-section .menu-tab::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        #home-best-sellers-section .menu-tab .menu {
+            justify-content: center;
+            width: max-content;
+            max-width: 100%;
+            margin-inline: auto;
+        }
+        @media (max-width: 639.98px) {
+            #home-best-sellers-section .menu-tab .tab-item {
+                padding-left: 0.7rem;
+                padding-right: 0.7rem;
+                font-size: 0.8125rem;
+                line-height: 1.25;
+            }
+        }
+        .menu-tab {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .menu-tab::-webkit-scrollbar {
+            display: none;
+            height: 0;
+        }
         /* Product page Related Products: Swiper h-full was stretching thumbs past 3:4 ratio */
         .tab-features-block .list-product.six-product .swiper-list-product,
+        .tab-features-block .list-product.six-product .related-products-swiper,
         .tab-features-block .list-product.six-product .swiper-slide {
             height: auto !important;
         }
@@ -402,6 +500,38 @@
         }
         .tab-features-block .list-product.six-product .product-item .product-main {
             height: auto;
+        }
+        /* Collapse reserved sold-block / bottom gap under related cards */
+        .related-products-section {
+            overflow: hidden;
+        }
+        .related-products-slider {
+            overflow: hidden;
+        }
+        .related-products-slider .swiper-wrapper {
+            height: auto !important;
+            align-items: stretch;
+        }
+        .related-products-slider .product-item .product-infor {
+            margin-bottom: 0 !important;
+        }
+        .related-products-slider .product-item .product-sold {
+            display: none !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        /* Pin arrows to product image row (not mid-tall empty track) */
+        .related-products-slider.section-swiper-navigation.style-outline .related-products-prev,
+        .related-products-slider.section-swiper-navigation.style-outline .related-products-next,
+        .related-products-slider.section-swiper-navigation.style-outline .swiper-button-prev2,
+        .related-products-slider.section-swiper-navigation.style-outline .swiper-button-next2 {
+            top: 22%;
+            transform: translateY(-50%);
+        }
+        .related-products-slider .swiper-button-lock {
+            display: none !important;
         }
         /* Shopping cart drawer uses .list-cart (not .list-product); thumb size + object-fit */
         .modal-cart-block .modal-cart-main .list-product .item,
@@ -560,34 +690,77 @@
             align-items: start;
         }
         /* Two-block category cards (Home + Drinkware/Barware subcategories) */
+        .home-two-categories .list-collection,
+        .home-two-categories .banner-block,
+        .home-two-categories .banner-block > .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
         .two-block-category-grid {
             width: 100%;
-            max-width: 22rem;
+            max-width: 34rem;
+            margin-left: auto;
+            margin-right: auto;
             justify-items: stretch;
+            justify-content: center;
         }
         @media (min-width: 640px) {
             .two-block-category-grid {
-                max-width: 28rem;
+                max-width: 42rem;
             }
         }
         @media (min-width: 768px) {
             .two-block-category-grid {
-                max-width: 32rem;
+                max-width: 52rem;
             }
         }
         @media (min-width: 1024px) {
             .two-block-category-grid {
-                max-width: 36rem;
+                max-width: 60rem;
             }
         }
         .home-two-categories .banner-item,
         .category-subcategory-blocks .two-block-category-grid .banner-item {
             max-width: 100%;
+            width: 100%;
+        }
+        .home-two-categories .banner-item .banner-img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img {
+            overflow: hidden;
+            line-height: 0;
         }
         .home-two-categories .banner-item .banner-img img,
         .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img img {
             display: block;
             width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            transform: scale(1);
+            transform-origin: center center;
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1 !important;
+            will-change: transform;
+        }
+        .home-two-categories .banner-item::before,
+        .home-two-categories .banner-item:hover::before,
+        .home-two-categories .banner-item:focus-within::before,
+        .category-subcategory-blocks .two-block-category-grid .banner-item::before,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:hover::before,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within::before {
+            display: none !important;
+            content: none !important;
+            background-color: transparent !important;
+            opacity: 0 !important;
+        }
+        .home-two-categories .banner-item:hover .banner-img img,
+        .home-two-categories .banner-item:focus-within .banner-img img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:hover .banner-img img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within .banner-img img {
+            transform: scale(1.06);
+            opacity: 1 !important;
         }
         /* Best Sellers wide banner — zoom only, no dark hover overlay */
         .home-best-sellers-banner.banner-block .banner-item {
@@ -663,10 +836,29 @@
         .banner-block .banner-item.banner-card-stable:hover .button-main,
         .banner-block .banner-item.banner-card-stable:focus-within .button-main {
             opacity: 1 !important;
-            transform: translateX(-50%) !important;
             color: inherit;
             background-color: var(--black, #000) !important;
             border: none !important;
+        }
+        /* Absolutely positioned CTAs keep horizontal centering on hover */
+        .banner-block .banner-item.banner-card-stable:hover .button-main.absolute.left-1\/2,
+        .banner-block .banner-item.banner-card-stable:focus-within .button-main.absolute.left-1\/2 {
+            transform: translateX(-50%) !important;
+        }
+        /* Flex overlay CTAs stay centered — never apply translateX(-50%) (that shifts them off-center) */
+        .banner-block .banner-item .banner-text-overlay .button-main,
+        .category-hero-banner .banner-text-overlay .button-main,
+        .banner-block .banner-item:hover .banner-text-overlay .button-main,
+        .banner-block .banner-item:focus-within .banner-text-overlay .button-main,
+        .banner-block .banner-item.banner-card-stable:hover .banner-text-overlay .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-text-overlay .button-main {
+            transform: none !important;
+            position: relative;
+            left: auto;
+            right: auto;
+            margin-left: auto;
+            margin-right: auto;
+            align-self: center;
         }
         .banner-block .banner-item.banner-card-stable .banner-img,
         .banner-block .banner-item.banner-zoom-only .banner-img {
@@ -680,8 +872,14 @@
         }
         .banner-block .banner-item.banner-zoom-only:hover .banner-img img,
         .banner-block .banner-item.banner-zoom-only:focus-within .banner-img img,
-        .banner-block .banner-item.banner-card-stable:hover .banner-img img {
-            transform: scale(1.04);
+        .banner-block .banner-item.banner-card-stable:hover .banner-img img,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-img img {
+            transform: scale(1.06);
+            opacity: 1 !important;
+        }
+        .banner-block .banner-item.banner-zoom-only .banner-img img,
+        .banner-block .banner-item.banner-card-stable .banner-img img {
+            opacity: 1 !important;
         }
         /* Fixed-size banner cards: text overlays must not change block height */
         .banner-block .banner-item.banner-size-fixed,
@@ -691,14 +889,14 @@
             overflow: hidden;
         }
         .banner-block .banner-item.banner-size-fixed {
-            aspect-ratio: 4 / 5;
+            aspect-ratio: 1 / 1;
         }
         .category-hero-banner.list-banner {
             aspect-ratio: 16 / 5;
         }
         @media (max-width: 767.98px) {
             .category-hero-banner.list-banner {
-                aspect-ratio: 4 / 5;
+                aspect-ratio: 1 / 1;
             }
         }
         .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
@@ -706,7 +904,7 @@
         }
         @media (max-width: 767.98px) {
             .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
-                aspect-ratio: 4 / 5;
+                aspect-ratio: 1 / 1;
             }
         }
         .banner-block .banner-item.banner-size-fixed .banner-img,
@@ -726,8 +924,20 @@
             width: 100% !important;
             height: 100% !important;
             object-fit: cover;
+            object-position: center center;
             display: block;
             aspect-ratio: unset !important;
+        }
+        /* Square product banners: show full 1:1 (1500×1500) image without cropping */
+        .banner-block .banner-item.banner-size-fixed .banner-img {
+            background-color: var(--surface, #f5f5f5);
+        }
+        .banner-block .banner-item.banner-size-fixed .banner-img img,
+        .banner-block .banner-item.banner-size-fixed .banner-img picture img,
+        .home-two-categories .banner-item.banner-size-fixed .banner-img img,
+        .category-subcategory-blocks .banner-item.banner-size-fixed .banner-img img {
+            object-fit: contain !important;
+            object-position: center center;
         }
         .banner-block .banner-item.banner-size-fixed .banner-text-overlay,
         .category-hero-banner .banner-text-overlay {
@@ -810,8 +1020,15 @@
             pointer-events: auto;
             flex-shrink: 0;
         }
-        .banner-block .banner-item.banner-size-fixed.banner-aspect-3-4 {
-            aspect-ratio: 3 / 4;
+        .banner-block .banner-item.banner-size-fixed.banner-aspect-3-4,
+        .banner-block .banner-item.banner-size-fixed.banner-aspect-1-1 {
+            aspect-ratio: 1 / 1;
+        }
+        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed .banner-img img,
+        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed .banner-img picture img,
+        .category-hero-banner .banner-img img,
+        .category-hero-banner .banner-img picture img {
+            object-fit: cover !important;
         }
         .home-best-sellers-banner .banner-text-overlay {
             justify-content: center;
@@ -883,15 +1100,114 @@
                 left: auto !important;
             }
         }
+        /* Product lightbox: same image framing on web + mobile */
+        .product-detail .popup-img {
+            z-index: 1100;
+        }
+        .product-detail .popup-img .swiper-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .product-detail .popup-img img,
+        .product-detail .popup-img .product-lightbox-img {
+            width: auto !important;
+            height: auto !important;
+            max-width: min(92vw, 1100px) !important;
+            max-height: 88vh !important;
+            object-fit: contain !important;
+            margin: 0 auto;
+        }
+        @media (max-width: 767.98px) {
+            .product-detail .popup-img img,
+            .product-detail .popup-img .product-lightbox-img {
+                max-width: 92vw !important;
+                max-height: 80vh !important;
+            }
+            .product-detail .popup-img .close-popup-btn {
+                top: 12px;
+                right: 12px;
+            }
+        }
+        /* Specifications tab — consistent left alignment */
+        .product-detail .desc-item.specifications {
+            display: block;
+            width: 100%;
+        }
+        .product-detail .product-specs-table {
+            width: 100%;
+            max-width: 40rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .product-detail .product-spec-row {
+            align-items: flex-start;
+            text-align: left;
+        }
+        .product-detail .product-spec-label {
+            text-align: left;
+            line-height: 1.5;
+            padding-top: 0;
+        }
+        .product-detail .product-spec-value {
+            text-align: left !important;
+            line-height: 1.5;
+            margin: 0;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+        .product-detail .product-spec-value p {
+            margin: 0;
+            text-align: left;
+        }
         .hero-slider-nav {
             color: #fff;
             background: rgba(0,0,0,0.35);
             width: 44px;
             height: 44px;
             border-radius: 9999px;
+            z-index: 6;
         }
         .hero-slider-nav::after {
             font-size: 18px;
+        }
+        /* Home hero — small clickable line indicators */
+        #home-content .hero-slider-pagination.swiper-pagination {
+            position: absolute !important;
+            left: 50% !important;
+            bottom: 14px !important;
+            top: auto !important;
+            width: auto !important;
+            transform: translateX(-50%);
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 0;
+            margin: 0;
+            z-index: 8;
+            pointer-events: auto;
+        }
+        #home-content .hero-slider-pagination .swiper-pagination-bullet {
+            width: 16px !important;
+            height: 3px !important;
+            border-radius: 999px !important;
+            border: none !important;
+            background: rgba(255, 255, 255, 0.45) !important;
+            margin: 0 !important;
+            opacity: 1 !important;
+            cursor: pointer;
+            transition: width 0.25s ease, background-color 0.25s ease;
+        }
+        #home-content .hero-slider-pagination .swiper-pagination-bullet::before {
+            display: none !important;
+            content: none !important;
+        }
+        #home-content .hero-slider-pagination .swiper-pagination-bullet-active {
+            width: 28px !important;
+            background: #fff !important;
+            transform: none !important;
         }
         .breadcrumb-product .product-nav-links {
             flex: 1 1 auto;
@@ -946,23 +1262,46 @@
             if (m) { m.classList.add('open'); document.body.style.overflow='hidden'; if(window.handleItemModalWishlist) window.handleItemModalWishlist(); }
             else location.href='{{ route("wishlist") }}';
         }
+        var searchModalScrollY = 0;
+        function lockSearchBodyScroll() {
+            searchModalScrollY = window.scrollY || window.pageYOffset || 0;
+            document.body.classList.add('search-modal-open');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = '-' + searchModalScrollY + 'px';
+            document.body.style.left = '0';
+            document.body.style.right = '0';
+            document.body.style.width = '100%';
+        }
+        function unlockSearchBodyScroll() {
+            document.body.classList.remove('search-modal-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.width = '';
+            window.scrollTo(0, searchModalScrollY);
+        }
         function openSearch() {
             var main = document.querySelector('.modal-search-block .modal-search-main');
             if (main) {
                 main.classList.add('open');
-                document.body.classList.add('search-modal-open');
-                document.body.style.overflow = 'hidden';
+                lockSearchBodyScroll();
+                var input = document.getElementById('searchModalInput');
+                if (input) setTimeout(function() { input.focus(); }, 50);
             }
         }
         function closeSearch() {
             var main = document.querySelector('.modal-search-block .modal-search-main');
             if (main) {
                 main.classList.remove('open');
-                document.body.classList.remove('search-modal-open');
-                document.body.style.overflow = '';
+                unlockSearchBodyScroll();
             }
         }
         window.closeSearch = closeSearch;
+        window.lockSearchBodyScroll = lockSearchBodyScroll;
+        window.unlockSearchBodyScroll = unlockSearchBodyScroll;
         function openMobileMenuFromBottom() {
             var mm = document.getElementById('menu-mobile');
             if (mm) { mm.classList.add('open'); document.body.style.overflow='hidden'; document.body.classList.add('mobile-menu-open'); }
@@ -1257,27 +1596,49 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu: .open class handled in assets/js/main.js (avoid duplicate .active handlers)
 
-            // Close search modal (backdrop click + ESC)
+            // Close search modal (backdrop click + ESC) + trap scroll inside results
             const searchModal = document.querySelector('.modal-search-block');
             const searchModalMain = document.querySelector('.modal-search-block .modal-search-main');
             if (searchModal && searchModalMain) {
                 searchModal.addEventListener('click', function(e) {
                     if (e.target === searchModal) {
-                        searchModalMain.classList.remove('open');
-                        document.body.classList.remove('search-modal-open');
-                        document.body.style.overflow = '';
+                        if (typeof window.closeSearch === 'function') window.closeSearch();
+                        else {
+                            searchModalMain.classList.remove('open');
+                            if (typeof window.unlockSearchBodyScroll === 'function') window.unlockSearchBodyScroll();
+                        }
                     }
                 });
                 searchModalMain.addEventListener('click', function(e) { e.stopPropagation(); });
+
+                function trapSearchWheel(e) {
+                    if (!searchModalMain.classList.contains('open')) return;
+                    var scrollArea = e.target.closest('.search-modal-results-scroll');
+                    if (scrollArea) {
+                        var atTop = scrollArea.scrollTop <= 0;
+                        var atBottom = scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1;
+                        if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+                            e.preventDefault();
+                        }
+                        return;
+                    }
+                    // Wheel outside results (header/popular/backdrop): keep page locked
+                    e.preventDefault();
+                }
+                searchModal.addEventListener('wheel', trapSearchWheel, { passive: false });
+                searchModal.addEventListener('touchmove', function(e) {
+                    if (!searchModalMain.classList.contains('open')) return;
+                    if (!e.target.closest('.search-modal-results-scroll')) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
             }
             
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     const sm = document.querySelector('.modal-search-block .modal-search-main');
                     if (sm && sm.classList.contains('open')) {
-                        sm.classList.remove('open');
-                        document.body.classList.remove('search-modal-open');
-                        document.body.style.overflow = '';
+                        if (typeof window.closeSearch === 'function') window.closeSearch();
                     }
                     if (menuMobile && menuMobile.classList.contains('active')) {
                         menuMobile.classList.remove('active');

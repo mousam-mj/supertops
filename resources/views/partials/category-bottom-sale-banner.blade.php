@@ -7,7 +7,8 @@
     $subtext = trim((string) ($mc->bottom_banner_subtext ?? ''));
     $heading = trim((string) ($mc->bottom_banner_text ?? ''));
     $buttonText = trim((string) ($mc->bottom_banner_button_text ?? '')) ?: 'Shop Now';
-    $buttonUrl = setting_link_url($mc->bottom_banner_button_url ?? null, route('shop'));
+    $bottomDefaultShop = route('shop', ['category' => $mc->slug]);
+    $buttonUrl = setting_link_url($mc->bottom_banner_button_url ?? null, $bottomDefaultShop);
     $bgUrls = banner_picture_urls($mc->bottom_banner_bg_image, $mc->bottom_banner_bg_image_mobile, 'assets/images/slider/bg-toys.png');
     $productUrls = banner_picture_urls($mc->bottom_banner_image, $mc->bottom_banner_image_mobile, 'assets/images/banner/perch123(1).webp');
     if ($subtext === '') {

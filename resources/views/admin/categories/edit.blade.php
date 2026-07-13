@@ -132,7 +132,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="hero_text" class="form-label">Hero Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_text') is-invalid @enderror" 
@@ -145,7 +145,7 @@
                             @enderror
                             <small class="form-text text-muted">Main heading text displayed on hero banner</small>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="hero_button_text" class="form-label">Button Text</label>
                             <input type="text" 
                                    class="form-control @error('hero_button_text') is-invalid @enderror" 
@@ -155,7 +155,20 @@
                             @error('hero_button_text')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Text for hero button (default: Shop Now)</small>
+                            <small class="form-text text-muted">Default: Shop Now</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="hero_button_url" class="form-label">Button link</label>
+                            <input type="text"
+                                   class="form-control @error('hero_button_url') is-invalid @enderror"
+                                   id="hero_button_url"
+                                   name="hero_button_url"
+                                   value="{{ old('hero_button_url', $category->hero_button_url) }}"
+                                   placeholder="/shop or full URL">
+                            @error('hero_button_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">Leave blank for /shop</small>
                         </div>
                     </div>
 
@@ -168,17 +181,20 @@
 
                     <hr class="my-4">
                     <h5 class="mb-3">Promotional Banners (3 Blocks)</h5>
+                    <p class="text-muted small mb-3">Set a <strong>Shop Now button link</strong> on each block so it opens a specific category (e.g. <code>/category/drinkware</code>) instead of mixed shop products.</p>
 
                     @php
                         $bannerImages = old('banner_images', is_array($category->banner_images) ? $category->banner_images : []);
                         $bannerTexts = old('banner_texts', is_array($category->banner_texts) ? $category->banner_texts : []);
+                        $bannerUrls = old('banner_urls', is_array($category->banner_urls) ? $category->banner_urls : []);
                         while(count($bannerImages) < 3) $bannerImages[] = null;
                         while(count($bannerTexts) < 3) $bannerTexts[] = '';
+                        while(count($bannerUrls) < 3) $bannerUrls[] = '';
                     @endphp
 
                     @for($i = 0; $i < 3; $i++)
                     <div class="card mb-3">
-                        <div class="card-header bg-light">
+                        <div class="card-header bg-primary text-white py-2">
                             <h6 class="mb-0">Banner {{ $i + 1 }}</h6>
                         </div>
                         <div class="card-body">
@@ -213,6 +229,15 @@
                                        value="{{ $bannerTexts[$i] ?? '' }}"
                                        placeholder="e.g. Drinkware, Barware, Kitchenware">
                                 <small class="form-text text-muted">Text to display on this banner</small>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Shop Now button link {{ $i + 1 }}</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="banner_urls[]"
+                                       value="{{ $bannerUrls[$i] ?? '' }}"
+                                       placeholder="/category/drinkware">
+                                <small class="form-text text-muted">e.g. <code>/category/drinkware</code> or <code>/category/barware</code>. Leave blank for /shop.</small>
                             </div>
                         </div>
                     </div>

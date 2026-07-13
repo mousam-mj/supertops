@@ -532,33 +532,33 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="desc-item specifications flex items-center justify-center" data-item="Specifications">
-                            <div class="lg:w-1/2 sm:w-3/4 w-full">
+                        <div class="desc-item specifications" data-item="Specifications">
+                            <div class="product-specs-table lg:w-1/2 sm:w-3/4 w-full mx-auto">
                                 @if(isset($availableSizes) && count($availableSizes) > 0)
-                                <div class="item flex items-center gap-8 py-3 px-10">
-                                    <div class="text-title sm:w-1/4 w-1/3">Size</div>
-                                    <p>{{ implode(', ', $availableSizes) }}</p>
+                                <div class="product-spec-row item flex items-start gap-4 sm:gap-8 py-3 px-4 sm:px-10">
+                                    <div class="product-spec-label text-title shrink-0 sm:w-1/3 w-2/5">Size</div>
+                                    <div class="product-spec-value text-secondary flex-1 min-w-0">{{ implode(', ', $availableSizes) }}</div>
                                 </div>
                                 @endif
                                 @if(isset($availableColors) && count($availableColors) > 0)
-                                <div class="item bg-surface flex items-center gap-8 py-3 px-10">
-                                    <div class="text-title sm:w-1/4 w-1/3">Colors</div>
-                                    <p>{{ implode(', ', $availableColors) }}</p>
+                                <div class="product-spec-row item bg-surface flex items-start gap-4 sm:gap-8 py-3 px-4 sm:px-10">
+                                    <div class="product-spec-label text-title shrink-0 sm:w-1/3 w-2/5">Colors</div>
+                                    <div class="product-spec-value text-secondary flex-1 min-w-0">{{ implode(', ', $availableColors) }}</div>
                                 </div>
                                 @endif
                                 @if($product->specifications && is_array($product->specifications) && count($product->specifications) > 0)
                                     @php $specIndex = 0; @endphp
                                     @foreach($product->specifications as $key => $value)
-                                    <div class="item {{ $specIndex % 2 == 0 ? '' : 'bg-surface' }} flex items-center gap-8 py-3 px-10">
-                                        <div class="text-title sm:w-1/4 w-1/3">{{ $key }}</div>
-                                        <p>{{ $value }}</p>
+                                    <div class="product-spec-row item {{ $specIndex % 2 == 0 ? '' : 'bg-surface' }} flex items-start gap-4 sm:gap-8 py-3 px-4 sm:px-10">
+                                        <div class="product-spec-label text-title shrink-0 sm:w-1/3 w-2/5">{{ $key }}</div>
+                                        <div class="product-spec-value text-secondary flex-1 min-w-0">{{ is_array($value) ? implode(', ', $value) : $value }}</div>
                                     </div>
                                     @php $specIndex++; @endphp
                                     @endforeach
                                 @endif
                                 @if((isset($availableSizes) && count($availableSizes) > 0) || (isset($availableColors) && count($availableColors) > 0) || ($product->specifications && is_array($product->specifications) && count($product->specifications) > 0))
                                 @else
-                                <div class="item flex items-center gap-8 py-3 px-10">
+                                <div class="product-spec-row item flex items-start gap-4 sm:gap-8 py-3 px-4 sm:px-10">
                                     <div class="text-secondary">No specifications available for this product.</div>
                                 </div>
                                 @endif
@@ -590,37 +590,85 @@
             </div>
         @endif
 
-        <div class="tab-features-block filter-product-block md:py-20 py-10">
+        <div class="tab-features-block filter-product-block related-products-section md:pt-16 md:pb-10 pt-8 pb-6">
             <div class="container">
                 <div class="heading3 text-center">Related Products</div>
-                <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-10 mt-6 related-products-slider">
-                    <div class="swiper-button-prev2 sm:left-10 left-6">
+                <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-8 mt-5 related-products-slider">
+                    <button type="button" class="related-products-prev swiper-button-prev2 sm:left-10 left-6" aria-label="Previous related products">
                         <i class="ph-bold ph-caret-left text-xl"></i>
-                </div>
-                    <div class="swiper swiper-list-product relative">
+                    </button>
+                    <div class="swiper related-products-swiper relative">
                         <div class="swiper-wrapper">
                             @forelse($relatedProducts as $relatedProduct)
                                 <div class="swiper-slide h-auto">
-                        @include('partials.product-card', ['product' => $relatedProduct])
-                </div>
+                                    @include('partials.product-card', ['product' => $relatedProduct])
+                                </div>
                             @empty
                                 <div class="swiper-slide col-span-full text-center py-10">
                                     <p class="text-secondary">No related products available</p>
-            </div>
+                                </div>
                             @endforelse
                         </div>
                     </div>
-                    <div class="swiper-button-next2 sm:right-10 right-6">
+                    <button type="button" class="related-products-next swiper-button-next2 sm:right-10 right-6" aria-label="Next related products">
                         <i class="ph-bold ph-caret-right text-xl"></i>
-                    </div>
+                    </button>
                 </div>
-    </div>
-</div>
+            </div>
+        </div>
 @endsection
 @section('scripts')
 <script src="{{ asset('assets/js/product-detail.js') }}"></script>
 <script>
 (function () {
+    function setupRelatedProductsSlider() {
+        var root = document.querySelector('.related-products-slider');
+        var el = root && root.querySelector('.related-products-swiper');
+        if (!el || typeof Swiper === 'undefined') return;
+
+        var prevEl = root.querySelector('.related-products-prev');
+        var nextEl = root.querySelector('.related-products-next');
+
+        if (el.swiper) {
+            el.swiper.destroy(true, true);
+        }
+
+        new Swiper(el, {
+            navigation: {
+                prevEl: prevEl,
+                nextEl: nextEl,
+            },
+            loop: false,
+            watchOverflow: true,
+            slidesPerView: 2,
+            spaceBetween: 16,
+            observer: true,
+            observeParents: true,
+            breakpoints: {
+                640: {
+                    slidesPerView: 3,
+                    spaceBetween: 16,
+                },
+                768: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+                1280: {
+                    slidesPerView: 4,
+                    spaceBetween: 30,
+                },
+            },
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupRelatedProductsSlider);
+    } else {
+        setupRelatedProductsSlider();
+    }
+    // Re-init after theme main.js in case it races
+    window.addEventListener('load', setupRelatedProductsSlider);
+
     function setupProductGallery() {
         var productDetail = document.querySelector('.product-detail.style-grouped');
         if (!productDetail || typeof Swiper === 'undefined') return;
@@ -1101,10 +1149,44 @@
         
         // Add to cart from product detail page
         let isAddingToCart = false; // Prevent double clicks
+
+        function productPageNotify(message, type) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(message, type || 'success');
+                return;
+            }
+            alert(message);
+        }
+
+        function readSelectedVariant(productInfor) {
+            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
+            const selectedColorItem = productInfor.querySelector('.color-item.active');
+            let size = selectedSizeItem ? selectedSizeItem.getAttribute('data-size') : null;
+            let color = selectedColorItem ? selectedColorItem.getAttribute('data-color') : null;
+            if (!size) {
+                size = productInfor.getAttribute('data-default-size') || null;
+            }
+            size = size && String(size).trim() !== '' ? String(size).trim() : null;
+            color = color && String(color).trim() !== '' ? String(color).trim() : null;
+            return { size: size, color: color };
+        }
+
+        function parseCartJsonResponse(response) {
+            var contentType = response.headers.get('content-type') || '';
+            if (contentType.indexOf('application/json') !== -1) {
+                return response.json().then(function(data) {
+                    return { ok: response.ok, status: response.status, data: data || {} };
+                });
+            }
+            var msg = response.status === 419
+                ? 'Page session expired. Please refresh and try again.'
+                : 'Could not add to cart. Please refresh and try again.';
+            return Promise.resolve({ ok: false, status: response.status, data: { success: false, message: msg } });
+        }
         
         document.addEventListener('click', function(e) {
-            const addCartBtn = e.target.closest('.add-cart-btn');
-            if (!addCartBtn || !addCartBtn.closest('.product-infor')) return;
+            const addCartBtn = e.target.closest('.product-detail .product-infor .add-cart-btn');
+            if (!addCartBtn) return;
             
             // Prevent double clicks
             if (isAddingToCart || addCartBtn.disabled) {
@@ -1117,7 +1199,10 @@
             e.stopPropagation();
             
             const productId = addCartBtn.getAttribute('data-product-id');
-            if (!productId) return;
+            if (!productId) {
+                productPageNotify('Could not add this product. Please refresh and try again.', 'error');
+                return;
+            }
             
             const productInfor = addCartBtn.closest('.product-infor');
             if (!productInfor) return;
@@ -1125,18 +1210,9 @@
             // Set flag to prevent double clicks
             isAddingToCart = true;
             
-            // Get selected size and color from this product (size card removed, use default when available)
-            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
-            const selectedColorItem = productInfor.querySelector('.color-item.active');
+            const variant = readSelectedVariant(productInfor);
             const quantityElement = productInfor.querySelector('.quantity-block .quantity');
-            
-            const size = selectedSizeItem?.getAttribute('data-size') || productInfor.getAttribute('data-default-size') || null;
-            const color = selectedColorItem?.getAttribute('data-color') || null;
-            // Get quantity from the quantity element, ensure it's at least 1
-            let quantity = 1;
-            if (quantityElement) {
-                quantity = readProductQty(quantityElement);
-            }
+            let quantity = quantityElement ? readProductQty(quantityElement) : 1;
             
             // Show loading state
             const originalText = addCartBtn.innerHTML;
@@ -1159,26 +1235,20 @@
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
-                    product_id: parseInt(productId),
+                    product_id: parseInt(productId, 10),
                     quantity: quantity,
-                    size: size,
-                    color: color
+                    size: variant.size,
+                    color: variant.color
                 })
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(parseCartJsonResponse)
+            .then(function(result) {
+                var data = result.data || {};
                 if (data.success) {
-                    // Update cart count
                     if (typeof window.updateCartCount === 'function') {
                         window.updateCartCount();
                     }
-                    
-                    // Show success message
-                    if (typeof window.showNotification === 'function') {
-                        window.showNotification('Product added to cart!', 'success');
-                    } else {
-                        alert('Product added to cart!');
-                    }
+                    productPageNotify('Product added to cart!', 'success');
                     
                     // Open cart drawer (CSS uses :has(.modal-cart-main.open), not .modal-cart-block.open)
                     const cartModalMains = document.querySelectorAll('.modal-cart-block .modal-cart-main');
@@ -1191,35 +1261,26 @@
                         }
                     }
                 } else {
-                    if (typeof window.showNotification === 'function') {
-                        window.showNotification(data.message || 'Failed to add product to cart', 'error');
-                    } else {
-                        alert(data.message || 'Failed to add product to cart');
-                    }
+                    productPageNotify(data.message || 'Failed to add product to cart', 'error');
                 }
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error:', error);
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('An error occurred. Please try again.', 'error');
-                } else {
-                    alert('An error occurred. Please try again.');
-                }
+                productPageNotify('An error occurred. Please try again.', 'error');
             })
-            .finally(() => {
-                // Always reset button state
+            .finally(function() {
                 addCartBtn.innerHTML = originalText;
                 addCartBtn.disabled = originalDisabled;
                 addCartBtn.style.pointerEvents = '';
                 isAddingToCart = false;
             });
-        });
+        }, true);
         
         // Buy It Now: add product to cart then redirect to checkout
         let isBuyItNow = false;
         document.addEventListener('click', function(e) {
-            const buyBtn = e.target.closest('.buy-it-now-btn');
-            if (!buyBtn || !buyBtn.closest('.product-infor')) return;
+            const buyBtn = e.target.closest('.product-detail .product-infor .buy-it-now-btn');
+            if (!buyBtn) return;
             if (isBuyItNow || buyBtn.disabled) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1229,13 +1290,13 @@
             e.stopPropagation();
             const productId = buyBtn.getAttribute('data-product-id');
             const checkoutUrl = buyBtn.getAttribute('data-checkout-url') || '/checkout';
-            if (!productId) return;
+            if (!productId) {
+                productPageNotify('Could not buy this product. Please refresh and try again.', 'error');
+                return;
+            }
             const productInfor = buyBtn.closest('.product-infor');
             if (!productInfor) return;
-            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
-            const selectedColorItem = productInfor.querySelector('.color-item.active');
-            const size = selectedSizeItem?.getAttribute('data-size') || productInfor.getAttribute('data-default-size') || null;
-            const color = selectedColorItem?.getAttribute('data-color') || null;
+            const variant = readSelectedVariant(productInfor);
             isBuyItNow = true;
             const originalText = buyBtn.innerHTML;
             buyBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
@@ -1252,26 +1313,23 @@
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
-                    product_id: parseInt(productId),
+                    product_id: parseInt(productId, 10),
                     quantity: (function() {
                         const qEl = productInfor.querySelector('.quantity-block .quantity');
                         return qEl ? readProductQty(qEl) : 1;
                     })(),
-                    size: size,
-                    color: color
+                    size: variant.size,
+                    color: variant.color
                 })
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(parseCartJsonResponse)
+            .then(function(result) {
+                var data = result.data || {};
                 if (data.success) {
                     if (typeof window.updateCartCount === 'function') window.updateCartCount();
                     window.location.href = checkoutUrl;
                 } else {
-                    if (typeof window.showNotification === 'function') {
-                        window.showNotification(data.message || 'Failed to add product', 'error');
-                    } else {
-                        alert(data.message || 'Failed to add product');
-                    }
+                    productPageNotify(data.message || 'Failed to add product', 'error');
                     buyBtn.innerHTML = originalText;
                     buyBtn.disabled = false;
                     buyBtn.style.pointerEvents = '';
@@ -1280,17 +1338,13 @@
             })
             .catch(function(err) {
                 console.error('Buy It Now error:', err);
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('An error occurred. Please try again.', 'error');
-                } else {
-                    alert('An error occurred. Please try again.');
-                }
+                productPageNotify('An error occurred. Please try again.', 'error');
                 buyBtn.innerHTML = originalText;
                 buyBtn.disabled = false;
                 buyBtn.style.pointerEvents = '';
                 isBuyItNow = false;
             });
-        });
+        }, true);
         
         // Show notification
         function showNotification(message, type = 'success') {
@@ -1310,146 +1364,151 @@
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
+        window.showNotification = window.showNotification || showNotification;
     })();
 
-    // Product image popup functionality - Direct implementation
+    // Product image lightbox — keep web/mobile on the same slide as the gallery
     (function() {
         'use strict';
-        
+
         function initImagePopup() {
-            const productDetail = document.querySelector(".product-detail");
-            if (!productDetail) {
-                console.log("[Popup] Product detail not found");
-                return;
-            }
+            const productDetail = document.querySelector('.product-detail.style-grouped');
+            if (!productDetail || typeof Swiper === 'undefined') return;
 
-            const popupImg = productDetail.querySelector(".popup-img");
-            if (!popupImg) {
-                console.log("[Popup] Popup element not found");
-                return;
-            }
+            const popupImg = productDetail.querySelector('.popup-img');
+            if (!popupImg) return;
 
-            const closePopupBtn = popupImg.querySelector(".close-popup-btn");
-            
-            const mainImages = productDetail.querySelectorAll(".list-img .mySwiper2 .swiper-slide img");
-            const thumbImages = productDetail.querySelectorAll(".list-img .mySwiper .swiper-slide img");
-
-            console.log("[Popup] Setup:", {
-                popupImg: !!popupImg,
-                mainImages: mainImages.length,
-                thumbImages: thumbImages.length,
-                closePopupBtn: !!closePopupBtn
-            });
-
-            if (mainImages.length === 0 && thumbImages.length === 0) {
-                console.log("[Popup] No images found");
-                return;
-            }
+            const closePopupBtn = popupImg.querySelector('.close-popup-btn');
+            const mainSwiperEl = productDetail.querySelector('.product-gallery-main') || productDetail.querySelector('.mySwiper2');
+            const thumbSwiperEl = productDetail.querySelector('.product-gallery-thumbs') || productDetail.querySelector('.mySwiper');
+            if (!mainSwiperEl) return;
 
             let popupSwiper = null;
 
-            function openPopup(index) {
-                console.log("[Popup] Opening at index:", index);
-                popupImg.classList.add("open");
-                document.body.style.overflow = "hidden";
-
-                if (!popupSwiper) {
-                    const nextBtn = popupImg.querySelector(".swiper-button-next");
-                    const prevBtn = popupImg.querySelector(".swiper-button-prev");
-                    
-                    popupSwiper = new Swiper(popupImg, {
-                        loop: true,
-                        slidesPerView: 1,
-                        spaceBetween: 0,
-                        centeredSlides: true,
-                        navigation: {
-                            nextEl: nextBtn,
-                            prevEl: prevBtn,
-                        },
-                        initialSlide: index,
-                    });
-                    console.log("[Popup] Swiper initialized");
-                } else {
-                    if (popupSwiper.slideToLoop) {
-                        popupSwiper.slideToLoop(index);
-                    } else {
-                        popupSwiper.slideTo(index);
-                    }
-                }
+            function getMainImages() {
+                return Array.from(mainSwiperEl.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate) img'));
             }
 
-            function closePopup() {
-                console.log("[Popup] Closing");
-                popupImg.classList.remove("open");
-                document.body.style.overflow = "";
+            function getActiveIndex() {
+                var main = window.swiper2 || (mainSwiperEl && mainSwiperEl.swiper) || null;
+                if (main && typeof main.realIndex === 'number') return main.realIndex;
+                if (main && typeof main.activeIndex === 'number') return main.activeIndex;
+                return 0;
+            }
+
+            function syncPopupSlides() {
+                var wrapper = popupImg.querySelector('.swiper-wrapper');
+                if (!wrapper) return 0;
+                var images = getMainImages();
+                if (!images.length) return 0;
+                wrapper.innerHTML = images.map(function(img) {
+                    var src = img.currentSrc || img.src || '';
+                    var alt = (img.getAttribute('alt') || '').replace(/"/g, '&quot;');
+                    return '<div class="swiper-slide"><img src="' + src + '" alt="' + alt + '" class="product-lightbox-img" /></div>';
+                }).join('');
+                return images.length;
+            }
+
+            function destroyPopupSwiper() {
                 if (popupSwiper) {
                     popupSwiper.destroy(true, true);
                     popupSwiper = null;
                 }
             }
 
-            // Add click handlers to main images
-            mainImages.forEach((img, index) => {
-                img.style.cursor = "pointer";
-                img.addEventListener("click", function (e) {
+            function openPopup(index) {
+                var count = syncPopupSlides();
+                if (!count) return;
+                index = Math.max(0, Math.min(parseInt(index, 10) || 0, count - 1));
+
+                destroyPopupSwiper();
+                popupImg.classList.add('open');
+                document.body.style.overflow = 'hidden';
+
+                var nextBtn = popupImg.querySelector('.swiper-button-next');
+                var prevBtn = popupImg.querySelector('.swiper-button-prev');
+                popupSwiper = new Swiper(popupImg, {
+                    loop: false,
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    centeredSlides: true,
+                    initialSlide: index,
+                    navigation: {
+                        nextEl: nextBtn,
+                        prevEl: prevBtn,
+                    },
+                });
+                // Ensure exact slide after layout (mobile Swiper can mis-resolve initialSlide)
+                popupSwiper.slideTo(index, 0, false);
+            }
+
+            function closePopup() {
+                popupImg.classList.remove('open');
+                document.body.style.overflow = '';
+                destroyPopupSwiper();
+            }
+
+            // Main gallery image → open lightbox at the currently visible slide
+            mainSwiperEl.addEventListener('click', function(e) {
+                var img = e.target.closest('img');
+                if (!img || !mainSwiperEl.contains(img)) return;
+                e.preventDefault();
+                e.stopPropagation();
+                openPopup(getActiveIndex());
+            });
+
+            // Thumbnail → show that image in the main gallery (same on web & mobile)
+            if (thumbSwiperEl) {
+                thumbSwiperEl.addEventListener('click', function(e) {
+                    var slide = e.target.closest('.swiper-slide');
+                    if (!slide || !thumbSwiperEl.contains(slide)) return;
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log("[Popup] Main image clicked:", index);
+                    var slides = Array.from(thumbSwiperEl.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate)'));
+                    var index = slides.indexOf(slide);
+                    if (index < 0) return;
+                    var main = window.swiper2 || (mainSwiperEl && mainSwiperEl.swiper);
+                    if (main) main.slideTo(index);
+                });
+            }
+
+            // Double-tap / second click path: open lightbox from active thumb
+            if (thumbSwiperEl) {
+                thumbSwiperEl.addEventListener('dblclick', function(e) {
+                    var slide = e.target.closest('.swiper-slide');
+                    if (!slide) return;
+                    var slides = Array.from(thumbSwiperEl.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate)'));
+                    var index = slides.indexOf(slide);
+                    if (index < 0) return;
                     openPopup(index);
                 });
-            });
+            }
 
-            // Thumbnail click: only change center/main image, do NOT open popup
-            thumbImages.forEach((img, index) => {
-                img.style.cursor = "pointer";
-                img.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (typeof swiper2 !== "undefined" && swiper2) {
-                        swiper2.slideTo(index);
-                    }
-                });
-            });
-
-            // Close button
             if (closePopupBtn) {
-                closePopupBtn.addEventListener("click", function (e) {
+                closePopupBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     closePopup();
                 });
             }
 
-            // Close on background click (but not on navigation buttons or swiper content)
-            popupImg.addEventListener("click", function (e) {
-                // Don't close if clicking on:
-                // - Navigation buttons
-                // - Swiper wrapper/slides
-                // - Close button (handled separately)
-                if (e.target.closest('.swiper-button-next') || 
-                    e.target.closest('.swiper-button-prev') || 
-                    e.target.closest('.swiper-wrapper') || 
+            popupImg.addEventListener('click', function(e) {
+                if (e.target.closest('.swiper-button-next') ||
+                    e.target.closest('.swiper-button-prev') ||
                     e.target.closest('.swiper-slide') ||
                     e.target.closest('.close-popup-btn')) {
-                    return; // Don't close
+                    return;
                 }
-                // Only close if clicking directly on the popup background
-                if (e.target === popupImg) {
+                if (e.target === popupImg) closePopup();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && popupImg.classList.contains('open')) {
                     closePopup();
                 }
             });
-
-            // Close on Escape key
-            document.addEventListener("keydown", function (e) {
-                if (e.key === "Escape" && popupImg.classList.contains("open")) {
-                    closePopup();
-                }
-            });
-
-            console.log("[Popup] Event listeners attached");
         }
 
-        // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initImagePopup);
         } else {
