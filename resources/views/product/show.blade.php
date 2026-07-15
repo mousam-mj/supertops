@@ -135,6 +135,145 @@
 .product-description-html a { text-decoration: underline; }
 .choose-color .list-color-image .color-item { overflow: hidden; padding: 0; background: transparent !important; }
 .choose-color .list-color-image .color-item img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 9999px; }
+.choose-color .list-color .color-item {
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+}
+/* Product gallery: thumbs + square main image that stays inside left column */
+.product-detail.style-grouped .product-gallery-wrap {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+.product-detail.style-grouped .product-gallery-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+.product-detail.style-grouped .product-gallery-thumbs {
+    order: 0;
+    position: relative !important;
+    width: 72px !important;
+    max-width: 72px;
+    flex-shrink: 0;
+    margin: 0 !important;
+    height: auto !important;
+    max-height: min(100%, calc((100vw - 3rem) / 2 - 45px));
+    overflow: hidden;
+}
+.product-detail.style-grouped .product-gallery-main,
+.product-detail.style-grouped .list-img .mySwiper2 {
+    order: 1;
+    flex: 1 1 auto;
+    width: auto !important;
+    max-width: calc(100% - 84px) !important;
+    margin-left: 0 !important;
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+.product-detail.style-grouped .product-gallery-thumbs .swiper-wrapper {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    flex-direction: column !important;
+    width: 72px !important;
+    height: auto !important;
+    gap: 0;
+}
+.product-detail.style-grouped .product-gallery-thumbs .swiper-slide {
+    width: 72px !important;
+    height: 72px !important;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0.55;
+    border: 1px solid #A0A0A0;
+}
+.product-detail.style-grouped .product-gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+    border-color: #000;
+}
+.product-detail.style-grouped .product-gallery-thumbs .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.product-detail.style-grouped .product-gallery-main .swiper-wrapper {
+    height: 100%;
+}
+.product-detail.style-grouped .product-gallery-main .swiper-slide {
+    height: 100%;
+}
+.product-detail.style-grouped .product-gallery-main .swiper-slide img,
+.product-detail.style-grouped .list-img .mySwiper2 .swiper-slide img {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    display: block;
+}
+.product-detail.style-grouped .product-infor {
+    min-width: 0;
+    max-width: 100%;
+}
+.product-detail.style-grouped .product-name {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+@media (max-width: 1023.98px) {
+    .product-detail.style-grouped .product-gallery-thumbs {
+        width: 56px !important;
+        max-width: 56px;
+    }
+    .product-detail.style-grouped .product-gallery-thumbs .swiper-wrapper {
+        width: 56px !important;
+    }
+    .product-detail.style-grouped .product-gallery-thumbs .swiper-slide {
+        width: 56px !important;
+        height: 56px !important;
+    }
+    .product-detail.style-grouped .product-gallery-main,
+    .product-detail.style-grouped .list-img .mySwiper2 {
+        max-width: calc(100% - 68px) !important;
+    }
+}
+@media (max-width: 639.98px) {
+    .product-detail.style-grouped .product-gallery-inner {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .product-detail.style-grouped .product-gallery-main,
+    .product-detail.style-grouped .list-img .mySwiper2 {
+        order: 1;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+    }
+    .product-detail.style-grouped .product-gallery-thumbs {
+        order: 2;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden;
+    }
+    .product-detail.style-grouped .product-gallery-thumbs .swiper-wrapper {
+        flex-direction: row !important;
+        width: auto !important;
+        gap: 10px;
+    }
+    .product-detail.style-grouped .product-gallery-thumbs .swiper-slide {
+        width: 64px !important;
+        height: 64px !important;
+    }
+}
 .pincode-checker .delivery-result-box { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--line, #d4d4d4); }
 .pincode-checker .delivery-result-box--success { background: #f0fdf4; border-color: #86efac; }
 .pincode-checker .delivery-result-box--error { background: #fef2f2; border-color: #fca5a5; }
@@ -688,18 +827,13 @@
         var isMobile = window.matchMedia('(max-width: 639.98px)').matches;
 
         var thumbSwiper = new Swiper(thumbEl, {
-            spaceBetween: isMobile ? 10 : 0,
-            slidesPerView: isMobile ? 'auto' : 1,
-            freeMode: isMobile,
+            direction: isMobile ? 'horizontal' : 'vertical',
+            spaceBetween: 10,
+            slidesPerView: 'auto',
+            freeMode: true,
             watchSlidesProgress: true,
             slideToClickedSlide: true,
-            breakpoints: {
-                640: {
-                    slidesPerView: 1,
-                    spaceBetween: 0,
-                    freeMode: false,
-                },
-            },
+            watchOverflow: true,
         });
 
         var mainSwiper = new Swiper(mainEl, {
@@ -714,6 +848,15 @@
                 },
             },
         });
+
+        // Keep square gallery height for vertical thumbs column
+        if (!isMobile && mainEl) {
+            var syncThumbHeight = function () {
+                thumbEl.style.maxHeight = mainEl.offsetHeight + 'px';
+            };
+            syncThumbHeight();
+            window.addEventListener('resize', syncThumbHeight);
+        }
 
         window.swiperUnderwear = thumbSwiper;
         window.swiper2 = mainSwiper;

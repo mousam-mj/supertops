@@ -3319,7 +3319,7 @@ input[type=file]::-webkit-file-upload-button {
   .product-detail.style-grouped .list-img .mySwiper2 .swiper-slide img {
     width: 100%;
     height: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
   }
@@ -3346,7 +3346,7 @@ input[type=file]::-webkit-file-upload-button {
     max-width: 72px;
     flex-shrink: 0;
     height: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
   }
   .product-detail.style-grouped .featured-product.underwear .mySwiper .swiper-slide img,
   .product-detail.style-grouped .featured-product.cosmetic .mySwiper .swiper-slide img {
@@ -4758,7 +4758,8 @@ input[type=file]::-webkit-file-upload-button {
   .featured-product.underwear .mySwiper .swiper-slide,
   .featured-product.cosmetic .mySwiper .swiper-slide {
     width: 68px !important;
-    height: 85px;
+    height: 68px;
+    aspect-ratio: 1 / 1;
     flex-shrink: 0;
     border: 1px solid #A0A0A0;
     border-radius: 12px;

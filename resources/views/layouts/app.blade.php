@@ -1033,6 +1033,7 @@
         .home-best-sellers-banner .banner-text-overlay {
             justify-content: center;
         }
+        /* Product gallery fit handled in product/show.blade.php (1:1 + thumbs row) */
         /* Product page: horizontal thumb strip below main image on mobile */
         @media (max-width: 639.98px) {
             .product-detail.style-grouped .product-gallery-wrap {
@@ -1055,7 +1056,7 @@
             }
             .product-detail.style-grouped .product-gallery-main .swiper-slide img {
                 width: 100%;
-                aspect-ratio: 3 / 4;
+                aspect-ratio: 1 / 1;
                 object-fit: cover;
                 display: block;
             }
@@ -1077,7 +1078,7 @@
             }
             .product-detail.style-grouped .product-gallery-thumbs .swiper-slide {
                 width: 68px !important;
-                height: 85px !important;
+                height: 68px !important;
                 flex-shrink: 0;
                 border-radius: 12px;
                 overflow: hidden;
