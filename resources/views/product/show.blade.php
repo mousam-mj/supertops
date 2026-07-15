@@ -44,9 +44,14 @@
         $swatchPath = $swatchImages[$colorName] ?? $product->getSwatchImageForColor($colorName);
         if ($swatchPath) {
             $colorSwatchUrls[$colorName] = str_starts_with($swatchPath, 'http') ? $swatchPath : storage_asset($swatchPath);
+        } elseif (! empty($colorImageUrls[$colorName])) {
+            // Fall back to inventory/color product image so swatches aren't blank grey
+            $colorSwatchUrls[$colorName] = $colorImageUrls[$colorName];
         }
     }
-    $masterColorCodes = MasterColor::pluck('color_code', 'name')->toArray();
+    $masterColorCodes = MasterColor::pluck('color_code', 'name')
+        ->mapWithKeys(fn ($code, $name) => [strtolower(trim((string) $name)) => $code])
+        ->toArray();
     $hasColorSwatchImages = count($colorSwatchUrls) > 0;
     $variantPrices = [];
     $productPrice = (float) ($product->price ?? 0);
@@ -309,8 +314,8 @@
                                             @foreach($linkedVariantProducts as $variant)
                                                 @php
                                                     $color = $variant['color'];
-                                                    $swatchUrl = $variant['swatch_url'] ?? null;
-                                                    $hexCode = trim((string) ($masterColorCodes[$color] ?? ''));
+                                                    $swatchUrl = $variant['swatch_url'] ?? $variant['image_url'] ?? null;
+                                                    $hexCode = trim((string) ($masterColorCodes[strtolower(trim((string) $color))] ?? ''));
                                                     $isValidHex = $hexCode !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $hexCode);
                                                     $swatchStyle = (!$swatchUrl && $isValidHex) ? 'background-color: '.$hexCode.';' : ((!$swatchUrl) ? 'background-color: #e5e7eb;' : '');
                                                 @endphp
@@ -326,8 +331,8 @@
                                             @endforeach
                                             @foreach($availableColors as $color)
                                                 @php
-                                                    $swatchUrl = $colorSwatchUrls[$color] ?? null;
-                                                    $hexCode = trim((string) ($masterColorCodes[$color] ?? ''));
+                                                    $swatchUrl = $colorSwatchUrls[$color] ?? $colorImageUrls[$color] ?? null;
+                                                    $hexCode = trim((string) ($masterColorCodes[strtolower(trim((string) $color))] ?? ''));
                                                     $isValidHex = $hexCode !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $hexCode);
                                                     $swatchStyle = (!$swatchUrl && $isValidHex) ? 'background-color: '.$hexCode.';' : ((!$swatchUrl) ? 'background-color: #e5e7eb;' : '');
                                                 @endphp
