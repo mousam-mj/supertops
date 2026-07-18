@@ -48,6 +48,14 @@
                                     <small class="text-muted">Recommended: 280×80px PNG with transparent background. Max 2MB.</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="form-label">Favicon</label>
+                                    <div class="mb-2">
+                                        <img src="{{ !empty($settings['site_favicon']) ? storage_asset($settings['site_favicon']) : asset('favicon.ico') }}" alt="Favicon" style="width: 32px; height: 32px; object-fit: contain;">
+                                    </div>
+                                    <input type="file" name="site_favicon" class="form-control" accept=".ico,image/*">
+                                    <small class="text-muted">Recommended: square 32×32px or 64×64px icon. ICO, PNG, JPG, GIF, WEBP, or SVG. Max 1MB.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Contact Email</label>
                                     <input type="email" name="contact_email" class="form-control" value="{{ old('contact_email', $settings['contact_email'] ?? 'ecom@perchbottle.in') }}" placeholder="ecom@perchbottle.in">
                                 </div>

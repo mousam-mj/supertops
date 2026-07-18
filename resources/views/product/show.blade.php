@@ -202,7 +202,6 @@
     border-color: #000;
 }
 .product-detail.style-grouped .product-gallery-thumbs .swiper-slide img {
-    width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
@@ -359,7 +358,7 @@
                                 <div class="swiper-wrapper">
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
-                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover cursor-pointer" />
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="h-full object-cover cursor-pointer" />
                                         </div>
                                     @endforeach
                                 </div>

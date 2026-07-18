@@ -5,8 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <title>@yield('title', 'Perch Bottle')</title>
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon" />
-        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon" />
+        @php
+            $siteFavicon = \App\Models\Setting::get('site_favicon');
+            $siteFaviconUrl = $siteFavicon ? storage_asset($siteFavicon) : asset('favicon.ico');
+        @endphp
+        <link rel="shortcut icon" href="{{ $siteFaviconUrl }}" />
+        <link rel="icon" href="{{ $siteFaviconUrl }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/swiper-bundle.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
     <link rel="stylesheet" href="{{ asset('dist/output-scss.css') }}" />
@@ -761,6 +765,27 @@
         .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within .banner-img img {
             transform: scale(1.06);
             opacity: 1 !important;
+        }
+        .home-two-categories .banner-item.banner-zoom-only .banner-img,
+        .home-two-categories .banner-item.banner-zoom-only .banner-img img {
+            border-radius: inherit;
+        }
+        .home-two-categories .banner-item.banner-zoom-only .banner-img img {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .home-two-categories .banner-item.banner-zoom-only::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 18px;
+            z-index: 1;
+            background: var(--surface, #f5f5f5);
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+            pointer-events: none;
         }
         /* Best Sellers wide banner — zoom only, no dark hover overlay */
         .home-best-sellers-banner.banner-block .banner-item {

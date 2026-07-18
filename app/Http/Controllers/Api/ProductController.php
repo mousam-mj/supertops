@@ -132,6 +132,10 @@ class ProductController extends Controller
         }
         $images = $product->images && is_array($product->images) ? $product->images : [];
         $thumbImages = array_map($toFullUrl, array_merge([$primaryImage], array_filter($images, fn ($i) => $i !== $primaryImage)));
+        $regularPrice = (float) ($product->price ?? 0);
+        $salePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
+        $hasSale = $salePrice !== null && $salePrice > 0 && $salePrice < $regularPrice;
+        $displayPrice = $hasSale ? $salePrice : $regularPrice;
 
         return response()->json([
             'success' => true,
@@ -139,9 +143,9 @@ class ProductController extends Controller
                 'id' => (string) $product->id,
                 'name' => $product->name,
                 'slug' => $product->slug,
-                'price' => number_format((float) $product->price, 2, '.', ''),
-                'originPrice' => $product->sale_price ? number_format((float) $product->price, 2, '.', '') : null,
-                'sale' => (bool) ($product->sale_price && $product->sale_price < $product->price),
+                'price' => number_format($displayPrice, 2, '.', ''),
+                'originPrice' => $hasSale ? number_format($regularPrice, 2, '.', '') : null,
+                'sale' => $hasSale,
                 'new' => (bool) $product->is_new_arrival,
                 'thumbImage' => $thumbImages,
                 'sold' => 0,
@@ -193,7 +197,6 @@ class ProductController extends Controller
         ]);
     }
 }
-
 
 
 

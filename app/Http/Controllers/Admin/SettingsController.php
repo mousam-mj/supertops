@@ -70,6 +70,7 @@ class SettingsController extends Controller
         'general' => [
             'site_name',
             'site_logo',
+            'site_favicon',
             'contact_email',
             'contact_phone',
             'contact_address',
@@ -203,6 +204,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'site_name' => 'nullable|string|max:255',
             'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'site_favicon' => 'nullable|mimes:ico,jpeg,png,jpg,gif,webp,svg|max:1024',
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:50',
             'contact_address' => 'nullable|string|max:500',
@@ -314,6 +316,17 @@ class SettingsController extends Controller
             $validated['site_logo'] = $request->file('site_logo')->store('settings', 'public');
         } else {
             $validated['site_logo'] = Setting::get('site_logo', '');
+        }
+
+        // Handle favicon upload
+        if ($request->hasFile('site_favicon')) {
+            $oldFavicon = Setting::get('site_favicon');
+            if ($oldFavicon && Storage::disk('public')->exists($oldFavicon)) {
+                Storage::disk('public')->delete($oldFavicon);
+            }
+            $validated['site_favicon'] = $request->file('site_favicon')->store('settings', 'public');
+        } else {
+            $validated['site_favicon'] = Setting::get('site_favicon', '');
         }
 
         foreach ($this->homepageImageKeys as $imageKey) {

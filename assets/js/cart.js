@@ -1406,11 +1406,15 @@
                         if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
                         if (typeof window.updateWishlistIcons === 'function') window.updateWishlistIcons();
                         if (typeof window.showNotification === 'function') window.showNotification('Added to wishlist');
-                        var wm = document.querySelectorAll('.modal-wishlist-block .modal-wishlist-main');
-                        var modal = wm.length ? wm[wm.length - 1] : null;
-                        if (modal) {
-                            modal.classList.add('open');
-                            document.body.style.overflow = 'hidden';
+                        if (typeof window.openModalWishlist === 'function') {
+                            window.openModalWishlist();
+                        } else {
+                            var wm = document.querySelectorAll('.modal-wishlist-block .modal-wishlist-main');
+                            var modal = wm.length ? wm[wm.length - 1] : null;
+                            if (modal) {
+                                modal.classList.add('open');
+                                document.body.style.overflow = 'hidden';
+                            }
                         }
                     }
                 })

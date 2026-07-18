@@ -452,6 +452,28 @@ const handleItemModalWishlist = () => {
     listItemWishlist.innerHTML = `<p class='mt-1'>No product in wishlist</p>`;
   } else {
     items.forEach((item) => {
+      if (item && item.id && !item._wishlistPriceSynced) {
+        fetch(window.location.origin + "/api/products/by-id/" + item.id, {
+          headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin"
+        })
+          .then((r) => r.json())
+          .then((res) => {
+            if (!res.success || !res.data) return;
+            const latest = localStorage.getItem("wishlistStore");
+            const latestItems = latest ? JSON.parse(latest) : [];
+            if (!Array.isArray(latestItems)) return;
+            const nextItems = latestItems.map((storedItem) => (
+              String(storedItem.id) === String(res.data.id)
+                ? { ...storedItem, ...res.data, _wishlistPriceSynced: true }
+                : storedItem
+            ));
+            localStorage.setItem("wishlistStore", JSON.stringify(nextItems));
+            handleItemModalWishlist();
+          })
+          .catch(() => {});
+      }
+
       const prdItem = document.createElement("div");
       prdItem.setAttribute("data-item", item.id);
       prdItem.classList.add(
@@ -513,13 +535,14 @@ const updateWishlistIcons = () => {
   const wishlistIcons = document.querySelectorAll(".add-wishlist-btn");
   wishlistIcons.forEach((wishlistIcon) => {
     const productId = wishlistIcon
+      .getAttribute("data-product-id") || wishlistIcon
       .closest(".product-item")
       ?.getAttribute("data-item");
     const wishlistStore = localStorage.getItem("wishlistStore")
       ? JSON.parse(localStorage.getItem("wishlistStore"))
       : [];
     const isProductInWishlist = wishlistStore.some(
-      (item) => item.id === productId
+      (item) => String(item.id) === String(productId)
     );
     if (isProductInWishlist) {
       wishlistIcon.classList.add("active");
@@ -532,6 +555,9 @@ const updateWishlistIcons = () => {
     }
   });
 };
+
+window.handleItemModalWishlist = handleItemModalWishlist;
+window.updateWishlistIcons = updateWishlistIcons;
 
 handleItemModalWishlist();
 
