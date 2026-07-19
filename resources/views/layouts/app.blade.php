@@ -210,18 +210,43 @@
         .modal-search-block {
             pointer-events: none !important;
         }
+        .modal-search-block:not(:has(.modal-search-main.open)),
+        .modal-search-block:not(:has(.modal-search-main.open)) * {
+            pointer-events: none !important;
+        }
         .modal-search-block:has(.modal-search-main.open) {
             pointer-events: auto !important;
+        }
+        .modal-search-block:has(.modal-search-main.open) .modal-search-main,
+        .modal-search-block:has(.modal-search-main.open) .modal-search-main * {
+            pointer-events: auto;
+        }
+        /* grid-type cards force visibility:visible on CTAs — hide them when search modal is closed */
+        .modal-search-block:not(:has(.modal-search-main.open)) .product-card-actions,
+        .modal-search-block:not(:has(.modal-search-main.open)) .product-card-actions * {
+            visibility: hidden !important;
         }
         .modal-cart-block,
         .modal-wishlist-block,
         .modal-quickview-block {
             pointer-events: none !important;
         }
+        .modal-cart-block:not(:has(.modal-cart-main.open)),
+        .modal-cart-block:not(:has(.modal-cart-main.open)) *,
+        .modal-wishlist-block:not(:has(.modal-wishlist-main.open)),
+        .modal-wishlist-block:not(:has(.modal-wishlist-main.open)) *,
+        .modal-quickview-block:not(:has(.modal-quickview-main.open)),
+        .modal-quickview-block:not(:has(.modal-quickview-main.open)) * {
+            pointer-events: none !important;
+        }
         .modal-cart-block:has(.modal-cart-main.open),
         .modal-wishlist-block:has(.modal-wishlist-main.open),
         .modal-quickview-block:has(.modal-quickview-main.open) {
             pointer-events: auto !important;
+        }
+        .modal-cart-block:not(:has(.modal-cart-main.open)) .product-card-actions,
+        .modal-cart-block:not(:has(.modal-cart-main.open)) .product-card-actions * {
+            visibility: hidden !important;
         }
         .modal-search-block .search-modal-body {
             flex: 1 1 auto;

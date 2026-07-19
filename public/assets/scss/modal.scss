@@ -55,6 +55,12 @@
         pointer-events: auto;
     }
 
+    /* Closed: block all descendant pointer-events (grid-type CTAs set visibility:visible + pointer-events:auto) */
+    &:not(:has(.modal-newsletter-main.open)):not(:has(.modal-video-main.open)):not(:has(.modal-sizeguide-main.open)):not(:has(.modal-quickview-main.open)):not(:has(.modal-order-detail-main.open)):not(:has(.modal-cart-main.open)):not(:has(.modal-wishlist-main.open)):not(:has(.modal-search-main.open)),
+    &:not(:has(.modal-newsletter-main.open)):not(:has(.modal-video-main.open)):not(:has(.modal-sizeguide-main.open)):not(:has(.modal-quickview-main.open)):not(:has(.modal-order-detail-main.open)):not(:has(.modal-cart-main.open)):not(:has(.modal-wishlist-main.open)):not(:has(.modal-search-main.open)) * {
+        pointer-events: none !important;
+    }
+
     .modal-newsletter-main {
         width: 100%;
         transform: translateY(-100%);
