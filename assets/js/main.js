@@ -18,6 +18,12 @@ window.openModalWishlist = function () {
   }
 };
 
+window.formatInrPrice = function (value) {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n)) return "₹0.00";
+  return "₹" + n.toFixed(2);
+};
+
 // Table of contents
 /**** Select language, money top nav ****/
 /**** Add fixed header ****/
@@ -598,21 +604,8 @@ const closeModalCart = () => {
   }
 };
 
-if (addCartBtns && addCartBtns.length > 0) {
-  addCartBtns.forEach((item) => {
-    // Customizer uses its own /api/cart/add flow; opening the drawer here races before the line exists.
-    if (item.closest(".customize-page")) {
-      return;
-    }
-    // Product detail page has its own add-to-cart handler (show.blade.php)
-    if (item.closest(".product-detail .product-infor")) {
-      return;
-    }
-    item.addEventListener("click", () => {
-      openModalCart();
-    });
-  });
-}
+// Product listing cards: cart.js handles add-to-cart via /api/cart/add (capture phase).
+// Do not open an empty cart drawer on add-cart-btn click here.
 
 if (cartIcon) {
   cartIcon.addEventListener("click", openModalCart);
@@ -1504,7 +1497,7 @@ const handleItemModalCompare = () => {
                     </div>
                     <div class=''>
                         <div class="name text-title">${item.name}</div>
-                        <div class="product-price text-title mt-2">₹${item.price}.00</div>
+                        <div class="product-price text-title mt-2">${window.formatInrPrice(item.price)}</div>
                     </div>
                 </div>
                 <div
@@ -1628,8 +1621,8 @@ const handleItemModalQuickview = () => {
       }
     }
     modalQuickviewMain.querySelector('.product-infor .rate').innerHTML = arrOfStar
-    modalQuickviewMain.querySelector('.product-infor .product-price').innerHTML = '$' + item.price + '.00'
-    modalQuickviewMain.querySelector('.product-infor .product-origin-price del').innerHTML = '$' + item.originPrice + '.00'
+    modalQuickviewMain.querySelector('.product-infor .product-price').innerHTML = window.formatInrPrice(item.price)
+    modalQuickviewMain.querySelector('.product-infor .product-origin-price del').innerHTML = window.formatInrPrice(item.originPrice)
     modalQuickviewMain.querySelector('.product-infor .product-sale').innerHTML = '-' + Math.floor(100 - (item.price / item.originPrice) * 100) + '%'
     modalQuickviewMain.querySelector('.product-infor .desc').innerHTML = item.description
 
@@ -2012,16 +2005,16 @@ const createProductItem = (product) => {
     }
         <div
         class="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-        <div class="product-price text-title">$${product.price}.00</div>
-        ${Math.floor(100 - (product.price / product.originPrice) * 100) > 0
+        <div class="product-price text-title">${window.formatInrPrice(product.price)}</div>
+        ${product.originPrice && Math.floor(100 - (Number(product.price) / Number(product.originPrice)) * 100) > 0
       ? `
                 <div class="product-origin-price caption1 text-secondary2">
-                    <del>$${product.originPrice}.00</del>
+                    <del>${window.formatInrPrice(product.originPrice)}</del>
                 </div>
                 <div
                     class="product-sale caption1 font-medium bg-green px-3 py-0.5 inline-block rounded-full">
                     -${Math.floor(
-        100 - (product.price / product.originPrice) * 100
+        100 - (Number(product.price) / Number(product.originPrice)) * 100
       )}%
                 </div>
         `
@@ -2880,7 +2873,7 @@ const createProductItemMarketplace = (product) => {
                         <div class="flex gap-0.5 mt-1">
                             ${arrOfStar}
                         </div>
-                        <span class="text-title inline-block mt-1">$${product.price}.00</span>
+                        <span class="text-title inline-block mt-1">${window.formatInrPrice(product.price)}</span>
                     </div>
     `;
 
@@ -3568,7 +3561,7 @@ if (listProductCompare) {
       );
       priceElement.innerHTML = `
                 <div class='price-item h-full flex items-center justify-center'>
-                    $${product.price}.00
+                    ${window.formatInrPrice(product.price)}
                 </div>
             `;
 
@@ -3726,7 +3719,7 @@ const handleInforCart = () => {
                     </div>
                 </div>
                 <div class="w-1/12 price flex items-center justify-center">
-                    <div class="text-title text-center">$${product.price}.00</div>
+                    <div class="text-title text-center">${window.formatInrPrice(product.price)}</div>
                 </div>
                 <div class="w-1/6 flex items-center justify-center">
                     <div
@@ -3737,7 +3730,7 @@ const handleInforCart = () => {
                     </div>
                 </div>
                 <div class="w-1/6 flex total-price items-center justify-center">
-                    <div class="text-title text-center">$${product.price}.00
+                    <div class="text-title text-center">${window.formatInrPrice(product.quantityPurchase * product.price)}
                     </div>
                 </div>
                 <div class="w-1/12 flex items-center justify-center">
@@ -3753,7 +3746,7 @@ const handleInforCart = () => {
       );
 
       const syncLineTotal = () => {
-        totalPriceProduct.textContent = `₹${product.quantityPurchase * product.price}.00`;
+        totalPriceProduct.textContent = window.formatInrPrice(product.quantityPurchase * product.price);
       };
 
       quantityBlock.querySelector(".ph-plus").addEventListener("click", () => {
@@ -3876,7 +3869,7 @@ if (listProductCheckout) {
                     <span class='quantity'>${product.quantityPurchase}</span>
                     <span class='px-1'>x</span>
                     <span>
-                        ₹${product.price}.00
+                        ${window.formatInrPrice(product.price)}
                     </span>
                 </div>
             </div>
@@ -3886,7 +3879,7 @@ if (listProductCheckout) {
     totalCart += product.price * product.quantityPurchase;
     document.querySelector(
       ".total-cart-block .total-cart"
-    ).innerHTML = `₹${totalCart}.00`;
+    ).innerHTML = window.formatInrPrice(totalCart);
   });
 }
 

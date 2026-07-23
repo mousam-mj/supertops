@@ -36,7 +36,12 @@
             </a>
         </div>
 
+        @php
+            $realStock = max(0, (int) ($product->stock_quantity ?? 0));
+            $isInStock = ($product->in_stock ?? true) && $realStock > 0;
+        @endphp
         <div class="product-card-actions list-action grid grid-cols-2 gap-2 mt-3">
+            @if($isInStock)
             <div class="add-cart-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2" data-product-id="{{ $product->id ?? '' }}">
                 <i class="ph ph-shopping-cart-simple text-lg shrink-0" aria-hidden="true"></i>
                 <span class="btn-label-full">Add To Cart</span>
@@ -47,15 +52,27 @@
                 <span class="btn-label-full">Buy Now</span>
                 <span class="btn-label-short">Buy</span>
             </a>
+            @else
+            <div class="add-cart-btn is-out-of-stock w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line opacity-50 cursor-not-allowed select-none flex items-center justify-center gap-2" data-product-id="{{ $product->id ?? '' }}" data-out-of-stock="1" aria-disabled="true">
+                <i class="ph ph-x-circle text-lg shrink-0" aria-hidden="true"></i>
+                <span class="btn-label-full">Out of Stock</span>
+                <span class="btn-label-short">Sold Out</span>
+            </div>
+            <a href="{{ route('product.show', $product->slug ?? '#') }}" class="buy-now-btn w-full text-button-uppercase py-2.5 px-3 text-center rounded-full duration-300 bg-white border border-line hover:bg-black hover:text-white cursor-pointer select-none flex items-center justify-center gap-2 no-underline text-inherit">
+                <i class="ph ph-eye text-lg shrink-0" aria-hidden="true"></i>
+                <span class="btn-label-full">View Product</span>
+                <span class="btn-label-short">View</span>
+            </a>
+            @endif
         </div>
         
         <div class="product-infor mt-3 lg:mb-7">
             <div class="product-sold sm:pb-4 pb-2">
                 @php
-                    $stockQuantity = max(1, (int) ($product->stock_quantity ?? 100));
+                    $stockQuantity = $realStock > 0 ? $realStock : 1;
                     $soldSeed = crc32((string) ($product->id ?? $product->slug ?? '0'));
-                    $sold = 10 + ($soldSeed % max(1, min(40, $stockQuantity - 10)));
-                    $available = max(0, $stockQuantity - $sold);
+                    $sold = $realStock > 0 ? (10 + ($soldSeed % max(1, min(40, $stockQuantity - 10)))) : 0;
+                    $available = $realStock > 0 ? max(0, $stockQuantity - $sold) : 0;
                     $soldPercentage = $stockQuantity > 0 ? ($sold / $stockQuantity) * 100 : 0;
                 @endphp
                 <div class="progress bg-line h-1.5 w-full rounded-full overflow-hidden relative">

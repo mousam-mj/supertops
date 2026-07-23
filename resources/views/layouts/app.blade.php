@@ -434,7 +434,8 @@
             gap: 0.5rem;
         }
         .product-item.grid-type .product-card-actions .add-cart-btn,
-        .product-item.grid-type .product-card-actions .buy-now-btn {
+        .product-item.grid-type .product-card-actions .buy-now-btn,
+        .product-item.grid-type .product-card-actions .product-card-action-btn {
             width: 100%;
             height: auto;
             min-height: 40px;
@@ -446,6 +447,7 @@
             line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
             letter-spacing: 0.02em;
         }
         .product-item.grid-type .product-card-actions .btn-label-short {
@@ -459,14 +461,16 @@
                 gap: 0.375rem;
             }
             .product-item.grid-type .product-card-actions .add-cart-btn,
-            .product-item.grid-type .product-card-actions .buy-now-btn {
+            .product-item.grid-type .product-card-actions .buy-now-btn,
+            .product-item.grid-type .product-card-actions .product-card-action-btn {
                 min-height: 36px;
                 padding: 8px 6px !important;
                 font-size: 0.625rem;
                 gap: 0.25rem !important;
             }
             .product-item.grid-type .product-card-actions .add-cart-btn i,
-            .product-item.grid-type .product-card-actions .buy-now-btn i {
+            .product-item.grid-type .product-card-actions .buy-now-btn i,
+            .product-item.grid-type .product-card-actions .product-card-action-btn i {
                 font-size: 0.9375rem;
             }
             .product-item.grid-type .product-card-actions .btn-label-full {
@@ -478,7 +482,8 @@
         }
         @media (min-width: 640px) {
             .product-item.grid-type .product-card-actions .add-cart-btn,
-            .product-item.grid-type .product-card-actions .buy-now-btn {
+            .product-item.grid-type .product-card-actions .buy-now-btn,
+            .product-item.grid-type .product-card-actions .product-card-action-btn {
                 font-size: 0.75rem;
             }
         }

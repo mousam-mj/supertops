@@ -1297,7 +1297,21 @@
         // Add to cart from product detail page
         let isAddingToCart = false; // Prevent double clicks
 
+        function extractCartErrorMessage(data, status) {
+            if (typeof window.extractCartErrorMessage === 'function') {
+                return window.extractCartErrorMessage(data, status);
+            }
+            if (data && data.message) return String(data.message);
+            return 'Failed to add product to cart. Please try again.';
+        }
+
         function productPageNotify(message, type) {
+            if (type === 'error') {
+                if (typeof window.showCartAlert === 'function') {
+                    window.showCartAlert(message);
+                    return;
+                }
+            }
             if (typeof window.showNotification === 'function') {
                 window.showNotification(message, type || 'success');
                 return;
@@ -1408,7 +1422,7 @@
                         }
                     }
                 } else {
-                    productPageNotify(data.message || 'Failed to add product to cart', 'error');
+                    productPageNotify(extractCartErrorMessage(data, result.status), 'error');
                 }
             })
             .catch(function(error) {
@@ -1476,7 +1490,7 @@
                     if (typeof window.updateCartCount === 'function') window.updateCartCount();
                     window.location.href = checkoutUrl;
                 } else {
-                    productPageNotify(data.message || 'Failed to add product', 'error');
+                    productPageNotify(extractCartErrorMessage(data, result.status), 'error');
                     buyBtn.innerHTML = originalText;
                     buyBtn.disabled = false;
                     buyBtn.style.pointerEvents = '';

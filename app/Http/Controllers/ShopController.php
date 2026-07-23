@@ -222,7 +222,7 @@ class ShopController extends Controller
             ->orderBy('sort_order')
             ->get();
         
-        // Featured products for this main category only
+        // Featured products for this main category only (in stock first)
         $featuredProducts = Product::where('is_active', true)
             ->where('is_featured', true)
             ->when($mainCategory, function ($query) use ($mainCategory) {
@@ -230,6 +230,8 @@ class ShopController extends Controller
                     $q->where('main_category_id', $mainCategory->id);
                 });
             })
+            ->orderByRaw('CASE WHEN stock_quantity > 0 AND in_stock = 1 THEN 0 ELSE 1 END')
+            ->orderByDesc('created_at')
             ->with('category.mainCategory')
             ->limit(12)
             ->get();

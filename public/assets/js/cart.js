@@ -44,13 +44,18 @@
             e.preventDefault();
             e.stopPropagation();
 
+            if (addCartBtn.getAttribute('data-out-of-stock') === '1' || addCartBtn.classList.contains('is-out-of-stock')) {
+                showCartAlert('This item is out of stock.');
+                return;
+            }
+
             let productId = addCartBtn.getAttribute('data-product-id');
             if (!productId || String(productId).trim() === '') {
                 const productItem = addCartBtn.closest('.product-item');
                 productId = productItem ? productItem.getAttribute('data-item') : null;
             }
             if (!productId || String(productId).trim() === '') {
-                showNotification('Could not add this product. Please try again or open the product page.', 'error');
+                showCartAlert('Could not add this product. Please try again or open the product page.');
                 return;
             }
             productId = String(productId).trim();
@@ -59,9 +64,10 @@
             isAddingToCart = true;
 
             // Get size and color if available
-            const sizeItem = addCartBtn.closest('.product-item')?.querySelector('.size-item.active');
-            const colorItem = addCartBtn.closest('.product-item')?.querySelector('.color-item.active');
-            
+            const productItem = addCartBtn.closest('.product-item');
+            const sizeItem = productItem?.querySelector('.size-item.active') || productItem?.querySelector('.size-item');
+            const colorItem = productItem?.querySelector('.color-item.active') || productItem?.querySelector('.color-item');
+
             const size = sizeItem?.getAttribute('data-size') || null;
             const color = colorItem?.getAttribute('data-color') || null;
 
@@ -113,7 +119,7 @@
             .then(function(result) {
                 var data = result.data;
                 if (result.status === 401 || result.status === 403 || (data && (data.message === 'Unauthorized' || data.message === 'Unauthenticated.'))) {
-                    showNotification('Session expired or cart changed. Please refresh the page and try again.', 'error');
+                    showCartAlert('Session expired or cart changed. Please refresh the page and try again.');
                     if (typeof updateCartCount === 'function') updateCartCount();
                     if (typeof loadCartItems === 'function') loadCartItems();
                     return;
@@ -128,12 +134,12 @@
                         if (typeof loadCartItems === 'function') loadCartItems();
                     }
                 } else {
-                    showNotification(data && data.message ? data.message : 'Failed to add product to cart', 'error');
+                    showCartAlert(extractCartErrorMessage(data, result.status));
                 }
             })
             .catch(function(error) {
                 console.error('Error:', error);
-                showNotification('An error occurred. Please try again.', 'error');
+                showCartAlert('An error occurred. Please try again.');
             })
             .finally(() => {
                 // Always reset button state
@@ -764,16 +770,71 @@
         if (cartId) removeCartItem(cartId);
     }, true);
 
+    function extractCartErrorMessage(data, status) {
+        if (data && data.message) return String(data.message);
+        if (data && data.errors && typeof data.errors === 'object') {
+            var parts = [];
+            Object.keys(data.errors).forEach(function(key) {
+                var val = data.errors[key];
+                if (Array.isArray(val) && val[0]) parts.push(String(val[0]));
+                else if (typeof val === 'string') parts.push(val);
+            });
+            if (parts.length) return parts.join(' ');
+        }
+        if (status === 419) return 'Page session expired. Please refresh and try again.';
+        return 'Failed to add product to cart. Please try again.';
+    }
+
+    function showCartAlert(message, title) {
+        var msg = String(message || 'Something went wrong. Please try again.');
+        var heading = title || 'Could not add to cart';
+
+        var existing = document.getElementById('cart-alert-popup');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'cart-alert-popup';
+        overlay.className = 'cart-alert-popup fixed inset-0 z-[9999] flex items-center justify-center p-4';
+        overlay.innerHTML =
+            '<div class="cart-alert-backdrop absolute inset-0 bg-black/50" aria-hidden="true"></div>' +
+            '<div class="cart-alert-dialog relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 z-10" role="alertdialog" aria-labelledby="cart-alert-title" aria-describedby="cart-alert-message">' +
+                '<div class="flex items-start gap-3 mb-5">' +
+                    '<i class="ph ph-warning-circle text-3xl text-red shrink-0 mt-0.5" aria-hidden="true"></i>' +
+                    '<div class="min-w-0">' +
+                        '<h3 id="cart-alert-title" class="text-title font-semibold">' + escapeHtml(heading) + '</h3>' +
+                        '<p id="cart-alert-message" class="text-secondary mt-2 leading-relaxed">' + escapeHtml(msg) + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<button type="button" class="cart-alert-ok button-main w-full text-center rounded-full py-3 bg-black text-white">OK</button>' +
+            '</div>';
+
+        function closeAlert() {
+            overlay.remove();
+            if (!document.querySelector('.modal-cart-main.open, .modal-quickview-main.open, .modal-search-main.open')) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        overlay.querySelector('.cart-alert-backdrop').addEventListener('click', closeAlert);
+        overlay.querySelector('.cart-alert-ok').addEventListener('click', closeAlert);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+        overlay.querySelector('.cart-alert-ok').focus();
+    }
+
     // Show notification
     function showNotification(message, type = 'success') {
+        if (type === 'error') {
+            showCartAlert(message);
+            return;
+        }
+
         // Remove existing notifications
         const existing = document.querySelector('.notification');
         if (existing) existing.remove();
 
         const notification = document.createElement('div');
-        notification.className = `notification fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg ${
-            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-        }`;
+        notification.className = 'notification fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg bg-green-500 text-white';
         notification.textContent = message;
         document.body.appendChild(notification);
 
@@ -1476,6 +1537,8 @@
     window.loadCheckoutCartItems = loadCheckoutCartItems;
     window.removeCartItem = removeCartItem;
     window.showNotification = showNotification;
+    window.showCartAlert = showCartAlert;
+    window.extractCartErrorMessage = extractCartErrorMessage;
     window.openQuickView = function(slug) { if(slug) loadQuickViewProductBySlug(slug); };
 
     // Run when DOM is ready

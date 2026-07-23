@@ -73,6 +73,12 @@ class Product extends Model
                 $product->sku = 'PROD-' . strtoupper(Str::random(8));
             }
         });
+
+        static::saving(function ($product) {
+            if ($product->isDirty('stock_quantity')) {
+                $product->in_stock = (int) $product->stock_quantity > 0;
+            }
+        });
     }
 
     public function category()
