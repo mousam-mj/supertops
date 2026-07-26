@@ -16,8 +16,93 @@
         else el.textContent = String(n);
     }
 
+    function readProductDetailVariant(productInfor) {
+        if (!productInfor) return { size: null, color: null };
+        var selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
+        var selectedColorItem = productInfor.querySelector('.color-item.active');
+        var size = selectedSizeItem ? selectedSizeItem.getAttribute('data-size') : null;
+        var color = selectedColorItem ? selectedColorItem.getAttribute('data-color') : null;
+        if (!size) {
+            size = productInfor.getAttribute('data-default-size') || null;
+        }
+        size = size && String(size).trim() !== '' ? String(size).trim() : null;
+        color = color && String(color).trim() !== '' ? String(color).trim() : null;
+        return { size: size, color: color };
+    }
+
+    function parseCartApiResponse(response) {
+        var contentType = response.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') !== -1) {
+            return response.json().then(function(data) {
+                return { ok: response.ok, status: response.status, data: data || {} };
+            });
+        }
+        var msg = response.status === 419
+            ? 'Page session expired. Please refresh and try again.'
+            : 'Please refresh the page and try again.';
+        return Promise.resolve({ ok: false, status: response.status, data: { success: false, message: msg } });
+    }
+
+    function postCartAdd(payload) {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        return fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        }).then(parseCartApiResponse);
+    }
+
+    function setActionButtonLoading(btn, loading, loadingHtml) {
+        if (!btn) return function() {};
+        if (loading) {
+            btn._cartOrigHtml = btn.innerHTML;
+            btn._cartOrigDisabled = btn.disabled;
+            btn.innerHTML = loadingHtml || '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
+            btn.disabled = true;
+            btn.style.pointerEvents = 'none';
+            return function reset() {
+                btn.innerHTML = btn._cartOrigHtml;
+                btn.disabled = btn._cartOrigDisabled;
+                btn.style.pointerEvents = '';
+            };
+        }
+        return function reset() {};
+    }
+
+    function handleCartAddSuccess(openDrawer) {
+        if (typeof updateCartCount === 'function') updateCartCount();
+        showNotification('Product added to cart!', 'success');
+        if (openDrawer !== false) {
+            var allCart = document.querySelectorAll('.modal-cart-block .modal-cart-main');
+            var cartModalMain = allCart.length ? allCart[allCart.length - 1] : null;
+            if (cartModalMain) {
+                cartModalMain.classList.add('open');
+                document.body.style.overflow = 'hidden';
+                if (typeof loadCartItems === 'function') loadCartItems();
+            }
+        }
+    }
+
+    function handleCartAddFailure(result) {
+        var data = result.data || {};
+        if (result.status === 401 || result.status === 403 || (data.message === 'Unauthorized' || data.message === 'Unauthenticated.')) {
+            showCartAlert('Session expired or cart changed. Please refresh the page and try again.');
+            if (typeof updateCartCount === 'function') updateCartCount();
+            if (typeof loadCartItems === 'function') loadCartItems();
+            return;
+        }
+        showCartAlert(extractCartErrorMessage(data, result.status));
+    }
+
     // Add to cart functionality
     let isAddingToCart = false; // Prevent double clicks
+    let isBuyItNow = false;
     
     function initAddToCart() {
         // Use capture phase so we run before main.js Quick View modal's stopPropagation (which blocks bubble)
@@ -27,11 +112,6 @@
 
             if (addCartBtn.closest('.customize-page')) {
                 return;
-            }
-
-            // Skip only on product detail page (full page), not inside Quick View modal
-            if (addCartBtn.closest('.product-infor') && !addCartBtn.closest('.modal-quickview-block')) {
-                return; // Let product detail page handler take care of it
             }
 
             // Prevent double clicks
@@ -50,6 +130,9 @@
             }
 
             let productId = addCartBtn.getAttribute('data-product-id');
+            const productInfor = addCartBtn.closest('.product-infor');
+            const isProductDetail = !!(productInfor && productInfor.closest('.product-detail') && !addCartBtn.closest('.modal-quickview-block'));
+
             if (!productId || String(productId).trim() === '') {
                 const productItem = addCartBtn.closest('.product-item');
                 productId = productItem ? productItem.getAttribute('data-item') : null;
@@ -60,95 +143,118 @@
             }
             productId = String(productId).trim();
 
-            // Set flag to prevent double clicks
-            isAddingToCart = true;
-
-            // Get size and color if available
-            const productItem = addCartBtn.closest('.product-item');
-            const sizeItem = productItem?.querySelector('.size-item.active') || productItem?.querySelector('.size-item');
-            const colorItem = productItem?.querySelector('.color-item.active') || productItem?.querySelector('.color-item');
-
-            const size = sizeItem?.getAttribute('data-size') || null;
-            const color = colorItem?.getAttribute('data-color') || null;
-
-            // Quantity: from Quick View modal if this button is inside it, else 1
             var quantity = 1;
-            var qvModal = addCartBtn.closest('.modal-quickview-main');
-            if (qvModal) {
-                var qtyEl = qvModal.querySelector('.choose-quantity .quantity');
+            var size = null;
+            var color = null;
+
+            if (isProductDetail && productInfor) {
+                var qtyEl = productInfor.querySelector('.quantity-block .quantity');
                 if (qtyEl) quantity = readQtyControl(qtyEl);
+                var variant = readProductDetailVariant(productInfor);
+                size = variant.size;
+                color = variant.color;
+            } else {
+                const productItem = addCartBtn.closest('.product-item');
+                const sizeItem = productItem?.querySelector('.size-item.active') || productItem?.querySelector('.size-item');
+                const colorItem = productItem?.querySelector('.color-item.active') || productItem?.querySelector('.color-item');
+                size = sizeItem?.getAttribute('data-size') || null;
+                color = colorItem?.getAttribute('data-color') || null;
+                var qvModal = addCartBtn.closest('.modal-quickview-main');
+                if (qvModal) {
+                    var qvQtyEl = qvModal.querySelector('.choose-quantity .quantity');
+                    if (qvQtyEl) quantity = readQtyControl(qvQtyEl);
+                }
             }
 
-            // Show loading state
-            const originalText = addCartBtn.innerHTML;
-            const originalDisabled = addCartBtn.disabled;
-            addCartBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
-            addCartBtn.disabled = true;
-            addCartBtn.style.pointerEvents = 'none';
+            isAddingToCart = true;
+            var resetBtn = setActionButtonLoading(addCartBtn, true);
 
-            // Get CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            
-            // Make API call
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    product_id: parseInt(productId, 10),
-                    quantity: quantity,
-                    size: size,
-                    color: color
-                })
-            })
-            .then(function(response) {
-                var contentType = response.headers.get('content-type');
-                if (contentType && contentType.indexOf('application/json') !== -1) {
-                    return response.json().then(function(data) {
-                        return { ok: response.ok, status: response.status, data: data };
-                    });
-                }
-                var msg = response.status === 419 ? 'Page session expired. Please refresh and try again.' : 'Please refresh the page and try again.';
-                return Promise.resolve({ ok: false, status: response.status, data: { success: false, message: msg } });
+            postCartAdd({
+                product_id: parseInt(productId, 10),
+                quantity: quantity,
+                size: size,
+                color: color
             })
             .then(function(result) {
-                var data = result.data;
-                if (result.status === 401 || result.status === 403 || (data && (data.message === 'Unauthorized' || data.message === 'Unauthenticated.'))) {
-                    showCartAlert('Session expired or cart changed. Please refresh the page and try again.');
-                    if (typeof updateCartCount === 'function') updateCartCount();
-                    if (typeof loadCartItems === 'function') loadCartItems();
-                    return;
-                }
-                if (data && data.success) {
-                    if (typeof updateCartCount === 'function') updateCartCount();
-                    showNotification('Product added to cart!', 'success');
-                    const allCart = document.querySelectorAll('.modal-cart-block .modal-cart-main');
-                    const cartModalMain = allCart.length ? allCart[allCart.length - 1] : null;
-                    if (cartModalMain) {
-                        cartModalMain.classList.add('open');
-                        if (typeof loadCartItems === 'function') loadCartItems();
-                    }
+                if (result.data && result.data.success) {
+                    handleCartAddSuccess(true);
                 } else {
-                    showCartAlert(extractCartErrorMessage(data, result.status));
+                    handleCartAddFailure(result);
                 }
             })
             .catch(function(error) {
                 console.error('Error:', error);
                 showCartAlert('An error occurred. Please try again.');
             })
-            .finally(() => {
-                // Always reset button state
-                addCartBtn.innerHTML = originalText;
-                addCartBtn.disabled = originalDisabled;
-                addCartBtn.style.pointerEvents = '';
+            .finally(function() {
+                resetBtn();
                 isAddingToCart = false;
             });
         }, true); // capture phase: run before modal's stopPropagation so Quick View Add to Cart works
+    }
+
+    function initBuyItNow() {
+        document.addEventListener('click', function(e) {
+            var buyBtn = e.target.closest('.buy-it-now-btn');
+            if (!buyBtn) return;
+            var productInfor = buyBtn.closest('.product-infor');
+            if (!productInfor || !productInfor.closest('.product-detail')) return;
+            if (isBuyItNow || buyBtn.disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+
+            var productId = buyBtn.getAttribute('data-product-id');
+            var checkoutUrl = buyBtn.getAttribute('data-checkout-url') || '/checkout';
+            if (!productId) {
+                showCartAlert('Could not buy this product. Please refresh and try again.');
+                return;
+            }
+
+            var variant = readProductDetailVariant(productInfor);
+            var qtyEl = productInfor.querySelector('.quantity-block .quantity');
+            var quantity = qtyEl ? readQtyControl(qtyEl) : 1;
+
+            isBuyItNow = true;
+            var resetBtn = setActionButtonLoading(buyBtn, true);
+
+            postCartAdd({
+                product_id: parseInt(productId, 10),
+                quantity: quantity,
+                size: variant.size,
+                color: variant.color
+            })
+            .then(function(result) {
+                if (result.data && result.data.success) {
+                    if (typeof updateCartCount === 'function') updateCartCount();
+                    window.location.href = checkoutUrl;
+                } else {
+                    handleCartAddFailure(result);
+                    resetBtn();
+                    isBuyItNow = false;
+                }
+            })
+            .catch(function(err) {
+                console.error('Buy It Now error:', err);
+                showCartAlert('An error occurred. Please try again.');
+                resetBtn();
+                isBuyItNow = false;
+            });
+        }, true);
+    }
+
+    function initBuyQueryParam() {
+        try {
+            if (new URLSearchParams(window.location.search).get('buy') !== '1') return;
+            if (!document.querySelector('.product-detail .product-infor')) return;
+            window.setTimeout(function() {
+                var buyBtn = document.querySelector('.product-detail .product-infor .buy-it-now-btn');
+                if (buyBtn && !buyBtn.disabled) buyBtn.click();
+            }, 400);
+        } catch (err) { /* ignore */ }
     }
 
     // Quick View modal: size and color selection (toggle .active)
@@ -1489,6 +1595,8 @@
     // Initialize all functionality
     function init() {
         initAddToCart();
+        initBuyItNow();
+        initBuyQueryParam();
         initQuickView();
         initQuickViewSizeColor();
         initWishlistBtn();

@@ -206,3 +206,105 @@ if (! function_exists('banner_text_align_flex_class')) {
         };
     }
 }
+
+if (! function_exists('product_search_has_results')) {
+    /**
+     * Whether any active product matches a search term.
+     */
+    function product_search_has_results(string $term): bool
+    {
+        $term = trim($term);
+        if ($term === '') {
+            return false;
+        }
+
+        return \App\Models\Product::query()
+            ->where('is_active', true)
+            ->searchTerm($term)
+            ->exists();
+    }
+}
+
+if (! function_exists('popular_search_suggestions')) {
+    /**
+     * Popular search chips for the search modal — categories and terms that match real inventory.
+     *
+     * @return array<int, array{label: string, url: string}>
+     */
+    function popular_search_suggestions(int $limit = 6): array
+    {
+        $suggestions = [];
+        $seen = [];
+
+        $add = function (string $label, string $url) use (&$suggestions, &$seen, $limit): void {
+            $key = strtolower(trim($label));
+            if ($key === '' || isset($seen[$key]) || count($suggestions) >= $limit) {
+                return;
+            }
+
+            $seen[$key] = true;
+            $suggestions[] = ['label' => $label, 'url' => $url];
+        };
+
+        foreach (\App\Models\MainCategory::visible()->orderBy('sort_order')->get() as $mainCategory) {
+            $add($mainCategory->name, route('category', $mainCategory->slug));
+        }
+
+        foreach (\App\Models\Category::query()
+            ->where('is_active', true)
+            ->whereNotNull('parent_id')
+            ->orderBy('sort_order')
+            ->get() as $category) {
+            $add($category->name, route('category', $category->slug));
+        }
+
+        foreach (\App\Models\MainCategory::visible()->orderBy('sort_order')->get() as $mainCategory) {
+            foreach ($mainCategory->banner_texts ?? [] as $bannerText) {
+                $label = trim((string) $bannerText);
+                if ($label !== '' && product_search_has_results($label)) {
+                    $add($label, route('search', ['q' => $label]));
+                }
+            }
+        }
+
+        foreach (['Bottle', 'Insulated', 'Tumbler', 'Whiskey', 'Cocktail', 'Flask', 'Bar'] as $priorityTerm) {
+            if (product_search_has_results($priorityTerm)) {
+                $add($priorityTerm, route('search', ['q' => $priorityTerm]));
+            }
+        }
+
+        $wordCounts = [];
+        $productTerms = \App\Models\Product::query()
+            ->where('is_active', true)
+            ->orderByDesc('created_at')
+            ->limit(60)
+            ->pluck('name');
+
+        $stopWords = [
+            'with', 'and', 'the', 'for', 'set', 'piece', 'pieces', 'print', 'leatherette',
+            'suitcase', 'army', 'crocodile', 'natural', 'flavors', 'flavour', 'flavours',
+            'rose', 'gold', 'golden', 'silver', 'black', 'white',
+        ];
+
+        foreach ($productTerms as $productName) {
+            foreach (preg_split('/[^a-zA-Z0-9]+/', (string) $productName) ?: [] as $word) {
+                $word = strtolower($word);
+                if (strlen($word) < 4 || in_array($word, $stopWords, true)) {
+                    continue;
+                }
+
+                $wordCounts[$word] = ($wordCounts[$word] ?? 0) + 1;
+            }
+        }
+
+        arsort($wordCounts);
+
+        foreach (array_keys($wordCounts) as $word) {
+            if (product_search_has_results($word)) {
+                $add(ucfirst($word), route('search', ['q' => $word]));
+            }
+        }
+
+        return array_slice($suggestions, 0, $limit);
+    }
+}

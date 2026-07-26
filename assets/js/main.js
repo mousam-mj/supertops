@@ -19,7 +19,9 @@ window.openModalWishlist = function () {
 };
 
 window.formatInrPrice = function (value) {
-  const n = parseFloat(value);
+  if (value == null || value === "") return "₹0.00";
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  const n = parseFloat(cleaned);
   if (!Number.isFinite(n)) return "₹0.00";
   return "₹" + n.toFixed(2);
 };
@@ -503,8 +505,8 @@ const handleItemModalWishlist = () => {
                     <div class=''>
                         <div class="name text-button">${item.name || 'Product'}</div>
                         <div class="flex items-center gap-2 mt-2">
-                            <div class="product-price text-title">₹${(item.price != null ? Number(item.price).toFixed(2) : '0.00')}</div>
-                            ${item.originPrice != null ? `<div class="product-origin-price text-title text-secondary2"><del>₹${Number(item.originPrice).toFixed(2)}</del></div>` : ''}
+                            <div class="product-price text-title">${window.formatInrPrice(item.price)}</div>
+                            ${item.originPrice != null ? `<div class="product-origin-price text-title text-secondary2"><del>${window.formatInrPrice(item.originPrice)}</del></div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -3446,9 +3448,10 @@ if (layoutProductList && chooseLayoutItems) {
 }
 
 // Display wishlist, cart, compare item from localStorage
-const listProductWishlist = document.querySelector(
-  ".wishlist-block .list-product"
-);
+// Wishlist page uses its own renderer (#wishlist-product-list)
+const listProductWishlist = document.getElementById("wishlist-product-list")
+  ? null
+  : document.querySelector(".wishlist-block .list-product");
 const cartPage = document.querySelector(".cart-block");
 const checkoutPage = document.querySelector(".checkout-block");
 const listProductCheckout = document.querySelector(

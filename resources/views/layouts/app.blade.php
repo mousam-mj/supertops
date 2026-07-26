@@ -244,6 +244,12 @@
         .modal-quickview-block:has(.modal-quickview-main.open) {
             pointer-events: auto !important;
         }
+        #wishlist-product-list .remove-from-wishlist {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+        #wishlist-product-list .product-tag {
+            z-index: 2;
+        }
         .modal-cart-block:not(:has(.modal-cart-main.open)) .product-card-actions,
         .modal-cart-block:not(:has(.modal-cart-main.open)) .product-card-actions * {
             visibility: hidden !important;
@@ -487,10 +493,15 @@
                 font-size: 0.75rem;
             }
         }
-        /* Best Sellers tabs: hide mobile scrollbar under the pill menu */
+        /* Best Sellers tabs — mobile segmented control */
+        #home-best-sellers-section .heading {
+            width: 100%;
+            padding-inline: 0.25rem;
+        }
         #home-best-sellers-section .menu-tab {
             max-width: 100%;
-            overflow-x: auto;
+            width: 100%;
+            overflow: hidden;
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
@@ -500,17 +511,46 @@
             height: 0;
         }
         #home-best-sellers-section .menu-tab .menu {
-            justify-content: center;
-            width: max-content;
+            justify-content: stretch;
+            width: 100%;
             max-width: 100%;
             margin-inline: auto;
         }
-        @media (max-width: 639.98px) {
+        #home-best-sellers-section .menu-tab .tab-item {
+            z-index: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #home-best-sellers-section .menu-tab .tab-item.active {
+            color: var(--black, #000);
+        }
+        #home-best-sellers-section .menu-tab .indicator {
+            border-radius: 9999px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        @media (max-width: 767.98px) {
+            #home-best-sellers-section .menu-tab .menu {
+                gap: 0.2rem;
+            }
             #home-best-sellers-section .menu-tab .tab-item {
-                padding-left: 0.7rem;
-                padding-right: 0.7rem;
-                font-size: 0.8125rem;
-                line-height: 1.25;
+                flex: 1 1 0;
+                min-width: 0;
+                padding-left: 0.35rem;
+                padding-right: 0.35rem;
+                font-size: 0.6875rem;
+                line-height: 1.15;
+                letter-spacing: 0.03em;
+            }
+        }
+        @media (min-width: 768px) {
+            #home-best-sellers-section .menu-tab .menu {
+                width: max-content;
+                max-width: 100%;
+            }
+            #home-best-sellers-section .menu-tab .tab-item {
+                flex: 0 1 auto;
             }
         }
         .menu-tab {
@@ -535,19 +575,37 @@
         .tab-features-block .list-product.six-product .product-item .product-main {
             height: auto;
         }
-        /* Collapse reserved sold-block / bottom gap under related cards */
+        /* Related products: don't clip card actions or nav arrows */
         .related-products-section {
-            overflow: hidden;
+            overflow: visible;
         }
         .related-products-slider {
+            overflow: visible;
+            padding-left: 52px;
+            padding-right: 52px;
+        }
+        .related-products-slider .related-products-swiper {
             overflow: hidden;
         }
         .related-products-slider .swiper-wrapper {
             height: auto !important;
             align-items: stretch;
         }
+        .related-products-slider .swiper-slide {
+            height: auto !important;
+            overflow: visible !important;
+        }
+        .related-products-slider .product-item,
+        .related-products-slider .product-item .product-main {
+            height: auto;
+            overflow: visible;
+        }
         .related-products-slider .product-item .product-infor {
             margin-bottom: 0 !important;
+            padding-bottom: 2px;
+        }
+        .related-products-slider .product-item .product-card-actions {
+            overflow: visible;
         }
         .related-products-slider .product-item .product-sold {
             display: none !important;
@@ -556,13 +614,29 @@
             padding: 0 !important;
             overflow: hidden !important;
         }
-        /* Pin arrows to product image row (not mid-tall empty track) */
+        /* Arrows sit in slider side padding — fully visible */
         .related-products-slider.section-swiper-navigation.style-outline .related-products-prev,
         .related-products-slider.section-swiper-navigation.style-outline .related-products-next,
         .related-products-slider.section-swiper-navigation.style-outline .swiper-button-prev2,
         .related-products-slider.section-swiper-navigation.style-outline .swiper-button-next2 {
-            top: 22%;
+            top: 26%;
             transform: translateY(-50%);
+        }
+        .related-products-slider .related-products-prev,
+        .related-products-slider .swiper-button-prev2.related-products-prev {
+            left: 0 !important;
+            right: auto !important;
+        }
+        .related-products-slider .related-products-next,
+        .related-products-slider .swiper-button-next2.related-products-next {
+            right: 0 !important;
+            left: auto !important;
+        }
+        @media (max-width: 639.98px) {
+            .related-products-slider {
+                padding-left: 42px;
+                padding-right: 42px;
+            }
         }
         .related-products-slider .swiper-button-lock {
             display: none !important;
@@ -766,56 +840,103 @@
             line-height: 0;
         }
         .home-two-categories .banner-item .banner-img img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img img,
+        .home-two-categories .banner-item .banner-img picture,
+        .home-two-categories .banner-item .banner-img picture img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img picture,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img picture img {
+            width: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            object-fit: contain !important;
+            object-position: center center;
+            opacity: 1 !important;
+        }
+        .home-two-categories .banner-item .banner-img img,
         .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img img {
             display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center center;
             transform: scale(1);
             transform-origin: center center;
             transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1 !important;
             will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .home-two-categories .banner-item.banner-size-fixed,
+        .home-two-categories .banner-item.banner-size-fixed.banner-aspect-1-1,
+        .category-subcategory-blocks .two-block-category-grid .banner-item.banner-size-fixed,
+        .category-subcategory-blocks .two-block-category-grid .banner-item.banner-size-fixed.banner-aspect-1-1 {
+            aspect-ratio: auto !important;
+            height: auto !important;
+        }
+        .home-two-categories .banner-item.banner-size-fixed .banner-img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item.banner-size-fixed .banner-img {
+            position: relative !important;
+            inset: auto !important;
+            width: 100% !important;
+            height: auto !important;
         }
         .home-two-categories .banner-item::before,
+        .home-two-categories .banner-item::after,
         .home-two-categories .banner-item:hover::before,
+        .home-two-categories .banner-item:hover::after,
         .home-two-categories .banner-item:focus-within::before,
+        .home-two-categories .banner-item:focus-within::after,
         .category-subcategory-blocks .two-block-category-grid .banner-item::before,
+        .category-subcategory-blocks .two-block-category-grid .banner-item::after,
         .category-subcategory-blocks .two-block-category-grid .banner-item:hover::before,
-        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within::before {
+        .category-subcategory-blocks .two-block-category-grid .banner-item:hover::after,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within::before,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within::after {
             display: none !important;
             content: none !important;
+            background: none !important;
             background-color: transparent !important;
             opacity: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .home-two-categories .banner-item,
+        .home-two-categories .banner-item:hover,
+        .home-two-categories .banner-item:focus,
+        .home-two-categories .banner-item:focus-visible,
+        .category-subcategory-blocks .two-block-category-grid .banner-item,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:hover,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus,
+        .category-subcategory-blocks .two-block-category-grid .banner-item:focus-visible {
+            text-decoration: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
         .home-two-categories .banner-item:hover .banner-img img,
         .home-two-categories .banner-item:focus-within .banner-img img,
         .category-subcategory-blocks .two-block-category-grid .banner-item:hover .banner-img img,
         .category-subcategory-blocks .two-block-category-grid .banner-item:focus-within .banner-img img {
-            transform: scale(1.06);
+            transform: scale(1.06) !important;
             opacity: 1 !important;
+        }
+        .home-two-categories .banner-item .banner-img picture,
+        .category-subcategory-blocks .two-block-category-grid .banner-item .banner-img picture {
+            display: block;
+            line-height: 0;
         }
         .home-two-categories .banner-item.banner-zoom-only .banner-img,
         .home-two-categories .banner-item.banner-zoom-only .banner-img img {
             border-radius: inherit;
         }
-        .home-two-categories .banner-item.banner-zoom-only .banner-img img {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        .home-two-categories .banner-item.banner-zoom-only::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 18px;
-            z-index: 1;
-            background: var(--surface, #f5f5f5);
-            border-bottom-left-radius: inherit;
-            border-bottom-right-radius: inherit;
-            pointer-events: none;
+        @media (max-width: 767.98px) {
+            .home-two-categories .banner-item.banner-size-fixed,
+            .home-two-categories .banner-item.banner-size-fixed.banner-aspect-1-1 {
+                aspect-ratio: auto !important;
+                height: auto !important;
+            }
+            .home-two-categories .banner-item.banner-size-fixed .banner-img img,
+            .home-two-categories .banner-item .banner-img img {
+                object-fit: contain !important;
+                object-position: center center !important;
+                height: auto !important;
+            }
         }
         /* Best Sellers wide banner — zoom only, no dark hover overlay */
         .home-best-sellers-banner.banner-block .banner-item {
@@ -888,12 +1009,36 @@
         .banner-block .banner-item:focus-within .heading4.absolute.left-1\/2 {
             transform: translateX(-50%) !important;
         }
-        .banner-block .banner-item.banner-card-stable:hover .button-main,
-        .banner-block .banner-item.banner-card-stable:focus-within .button-main {
+        /* Legacy absolutely positioned CTAs only — flex overlay buttons use banner-text-tone rules */
+        .banner-block .banner-item.banner-card-stable:hover > .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within > .button-main {
             opacity: 1 !important;
             color: inherit;
             background-color: var(--black, #000) !important;
             border: none !important;
+        }
+        .banner-block .banner-item.banner-card-stable:hover .banner-text-overlay .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-text-overlay .button-main {
+            opacity: 1 !important;
+            border: none !important;
+        }
+        .banner-block .banner-item.banner-card-stable:hover .banner-text-tone-white .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-text-tone-white .button-main {
+            background: #fff !important;
+            color: #000 !important;
+            border-color: #fff !important;
+        }
+        .banner-block .banner-item.banner-card-stable:hover .banner-text-tone-black .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-text-tone-black .button-main {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000 !important;
+        }
+        .banner-block .banner-item.banner-card-stable:hover .banner-text-overlay:not([class*="banner-text-tone"]) .button-main,
+        .banner-block .banner-item.banner-card-stable:focus-within .banner-text-overlay:not([class*="banner-text-tone"]) .button-main {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #000 !important;
         }
         /* Absolutely positioned CTAs keep horizontal centering on hover */
         .banner-block .banner-item.banner-card-stable:hover .button-main.absolute.left-1\/2,
@@ -949,19 +1094,6 @@
         .category-hero-banner.list-banner {
             aspect-ratio: 16 / 5;
         }
-        @media (max-width: 767.98px) {
-            .category-hero-banner.list-banner {
-                aspect-ratio: 1 / 1;
-            }
-        }
-        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
-            aspect-ratio: 16 / 5;
-        }
-        @media (max-width: 767.98px) {
-            .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
-                aspect-ratio: 1 / 1;
-            }
-        }
         .banner-block .banner-item.banner-size-fixed .banner-img,
         .category-hero-banner .banner-img {
             position: absolute;
@@ -969,6 +1101,14 @@
             width: 100%;
             height: 100%;
             line-height: 0;
+        }
+        @media (max-width: 767.98px) {
+            .category-hero-banner .banner-img {
+                position: relative;
+                inset: auto;
+                height: auto;
+                background-color: var(--surface, #f3f3f3);
+            }
         }
         .banner-block .banner-item.banner-size-fixed .banner-img img,
         .banner-block .banner-item.banner-size-fixed .banner-img picture,
@@ -983,16 +1123,44 @@
             display: block;
             aspect-ratio: unset !important;
         }
-        /* Square product banners: show full 1:1 (1500×1500) image without cropping */
+        @media (max-width: 767.98px) {
+            .category-hero-banner.list-banner {
+                aspect-ratio: auto;
+                height: auto;
+            }
+            .category-hero-banner .banner-img img,
+            .category-hero-banner .banner-img picture,
+            .category-hero-banner .banner-img picture img {
+                height: auto !important;
+                object-fit: contain !important;
+            }
+            .category-hero-banner .banner-text-overlay {
+                padding: 1rem 0.75rem 1.25rem;
+                gap: 0.5rem;
+            }
+        }
+        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
+            aspect-ratio: 16 / 5;
+        }
+        @media (max-width: 767.98px) {
+            .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed {
+                aspect-ratio: 1 / 1;
+            }
+        }
         .banner-block .banner-item.banner-size-fixed .banner-img {
             background-color: var(--surface, #f5f5f5);
         }
         .banner-block .banner-item.banner-size-fixed .banner-img img,
         .banner-block .banner-item.banner-size-fixed .banner-img picture img,
-        .home-two-categories .banner-item.banner-size-fixed .banner-img img,
         .category-subcategory-blocks .banner-item.banner-size-fixed .banner-img img {
+            object-fit: cover !important;
+            object-position: center center;
+        }
+        .home-two-categories .banner-item.banner-size-fixed .banner-img img,
+        .category-subcategory-blocks .two-block-category-grid .banner-item.banner-size-fixed .banner-img img {
             object-fit: contain !important;
             object-position: center center;
+            height: auto !important;
         }
         .banner-block .banner-item.banner-size-fixed .banner-text-overlay,
         .category-hero-banner .banner-text-overlay {
@@ -1080,10 +1248,14 @@
             aspect-ratio: 1 / 1;
         }
         .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed .banner-img img,
-        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed .banner-img picture img,
-        .category-hero-banner .banner-img img,
-        .category-hero-banner .banner-img picture img {
+        .home-best-sellers-banner.banner-block .banner-item.banner-size-fixed .banner-img picture img {
             object-fit: cover !important;
+        }
+        @media (min-width: 768px) {
+            .category-hero-banner .banner-img img,
+            .category-hero-banner .banner-img picture img {
+                object-fit: cover !important;
+            }
         }
         .home-best-sellers-banner .banner-text-overlay {
             justify-content: center;
@@ -1264,6 +1436,62 @@
             width: 28px !important;
             background: #fff !important;
             transform: none !important;
+        }
+        /* Home hero — full banner visible (no crop), stable slide height */
+        #home-content .slider-block.style-two.home-hero-slider {
+            height: auto !important;
+            min-height: 0;
+            aspect-ratio: 16 / 6;
+            max-height: min(820px, 88vh);
+            background: #f3f3f3;
+            overflow: hidden;
+        }
+        @media (max-width: 1023.98px) {
+            #home-content .slider-block.style-two.home-hero-slider {
+                aspect-ratio: 4 / 3;
+                max-height: min(560px, 72vh);
+            }
+        }
+        @media (max-width: 639.98px) {
+            #home-content .slider-block.style-two.home-hero-slider {
+                aspect-ratio: 1 / 1;
+                max-height: min(420px, 68vh);
+            }
+        }
+        #home-content .slider-block.style-two.home-hero-slider .slider-main,
+        #home-content .slider-block.style-two.home-hero-slider .swiper.swiper-slider,
+        #home-content .slider-block.style-two.home-hero-slider .swiper-wrapper,
+        #home-content .slider-block.style-two.home-hero-slider .swiper-slide,
+        #home-content .slider-block.style-two.home-hero-slider .slider-item {
+            height: 100% !important;
+            min-height: 0;
+        }
+        #home-content .slider-block.style-two.home-hero-slider .sub-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            line-height: 0;
+            background: #f3f3f3;
+        }
+        #home-content .slider-block.style-two.home-hero-slider .sub-img img,
+        #home-content .slider-block.style-two.home-hero-slider .sub-img picture,
+        #home-content .slider-block.style-two.home-hero-slider .sub-img picture img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center center;
+            display: block;
+        }
+        #home-content .slider-block.style-two.home-hero-slider .swiper-slide-active .sub-img img {
+            animation: none;
+            transform: none;
+        }
+        #home-content .slider-block.style-two .hero-slide-overlay .button-main:empty {
+            display: none !important;
+        }
+        #home-content .slider-block.style-two .hero-slide-overlay .button-main {
+            flex-shrink: 0;
         }
         .breadcrumb-product .product-nav-links {
             flex: 1 1 auto;
@@ -1468,13 +1696,21 @@
                     <i class="ph ph-x text-lg leading-none"></i>
                 </button>
             </div>
+            @php
+                $popularSearchSuggestions = popular_search_suggestions(6);
+                $recentProducts = \App\Models\Product::where('is_active', true)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(4)
+                    ->get();
+            @endphp
             <div class="keyword mt-8 shrink-0">
                 <div class="heading5">Popular searches</div>
                 <div class="list-keyword flex items-center flex-wrap gap-3 mt-4">
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Dress']) }}}'">Dress</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'T-shirt']) }}}'">T-shirt</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Bottle']) }}}'">Bottle</button>
-                    <button type="button" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white" onclick="window.location.href='{{{ route('search', ['q' => 'Top']) }}}'">Top</button>
+                    @forelse($popularSearchSuggestions as $suggestion)
+                        <a href="{{ $suggestion['url'] }}" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">{{ $suggestion['label'] }}</a>
+                    @empty
+                        <a href="{{ route('shop') }}" class="item px-4 py-1.5 border border-line rounded-full cursor-pointer duration-300 hover:bg-black hover:text-white">Browse shop</a>
+                    @endforelse
                 </div>
             </div>
             <div class="search-modal-body mt-8 min-h-0">
@@ -1482,12 +1718,6 @@
                 <div class="heading6 shrink-0" id="searchResultsTitle">Latest products</div>
                 <div class="search-modal-results-scroll mt-4">
                 <div class="list-product pb-5 hide-product-sold grid xl:grid-cols-4 sm:grid-cols-3 grid-cols-2 md:gap-[30px] gap-4" id="searchModalProductList">
-                    @php
-                        $recentProducts = \App\Models\Product::where('is_active', true)
-                            ->orderBy('created_at', 'desc')
-                            ->limit(4)
-                            ->get();
-                    @endphp
                     @forelse($recentProducts as $product)
                         <div class="product-item grid-type search-default-product">
                             @include('partials.product-card', ['product' => $product])

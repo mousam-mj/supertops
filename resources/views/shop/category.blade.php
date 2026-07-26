@@ -91,7 +91,7 @@
                 'desktop' => $heroImage,
                 'mobile' => $heroImageMobile,
                 'alt' => $category->name,
-                'class' => 'w-full h-full object-cover duration-500',
+                'class' => 'w-full h-full md:object-cover object-contain duration-500',
             ])
         </div>
     @else

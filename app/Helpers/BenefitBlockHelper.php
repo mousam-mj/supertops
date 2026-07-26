@@ -51,3 +51,48 @@ if (! function_exists('benefit_block_items')) {
         return $items;
     }
 }
+
+if (! function_exists('product_benefit_items')) {
+    /**
+     * Three trust badges below Add to Cart on the product page.
+     *
+     * @return list<array{icon: string, title: string, text: string}>
+     */
+    function product_benefit_items(): array
+    {
+        $defaults = [
+            [
+                'icon' => 'icon-delivery-truck',
+                'title' => 'Free shipping',
+                'text' => 'Free shipping on orders over ₹499.',
+            ],
+            [
+                'icon' => 'icon-phone-call',
+                'title' => 'Support everyday',
+                'text' => 'Support from 8:30 AM to 10:00 PM everyday',
+            ],
+            [
+                'icon' => 'icon-return',
+                'title' => '100 Day Returns',
+                'text' => 'Not impressed? Get a refund. You have 100 days to break our hearts.',
+            ],
+        ];
+
+        $items = [];
+
+        foreach ($defaults as $i => $default) {
+            $n = $i + 1;
+            $title = trim((string) Setting::get("product_benefit_{$n}_title", ''));
+            $text = trim((string) Setting::get("product_benefit_{$n}_text", ''));
+            $icon = trim((string) Setting::get("product_benefit_{$n}_icon", ''));
+
+            $items[] = [
+                'icon' => $icon !== '' ? $icon : $default['icon'],
+                'title' => $title !== '' ? $title : $default['title'],
+                'text' => $text !== '' ? $text : $default['text'],
+            ];
+        }
+
+        return $items;
+    }
+}

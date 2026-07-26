@@ -493,7 +493,7 @@
                                         <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                     </div>
-                                    <div class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</div>
+                                    <button type="button" class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</button>
                                 </div>
                                 <!-- Pincode Checker -->
                                 <div class="pincode-checker mt-5 p-4 border border-line rounded-lg">
@@ -529,29 +529,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="get-it mt-6">
-                                <div class="item flex items-center gap-3 mt-4">
-                                    <div class="icon-delivery-truck text-4xl"></div>
-                                    <div>
-                                        <div class="text-title">Free shipping</div>
-                                        <div class="caption1 text-secondary mt-1">Free shipping on orders over ₹75.</div>
-                                    </div>
-                                </div>
-                                <div class="item flex items-center gap-3 mt-4">
-                                    <div class="icon-phone-call text-4xl"></div>
-                                    <div>
-                                        <div class="text-title">Support everyday</div>
-                                        <div class="caption1 text-secondary mt-1">Support from 8:30 AM to 10:00 PM everyday</div>
-                                    </div>
-                                </div>
-                                <div class="item flex items-center gap-3 mt-4">
-                                    <div class="icon-return text-4xl"></div>
-                                    <div>
-                                        <div class="text-title">100 Day Returns</div>
-                                        <div class="caption1 text-secondary mt-1">Not impressed? Get a refund. You have 100 days to break our hearts.</div>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('partials.product-benefit-items')
                         </div>
                     </div>
                 </div>
@@ -737,7 +715,7 @@
             <div class="container">
                 <div class="heading3 text-center">Related Products</div>
                 <div class="list-product six-product hide-product-sold relative section-swiper-navigation style-outline style-small-border md:mt-8 mt-5 related-products-slider">
-                    <button type="button" class="related-products-prev swiper-button-prev2 sm:left-10 left-6" aria-label="Previous related products">
+                    <button type="button" class="related-products-prev swiper-button-prev2" aria-label="Previous related products">
                         <i class="ph-bold ph-caret-left text-xl"></i>
                     </button>
                     <div class="swiper related-products-swiper relative">
@@ -753,7 +731,7 @@
                             @endforelse
                         </div>
                     </div>
-                    <button type="button" class="related-products-next swiper-button-next2 sm:right-10 right-6" aria-label="Next related products">
+                    <button type="button" class="related-products-next swiper-button-next2" aria-label="Next related products">
                         <i class="ph-bold ph-caret-right text-xl"></i>
                     </button>
                 </div>
@@ -761,7 +739,7 @@
         </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('assets/js/product-detail.js') }}"></script>
+<script src="{{ asset('assets/js/product-detail.js') }}?v={{ filemtime(public_path('assets/js/product-detail.js')) }}"></script>
 <script>
 (function () {
     function setupRelatedProductsSlider() {
@@ -783,10 +761,12 @@
             },
             loop: false,
             watchOverflow: true,
+            autoHeight: true,
             slidesPerView: 2,
             spaceBetween: 16,
             observer: true,
             observeParents: true,
+            observeSlideChildren: true,
             breakpoints: {
                 640: {
                     slidesPerView: 3,
@@ -1294,220 +1274,9 @@
             writeProductQty(q, readProductQty(q));
         }, true);
         
-        // Add to cart from product detail page
-        let isAddingToCart = false; // Prevent double clicks
-
-        function extractCartErrorMessage(data, status) {
-            if (typeof window.extractCartErrorMessage === 'function') {
-                return window.extractCartErrorMessage(data, status);
-            }
-            if (data && data.message) return String(data.message);
-            return 'Failed to add product to cart. Please try again.';
-        }
-
-        function productPageNotify(message, type) {
-            if (type === 'error') {
-                if (typeof window.showCartAlert === 'function') {
-                    window.showCartAlert(message);
-                    return;
-                }
-            }
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(message, type || 'success');
-                return;
-            }
-            alert(message);
-        }
-
-        function readSelectedVariant(productInfor) {
-            const selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
-            const selectedColorItem = productInfor.querySelector('.color-item.active');
-            let size = selectedSizeItem ? selectedSizeItem.getAttribute('data-size') : null;
-            let color = selectedColorItem ? selectedColorItem.getAttribute('data-color') : null;
-            if (!size) {
-                size = productInfor.getAttribute('data-default-size') || null;
-            }
-            size = size && String(size).trim() !== '' ? String(size).trim() : null;
-            color = color && String(color).trim() !== '' ? String(color).trim() : null;
-            return { size: size, color: color };
-        }
-
-        function parseCartJsonResponse(response) {
-            var contentType = response.headers.get('content-type') || '';
-            if (contentType.indexOf('application/json') !== -1) {
-                return response.json().then(function(data) {
-                    return { ok: response.ok, status: response.status, data: data || {} };
-                });
-            }
-            var msg = response.status === 419
-                ? 'Page session expired. Please refresh and try again.'
-                : 'Could not add to cart. Please refresh and try again.';
-            return Promise.resolve({ ok: false, status: response.status, data: { success: false, message: msg } });
-        }
+        // Add to cart / Buy it now — handled by assets/js/cart.js (product detail + listing + quick view)
         
-        document.addEventListener('click', function(e) {
-            const addCartBtn = e.target.closest('.product-detail .product-infor .add-cart-btn');
-            if (!addCartBtn) return;
-            
-            // Prevent double clicks
-            if (isAddingToCart || addCartBtn.disabled) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const productId = addCartBtn.getAttribute('data-product-id');
-            if (!productId) {
-                productPageNotify('Could not add this product. Please refresh and try again.', 'error');
-                return;
-            }
-            
-            const productInfor = addCartBtn.closest('.product-infor');
-            if (!productInfor) return;
-            
-            // Set flag to prevent double clicks
-            isAddingToCart = true;
-            
-            const variant = readSelectedVariant(productInfor);
-            const quantityElement = productInfor.querySelector('.quantity-block .quantity');
-            let quantity = quantityElement ? readProductQty(quantityElement) : 1;
-            
-            // Show loading state
-            const originalText = addCartBtn.innerHTML;
-            const originalDisabled = addCartBtn.disabled;
-            addCartBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
-            addCartBtn.disabled = true;
-            addCartBtn.style.pointerEvents = 'none';
-            
-            // Get CSRF token
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            
-            // Make API call
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    product_id: parseInt(productId, 10),
-                    quantity: quantity,
-                    size: variant.size,
-                    color: variant.color
-                })
-            })
-            .then(parseCartJsonResponse)
-            .then(function(result) {
-                var data = result.data || {};
-                if (data.success) {
-                    if (typeof window.updateCartCount === 'function') {
-                        window.updateCartCount();
-                    }
-                    productPageNotify('Product added to cart!', 'success');
-                    
-                    // Open cart drawer (CSS uses :has(.modal-cart-main.open), not .modal-cart-block.open)
-                    const cartModalMains = document.querySelectorAll('.modal-cart-block .modal-cart-main');
-                    const cartModalMain = cartModalMains.length ? cartModalMains[cartModalMains.length - 1] : null;
-                    if (cartModalMain) {
-                        cartModalMain.classList.add('open');
-                        document.body.style.overflow = 'hidden';
-                        if (typeof window.loadCartItems === 'function') {
-                            window.loadCartItems();
-                        }
-                    }
-                } else {
-                    productPageNotify(extractCartErrorMessage(data, result.status), 'error');
-                }
-            })
-            .catch(function(error) {
-                console.error('Error:', error);
-                productPageNotify('An error occurred. Please try again.', 'error');
-            })
-            .finally(function() {
-                addCartBtn.innerHTML = originalText;
-                addCartBtn.disabled = originalDisabled;
-                addCartBtn.style.pointerEvents = '';
-                isAddingToCart = false;
-            });
-        }, true);
-        
-        // Buy It Now: add product to cart then redirect to checkout
-        let isBuyItNow = false;
-        document.addEventListener('click', function(e) {
-            const buyBtn = e.target.closest('.product-detail .product-infor .buy-it-now-btn');
-            if (!buyBtn) return;
-            if (isBuyItNow || buyBtn.disabled) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            const productId = buyBtn.getAttribute('data-product-id');
-            const checkoutUrl = buyBtn.getAttribute('data-checkout-url') || '/checkout';
-            if (!productId) {
-                productPageNotify('Could not buy this product. Please refresh and try again.', 'error');
-                return;
-            }
-            const productInfor = buyBtn.closest('.product-infor');
-            if (!productInfor) return;
-            const variant = readSelectedVariant(productInfor);
-            isBuyItNow = true;
-            const originalText = buyBtn.innerHTML;
-            buyBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Adding...';
-            buyBtn.disabled = true;
-            buyBtn.style.pointerEvents = 'none';
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    product_id: parseInt(productId, 10),
-                    quantity: (function() {
-                        const qEl = productInfor.querySelector('.quantity-block .quantity');
-                        return qEl ? readProductQty(qEl) : 1;
-                    })(),
-                    size: variant.size,
-                    color: variant.color
-                })
-            })
-            .then(parseCartJsonResponse)
-            .then(function(result) {
-                var data = result.data || {};
-                if (data.success) {
-                    if (typeof window.updateCartCount === 'function') window.updateCartCount();
-                    window.location.href = checkoutUrl;
-                } else {
-                    productPageNotify(extractCartErrorMessage(data, result.status), 'error');
-                    buyBtn.innerHTML = originalText;
-                    buyBtn.disabled = false;
-                    buyBtn.style.pointerEvents = '';
-                    isBuyItNow = false;
-                }
-            })
-            .catch(function(err) {
-                console.error('Buy It Now error:', err);
-                productPageNotify('An error occurred. Please try again.', 'error');
-                buyBtn.innerHTML = originalText;
-                buyBtn.disabled = false;
-                buyBtn.style.pointerEvents = '';
-                isBuyItNow = false;
-            });
-        }, true);
-        
-        // Show notification
+        // Show notification (fallback if cart.js not loaded)
         function showNotification(message, type = 'success') {
             const existing = document.querySelector('.notification');
             if (existing) existing.remove();

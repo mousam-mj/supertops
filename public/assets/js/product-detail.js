@@ -41,7 +41,7 @@ if (document.querySelector('.swiper-product-scroll')) {
 }
 
 
-// detail infor by fetch data
+// detail infor by fetch data — skip on Laravel server-rendered product pages
 const pathname = new URL(window.location.href)
 const productId = pathname.searchParams.get('id') === null ? '1' : pathname.searchParams.get('id')
 const productDetail = document.querySelector('.product-detail')
@@ -51,8 +51,11 @@ let currentIndex;
 let classes = productDetail ? productDetail.className.split(' ') : [];
 let typePage = classes[1] || '';
 
+const isServerRenderedProductPage = productDetail
+    && productDetail.querySelector('.product-infor[data-default-size], .product-infor .product-price-block[data-product-price]');
 
-if (productDetail) {
+
+if (productDetail && !isServerRenderedProductPage) {
     fetch('./assets/data/Product.json')
         .then(response => response.json())
         .then(data => {
@@ -357,6 +360,7 @@ if (document.readyState === 'loading') {
 
 
 // list-img on-sale
+if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-img-on-sale')) {
 var swiperListImgOnSale = new Swiper(".swiper-img-on-sale", {
     loop: true,
     autoplay: {
@@ -387,9 +391,11 @@ var swiperListImgOnSale = new Swiper(".swiper-img-on-sale", {
         },
     },
 });
+}
 
 
 // list-img review
+if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-img-review')) {
 var swiperImgReview = new Swiper(".swiper-img-review", {
     loop: true,
     autoplay: {
@@ -426,6 +432,7 @@ var swiperImgReview = new Swiper(".swiper-img-review", {
         },
     },
 });
+}
 
 
 // Redirect filter type product-sidebar

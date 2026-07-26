@@ -5,7 +5,7 @@
 @section('content')
 <div id="home-content">
 <!-- Slider (dynamic from admin Hero Banners) -->
-            <div class="slider-block style-two xl:h-[820px] lg:h-[700px] md:h-[580px] sm:h-[500px] h-[350px] max-[420px]:h-[340px] w-full">
+            <div class="slider-block style-two home-hero-slider w-full">
                 <div class="slider-main h-full w-full">
                     <div class="swiper swiper-slider h-full relative">
                         <div class="swiper-wrapper">
@@ -32,16 +32,21 @@
                                                 <img src="{{ asset('assets/images/slider/03b-scaled.webp') }}" alt="{{ $banner->name }}" class="w-full h-full object-cover" />
                                             @endif
                                         </div>
-                                        @if($banner->show_text)
-                                        <div class="absolute inset-0 z-[2] flex flex-col items-center justify-center text-center px-6 pointer-events-none {{ banner_text_color_class($banner->text_color ?? null) }}">
-                                            @if($banner->name)
-                                                <div class="heading1 drop-shadow-md">{{ $banner->name }}</div>
+                                        @php
+                                            $heroTitle = trim((string) ($banner->name ?? ''));
+                                            $heroSubtitle = trim((string) ($banner->subtitle ?? ''));
+                                            $heroButtonText = trim((string) ($banner->button_text ?? ''));
+                                        @endphp
+                                        @if($banner->show_text && ($heroTitle !== '' || $heroSubtitle !== '' || $heroButtonText !== ''))
+                                        <div class="hero-slide-overlay absolute inset-0 z-[2] flex flex-col items-center justify-center text-center px-6 pointer-events-none {{ banner_text_color_class($banner->text_color ?? null) }}">
+                                            @if($heroTitle !== '')
+                                                <div class="heading1 drop-shadow-md">{{ $heroTitle }}</div>
                                             @endif
-                                            @if($banner->subtitle)
-                                                <div class="body1 mt-3 drop-shadow-md">{{ $banner->subtitle }}</div>
+                                            @if($heroSubtitle !== '')
+                                                <div class="body1 mt-3 drop-shadow-md">{{ $heroSubtitle }}</div>
                                             @endif
-                                            @if($banner->button_text)
-                                                <span class="button-main mt-5 pointer-events-auto">{{ $banner->button_text }}</span>
+                                            @if($heroButtonText !== '')
+                                                <span class="button-main mt-5 pointer-events-auto">{{ $heroButtonText }}</span>
                                             @endif
                                         </div>
                                         @endif
@@ -82,22 +87,35 @@
             <div class="container">
                 <div class="two-block-category-grid list-banner grid grid-cols-2 gap-4 md:gap-8 mx-auto">
                     @forelse($homeCategories as $category)
+                        @php
+                            $categoryImageDefaults = [
+                                'drinkware' => 'assets/images/product/Bottle-1.webp',
+                                'barware' => 'assets/images/product/Bottle-4.webp',
+                                'kitchenware' => 'assets/images/product/Bottle-8.webp',
+                            ];
+                            $categoryDefaultAsset = $categoryImageDefaults[$category->slug] ?? 'assets/images/product/Bottle-1.webp';
+                        @endphp
                         <a href="{{ $category->storefrontUrl() }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ $category->homepageImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center hidden md:block" />
-                                <img src="{{ $category->homepageMobileImageUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover object-center md:hidden" />
+                                @include('partials.responsive-banner-img', [
+                                    'desktop' => $category->image,
+                                    'mobile' => $category->image_mobile,
+                                    'default' => $categoryDefaultAsset,
+                                    'alt' => $category->name,
+                                    'class' => 'w-full h-auto block',
+                                ])
                             </div>
                         </a>
                     @empty
                         {{-- Fallback if no categories --}}
                         <a href="{{ route('shop') }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full h-full object-cover object-center" />
+                                <img src="{{ asset('assets/images/product/Bottle-1.webp') }}" alt="Drinkware" class="w-full h-auto block" />
                             </div>
                         </a>
                         <a href="{{ route('shop') }}" class="banner-item banner-card-stable banner-zoom-only banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
-                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full h-full object-cover object-center" />
+                                <img src="{{ asset('assets/images/product/Bottle-4.webp') }}" alt="Barware" class="w-full h-auto block" />
                             </div>
                         </a>
                     @endforelse
@@ -140,12 +158,12 @@
         <div class="tab-features-block filter-prodduct-block md:pt-10 pt-6 md:pb-4 pb-2" id="home-best-sellers-section">
             <div class="container">
                 <div class="heading flex flex-col items-center text-center">
-                    <div class="menu-tab bg-surface rounded-2xl">
-                        <div class="menu flex items-center gap-2 p-1 relative">
+                    <div class="menu-tab bg-surface rounded-2xl w-full max-w-full">
+                        <div class="menu flex items-center gap-1 sm:gap-2 p-1 relative w-full">
                             <div class="indicator absolute top-1 bottom-1 bg-white rounded-full shadow-md duration-300"></div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black active" data-item="best sellers">best sellers</div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black" data-item="on sale">on sale</div>
-                            <div class="tab-item relative text-secondary heading5 py-2 px-5 cursor-pointer duration-500 hover:text-black" data-item="new arrivals">new arrivals</div>
+                            <div class="tab-item relative z-[1] text-secondary text-button-uppercase text-[11px] sm:text-xs md:heading5 py-2.5 px-2 sm:px-4 md:px-5 cursor-pointer duration-500 hover:text-black active text-center flex-1 min-w-0" data-item="best sellers">Best Sellers</div>
+                            <div class="tab-item relative z-[1] text-secondary text-button-uppercase text-[11px] sm:text-xs md:heading5 py-2.5 px-2 sm:px-4 md:px-5 cursor-pointer duration-500 hover:text-black text-center flex-1 min-w-0" data-item="on sale">On Sale</div>
+                            <div class="tab-item relative z-[1] text-secondary text-button-uppercase text-[11px] sm:text-xs md:heading5 py-2.5 px-2 sm:px-4 md:px-5 cursor-pointer duration-500 hover:text-black text-center flex-1 min-w-0" data-item="new arrivals">New Arrivals</div>
                         </div>
                     </div>
                 </div>
@@ -206,6 +224,10 @@
                 });
             });
             syncIndicator();
+            window.addEventListener('resize', syncIndicator);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(syncIndicator, 100);
+            });
         })();
         </script>
         @endpush

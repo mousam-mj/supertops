@@ -410,6 +410,38 @@
                                     <input type="text" name="product_feature_4_text" class="form-control" value="{{ old('product_feature_4_text', $settings['product_feature_4_text'] ?? '') }}" placeholder="Works beautifully everywhere">
                                 </div>
                             </div>
+                            <hr class="my-4">
+                            <h6 class="mb-2">Product page trust badges</h6>
+                            <p class="text-muted small mb-3">The three icon rows below Add to Cart (Free shipping, Support, Returns). Leave blank to keep the default text.</p>
+                            @php
+                                $productBenefitDefaults = [
+                                    1 => ['icon' => 'icon-delivery-truck', 'title' => 'Free shipping', 'text' => 'Free shipping on orders over ₹499.'],
+                                    2 => ['icon' => 'icon-phone-call', 'title' => 'Support everyday', 'text' => 'Support from 8:30 AM to 10:00 PM everyday'],
+                                    3 => ['icon' => 'icon-return', 'title' => '100 Day Returns', 'text' => 'Not impressed? Get a refund. You have 100 days to break our hearts.'],
+                                ];
+                            @endphp
+                            @foreach($productBenefitDefaults as $n => $def)
+                                <div class="card mb-3">
+                                    <div class="card-header py-2"><strong>Badge {{ $n }}</strong></div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Icon class</label>
+                                                <input type="text" name="product_benefit_{{ $n }}_icon" class="form-control" value="{{ old('product_benefit_'.$n.'_icon', $settings['product_benefit_'.$n.'_icon'] ?? '') }}" placeholder="{{ $def['icon'] }}">
+                                                <small class="text-muted">e.g. {{ $def['icon'] }}</small>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label">Title</label>
+                                                <input type="text" name="product_benefit_{{ $n }}_title" class="form-control" value="{{ old('product_benefit_'.$n.'_title', $settings['product_benefit_'.$n.'_title'] ?? '') }}" placeholder="{{ $def['title'] }}">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Description</label>
+                                                <textarea name="product_benefit_{{ $n }}_text" class="form-control" rows="2" placeholder="{{ $def['text'] }}">{{ old('product_benefit_'.$n.'_text', $settings['product_benefit_'.$n.'_text'] ?? '') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 

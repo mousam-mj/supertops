@@ -72,8 +72,46 @@
     }
 }
 
-/* Home hero: mobile — show full image without cropping */
-#home-content .slider-block.style-two {
+/* Home hero: show full banner image without cropping (all breakpoints) */
+#home-content .slider-block.style-two.home-hero-slider {
+    height: auto !important;
+    min-height: unset !important;
+
+    .slider-main,
+    .swiper.swiper-slider,
+    .swiper-wrapper,
+    .swiper-slide,
+    .swiper-slide .slider-item {
+        height: 100% !important;
+        min-height: unset !important;
+    }
+
+    .sub-img {
+        position: absolute !important;
+        inset: 0;
+        width: 100%;
+        height: 100% !important;
+        background-color: var(--surface, #f3f3f3);
+    }
+
+    .sub-img img,
+    .sub-img picture,
+    .sub-img picture img {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        object-position: center center;
+    }
+
+    .swiper-slide-active .sub-img img {
+        animation: none;
+        transform: none;
+    }
+}
+
+/* Legacy mobile-only rules for non-home-hero style-two sliders */
+#home-content .slider-block.style-two:not(.home-hero-slider) {
     @media (max-width: 1023px) {
         height: auto !important;
         min-height: unset !important;

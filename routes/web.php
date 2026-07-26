@@ -235,9 +235,13 @@ Route::get('/wishlist', function () {
         // Get user's wishlist items - you'll need to implement wishlist functionality
         $wishlistItems = collect([]);
     }
-    $categories = Category::where('is_active', true)->orderBy('name')->get();
+    $mainCategories = \App\Models\MainCategory::visible()->orderBy('sort_order')->get();
+    $subCategories = Category::where('is_active', true)
+        ->whereNotNull('parent_id')
+        ->orderBy('sort_order')
+        ->get();
 
-    return view('wishlist', compact('wishlistItems', 'categories'));
+    return view('wishlist', compact('wishlistItems', 'mainCategories', 'subCategories'));
 })->name('wishlist');
 
 // Search Route
@@ -246,12 +250,7 @@ Route::get('/search', function () {
     $products = collect([]);
     if ($query) {
         $products = Product::where('is_active', true)
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%'.$query.'%')
-                    ->orWhere('description', 'like', '%'.$query.'%')
-                    ->orWhere('short_description', 'like', '%'.$query.'%')
-                    ->orWhere('sku', 'like', '%'.$query.'%');
-            })
+            ->searchTerm($query)
             ->with('category')
             ->paginate(20)
             ->withQueryString();
@@ -266,12 +265,7 @@ Route::get('/search/ajax', function () {
     $products = collect([]);
     if ($query && strlen(trim($query)) >= 2) {
         $products = Product::where('is_active', true)
-            ->where(function ($q) use ($query) {
-                $q->where('name', 'like', '%'.$query.'%')
-                    ->orWhere('description', 'like', '%'.$query.'%')
-                    ->orWhere('short_description', 'like', '%'.$query.'%')
-                    ->orWhere('sku', 'like', '%'.$query.'%');
-            })
+            ->searchTerm($query)
             ->with('category')
             ->limit(8)
             ->get();

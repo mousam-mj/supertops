@@ -86,6 +86,27 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * Match products by name, description, SKU, or category name.
+     */
+    public function scopeSearchTerm($query, string $term)
+    {
+        $term = trim($term);
+        if ($term === '') {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query->where(function ($q) use ($term) {
+            $q->where('name', 'like', '%'.$term.'%')
+                ->orWhere('description', 'like', '%'.$term.'%')
+                ->orWhere('short_description', 'like', '%'.$term.'%')
+                ->orWhere('sku', 'like', '%'.$term.'%')
+                ->orWhereHas('category', function ($categoryQuery) use ($term) {
+                    $categoryQuery->where('name', 'like', '%'.$term.'%');
+                });
+        });
+    }
+
     public function parentProduct()
     {
         return $this->belongsTo(Product::class, 'parent_product_id');

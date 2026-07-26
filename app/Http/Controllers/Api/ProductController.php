@@ -136,6 +136,8 @@ class ProductController extends Controller
         $salePrice = $product->sale_price !== null ? (float) $product->sale_price : null;
         $hasSale = $salePrice !== null && $salePrice > 0 && $salePrice < $regularPrice;
         $displayPrice = $hasSale ? $salePrice : $regularPrice;
+        $category = $product->category;
+        $mainCategorySlug = $category?->mainCategory?->slug ?? $category?->slug;
 
         return response()->json([
             'success' => true,
@@ -153,6 +155,10 @@ class ProductController extends Controller
                 'sizes' => $product->sizes && is_array($product->sizes) ? $product->sizes : [],
                 'variation' => [],
                 'action' => 'quick shop',
+                'category' => $category?->name,
+                'categorySlug' => $category?->slug,
+                'mainCategorySlug' => $mainCategorySlug,
+                'type' => $category?->slug,
             ],
         ]);
     }

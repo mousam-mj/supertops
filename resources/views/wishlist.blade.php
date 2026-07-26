@@ -584,14 +584,13 @@
                             <div class="right flex items-center gap-3">
                                 <div class="select-block filter-type relative">
                                     <select class="caption1 py-2 pl-3 md:pr-12 pr-8 rounded-lg border border-line capitalize" name="select-type" id="select-type">
-                                        <option value="Type">Type</option>
-                                        <option class="item cursor-pointer">t-shirt</option>
-                                        <option class="item cursor-pointer">dress</option>
-                                        <option class="item cursor-pointer">top</option>
-                                        <option class="item cursor-pointer">swimwear</option>
-                                        <option class="item cursor-pointer">shirt</option>
-                                        <option class="item cursor-pointer">underwear</option>
-                                        <option class="item cursor-pointer">sets</option>
+                                        <option value="">Type</option>
+                                        @foreach($mainCategories ?? [] as $mainCategory)
+                                            <option value="{{ $mainCategory->slug }}">{{ $mainCategory->name }}</option>
+                                        @endforeach
+                                        @foreach($subCategories ?? [] as $subCategory)
+                                            <option value="{{ $subCategory->slug }}">{{ $subCategory->name }}</option>
+                                        @endforeach
                                     </select>
                                     <i class="ph ph-caret-down absolute top-1/2 -translate-y-1/2 md:right-4 right-2"></i>
                                 </div>
@@ -626,7 +625,18 @@
 (function() {
     var listEl = document.getElementById('wishlist-product-list');
     var emptyEl = document.getElementById('wishlist-empty-state');
+    var typeSelect = document.getElementById('select-type');
+    var sortSelect = document.getElementById('select-filter');
     if (!listEl) return;
+
+    var wishlistProducts = [];
+
+    function formatPrice(value) {
+        if (typeof window.formatInrPrice === 'function') return window.formatInrPrice(value);
+        var n = parseFloat(String(value || '').replace(/[^0-9.-]/g, ''));
+        if (!Number.isFinite(n)) return '₹0.00';
+        return '₹' + n.toFixed(2);
+    }
 
     var origin = (typeof window.location !== 'undefined' && window.location.origin) ? window.location.origin.replace(/\/$/, '') : '{{ url("") }}'.replace(/\/$/, '');
     var baseUrl = origin;
@@ -657,8 +667,8 @@
             id: id,
             name: p.name || 'Product',
             slug: p.slug || '#',
-            price: p.price != null ? String(Number(p.price).toFixed(2)) : '0.00',
-            originPrice: p.originPrice != null ? String(Number(p.originPrice).toFixed(2)) : null,
+            price: p.price != null ? String(Number(String(p.price).replace(/[^0-9.-]/g, '')).toFixed(2)) : '0.00',
+            originPrice: p.originPrice != null ? String(Number(String(p.originPrice).replace(/[^0-9.-]/g, '')).toFixed(2)) : null,
             sale: !!p.sale,
             new: !!p.new,
             thumbImage: thumbImage,
@@ -666,8 +676,56 @@
             quantity: parseInt(p.quantity, 10) || 100,
             sizes: Array.isArray(p.sizes) ? p.sizes : [],
             variation: Array.isArray(p.variation) ? p.variation : [],
-            action: p.action || 'quick shop'
+            action: p.action || 'quick shop',
+            categorySlug: p.categorySlug || p.type || '',
+            mainCategorySlug: p.mainCategorySlug || p.categorySlug || p.type || '',
+            categoryName: p.category || ''
         };
+    }
+
+    function productMatchesType(product, typeSlug) {
+        if (!typeSlug) return true;
+        return product.categorySlug === typeSlug || product.mainCategorySlug === typeSlug;
+    }
+
+    function sortProducts(products, sortKey) {
+        var sorted = products.slice();
+        if (sortKey === 'priceHighToLow') {
+            sorted.sort(function(a, b) { return parseFloat(b.price) - parseFloat(a.price); });
+        } else if (sortKey === 'priceLowToHigh') {
+            sorted.sort(function(a, b) { return parseFloat(a.price) - parseFloat(b.price); });
+        } else if (sortKey === 'discountHighToLow') {
+            sorted.sort(function(a, b) {
+                var discA = a.originPrice ? (1 - parseFloat(a.price) / parseFloat(a.originPrice)) : 0;
+                var discB = b.originPrice ? (1 - parseFloat(b.price) / parseFloat(b.originPrice)) : 0;
+                return discB - discA;
+            });
+        }
+        return sorted;
+    }
+
+    function applyFiltersAndSort() {
+        var typeSlug = typeSelect ? typeSelect.value : '';
+        var sortKey = sortSelect ? sortSelect.value : '';
+        var filtered = wishlistProducts.filter(function(p) { return productMatchesType(p, typeSlug); });
+        if (sortKey && sortKey !== 'Sorting') {
+            filtered = sortProducts(filtered, sortKey);
+        }
+        listEl.innerHTML = '';
+        if (filtered.length === 0) {
+            listEl.classList.add('hidden');
+            if (emptyEl) {
+                emptyEl.classList.remove('hidden');
+                emptyEl.querySelector('p').textContent = typeSlug
+                    ? 'No wishlist products in this category.'
+                    : 'Your wishlist is empty.';
+            }
+            return;
+        }
+        listEl.classList.remove('hidden');
+        if (emptyEl) emptyEl.classList.add('hidden');
+        filtered.forEach(function(product) { appendProduct(product); });
+        finish();
     }
 
     function addRemoveHandler(el) {
@@ -681,7 +739,8 @@
             var arr = raw ? JSON.parse(raw) : [];
             arr = arr.filter(function(item) { return String(item.id) !== String(id); });
             localStorage.setItem('wishlistStore', JSON.stringify(arr));
-            renderWishlist();
+            wishlistProducts = wishlistProducts.filter(function(p) { return String(p.id) !== String(id); });
+            applyFiltersAndSort();
             if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
             if (typeof window.updateWishlistIcons === 'function') window.updateWishlistIcons();
         });
@@ -697,34 +756,58 @@
                 el = window.createProductItem(product);
             } catch (err) { el = null; }
         }
+        if (el) {
+            el.setAttribute('data-wishlist-page', '1');
+            el.setAttribute('data-slug', product.slug || '');
+            el.setAttribute('data-category-slug', product.categorySlug || '');
+            el.setAttribute('data-main-category-slug', product.mainCategorySlug || '');
+            el.setAttribute('data-price', product.price || '0');
+        }
         if (!el) {
             var imgSrc = (Array.isArray(product.thumbImage) && product.thumbImage[0]) ? toAbsoluteImgUrl(product.thumbImage[0]) : defaultImg;
             var productUrl = (product.slug && product.slug !== '#') ? (baseUrl + '/product/' + product.slug) : '#';
-            var priceHtml = product.originPrice ? '<span class="text-title">₹' + product.price + '</span> <del class="text-secondary2">₹' + product.originPrice + '</del>' : '<span class="text-title">₹' + product.price + '</span>';
+            var priceHtml = product.originPrice
+                ? '<span class="text-title">' + formatPrice(product.price) + '</span> <del class="text-secondary2">' + formatPrice(product.originPrice) + '</del>'
+                : '<span class="text-title">' + formatPrice(product.price) + '</span>';
             el = document.createElement('div');
             el.className = 'product-item grid-type';
             el.setAttribute('data-item', product.id);
             el.setAttribute('data-slug', product.slug || '');
             el.setAttribute('data-wishlist-page', '1');
             el.innerHTML = '<div class="product-main cursor-pointer block"><div class="product-thumb bg-white relative rounded-2xl overflow-hidden">' +
-                '<button type="button" class="remove-from-wishlist absolute top-3 left-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2">×</button>' +
+                '<button type="button" class="remove-from-wishlist absolute top-3 right-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2" title="Remove from wishlist"><i class="ph ph-x text-sm"></i></button>' +
                 '<a href="' + productUrl + '" class="product-img w-full block aspect-[3/4]"><img src="' + imgSrc + '" alt="' + (product.name || '').replace(/"/g, '&quot;') + '" class="w-full h-full object-cover" onerror="this.src=\'' + defaultImg + '\'" /></a></div>' +
                 '<div class="product-infor mt-4"><div class="product-name text-title duration-300">' + (product.name || 'Product') + '</div>' +
                 '<div class="flex items-center gap-2 mt-2">' + priceHtml + '</div></div></div>';
         } else {
-            el.setAttribute('data-wishlist-page', '1');
-            el.setAttribute('data-slug', product.slug || '');
             var removeBtn = document.createElement('button');
             removeBtn.type = 'button';
-            removeBtn.className = 'remove-from-wishlist absolute top-3 left-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2';
-            removeBtn.innerHTML = '&times;';
+            removeBtn.className = 'remove-from-wishlist absolute top-3 right-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2';
+            removeBtn.innerHTML = '<i class="ph ph-x text-sm"></i>';
             removeBtn.title = 'Remove from wishlist';
             var thumb = el.querySelector('.product-thumb');
-            if (thumb) thumb.appendChild(removeBtn);
+            if (thumb) {
+                var actionRight = thumb.querySelector('.list-action-right');
+                if (actionRight) actionRight.classList.add('hidden');
+                thumb.appendChild(removeBtn);
+            }
         }
         addRemoveHandler(el);
         listEl.appendChild(el);
         return true;
+    }
+
+    function syncWishlistStore(products) {
+        var raw = localStorage.getItem('wishlistStore');
+        var items = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(items)) items = [];
+        var byId = {};
+        products.forEach(function(p) { byId[String(p.id)] = p; });
+        var next = items.map(function(item) {
+            var fresh = byId[String(item.id)];
+            return fresh ? Object.assign({}, item, fresh) : item;
+        });
+        localStorage.setItem('wishlistStore', JSON.stringify(next));
     }
 
         function finish() {
@@ -759,6 +842,7 @@
         if (emptyEl) emptyEl.classList.add('hidden');
 
         if (uniqueItems.length === 0) {
+            wishlistProducts = [];
             listEl.classList.add('hidden');
             if (emptyEl) emptyEl.classList.remove('hidden');
             if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
@@ -782,12 +866,14 @@
                     if (!r.data) idsToRemove.push(r.id);
                 }
             });
+            wishlistProducts = [];
             idsInOrder.forEach(function(id) {
                 var productData = dataById[id];
                 if (productData) {
-                    appendProduct(normalizeProduct(productData));
+                    wishlistProducts.push(normalizeProduct(productData));
                 }
             });
+            syncWishlistStore(wishlistProducts);
             if (idsToRemove.length > 0) {
                 var idsSet = {};
                 idsToRemove.forEach(function(id) { idsSet[String(id)] = true; });
@@ -795,8 +881,15 @@
                 localStorage.setItem('wishlistStore', JSON.stringify(arr));
                 if (typeof window.handleItemModalWishlist === 'function') window.handleItemModalWishlist();
             }
-            finish();
+            applyFiltersAndSort();
         });
+    }
+
+    if (typeSelect) {
+        typeSelect.addEventListener('change', applyFiltersAndSort);
+    }
+    if (sortSelect) {
+        sortSelect.addEventListener('change', applyFiltersAndSort);
     }
 
     function run() {

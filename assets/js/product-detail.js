@@ -41,18 +41,21 @@ if (document.querySelector('.swiper-product-scroll')) {
 }
 
 
-// detail infor by fetch data
+// detail infor by fetch data — skip on Laravel server-rendered product pages
 const pathname = new URL(window.location.href)
 const productId = pathname.searchParams.get('id') === null ? '1' : pathname.searchParams.get('id')
 const productDetail = document.querySelector('.product-detail')
 let currentIndex;
 
 // Href
-let classes = productDetail.className.split(' ');
-let typePage = classes[1];
+let classes = productDetail ? productDetail.className.split(' ') : [];
+let typePage = classes[1] || '';
+
+const isServerRenderedProductPage = productDetail
+    && productDetail.querySelector('.product-infor[data-default-size], .product-infor .product-price-block[data-product-price]');
 
 
-if (productDetail) {
+if (productDetail && !isServerRenderedProductPage) {
     fetch('./assets/data/Product.json')
         .then(response => response.json())
         .then(data => {
@@ -300,14 +303,16 @@ if (productDetail) {
 }
 
 
-// desc-tab
-const descTabItem = document.querySelectorAll('.desc-tab .tab-item')
-const descItem = document.querySelectorAll('.desc-tab .desc-block .desc-item')
+// desc-tab — make Description, Specifications, Review tabs clickable
+function initDescTabs() {
+    const descTab = document.querySelector('.product-detail .desc-tab')
+    if (!descTab) return
+    const descTabItem = descTab.querySelectorAll('.tab-item')
+    const descItem = descTab.querySelectorAll('.desc-block .desc-item')
+    if (!descTabItem.length || !descItem.length) return
 
-descTabItem.forEach(tabItems => {
-    const handleOpen = () => {
-        let dataItem = tabItems.innerHTML.replace(/\s+/g, '')
-
+    function openDescTabByDataItem(dataItem) {
+        if (!dataItem) return
         descItem.forEach(item => {
             if (item.getAttribute('data-item') === dataItem) {
                 item.classList.add('open')
@@ -315,17 +320,47 @@ descTabItem.forEach(tabItems => {
                 item.classList.remove('open')
             }
         })
+        descTabItem.forEach(t => {
+            t.classList.remove('active')
+            if (t.getAttribute('data-item') === dataItem) t.classList.add('active')
+        })
     }
 
-    if (tabItems.classList.contains('active')) {
-        handleOpen()
-    }
+    descTabItem.forEach(tabEl => {
+        tabEl.setAttribute('role', 'button')
+        tabEl.setAttribute('tabindex', '0')
+        tabEl.style.cursor = 'pointer'
+        const handleOpen = (e) => {
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return
+            if (e.type === 'keydown') e.preventDefault()
+            const dataItem = tabEl.getAttribute('data-item') || tabEl.textContent.replace(/\s+/g, '').trim()
+            if (!dataItem) return
+            openDescTabByDataItem(dataItem)
+        }
+        tabEl.addEventListener('click', handleOpen)
+        tabEl.addEventListener('keydown', handleOpen)
+        if (tabEl.classList.contains('active')) {
+            openDescTabByDataItem(tabEl.getAttribute('data-item'))
+        }
+    })
 
-    tabItems.addEventListener('click', handleOpen)
-})
+    if (window.location.hash === '#form-review') {
+        openDescTabByDataItem('Review')
+    }
+    window.addEventListener('hashchange', function () {
+        if (window.location.hash === '#form-review') openDescTabByDataItem('Review')
+    })
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDescTabs)
+} else {
+    initDescTabs()
+}
 
 
 // list-img on-sale
+if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-img-on-sale')) {
 var swiperListImgOnSale = new Swiper(".swiper-img-on-sale", {
     loop: true,
     autoplay: {
@@ -356,9 +391,11 @@ var swiperListImgOnSale = new Swiper(".swiper-img-on-sale", {
         },
     },
 });
+}
 
 
 // list-img review
+if (typeof Swiper !== 'undefined' && document.querySelector('.swiper-img-review')) {
 var swiperImgReview = new Swiper(".swiper-img-review", {
     loop: true,
     autoplay: {
@@ -395,6 +432,7 @@ var swiperImgReview = new Swiper(".swiper-img-review", {
         },
     },
 });
+}
 
 
 // Redirect filter type product-sidebar
