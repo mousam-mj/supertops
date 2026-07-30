@@ -122,6 +122,8 @@
     }
     $initialSelectedColor = $product->getDisplayColorLabel() ?: ($firstColor ?? '');
     $showColorPicker = count($linkedVariantProducts) > 0 || count($availableColors) > 0;
+    $realStock = max(0, (int) ($product->stock_quantity ?? 0));
+    $isInStock = ($product->in_stock ?? true) && $realStock > 0;
 @endphp
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
@@ -319,7 +321,7 @@
                 </div>
             </div>
 
-        <div class="product-detail discount style-grouped">
+        <div class="product-detail discount style-grouped{{ $isInStock ? '' : ' out-of-stock' }}">
             <div class="featured-product underwear filter-product-img bg-linear pt-7 md:pb-20 pb-10">
                 <div class="container flex justify-between gap-y-6 flex-wrap">
                     <div class="list-img product-gallery-wrap md:w-1/2 md:pr-[45px] w-full flex-shrink-0">
@@ -379,12 +381,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="product-infor md:w-1/2 w-full lg:pl-[15px] md:pl-2" data-default-size="{{ $firstSize ?? $availableSizes[0] ?? '' }}">
+                    <div class="product-infor{{ $isInStock ? '' : ' style-out-of-stock' }} md:w-1/2 w-full lg:pl-[15px] md:pl-2" data-default-size="{{ $firstSize ?? $availableSizes[0] ?? '' }}" data-in-stock="{{ $isInStock ? '1' : '0' }}">
                         <div class="sticky">
                             <div class="flex justify-between">
                                 <div>
                                     <div class="product-category caption2 text-secondary font-semibold uppercase">{{ $product->category->name ?? 'Product' }}</div>
                                     <div class="product-name heading4 mt-1" @if(!empty($colorTitles)) data-color-titles="{{ e(json_encode($colorTitles)) }}" @endif>{{ $initialProductTitle }}</div>
+                                    @unless($isInStock)
+                                        <div class="product-stock-badge caption2 font-semibold text-red inline-flex items-center gap-1.5 mt-2">
+                                            <i class="ph ph-x-circle text-base"></i> Out of Stock
+                                        </div>
+                                    @endunless
                                 </div>
                                 <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white" data-product-id="{{ $product->id }}">
                                     <i class="ph ph-heart text-xl"></i>
@@ -488,12 +495,21 @@
                 @endif
                                 <div class="text-title mt-5">Quantity:</div>
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
+                                    @if($isInStock)
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1"></i>
                                         <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                     </div>
                                     <button type="button" class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</button>
+                                    @else
+                                    <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0 opacity-60 pointer-events-none">
+                                        <i class="ph-bold ph-minus body1"></i>
+                                        <input type="number" min="0" max="0" step="1" value="0" readonly tabindex="-1" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 opacity-60 cursor-not-allowed" />
+                                        <i class="ph-bold ph-plus body1"></i>
+                                    </div>
+                                    <button type="button" class="add-cart-btn is-out-of-stock button-main whitespace-nowrap w-full text-center bg-white text-black border border-black opacity-50 cursor-not-allowed select-none" data-product-id="{{ $product->id }}" data-out-of-stock="1" aria-disabled="true" disabled>Out of Stock</button>
+                                    @endif
                                 </div>
                                 <!-- Pincode Checker -->
                                 <div class="pincode-checker mt-5 p-4 border border-line rounded-lg">
@@ -523,7 +539,9 @@
                                     @if(setting_flag('show_customize_product_button', true))
                                     <a href="{{ route('customize') }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline min-w-[140px]">Customize</a>
                                     @endif
+                                    @if($isInStock)
                                     <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase min-w-[140px]" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
+                                    @endif
                                     <button type="button" class="share-product-btn w-12 h-12 flex-shrink-0 flex items-center justify-center border border-line rounded-lg cursor-pointer hover:bg-black hover:text-white duration-300" data-share-url="{{ route('product.show', $product->slug) }}" data-share-title="{{ $product->name }}" title="Share">
                                         <i class="ph ph-share-network text-xl"></i>
                                     </button>

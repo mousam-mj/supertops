@@ -204,6 +204,18 @@
                 e.stopPropagation();
                 return;
             }
+            if (buyBtn.getAttribute('data-out-of-stock') === '1' || buyBtn.classList.contains('is-out-of-stock')) {
+                e.preventDefault();
+                e.stopPropagation();
+                showCartAlert('This item is out of stock.');
+                return;
+            }
+            if (productInfor.getAttribute('data-in-stock') === '0') {
+                e.preventDefault();
+                e.stopPropagation();
+                showCartAlert('This item is out of stock.');
+                return;
+            }
             e.preventDefault();
             e.stopPropagation();
 
