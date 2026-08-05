@@ -108,6 +108,20 @@
         animation: none;
         transform: none;
     }
+
+    @media (max-width: 767.98px) {
+        height: calc(100dvh - 86px) !important;
+        min-height: calc(100dvh - 86px) !important;
+        aspect-ratio: auto !important;
+        max-height: none !important;
+
+        .sub-img img,
+        .sub-img picture,
+        .sub-img picture img {
+            object-fit: cover !important;
+            object-position: center center;
+        }
+    }
 }
 
 /* Legacy mobile-only rules for non-home-hero style-two sliders */

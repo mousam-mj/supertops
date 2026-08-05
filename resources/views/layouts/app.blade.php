@@ -1459,10 +1459,18 @@
                 max-height: min(560px, 72vh);
             }
         }
-        @media (max-width: 639.98px) {
+        @media (max-width: 767.98px) {
             #home-content .slider-block.style-two.home-hero-slider {
-                aspect-ratio: 1 / 1;
-                max-height: min(420px, 68vh);
+                aspect-ratio: auto !important;
+                max-height: none !important;
+                height: calc(100dvh - 86px) !important;
+                min-height: calc(100dvh - 86px) !important;
+            }
+            #home-content .slider-block.style-two.home-hero-slider .sub-img img,
+            #home-content .slider-block.style-two.home-hero-slider .sub-img picture,
+            #home-content .slider-block.style-two.home-hero-slider .sub-img picture img {
+                object-fit: cover !important;
+                object-position: center center;
             }
         }
         #home-content .slider-block.style-two.home-hero-slider .slider-main,
