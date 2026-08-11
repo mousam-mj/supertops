@@ -100,6 +100,15 @@
         showCartAlert(extractCartErrorMessage(data, result.status));
     }
 
+    function trackAddToCartFromApi(result) {
+        if (!result || !result.data || !result.data.tracking) return;
+        if (typeof window.pushEcommerceEvent !== 'function') return;
+        var tracking = result.data.tracking;
+        if (tracking.event && tracking.ecommerce) {
+            window.pushEcommerceEvent(tracking.event, tracking.ecommerce);
+        }
+    }
+
     // Add to cart functionality
     let isAddingToCart = false; // Prevent double clicks
     let isBuyItNow = false;
@@ -177,6 +186,7 @@
             })
             .then(function(result) {
                 if (result.data && result.data.success) {
+                    trackAddToCartFromApi(result);
                     handleCartAddSuccess(true);
                 } else {
                     handleCartAddFailure(result);
@@ -241,6 +251,7 @@
             })
             .then(function(result) {
                 if (result.data && result.data.success) {
+                    trackAddToCartFromApi(result);
                     if (typeof updateCartCount === 'function') updateCartCount();
                     window.location.href = checkoutUrl;
                 } else {

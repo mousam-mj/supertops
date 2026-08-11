@@ -757,6 +757,12 @@
         </div>
 @endsection
 @section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof window.pushEcommerceEvent !== 'function') return;
+    window.pushEcommerceEvent('view_item', @json(ecommerce_view_item_payload($product, $initialDisplayPrice, $initialProductTitle)));
+});
+</script>
 <script src="{{ asset('assets/js/product-detail.js') }}?v={{ filemtime(public_path('assets/js/product-detail.js')) }}"></script>
 <script>
 (function () {

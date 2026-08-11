@@ -474,6 +474,7 @@ class CartController extends Controller
                     'success' => true,
                     'message' => 'Item updated in cart',
                     'data' => $existingCart,
+                    'tracking' => $this->addToCartTracking($existingCart, (int) $request->quantity),
                 ]);
             }
         } else {
@@ -537,6 +538,7 @@ class CartController extends Controller
                     'success' => true,
                     'message' => 'Item updated in cart',
                     'data' => $existingCart,
+                    'tracking' => $this->addToCartTracking($existingCart, (int) $request->quantity),
                 ])->cookie('cart_session_id', $sessionId, 60 * 24 * 30);
             }
         }
@@ -547,6 +549,7 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Item added to cart',
             'data' => $cart->load('product'),
+            'tracking' => $this->addToCartTracking($cart, (int) $request->quantity),
         ], 201);
 
         if (!$request->user()) {
@@ -861,6 +864,17 @@ class CartController extends Controller
         }
 
         return implode(' | ', $parts);
+    }
+
+    /**
+     * GA4 / GTM add_to_cart payload for a confirmed cart update.
+     */
+    private function addToCartTracking(Cart $cart, int $quantityAdded): array
+    {
+        return [
+            'event' => 'add_to_cart',
+            'ecommerce' => ecommerce_add_to_cart_payload($cart, $quantityAdded),
+        ];
     }
 }
 

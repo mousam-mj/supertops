@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
         if (file_exists($helperPath = app_path('Helpers/BenefitBlockHelper.php'))) {
             require_once $helperPath;
         }
+        if (file_exists($helperPath = app_path('Helpers/EcommerceTrackingHelper.php'))) {
+            require_once $helperPath;
+        }
     }
 
     /**

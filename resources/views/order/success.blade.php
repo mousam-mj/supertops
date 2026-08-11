@@ -92,3 +92,18 @@
 </div>
 @endsection
 
+@section('scripts')
+<script>
+(function () {
+    if (typeof window.pushEcommerceEvent !== 'function') return;
+    var orderId = @json($order->order_number);
+    var storageKey = 'perch_purchase_tracked_' + orderId;
+    if (sessionStorage.getItem(storageKey)) {
+        return;
+    }
+    sessionStorage.setItem(storageKey, '1');
+    window.pushEcommerceEvent('purchase', @json(ecommerce_purchase_payload($order)));
+})();
+</script>
+@endsection
+

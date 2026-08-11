@@ -456,6 +456,14 @@
 
 @endsection
 @section('scripts')
+@if(($cartItems ?? collect())->isNotEmpty())
+<script>
+(function () {
+    if (typeof window.pushEcommerceEvent !== 'function') return;
+    window.pushEcommerceEvent('begin_checkout', @json(ecommerce_begin_checkout_payload($cartItems)));
+})();
+</script>
+@endif
 <script>
 // Define functions IMMEDIATELY - NO IIFE, execute directly
 // Function to validate form
