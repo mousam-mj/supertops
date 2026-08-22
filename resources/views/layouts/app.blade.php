@@ -1885,7 +1885,7 @@
                         <div class="text-button-uppercase">Total:</div>
                         <div class="text-title">₹<span class="total-price">0.00</span></div>
                     </div>
-                    <a href="{{{ route('checkout.index') }}}" class="button-main w-full text-center uppercase">Checkout</a>
+                    <a href="{{ route('checkout.index') }}" class="button-main cart-checkout-btn w-full text-center uppercase">Checkout</a>
                     <a href="{{{ route('cart.index') }}}" class="button-main w-full text-center uppercase mt-3 bg-white border border-black text-black hover:bg-black hover:text-white">View Cart</a>
                 </div>
             </div>

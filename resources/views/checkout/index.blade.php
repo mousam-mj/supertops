@@ -460,7 +460,10 @@
 <script>
 (function () {
     if (typeof window.pushEcommerceEvent !== 'function') return;
+    var firedAt = parseInt(sessionStorage.getItem('ecommerce_begin_checkout_fired') || '0', 10);
+    if (firedAt && (Date.now() - firedAt) < 5000) return;
     window.pushEcommerceEvent('begin_checkout', @json(ecommerce_begin_checkout_payload($cartItems)));
+    sessionStorage.setItem('ecommerce_begin_checkout_fired', String(Date.now()));
 })();
 </script>
 @endif

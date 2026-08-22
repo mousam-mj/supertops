@@ -250,6 +250,7 @@ class CartController extends Controller
             'data' => [
                 'items' => $items,
                 'total' => $total,
+                'tracking' => $this->beginCheckoutTracking($cartItems),
             ],
         ]);
 
@@ -874,6 +875,18 @@ class CartController extends Controller
         return [
             'event' => 'add_to_cart',
             'ecommerce' => ecommerce_add_to_cart_payload($cart, $quantityAdded),
+        ];
+    }
+
+    private function beginCheckoutTracking(\Illuminate\Support\Collection $cartItems): ?array
+    {
+        if ($cartItems->isEmpty()) {
+            return null;
+        }
+
+        return [
+            'event' => 'begin_checkout',
+            'ecommerce' => ecommerce_begin_checkout_payload($cartItems),
         ];
     }
 }
