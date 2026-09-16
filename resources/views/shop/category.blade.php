@@ -39,7 +39,8 @@
     $promoSectionEnabled = $mainCategory?->promo_section_enabled ?? true;
     $benefitsSectionEnabled = $mainCategory?->benefits_section_enabled ?? true;
     $instagramSectionEnabled = $mainCategory?->instagram_section_enabled ?? true;
-    $showCategoryBlocks = ! $isSubCategoryPage && $subCategoriesList->isNotEmpty() && $subcategoryCardsSectionEnabled;
+    $showCategoryBlocks = $subCategoriesList->isNotEmpty()
+        && ($isSubCategoryPage || $subcategoryCardsSectionEnabled);
     $testimonialText = $category->testimonial_text ?? ($mainCategory->testimonial_text ?? null);
     $defaultTestimonial = "I absolutely love this shop! The products are high-quality and the customer service is excellent. I always leave with exactly what I need and a smile on my face.";
     $promoBannerImages = $category->banner_images ?? ($mainCategory->banner_images ?? []);
@@ -147,8 +148,9 @@
                             $subImageMobileUrl = $subImageMobile ? storage_asset($subImageMobile) : $subImage;
                             $subShopUrl = setting_link_url(
                                 $subCat->hero_button_url ?? null,
-                                route('shop', ['category' => $subCat->slug])
+                                $subCat->storefrontUrl()
                             );
+                            $subCardLabel = trim((string) ($subCat->hero_button_text ?? '')) ?: $subCat->name;
                         @endphp
                         <a href="{{ $subShopUrl }}" class="banner-item banner-card-stable banner-size-fixed banner-aspect-1-1 relative bg-surface block rounded-[20px] overflow-hidden w-full">
                             <div class="banner-img w-full overflow-hidden">
@@ -161,7 +163,7 @@
                             </div>
                             @if($subcategoryCardsShowText)
                             <div class="banner-text-overlay">
-                                <span class="button-main">{{ $heroButtonText }}</span>
+                                <span class="button-main">{{ $subCardLabel }}</span>
                             </div>
                             @endif
                         </a>

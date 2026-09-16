@@ -76,12 +76,36 @@
     @endif
 </div>
 
+<div class="row mb-3">
+    <div class="col-12">
+        @php
+            $navCategory = $category->navigationCategory();
+            $cardSubcategories = $navCategory
+                ? $navCategory->children()->where('is_active', true)->where('show_on_parent_page', true)->orderBy('sort_order')->get()
+                : collect();
+        @endphp
+        <div class="alert alert-info mb-0">
+            <strong>Subcategory cards on storefront:</strong>
+            @if($category->subcategory_cards_section_enabled ?? true)
+                {{ $cardSubcategories->count() }} visible card(s) on the {{ $category->name }} page.
+            @else
+                Disabled — enable <em>Subcategory grid cards</em> in Edit.
+            @endif
+            <a href="{{ route('admin.categories.index', ['sub_only' => 1, 'main_category_id' => $category->id]) }}" class="alert-link ms-2">Manage subcategories</a>
+            @if($navCategory)
+                <a href="{{ route('admin.categories.create', ['parent_id' => $navCategory->id]) }}" class="alert-link ms-2">Add subcategory</a>
+            @endif
+        </div>
+    </div>
+</div>
+
 @if($category->categories->count() > 0)
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Sub Categories ({{ $category->categories->count() }})</h5>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Linked Categories ({{ $category->categories->count() }})</h5>
+                <a href="{{ route('admin.categories.index', ['sub_only' => 1, 'main_category_id' => $category->id]) }}" class="btn btn-sm btn-outline-primary">Manage subcategories</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

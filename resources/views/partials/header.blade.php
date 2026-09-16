@@ -180,12 +180,12 @@
                                                 <div class="list-nav-item w-full grid grid-cols-2 pt-2 pb-6">
                                                     @foreach($primaryCat->children as $subCategory)
                                                         <div class="nav-item">
-                                                            <a href="{{ route('category', $subCategory->slug) }}" class="text-title duration-300">{{ $subCategory->name }}</a>
+                                                            <a href="{{ $subCategory->storefrontUrl() }}" class="text-title duration-300">{{ $subCategory->name }}</a>
                                                             @if($subCategory->children->count() > 0)
                                                                 <ul class="mt-2">
                                                                     @foreach($subCategory->children as $childCategory)
                                                                         <li>
-                                                                            <a href="{{ route('category', $childCategory->slug) }}" class="link text-secondary duration-300">{{ $childCategory->name }}</a>
+                                                                            <a href="{{ $childCategory->storefrontUrl() }}" class="link text-secondary duration-300">{{ $childCategory->name }}</a>
                                                                         </li>
                                                                     @endforeach
                                                                 </ul>

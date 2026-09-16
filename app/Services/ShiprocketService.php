@@ -13,6 +13,8 @@ class ShiprocketService
     protected ?string $password;
     protected string $pickupPostcode;
 
+    protected string $pickupLocation;
+
     public function __construct()
     {
         $config = config('services.shiprocket', []);
@@ -20,6 +22,7 @@ class ShiprocketService
         $this->email = $config['email'] ?? null;
         $this->password = $config['password'] ?? null;
         $this->pickupPostcode = $config['pickup_postcode'] ?? '110001';
+        $this->pickupLocation = $config['pickup_location'] ?? 'Primary';
     }
 
     public function isConfigured(): bool
@@ -149,20 +152,37 @@ class ShiprocketService
         }
 
         $addr = $order['shipping_address'] ?? [];
-        $name = trim(($addr['full_name'] ?? '') ?: ($addr['first_name'] ?? '') . ' ' . ($addr['last_name'] ?? ''));
-        $address1 = $addr['address_line_1'] ?? $addr['address'] ?? '';
-        $address2 = $addr['address_line_2'] ?? '';
-        $city = $addr['city'] ?? '';
-        $state = $addr['state'] ?? '';
-        $pincode = $addr['pincode'] ?? '';
-        $phone = $addr['phone'] ?? $order['customer_phone'] ?? '';
-        $email = $addr['email'] ?? $order['customer_email'] ?? '';
+        $firstName = trim((string) ($addr['first_name'] ?? ''));
+        $lastName = trim((string) ($addr['last_name'] ?? ''));
+        $name = trim(($addr['full_name'] ?? '') ?: trim($firstName.' '.$lastName));
+        if ($name === '' && ! empty($order['customer_name'])) {
+            $name = trim((string) $order['customer_name']);
+            $parts = preg_split('/\s+/', $name, 2);
+            $firstName = $firstName !== '' ? $firstName : ($parts[0] ?? 'Customer');
+            $lastName = $lastName !== '' ? $lastName : ($parts[1] ?? '');
+        }
+        if ($firstName === '') {
+            $firstName = 'Customer';
+        }
+
+        $address1 = trim((string) ($addr['address_line_1'] ?? $addr['address'] ?? ''));
+        $address2 = trim((string) ($addr['address_line_2'] ?? ''));
+        $city = trim((string) ($addr['city'] ?? ''));
+        $state = trim((string) ($addr['state'] ?? ''));
+        $pincode = trim((string) ($addr['pincode'] ?? ''));
+        $phone = $this->normalizePhone((string) ($addr['phone'] ?? $order['customer_phone'] ?? ''));
+        $email = trim((string) ($addr['email'] ?? $order['customer_email'] ?? ''));
 
         $orderItems = [];
         foreach ($items as $item) {
+            $sku = trim((string) ($item['sku'] ?? ''));
+            if ($sku === '') {
+                $sku = 'ITEM-'.substr(md5(($item['name'] ?? 'product').($item['price'] ?? 0)), 0, 8);
+            }
+
             $orderItems[] = [
                 'name' => $item['name'] ?? 'Product',
-                'sku' => $item['sku'] ?? '',
+                'sku' => $sku,
                 'units' => (int) ($item['quantity'] ?? 1),
                 'selling_price' => (float) ($item['price'] ?? 0),
             ];
@@ -171,10 +191,10 @@ class ShiprocketService
         $payload = [
             'order_id' => $order['order_number'],
             'order_date' => now()->format('Y-m-d H:i:s'),
-            'pickup_location' => 'Primary',
+            'pickup_location' => $this->pickupLocation,
             'channel_id' => '',
-            'billing_customer_name' => $name,
-            'billing_last_name' => '',
+            'billing_customer_name' => $firstName,
+            'billing_last_name' => $lastName,
             'billing_address' => $address1,
             'billing_address_2' => $address2,
             'billing_city' => $city,
@@ -184,8 +204,8 @@ class ShiprocketService
             'billing_email' => $email ?: 'noreply@perchlife.in',
             'billing_phone' => $phone,
             'shipping_is_billing' => true,
-            'shipping_customer_name' => $name,
-            'shipping_last_name' => '',
+            'shipping_customer_name' => $firstName,
+            'shipping_last_name' => $lastName,
             'shipping_address' => $address1,
             'shipping_address_2' => $address2,
             'shipping_city' => $city,
@@ -195,7 +215,7 @@ class ShiprocketService
             'shipping_phone' => $phone,
             'order_items' => $orderItems,
             'payment_method' => (strtolower($order['payment_method'] ?? '') === 'cod') ? 'COD' : 'Prepaid',
-            'sub_total' => (float) ($order['total_amount'] ?? 0),
+            'sub_total' => (float) ($order['subtotal'] ?? $order['total_amount'] ?? 0),
             'length' => 10,
             'width' => 10,
             'height' => 10,
@@ -258,6 +278,19 @@ class ShiprocketService
     public function getPickupPostcode(): string
     {
         return $this->pickupPostcode;
+    }
+
+    private function normalizePhone(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone) ?? '';
+        if (str_starts_with($digits, '91') && strlen($digits) === 12) {
+            $digits = substr($digits, 2);
+        }
+        if (strlen($digits) > 10) {
+            $digits = substr($digits, -10);
+        }
+
+        return $digits;
     }
 
     /**

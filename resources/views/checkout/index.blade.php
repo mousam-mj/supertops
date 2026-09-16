@@ -264,7 +264,7 @@
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="Town/City *" value="{{ $defaultAddress->city ?? '' }}" required />
                                         </div>
                                         <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Street *" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Full Address *" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="country" name="country" type="text" placeholder="State *" value="{{ $defaultAddress->state ?? '' }}" required />
@@ -927,6 +927,7 @@ if (testBtn) {
     });
 
     // Global variables to track cart and shipping
+    const FREE_SHIPPING_THRESHOLD = {{ json_encode((float) \App\Models\Setting::get('free_shipping_threshold', 499)) }};
     let cartSubtotal = 0;
     let currentShippingCharge = 0;
     let isAddressComplete = false;
@@ -937,6 +938,26 @@ if (testBtn) {
     // Ensure variables are globally accessible
     window.cartSubtotal = cartSubtotal;
     window.currentShippingCharge = currentShippingCharge;
+
+    function applyFreeShippingIfEligible() {
+        const subtotal = window.cartSubtotal || cartSubtotal || 0;
+        if (subtotal < FREE_SHIPPING_THRESHOLD) {
+            return false;
+        }
+
+        currentShippingCharge = 0;
+        window.currentShippingCharge = 0;
+        isDeliveryCalculated = true;
+
+        const shippingElement = document.querySelector('.shipping-charge');
+        if (shippingElement) {
+            shippingElement.textContent = 'Free';
+        }
+
+        updateTotalDisplay();
+        updatePaymentAvailability();
+        return true;
+    }
 
     // Initialize cart subtotal from loaded cart items
     function initializeCartSubtotal() {
@@ -963,6 +984,7 @@ if (testBtn) {
                 window.currentShippingCharge = currentShippingCharge;
                 
                 updateTotalDisplay();
+                applyFreeShippingIfEligible();
                 if (typeof window.loadCheckoutCartItems === 'function') {
                     window.loadCheckoutCartItems();
                 }
@@ -1218,6 +1240,10 @@ if (testBtn) {
 
     // Shipping calculation
     function calculateShipping() {
+        if (applyFreeShippingIfEligible()) {
+            return;
+        }
+
         const postalCode = document.getElementById('postal')?.value?.trim();
         if (!postalCode || postalCode.length !== 6) {
             // Reset shipping if postal code is invalid
@@ -1258,12 +1284,16 @@ if (testBtn) {
             body: JSON.stringify({
                 pincode: postalCode,
                 weight: 1,
-                cod_amount: 0
+                cod_amount: 0,
+                order_amount: window.cartSubtotal || cartSubtotal || 0
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
+                if (applyFreeShippingIfEligible()) {
+                    return;
+                }
                 currentShippingCharge = parseFloat(data.data.shipping_charge) || 0;
                 window.currentShippingCharge = currentShippingCharge;
                 const shippingElement = document.querySelector('.shipping-charge');
@@ -1286,6 +1316,9 @@ if (testBtn) {
                 updatePaymentAvailability();
                 updateTotalDisplay();
             } else {
+                if (applyFreeShippingIfEligible()) {
+                    return;
+                }
                 // Handle error - set to fallback shipping
                 currentShippingCharge = 50; // Fallback shipping charge
                 window.currentShippingCharge = currentShippingCharge;
@@ -1307,6 +1340,9 @@ if (testBtn) {
         })
         .catch(error => {
             console.error('Shipping calculation error:', error);
+            if (applyFreeShippingIfEligible()) {
+                return;
+            }
             // Fallback to default shipping
             currentShippingCharge = 50;
             window.currentShippingCharge = currentShippingCharge;
@@ -1627,9 +1663,9 @@ if (testBtn) {
                         placeOrderAfterPayment(orderData);
                     },
                     prefill: {
-                        name: (orderData.shipping_address?.first_name || '') + ' ' + (orderData.shipping_address?.last_name || ''),
-                        email: orderData.shipping_address?.email || '',
-                        contact: orderData.shipping_address?.phone || ''
+                        name: ((orderData.guest_info?.first_name || orderData.shipping_address?.first_name || '') + ' ' + (orderData.guest_info?.last_name || orderData.shipping_address?.last_name || '')).trim(),
+                        email: orderData.guest_info?.email || orderData.shipping_address?.email || '',
+                        contact: orderData.guest_info?.phone || orderData.shipping_address?.phone || ''
                     },
                     theme: {
                         color: '#000000'
@@ -1638,11 +1674,7 @@ if (testBtn) {
                         ondismiss: function() {
                             console.log('Razorpay payment cancelled');
                             // Re-enable the submit button
-                            const submitBtn = document.querySelector('.place-order-btn');
-                            if (submitBtn) {
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Place Order';
-                            }
+                            resetSubmitButton();
                         }
                     }
                 };
@@ -1666,6 +1698,12 @@ if (testBtn) {
     }
 
     function placeOrderAfterPayment(orderData) {
+        const submitBtn = document.getElementById('place-order-btn');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Confirming order...';
+            submitBtn.disabled = true;
+        }
+
         fetch('/place-order', {
             method: 'POST',
             headers: {
@@ -1677,27 +1715,50 @@ if (testBtn) {
             credentials: 'same-origin',
             body: JSON.stringify(orderData)
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function(response) {
+            return response.text().then(function(text) {
+                var data = {};
+                try {
+                    data = text ? JSON.parse(text) : {};
+                } catch (err) {
+                    throw new Error('Invalid server response after payment. Please contact support with your payment ID.');
+                }
+
+                if (!response.ok) {
+                    var msg = data.message || 'Order creation failed after payment.';
+                    if (data.errors) {
+                        msg += '\n\n' + Object.values(data.errors).flat().join('\n');
+                    }
+                    throw new Error(msg);
+                }
+
+                return data;
+            });
+        })
+        .then(function(data) {
             if (data.success && data.data && data.data.id) {
                 console.log('Order placed successfully after payment');
-                window.location.href = `/order-success/${data.data.id}`;
-            } else {
-                alert('Payment successful but order creation failed. Please contact support.');
-                console.error('Order creation failed:', data);
+                window.location.replace('/order-success/' + data.data.id);
+                return;
             }
+
+            throw new Error(data.message || 'Payment successful but order creation failed. Please contact support.');
         })
-        .catch(error => {
+        .catch(function(error) {
             console.error('Error placing order after payment:', error);
-            alert('Payment successful but order creation failed. Please contact support.');
+            alert(error.message || 'Payment successful but order creation failed. Please contact support with your payment reference.');
+            resetSubmitButton();
         });
     }
 
     function resetSubmitButton() {
-        const submitBtn = document.querySelector('.place-order-btn');
+        const submitBtn = document.getElementById('place-order-btn');
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Place Order';
+            submitBtn.innerHTML = '<span id="btn-text">Pay Securely</span> <span id="btn-amount"></span> <i id="btn-icon" class="ph ph-credit-card text-xl"></i>';
+            if (typeof updateTotalDisplay === 'function') {
+                updateTotalDisplay();
+            }
         }
     }
 

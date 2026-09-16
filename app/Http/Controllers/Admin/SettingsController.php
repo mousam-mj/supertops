@@ -69,6 +69,7 @@ class SettingsController extends Controller
     protected array $settingKeys = [
         'general' => [
             'site_name',
+            'site_tagline',
             'site_logo',
             'site_favicon',
             'contact_email',
@@ -212,6 +213,7 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'site_name' => 'nullable|string|max:255',
+            'site_tagline' => 'nullable|string|max:255',
             'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'site_favicon' => 'nullable|mimes:ico,jpeg,png,jpg,gif,webp,svg|max:1024',
             'contact_email' => 'nullable|email|max:255',

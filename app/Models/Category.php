@@ -112,6 +112,30 @@ class Category extends Model
     }
 
     /**
+     * Whether this category has active child categories.
+     */
+    public function hasActiveChildren(): bool
+    {
+        if ($this->relationLoaded('children')) {
+            return $this->children->where('is_active', true)->isNotEmpty();
+        }
+
+        return $this->children()->where('is_active', true)->exists();
+    }
+
+    /**
+     * Storefront link: landing page for groups, filtered shop for leaf categories.
+     */
+    public function storefrontUrl(): string
+    {
+        if ($this->hasActiveChildren()) {
+            return route('category', $this->slug);
+        }
+
+        return route('shop', ['category' => $this->slug]);
+    }
+
+    /**
      * Get the full path of the category.
      */
     public function getFullPathAttribute()

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
-@section('title', 'Create Category')
-@section('page-title', 'Create New Category')
+@section('title', request('parent_id') ? 'Create Sub Category' : 'Create Category')
+@section('page-title', request('parent_id') ? 'Create New Sub Category' : 'Create New Category')
 
 @section('content')
 <div class="row">
@@ -34,17 +34,37 @@
                                     id="parent_id" 
                                     name="parent_id">
                                 <option value="">None (Main Category)</option>
-                                @foreach($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                        {{ $parent->name }}
+                                @foreach($parentOptions as $parent)
+                                    <option value="{{ $parent['id'] }}" {{ (string) old('parent_id', $preselectedParentId) === (string) $parent['id'] ? 'selected' : '' }}>
+                                        {{ $parent['label'] }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('parent_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Leave empty to create a main category</small>
+                            <small class="form-text text-muted">Choose <strong>Drinkware</strong> or <strong>Barware</strong> to add a subcategory card on that page.</small>
                         </div>
+                    </div>
+
+                    <div class="mb-3" id="mainCategoryField">
+                        <label for="main_category_id" class="form-label">Main Category (Drinkware / Barware)</label>
+                        <select class="form-select @error('main_category_id') is-invalid @enderror" id="main_category_id" name="main_category_id">
+                            <option value="">None</option>
+                            @foreach($mainCategories as $mainCat)
+                                <option value="{{ $mainCat->id }}" {{ old('main_category_id') == $mainCat->id ? 'selected' : '' }}>
+                                    {{ $mainCat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('main_category_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Only needed for top-level categories. Subcategories inherit this from their parent.</small>
+                    </div>
+
+                    <div id="subcategoryFieldsWrapper" style="display: none;">
+                        @include('admin.categories.partials.subcategory-create-fields')
                     </div>
 
                     <div class="mb-3">
@@ -311,6 +331,18 @@
 
 @push('scripts')
 <script>
+    function toggleCategoryFormSections() {
+        const parentId = document.getElementById('parent_id')?.value;
+        const subWrap = document.getElementById('subcategoryFieldsWrapper');
+        const mainField = document.getElementById('mainCategoryField');
+        const isSub = Boolean(parentId);
+        if (subWrap) subWrap.style.display = isSub ? 'block' : 'none';
+        if (mainField) mainField.style.display = isSub ? 'none' : 'block';
+    }
+
+    document.getElementById('parent_id')?.addEventListener('change', toggleCategoryFormSections);
+    toggleCategoryFormSections();
+
     function previewImage(input, previewId, imgId) {
         const preview = document.getElementById(previewId);
         const previewImg = document.getElementById(imgId);

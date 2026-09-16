@@ -52,6 +52,8 @@ return [
         'password' => env('SHIPROCKET_PASSWORD'),
         'api_url' => env('SHIPROCKET_API_URL', 'https://apiv2.shiprocket.in'),
         'pickup_postcode' => env('SHIPROCKET_PICKUP_POSTCODE', '110001'),
+        'pickup_location' => env('SHIPROCKET_PICKUP_LOCATION', 'Primary'),
+        'auto_sync' => env('SHIPROCKET_AUTO_SYNC', true),
     ],
 
     'google' => [
@@ -66,6 +68,9 @@ return [
         'route' => env('MSG91_ROUTE', 4),
         'country' => env('MSG91_COUNTRY', 91),
         'template_id' => env('MSG91_TEMPLATE_ID'),
+        'otp_variable' => env('MSG91_OTP_VARIABLE', 'var1'),
+        'order_sms_template_id' => env('MSG91_ORDER_SMS_TEMPLATE_ID'),
+        'order_whatsapp_template_id' => env('MSG91_ORDER_WHATSAPP_TEMPLATE_ID'),
     ],
 
     'instagram' => [

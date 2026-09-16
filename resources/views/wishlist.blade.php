@@ -776,7 +776,7 @@
             el.setAttribute('data-wishlist-page', '1');
             el.innerHTML = '<div class="product-main cursor-pointer block"><div class="product-thumb bg-white relative rounded-2xl overflow-hidden">' +
                 '<button type="button" class="remove-from-wishlist absolute top-3 right-3 z-10 bg-white border border-line rounded-full w-8 h-8 flex items-center justify-center text-red hover:bg-red hover:text-white caption2" title="Remove from wishlist"><i class="ph ph-x text-sm"></i></button>' +
-                '<a href="' + productUrl + '" class="product-img w-full block aspect-[3/4]"><img src="' + imgSrc + '" alt="' + (product.name || '').replace(/"/g, '&quot;') + '" class="w-full h-full object-cover" onerror="this.src=\'' + defaultImg + '\'" /></a></div>' +
+                '<a href="' + productUrl + '" class="product-img w-full block aspect-square bg-[#f5f5f5]"><img src="' + imgSrc + '" alt="' + (product.name || '').replace(/"/g, '&quot;') + '" class="w-full h-full object-contain" onerror="this.src=\'' + defaultImg + '\'" /></a></div>' +
                 '<div class="product-infor mt-4"><div class="product-name text-title duration-300">' + (product.name || 'Product') + '</div>' +
                 '<div class="flex items-center gap-2 mt-2">' + priceHtml + '</div></div></div>';
         } else {

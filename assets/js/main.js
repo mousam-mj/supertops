@@ -1857,7 +1857,7 @@ const createProductItem = (product) => {
 
   let productImages = "";
   product.thumbImage.forEach((img, index) => {
-    productImages += `<img key="${index}" class="w-full h-full object-cover duration-700" src="${img}" alt="img">`;
+    productImages += `<img key="${index}" class="w-full h-full object-contain duration-700" src="${img}" alt="img">`;
   });
 
   productItem.innerHTML = `
@@ -1880,7 +1880,7 @@ const createProductItem = (product) => {
                         <i class="ph ph-check-circle text-lg checked-icon"></i>
                     </div>
                 </div>
-                <div class="product-img w-full h-full aspect-[3/4]">
+                <div class="product-img w-full h-full aspect-square bg-[#f5f5f5]">
                     ${productImages}
                 </div>
                 ${product.sale ? (`
@@ -3508,8 +3508,8 @@ if (listProductCompare) {
         "cursor-pointer"
       );
       productElement.innerHTML = `
-                <div class="bg-img w-full aspect-[3/4] rounded-lg overflow-hidden flex-shrink-0">
-                    <img src=${product.thumbImage[0]} alt='img' class='w-full h-full object-cover' />
+                <div class="bg-img w-full aspect-square rounded-lg overflow-hidden flex-shrink-0 bg-[#f5f5f5]">
+                    <img src=${product.thumbImage[0]} alt='img' class='w-full h-full object-contain' />
                 </div>
                 <div class="text-title text-center mt-4">${product.name}</div>
                 <div class="caption2 font-semibold text-secondary2 uppercase text-center mt-1">

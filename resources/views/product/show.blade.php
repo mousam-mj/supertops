@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Product Discount - Perch Bottle')
+@section('title', site_page_title($product->name))
 
 @section('content')
 @php
@@ -641,7 +641,7 @@
                             <div class="grid lg:grid-cols-4 grid-cols-2 gap-[30px] md:mt-10 mt-6">
                                 @php
                                     $f1Title = \App\Models\Setting::get('product_feature_1_title', 'Shipping Faster');
-                                    $f1Text = \App\Models\Setting::get('product_feature_1_text', 'Free shipping on orders over ₹75. Fast delivery across India.');
+                                    $f1Text = \App\Models\Setting::get('product_feature_1_text', 'Free shipping on orders over ₹499. Fast delivery across India.');
                                     $f2Title = \App\Models\Setting::get('product_feature_2_title', 'Premium Material');
                                     $f2Text = \App\Models\Setting::get('product_feature_2_text', 'Crafted from high-quality materials for durability and style.');
                                     $f3Title = \App\Models\Setting::get('product_feature_3_title', 'High Quality');
@@ -1476,6 +1476,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const checkBtn = document.getElementById('check-pincode-btn');
         const deliveryInfo = document.getElementById('delivery-info');
         const deliveryEstimateText = document.getElementById('delivery-estimate-text');
+        const productOrderAmount = {{ json_encode((float) $initialDisplayPrice) }};
+        const freeShippingThreshold = {{ json_encode((float) \App\Models\Setting::get('free_shipping_threshold', 499)) }};
+        const productQualifiesFreeShipping = productOrderAmount >= freeShippingThreshold;
 
         // Check pincode on button click
         checkBtn.addEventListener('click', checkDelivery);
@@ -1521,7 +1524,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({
                     pincode: pincode,
                     weight: 1,
-                    cod_amount: 0
+                    cod_amount: 0,
+                    order_amount: productOrderAmount
                 })
             })
             .then(response => response.json())
@@ -1546,6 +1550,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const shippingCharge = parseFloat(deliveryData.shipping_charge) || 0;
             const estimatedDelivery = deliveryData.estimated_delivery || '3-5 business days';
             const provider = deliveryData.provider || 'Standard';
+            const showShippingRow = !productQualifiesFreeShipping && shippingCharge > 0;
 
             deliveryInfo.innerHTML = `
                 <div class="delivery-result-box delivery-result-box--success">
@@ -1554,10 +1559,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span>Delivery Available</span>
                     </div>
                     <div class="delivery-result-rows">
+                        ${productQualifiesFreeShipping ? `
+                        <div class="delivery-result-row">
+                            <span>Shipping:</span>
+                            <span>Free on orders above ₹${freeShippingThreshold.toFixed(0)}</span>
+                        </div>` : ''}
+                        ${showShippingRow ? `
                         <div class="delivery-result-row">
                             <span>Shipping Charge:</span>
-                            <span>${shippingCharge > 0 ? '₹' + shippingCharge.toFixed(2) : 'Free'}</span>
-                        </div>
+                            <span>₹${shippingCharge.toFixed(2)}</span>
+                        </div>` : ''}
                         <div class="delivery-result-row">
                             <span>Estimated Delivery:</span>
                             <span>${estimatedDelivery}</span>

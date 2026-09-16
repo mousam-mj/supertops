@@ -18,11 +18,13 @@ class ShippingController extends Controller
             'pincode' => 'required|string|size:6',
             'weight' => 'nullable|numeric|min:0',
             'cod_amount' => 'nullable|numeric|min:0',
+            'order_amount' => 'nullable|numeric|min:0',
         ]);
 
         $pincode = $request->pincode;
         $weight = (float) ($request->weight ?? 1);
         $codAmount = (float) ($request->cod_amount ?? 0);
+        $orderAmount = (float) ($request->order_amount ?? 0);
 
         // 1) Try Shiprocket
         $shiprocket = app(ShiprocketService::class);
@@ -31,13 +33,7 @@ class ShippingController extends Controller
             if ($result['serviceable']) {
                 return response()->json([
                     'success' => true,
-                    'data' => [
-                        'pincode' => $pincode,
-                        'serviceable' => true,
-                        'shipping_charge' => $result['shipping_charge'],
-                        'estimated_delivery' => $result['estimated_days'],
-                        'provider' => 'shiprocket',
-                    ],
+                    'data' => $this->shippingResponse($pincode, $result['shipping_charge'], $result['estimated_days'], 'shiprocket', $orderAmount),
                 ]);
             }
             // Don't return error immediately, fall through to other providers
@@ -59,15 +55,10 @@ class ShippingController extends Controller
                     $serviceable = isset($data['delivery_codes']) && count($data['delivery_codes']) > 0;
                     if ($serviceable) {
                         $shippingCharge = $this->calculateShippingCharge($weight, $codAmount);
+
                         return response()->json([
                             'success' => true,
-                            'data' => [
-                                'pincode' => $pincode,
-                                'serviceable' => true,
-                                'shipping_charge' => $shippingCharge,
-                                'estimated_delivery' => '3-5 business days',
-                                'provider' => 'delhivery',
-                            ],
+                            'data' => $this->shippingResponse($pincode, $shippingCharge, '3-5 business days', 'delhivery', $orderAmount),
                         ]);
                     }
                 }
@@ -82,14 +73,23 @@ class ShippingController extends Controller
         
         return response()->json([
             'success' => true,
-            'data' => [
-                'pincode' => $pincode,
-                'serviceable' => true,
-                'shipping_charge' => $shippingCharge,
-                'estimated_delivery' => $estimatedDelivery,
-                'provider' => 'zone_based',
-            ],
+            'data' => $this->shippingResponse($pincode, $shippingCharge, $estimatedDelivery, 'zone_based', $orderAmount),
         ]);
+    }
+
+    private function shippingResponse(string $pincode, float $shippingCharge, string $estimatedDelivery, string $provider, float $orderAmount): array
+    {
+        $freeShippingApplied = qualifies_for_free_shipping($orderAmount);
+
+        return [
+            'pincode' => $pincode,
+            'serviceable' => true,
+            'shipping_charge' => $freeShippingApplied ? 0 : round($shippingCharge, 2),
+            'estimated_delivery' => $estimatedDelivery,
+            'provider' => $provider,
+            'free_shipping_applied' => $freeShippingApplied,
+            'free_shipping_threshold' => free_shipping_threshold(),
+        ];
     }
 
     private function calculateShippingCharge($weight, $codAmount = 0)

@@ -18,7 +18,7 @@
                 </div>
             </div>
             
-            <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-[3/4] relative block overflow-hidden">
+            <a href="{{{ route('product.show', $product->slug ?? '#') }}}" class="product-img w-full h-full aspect-square relative block overflow-hidden bg-[#f5f5f5]">
                 @php
                     $getImageUrl = function($path) {
                         if (!$path || !is_string($path)) return asset('assets/images/product/perch-bottal.webp');
@@ -32,7 +32,7 @@
                         $mainImage = $getImageUrl($product->images[0]);
                     }
                 @endphp
-                <img class="w-full h-full object-cover duration-700 block" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
+                <img class="w-full h-full object-contain duration-700 block" src="{{ $mainImage }}" alt="{{ $product->name ?? 'Product' }}" onerror="this.onerror=null; this.src='{{ $placeholderImg }}';" />
             </a>
         </div>
 

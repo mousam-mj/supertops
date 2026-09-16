@@ -494,7 +494,7 @@ function renderProducts(page, products = []) {
 
         let productImages = '';
         product.thumbImage.forEach((img, index) => {
-            productImages += `<img key="${index}" class="w-full h-full object-cover duration-700" src="${img}" alt="img">`;
+            productImages += `<img key="${index}" class="w-full h-full object-contain duration-700" src="${img}" alt="img">`;
         });
 
         if (productContainer.classList.contains('style-grid')) {
@@ -518,7 +518,7 @@ function renderProducts(page, products = []) {
                                     <i class="ph ph-check-circle text-lg checked-icon"></i>
                                 </div>
                             </div>
-                            <div class="product-img w-full h-full aspect-[3/4]">
+                            <div class="product-img w-full h-full aspect-square bg-[#f5f5f5]">
                                 ${productImages}
                             </div>
                             <div class="list-action grid grid-cols-2 gap-3 px-5 absolute w-full bottom-5">
@@ -642,7 +642,7 @@ function renderProducts(page, products = []) {
                     <div class="product-main cursor-pointer flex lg:items-center sm:justify-between gap-7 max-lg:gap-5">
                         <div class="product-thumb bg-white relative overflow-hidden rounded-2xl block max-sm:w-1/2">
                             ${productTags}
-                            <div class="product-img w-full aspect-[3/4] rounded-2xl overflow-hidden">
+                            <div class="product-img w-full aspect-square rounded-2xl overflow-hidden bg-[#f5f5f5]">
                                 ${productImages}
                             </div>
                             <div class="list-action px-5 absolute w-full bottom-5 max-lg:hidden">

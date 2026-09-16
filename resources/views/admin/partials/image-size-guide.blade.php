@@ -39,11 +39,11 @@
             ['where' => 'Legacy category thumbnail (if used)', 'admin' => 'Sub Categories → Thumbnail', 'size' => '400×400px', 'ratio' => '1:1 square', 'format' => 'WebP / JPG / PNG'],
         ],
         'Products' => [
-            ['where' => 'Main product image', 'admin' => 'Products → Main image', 'size' => '1200×1600px', 'ratio' => '3:4 portrait', 'format' => 'WebP / JPG'],
-            ['where' => 'Product gallery images', 'admin' => 'Products → Gallery', 'size' => '1200×1600px', 'ratio' => '3:4 portrait', 'format' => 'WebP / JPG'],
-            ['where' => 'Color / variant image', 'admin' => 'Inventory → Variant image', 'size' => '1200×1600px', 'ratio' => '3:4 portrait', 'format' => 'WebP / JPG'],
+            ['where' => 'Main product image', 'admin' => 'Products → Main image', 'size' => '1200×1200px', 'ratio' => '1:1 square', 'format' => 'WebP / JPG'],
+            ['where' => 'Product gallery images', 'admin' => 'Products → Gallery', 'size' => '1200×1200px', 'ratio' => '1:1 square', 'format' => 'WebP / JPG'],
+            ['where' => 'Color / variant image', 'admin' => 'Inventory → Variant image', 'size' => '1200×1200px', 'ratio' => '1:1 square', 'format' => 'WebP / JPG'],
             ['where' => 'Color swatch circle', 'admin' => 'Inventory → Color display settings', 'size' => '96×96px', 'ratio' => '1:1 square', 'format' => 'PNG / WebP / JPG'],
-            ['where' => 'Shop / listing thumbnail', 'admin' => '(Uses main product image)', 'size' => '1200×1600px', 'ratio' => '3:4 portrait', 'format' => 'WebP / JPG'],
+            ['where' => 'Shop / listing thumbnail', 'admin' => '(Uses main product image)', 'size' => '1200×1200px', 'ratio' => '1:1 square', 'format' => 'WebP / JPG'],
         ],
         'Account / other' => [
             ['where' => 'User profile avatar', 'admin' => 'My Account', 'size' => '120×120px', 'ratio' => '1:1 square', 'format' => 'JPG / PNG'],

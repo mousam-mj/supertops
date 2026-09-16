@@ -319,7 +319,9 @@
                     if (typeof updateCartCount === 'function') updateCartCount();
                     fetchCartBeginCheckoutTracking().then(function(tracking) {
                         if (tracking) fireBeginCheckout(tracking);
-                        window.location.href = checkoutUrl;
+                        setTimeout(function() {
+                            window.location.href = checkoutUrl;
+                        }, 300);
                     });
                 } else {
                     handleCartAddFailure(result);
@@ -1251,6 +1253,8 @@
                                 }
                             }
                             
+                            window.cartPageSubtotal = subtotal;
+
                             // Update total (subtotal - discount + shipping)
                             updateCartPageTotal(subtotal);
                         } else {
@@ -1501,7 +1505,8 @@
                 body: JSON.stringify({
                     pincode: pincode,
                     weight: 1,
-                    cod_amount: 0
+                    cod_amount: 0,
+                    order_amount: window.cartPageSubtotal || 0
                 })
             })
             .then(function(r) { return r.json(); })

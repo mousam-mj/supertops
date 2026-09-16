@@ -650,8 +650,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/faqs/category/{faq}/items/{item}', [FaqController::class, 'updateItem'])->name('faqs.update-item');
         Route::delete('/faqs/category/{faq}/items/{item}', [FaqController::class, 'destroyItem'])->name('faqs.destroy-item');
 
-        // Product reviews (list & delete)
+        // Product reviews
         Route::get('/reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'index'])->name('reviews.index');
+        Route::get('/reviews/create', [App\Http\Controllers\Admin\ProductReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/reviews', [App\Http\Controllers\Admin\ProductReviewController::class, 'store'])->name('reviews.store');
+        Route::get('/reviews/{review}/edit', [App\Http\Controllers\Admin\ProductReviewController::class, 'edit'])->name('reviews.edit');
+        Route::put('/reviews/{review}', [App\Http\Controllers\Admin\ProductReviewController::class, 'update'])->name('reviews.update');
         Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ProductReviewController::class, 'destroy'])->name('reviews.destroy');
 
         // Additional Admin Routes

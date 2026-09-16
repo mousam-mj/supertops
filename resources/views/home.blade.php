@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Index - Perch Bottle')
+@section('title', site_page_title())
 
 @section('content')
 <div id="home-content">

@@ -222,14 +222,10 @@ class ShopController extends Controller
             ->orderBy('sort_order')
             ->get();
         
-        // Featured products for this main category only (in stock first)
+        // Featured products scoped to this category tree (not the entire catalog)
         $featuredProducts = Product::where('is_active', true)
             ->where('is_featured', true)
-            ->when($mainCategory, function ($query) use ($mainCategory) {
-                $query->whereHas('category', function ($q) use ($mainCategory) {
-                    $q->where('main_category_id', $mainCategory->id);
-                });
-            })
+            ->whereIn('category_id', $categoryIds)
             ->orderByRaw('CASE WHEN stock_quantity > 0 AND in_stock = 1 THEN 0 ELSE 1 END')
             ->orderByDesc('created_at')
             ->with('category.mainCategory')

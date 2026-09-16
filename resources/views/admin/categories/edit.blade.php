@@ -44,19 +44,37 @@
                                     id="parent_id" 
                                     name="parent_id">
                                 <option value="">None (Main Category)</option>
-                                @foreach($parentCategories as $parent)
-                                    <option value="{{ $parent->id }}" 
-                                            {{ old('parent_id', $category->parent_id) == $parent->id ? 'selected' : '' }}>
-                                        {{ $parent->name }}
+                                @foreach($parentOptions as $parent)
+                                    <option value="{{ $parent['id'] }}"
+                                            {{ old('parent_id', $category->parent_id) == $parent['id'] ? 'selected' : '' }}>
+                                        {{ $parent['label'] }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('parent_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Leave empty to make it a main category</small>
+                            <small class="form-text text-muted">Choose Drinkware or Barware to nest under, or a grouping like Double wall Bottles.</small>
                         </div>
                     </div>
+
+                    @if(empty($isSubCategory))
+                    <div class="mb-3" id="mainCategoryField">
+                        <label for="main_category_id" class="form-label">Main Category (Drinkware / Barware)</label>
+                        <select class="form-select @error('main_category_id') is-invalid @enderror" id="main_category_id" name="main_category_id">
+                            <option value="">None</option>
+                            @foreach($mainCategories as $mainCat)
+                                <option value="{{ $mainCat->id }}" {{ old('main_category_id', $category->main_category_id) == $mainCat->id ? 'selected' : '' }}>
+                                    {{ $mainCat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('main_category_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Required for top-level Drinkware / Barware category pages.</small>
+                    </div>
+                    @endif
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>

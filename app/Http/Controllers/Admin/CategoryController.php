@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\MainCategory;
 use App\Support\BannerMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -25,11 +26,24 @@ class CategoryController extends Controller
             $query->whereNotNull('parent_id');
         }
 
+        if ($mainCategoryId = request()->integer('main_category_id')) {
+            $query->where('main_category_id', $mainCategoryId);
+        }
+
         $categories = $query->get();
+        $mainCategories = MainCategory::orderBy('sort_order')->get();
+        $rootCategories = Category::whereNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
 
         return view('admin.categories.index', [
             'categories' => $categories,
             'subOnly' => request()->boolean('sub_only'),
+            'mainCategories' => $mainCategories,
+            'rootCategories' => $rootCategories,
+            'activeMainCategoryId' => $mainCategoryId ?: null,
         ]);
     }
 
@@ -38,12 +52,11 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        $parentCategories = Category::whereNull('parent_id')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-        
-        return view('admin.categories.create', compact('parentCategories'));
+        $parentOptions = $this->parentCategoryOptions();
+        $mainCategories = MainCategory::orderBy('sort_order')->get();
+        $preselectedParentId = request()->integer('parent_id') ?: null;
+
+        return view('admin.categories.create', compact('parentOptions', 'mainCategories', 'preselectedParentId'));
     }
 
     /**
@@ -73,8 +86,12 @@ class CategoryController extends Controller
             'additional_banner_image' => 'nullable|image|max:5120',
             'additional_banner_text' => 'nullable|string|max:255',
             'parent_id' => 'nullable|exists:categories,id',
+            'main_category_id' => 'nullable|exists:main_categories,id',
+            'image_mobile' => 'nullable|image|max:2048',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'show_on_parent_page' => 'nullable|boolean',
+            'hero_show_text' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -90,6 +107,19 @@ class CategoryController extends Controller
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
         }
+
+        if ($request->hasFile('image_mobile')) {
+            $validated['image_mobile'] = $request->file('image_mobile')->store('categories', 'public');
+        }
+
+        $validated['main_category_id'] = $this->resolveMainCategoryId(
+            $validated['parent_id'] ?? null,
+            $validated['main_category_id'] ?? null
+        );
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['show_on_parent_page'] = $request->boolean('show_on_parent_page', true);
+        $validated['hero_show_text'] = $request->boolean('hero_show_text', true);
+        $validated['hero_text_color'] = normalize_banner_text_color($request->input('hero_text_color'));
 
         // Handle hero image
         if ($request->hasFile('hero_image')) {
@@ -134,11 +164,13 @@ class CategoryController extends Controller
             $validated['additional_banner_image'] = $request->file('additional_banner_image')->store('categories/additional-banner', 'public');
         }
 
-        $validated['hero_text_color'] = normalize_banner_text_color($request->input('hero_text_color'));
-
         Category::create($validated);
 
-        return redirect()->route('admin.categories.index')
+        $redirectParams = $validated['parent_id']
+            ? ['sub_only' => 1, 'main_category_id' => $validated['main_category_id']]
+            : [];
+
+        return redirect()->route('admin.categories.index', $redirectParams)
             ->with('success', 'Category created successfully.');
     }
 
@@ -156,15 +188,13 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        $parentCategories = Category::whereNull('parent_id')
-            ->where('is_active', true)
-            ->where('id', '!=', $category->id)
-            ->orderBy('name')
-            ->get();
-        
+        $parentOptions = $this->parentCategoryOptions($category);
+        $mainCategories = MainCategory::orderBy('sort_order')->get();
+
         return view('admin.categories.edit', [
             'category' => $category,
-            'parentCategories' => $parentCategories,
+            'parentOptions' => $parentOptions,
+            'mainCategories' => $mainCategories,
             'isSubCategory' => (bool) $category->parent_id,
         ]);
     }
@@ -205,6 +235,7 @@ class CategoryController extends Controller
             'remove_additional_banner_image' => 'nullable|boolean',
             'additional_banner_text' => 'nullable|string|max:255',
             'parent_id' => 'nullable|exists:categories,id|different:id',
+            'main_category_id' => 'nullable|exists:main_categories,id',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'show_on_parent_page' => 'nullable|boolean',
@@ -364,10 +395,18 @@ class CategoryController extends Controller
         $validated['show_on_parent_page'] = $request->boolean('show_on_parent_page', true);
         $validated['hero_show_text'] = $request->boolean('hero_show_text', true);
         $validated['hero_text_color'] = normalize_banner_text_color($request->input('hero_text_color'));
+        $validated['main_category_id'] = $this->resolveMainCategoryId(
+            $validated['parent_id'] ?? null,
+            $validated['main_category_id'] ?? $category->main_category_id
+        );
 
         $category->update($validated);
 
-        return redirect()->route('admin.categories.index')
+        $redirectParams = $category->parent_id
+            ? array_filter(['sub_only' => 1, 'main_category_id' => $category->main_category_id])
+            : [];
+
+        return redirect()->route('admin.categories.index', $redirectParams)
             ->with('success', 'Category updated successfully.');
     }
 
@@ -391,6 +430,55 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category deleted successfully.');
+    }
+
+    /**
+     * Parent dropdown options: root categories and their direct children.
+     *
+     * @return array<int, array{id: int, label: string}>
+     */
+    private function parentCategoryOptions(?Category $exclude = null): array
+    {
+        $roots = Category::whereNull('parent_id')
+            ->where('is_active', true)
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')->orderBy('name')])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $options = [];
+
+        foreach ($roots as $root) {
+            if ($exclude && $exclude->id === $root->id) {
+                continue;
+            }
+
+            $options[] = ['id' => $root->id, 'label' => $root->name];
+
+            foreach ($root->children as $child) {
+                if ($exclude && ($exclude->id === $child->id || $this->isDescendant($exclude, $child))) {
+                    continue;
+                }
+
+                $options[] = ['id' => $child->id, 'label' => '— ' . $child->name];
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * Inherit main category from parent when creating/editing subcategories.
+     */
+    private function resolveMainCategoryId(?int $parentId, ?int $explicit = null): ?int
+    {
+        if ($parentId) {
+            $parent = Category::find($parentId);
+
+            return $parent?->main_category_id ?? $explicit;
+        }
+
+        return $explicit;
     }
 
     /**

@@ -11,7 +11,9 @@ use App\Models\CouponUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use App\Services\OrderNotificationService;
+use App\Services\ShiprocketOrderSyncService;
+use Illuminate\Support\Facades\App;
 
 class OrderController extends Controller
 {
@@ -296,6 +298,7 @@ class OrderController extends Controller
                 'email' => $guestInfo['email'],
                 'phone' => $guestInfo['phone'],
                 'address' => $guestInfo['address'],
+                'address_line_1' => $guestInfo['address'],
                 'city' => $guestInfo['city'],
                 'state' => $guestInfo['state'],
                 'pincode' => $guestInfo['pincode'],
@@ -334,8 +337,12 @@ class OrderController extends Controller
         }
 
         // Calculate shipping and COD charges
-        $shippingCharge = $request->shipping_charge ?? 0; // Use provided shipping charge or default to 0
-        $codCharge = $request->cod_charge ?? 0; // Use provided COD charge or default to 0
+        $shippingCharge = (float) ($request->shipping_charge ?? 0);
+        $codCharge = (float) ($request->cod_charge ?? 0);
+        $orderAmountForShipping = max(0, $subtotal - $couponDiscount);
+        if (qualifies_for_free_shipping($orderAmountForShipping)) {
+            $shippingCharge = 0;
+        }
 
         $totalAmount = $subtotal - $couponDiscount + $shippingCharge + $codCharge;
 
@@ -362,6 +369,10 @@ class OrderController extends Controller
                 'payment_status' => ($request->payment_method === 'cod' || $request->payment_method === 'test') ? 'paid' : ($request->razorpay_payment_id ? 'paid' : 'pending'),
                 'notes' => $request->notes,
             ];
+
+            if ($orderData['payment_status'] === 'paid') {
+                $orderData['status'] = 'processing';
+            }
 
             // Add customer info (for both guest and logged-in users)
             if ($isGuestAfterValidation) {
@@ -483,22 +494,35 @@ class OrderController extends Controller
                 Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
             }
 
-            // Send order confirmation email
-            try {
-                $email = $user ? $user->email : $order->customer_email;
-                $name = $user ? $user->name : $order->customer_name;
-                
-                if ($email) {
-                    Mail::send('emails.order-confirmation', ['order' => $order->load('items.product')], function ($message) use ($email, $name, $order) {
-                        $message->to($email, $name)
-                            ->subject("Order Confirmation - {$order->order_number}");
-                    });
-                }
-            } catch (\Exception $e) {
-                \Log::error('Order confirmation email failed: ' . $e->getMessage());
-            }
-
             DB::commit();
+
+            $orderId = $order->id;
+            App::terminating(function () use ($orderId) {
+                $freshOrder = Order::with('items.product')->find($orderId);
+                if (! $freshOrder) {
+                    return;
+                }
+
+                try {
+                    app(OrderNotificationService::class)->sendOrderConfirmation($freshOrder);
+                } catch (\Throwable $e) {
+                    \Log::error('Deferred order notification failed', [
+                        'order_id' => $orderId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                if (config('services.shiprocket.auto_sync', true)) {
+                    try {
+                        app(ShiprocketOrderSyncService::class)->sync($freshOrder);
+                    } catch (\Throwable $e) {
+                        \Log::error('Deferred Shiprocket sync failed', [
+                            'order_id' => $orderId,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            });
 
             return response()->json([
                 'success' => true,

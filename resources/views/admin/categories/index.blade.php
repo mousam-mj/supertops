@@ -14,12 +14,43 @@
                     <a href="{{ route('admin.categories.index') }}" class="text-primary small mt-1 d-inline-block">View all categories</a>
                 @endif
             </div>
-            <a href="{{{ route('admin.categories.create') }}}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add New Category
-            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                @if(isset($subOnly) && $subOnly && isset($rootCategories))
+                    @foreach($rootCategories as $rootCat)
+                        <a href="{{ route('admin.categories.create', ['parent_id' => $rootCat->id]) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Add under {{ $rootCat->name }}
+                        </a>
+                    @endforeach
+                @endif
+                <a href="{{ route('admin.categories.create', request('parent_id') ? ['parent_id' => request('parent_id')] : []) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>{{ isset($subOnly) && $subOnly ? 'Add Sub Category' : 'Add New Category' }}
+                </a>
+            </div>
         </div>
     </div>
 </div>
+
+@if(isset($subOnly) && $subOnly && isset($mainCategories))
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="text-muted small me-1">Filter:</span>
+            <a href="{{ route('admin.categories.index', ['sub_only' => 1]) }}"
+               class="btn btn-sm {{ empty($activeMainCategoryId) ? 'btn-primary' : 'btn-outline-secondary' }}">All</a>
+            @foreach($mainCategories as $mainCat)
+                <a href="{{ route('admin.categories.index', ['sub_only' => 1, 'main_category_id' => $mainCat->id]) }}"
+                   class="btn btn-sm {{ ($activeMainCategoryId ?? null) == $mainCat->id ? 'btn-primary' : 'btn-outline-secondary' }}">
+                    {{ $mainCat->name }}
+                </a>
+            @endforeach
+        </div>
+        <p class="small text-muted mb-0 mt-2">
+            Subcategories appear as cards on the Drinkware / Barware page when <strong>Show card on parent category page</strong> is enabled.
+            Also enable <strong>Subcategory grid cards</strong> under Admin → Main Categories → Edit.
+        </p>
+    </div>
+</div>
+@endif
 
 <div class="row">
     <div class="col-12">
@@ -37,6 +68,9 @@
                                 <th>Name</th>
                                 <th>Slug</th>
                                 <th>Parent</th>
+                                @if(isset($subOnly) && $subOnly)
+                                    <th>On parent page</th>
+                                @endif
                                 <th>Children</th>
                                 <th>Sort Order</th>
                                 <th>Status</th>
@@ -103,6 +137,15 @@
                                             <span class="text-muted">—</span>
                                         @endif
                                     </td>
+                                    @if(isset($subOnly) && $subOnly)
+                                    <td>
+                                        @if($category->show_on_parent_page)
+                                            <span class="badge bg-success">Visible</span>
+                                        @else
+                                            <span class="badge bg-secondary">Hidden</span>
+                                        @endif
+                                    </td>
+                                    @endif
                                     <td>
                                         @if($category->children->count() > 0)
                                             <span class="badge bg-secondary">{{ $category->children->count() }}</span>

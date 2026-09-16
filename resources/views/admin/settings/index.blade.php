@@ -35,7 +35,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Site Name</label>
-                                    <input type="text" name="site_name" class="form-control" value="{{ old('site_name', $settings['site_name'] ?? 'Perch Bottle') }}" placeholder="Perch Bottle">
+                                    <input type="text" name="site_name" class="form-control" value="{{ old('site_name', $settings['site_name'] ?? 'Perch') }}" placeholder="Perch">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Site Tagline</label>
+                                    <input type="text" name="site_tagline" class="form-control" value="{{ old('site_tagline', $settings['site_tagline'] ?? 'Your Things Elevated') }}" placeholder="Your Things Elevated">
+                                    <small class="text-muted">Used in page titles for SEO (e.g. Perch | Your Things Elevated)</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Logo</label>

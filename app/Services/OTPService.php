@@ -14,6 +14,8 @@ class OTPService
     private $country;
     private $templateId;
 
+    private string $otpVariable;
+
     public function __construct()
     {
         $this->authKey = config('services.msg91.auth_key');
@@ -21,6 +23,7 @@ class OTPService
         $this->route = config('services.msg91.route', 4);
         $this->country = config('services.msg91.country', 91);
         $this->templateId = config('services.msg91.template_id');
+        $this->otpVariable = config('services.msg91.otp_variable', 'var1');
     }
 
     /**
@@ -63,13 +66,16 @@ class OTPService
                 'has_template' => !empty($this->templateId)
             ]);
 
-            // Try Flow API first if template available, fallback to SMS if Flow fails
-            if (!empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
-                $result = $this->sendFlowOTP($mobile, $otp);
-                if (!$result['success'] && $this->shouldFallbackToSMS($result)) {
-                    Log::info('MSG91 Flow failed, falling back to SMS API', [
+            // Prefer MSG91 OTP API, then Flow template, then legacy SMS fallback
+            if (! empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
+                $result = $this->sendOtpApi($mobile, $otp);
+                if (! $result['success']) {
+                    $result = $this->sendFlowOTP($mobile, $otp);
+                }
+                if (! $result['success'] && $this->shouldFallbackToSMS($result)) {
+                    Log::info('MSG91 OTP/Flow failed, falling back to SMS API', [
                         'mobile' => $mobile,
-                        'flow_error' => $result['error']['message'] ?? ''
+                        'flow_error' => $result['error']['message'] ?? $result['message'] ?? '',
                     ]);
                     $result = $this->sendSMSOTP($mobile, $otp);
                 }
@@ -95,23 +101,83 @@ class OTPService
     }
 
     /**
+     * Send OTP using MSG91 OTP API (recommended for OTP templates)
+     */
+    private function sendOtpApi($mobile, $otp)
+    {
+        $response = Http::withHeaders([
+            'accept' => 'application/json',
+            'authkey' => $this->authKey,
+            'content-type' => 'application/json',
+        ])->post('https://control.msg91.com/api/v5/otp', [
+            'template_id' => $this->templateId,
+            'mobile' => $this->country.$mobile,
+            'otp' => (string) $otp,
+        ]);
+
+        Log::info('MSG91 OTP API Response:', [
+            'mobile' => $mobile,
+            'status' => $response->status(),
+            'response' => $response->json() ?? $response->body(),
+        ]);
+
+        if (! $response->successful()) {
+            return [
+                'success' => false,
+                'message' => 'Failed to send OTP: Network error',
+                'error' => 'HTTP Status: '.$response->status(),
+            ];
+        }
+
+        $responseData = $response->json();
+        if (is_array($responseData) && (($responseData['type'] ?? '') === 'success' || ($responseData['message'] ?? '') === 'OTP sent successfully')) {
+            return [
+                'success' => true,
+                'message' => 'OTP sent successfully',
+                'request_id' => $responseData['request_id'] ?? $responseData['message'] ?? null,
+            ];
+        }
+
+        $errorMessage = $this->getErrorMessage($responseData['message'] ?? 'Unknown error');
+
+        return [
+            'success' => false,
+            'message' => $errorMessage,
+            'error' => $responseData,
+        ];
+    }
+
+    /**
      * Send OTP using MSG91 Flow API (Template based)
      */
     private function sendFlowOTP($mobile, $otp)
     {
         $url = "https://control.msg91.com/api/v5/flow";
-        
+
+        $recipient = [
+            'mobiles' => $this->country.$mobile,
+        ];
+
+        foreach (array_unique([
+            $this->otpVariable,
+            'var',
+            'var1',
+            'VAR1',
+            'OTP',
+            'otp',
+            'code',
+            'verification_code',
+        ]) as $key) {
+            if ($key !== '') {
+                $recipient[$key] = (string) $otp;
+            }
+        }
+
         $payload = [
             'template_id' => $this->templateId,
             'short_url' => '0',
             'realTimeResponse' => '1',
-            'recipients' => [
-                [
-                    'mobiles' => $this->country . $mobile,
-                    'var1' => $otp,
-                    
-                ]
-            ]
+            'recipients' => [$recipient],
         ];
 
         $response = Http::withHeaders([
