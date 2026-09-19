@@ -379,6 +379,16 @@
                                 <label class="form-label">Meta Description (SEO)</label>
                                 <textarea name="meta_description" class="form-control" rows="2">{{ old('meta_description', $settings['meta_description'] ?? '') }}</textarea>
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">Default Meta Title (SEO)</label>
+                                <input type="text" name="default_meta_title" class="form-control" value="{{ old('default_meta_title', $settings['default_meta_title'] ?? 'Your Things Elevated') }}" placeholder="Your Things Elevated">
+                                <small class="text-muted">Default title suffix for pages (e.g., "Perch Bottle: Your Things Elevated")</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Default Meta Description (SEO)</label>
+                                <textarea name="default_meta_description" class="form-control" rows="2" placeholder="At Perch, we create thoughtfully designed drinkware and barware that elevates your everyday moments.">{{ old('default_meta_description', $settings['default_meta_description'] ?? '') }}</textarea>
+                                <small class="text-muted">Default description for pages without custom meta description</small>
+                            </div>
                             <hr class="my-4">
                             <h6 class="mb-3">Product Page Features (shown on product detail page only)</h6>
                             <div class="row">

@@ -20,12 +20,12 @@ if (! function_exists('site_page_title')) {
     function site_page_title(?string $pageTitle = null): string
     {
         $brand = site_brand_name();
-        $tagline = site_tagline();
+        $defaultTitle = trim((string) Setting::get('default_meta_title', 'Your Things Elevated')) ?: 'Your Things Elevated';
 
         if ($pageTitle !== null && trim($pageTitle) !== '') {
-            return trim($pageTitle).' | '.$brand.' - '.$tagline;
+            return trim($pageTitle).' | '.$brand.' - '.$defaultTitle;
         }
 
-        return $brand.' | '.$tagline;
+        return $brand.' | '.$defaultTitle;
     }
 }

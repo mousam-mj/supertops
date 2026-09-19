@@ -48,6 +48,8 @@ class SettingsController extends Controller
         'home_best_sellers_heading' => 'Best Sellers',
         'home_best_sellers_button_text' => 'Shop Now',
         'home_best_sellers_button_url' => '/shop',
+        'default_meta_title' => 'Your Things Elevated',
+        'default_meta_description' => 'At Perch, we create thoughtfully designed drinkware and barware that elevates your everyday moments.',
     ];
 
     protected array $flagSettingDefaults = [
@@ -176,7 +178,8 @@ class SettingsController extends Controller
         'other' => [
             'copyright_text',
             'free_shipping_text',
-            'meta_description',
+            'default_meta_title',
+            'default_meta_description',
             'product_feature_1_title',
             'product_feature_1_text',
             'product_feature_2_title',
@@ -307,7 +310,8 @@ class SettingsController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
             'copyright_text' => 'nullable|string|max:500',
             'free_shipping_text' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:500',
+            'default_meta_title' => 'nullable|string|max:255',
+            'default_meta_description' => 'nullable|string|max:500',
             'product_feature_1_title' => 'nullable|string|max:100',
             'product_feature_1_text' => 'nullable|string|max:500',
             'product_feature_2_title' => 'nullable|string|max:100',

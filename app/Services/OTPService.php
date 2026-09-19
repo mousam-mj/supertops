@@ -50,6 +50,13 @@ class OTPService
             $cacheKey = "otp_" . $mobile;
             Cache::put($cacheKey, $otp, 600); // 10 minutes
 
+            // Log OTP for debugging (remove in production)
+            Log::info('OTP Generated:', [
+                'mobile' => $mobile,
+                'otp' => $otp,
+                'cache_key' => $cacheKey
+            ]);
+
             // Validate MSG91 configuration
             if (empty($this->authKey)) {
                 Log::error('MSG91 Auth Key missing');
@@ -72,15 +79,22 @@ class OTPService
                 if (! $result['success']) {
                     $result = $this->sendFlowOTP($mobile, $otp);
                 }
-                if (! $result['success'] && $this->shouldFallbackToSMS($result)) {
-                    Log::info('MSG91 OTP/Flow failed, falling back to SMS API', [
+                // Always fallback to SMS if template-based methods fail to ensure OTP is delivered
+                if (! $result['success']) {
+                    Log::warning('MSG91 OTP/Flow failed, falling back to SMS API', [
                         'mobile' => $mobile,
-                        'flow_error' => $result['error']['message'] ?? $result['message'] ?? '',
+                        'otp_error' => $result['error']['message'] ?? $result['message'] ?? '',
                     ]);
                     $result = $this->sendSMSOTP($mobile, $otp);
                 }
             } else {
                 $result = $this->sendSMSOTP($mobile, $otp);
+            }
+
+            // Add OTP to response for debugging in development (remove in production)
+            if (config('app.env') === 'local' || config('app.debug')) {
+                $result['otp'] = $otp;
+                $result['debug_otp'] = $otp;
             }
 
             return $result;
@@ -158,19 +172,27 @@ class OTPService
             'mobiles' => $this->country.$mobile,
         ];
 
-        foreach (array_unique([
+        // Try multiple common variable names for MSG91 templates
+        $otpVariables = array_filter([
             $this->otpVariable,
-            'var',
             'var1',
             'VAR1',
+            '{{var1}}',
+            '#var1#',
             'OTP',
             'otp',
+            '{{otp}}',
+            '#otp#',
             'code',
+            '{{code}}',
+            '#code#',
             'verification_code',
-        ]) as $key) {
-            if ($key !== '') {
-                $recipient[$key] = (string) $otp;
-            }
+            '{{verification_code}}',
+            '#verification_code#',
+        ]);
+
+        foreach ($otpVariables as $key) {
+            $recipient[$key] = (string) $otp;
         }
 
         $payload = [
@@ -179,6 +201,13 @@ class OTPService
             'realTimeResponse' => '1',
             'recipients' => [$recipient],
         ];
+
+        Log::info('MSG91 Flow API Request:', [
+            'mobile' => $mobile,
+            'template_id' => $this->templateId,
+            'otp' => $otp,
+            'variables_used' => array_keys($recipient),
+        ]);
 
         $response = Http::withHeaders([
             'accept' => 'application/json',
@@ -201,14 +230,25 @@ class OTPService
     private function sendSMSOTP($mobile, $otp)
     {
         $url = "https://control.msg91.com/api/sendotp.php";
-        
+
+        // Ensure OTP is clearly visible in the message
+        $message = "Your verification code is {$otp}. Please keep it confidential. PADIA BRANDWORKS";
+
         $data = [
             'authkey' => $this->authKey,
             'mobile' => $this->country . $mobile,
-            'message' => "Your OTP for verification is {$otp}. Do not share this OTP with anyone. PADIA BRANDWORKS",
+            'message' => $message,
             'sender' => $this->senderId,
-            'otp' => $otp
+            'otp' => $otp,
+            'route' => $this->route
         ];
+
+        Log::info('MSG91 SMS API Request:', [
+            'mobile' => $mobile,
+            'otp' => $otp,
+            'message' => $message,
+            'sender' => $this->senderId
+        ]);
 
         $response = Http::asForm()->post($url, $data);
 
@@ -226,22 +266,8 @@ class OTPService
      */
     private function shouldFallbackToSMS(array $result): bool
     {
-        $msg = $result['error']['message'] ?? $result['error'] ?? '';
-        if (is_array($msg)) {
-            $msg = $msg['message'] ?? '';
-        }
-        $recoverableErrors = [
-            'IP is not whitelisted',
-            'template id missing',
-            'Authentication failure',
-            'Invalid template id',
-        ];
-        foreach ($recoverableErrors as $err) {
-            if (stripos((string) $msg, $err) !== false) {
-                return true;
-            }
-        }
-        return false;
+        // Always fallback to SMS for template issues to ensure OTP delivery
+        return true;
     }
 
     /**

@@ -12,7 +12,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <title>@yield('title', site_page_title())</title>
-        <meta name="description" content="@yield('meta_description', site_tagline() . ' — thoughtfully designed drinkware and barware from ' . site_brand_name() . '.')" />
+        <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('default_meta_description', 'At Perch, we create thoughtfully designed drinkware and barware that elevates your everyday moments.') . ' — thoughtfully designed drinkware and barware from ' . site_brand_name() . '.')" />
         @php
             $siteFavicon = \App\Models\Setting::get('site_favicon');
             $siteFaviconUrl = $siteFavicon ? storage_asset($siteFavicon) : asset('favicon.ico');

@@ -135,21 +135,71 @@ class CategorySeeder extends Seeder
             ]
         );
 
-        // Barware - Products
-        $barwareProducts = [
+        // 2.1 Barware Essentials (Sub-category)
+        $barwareEssentials = Category::updateOrCreate(
+            ['slug' => 'barware-essentials'],
+            [
+                'name' => 'Barware Essentials',
+                'description' => 'Essential barware products',
+                'parent_id' => $barware->id,
+                'main_category_id' => $mainBarware->id,
+                'sort_order' => 1,
+                'is_active' => true,
+                'show_on_parent_page' => true,
+                'hero_button_text' => 'Shop Now',
+                'hero_show_text' => true,
+            ]
+        );
+
+        // Barware Essentials - Products
+        $barwareEssentialsProducts = [
             'Perch O Holic',
             'Elite Kit',
-            'Suitcase Bar Set',
-            '3D Printed Cocktail Set',
         ];
 
-        foreach ($barwareProducts as $index => $productName) {
+        foreach ($barwareEssentialsProducts as $index => $productName) {
             Category::updateOrCreate(
                 ['slug' => Str::slug($productName)],
                 [
                     'name' => $productName,
                     'description' => $productName . ' - Barware essential',
-                    'parent_id' => $barware->id,
+                    'parent_id' => $barwareEssentials->id,
+                    'main_category_id' => $mainBarware->id,
+                    'sort_order' => $index + 1,
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // 2.2 Cocktail Sets (Sub-category)
+        $cocktailSets = Category::updateOrCreate(
+            ['slug' => 'cocktail-sets'],
+            [
+                'name' => 'Cocktail Sets',
+                'description' => 'Premium cocktail sets for home entertaining',
+                'parent_id' => $barware->id,
+                'main_category_id' => $mainBarware->id,
+                'sort_order' => 2,
+                'is_active' => true,
+                'show_on_parent_page' => true,
+                'hero_button_text' => 'Shop Now',
+                'hero_show_text' => true,
+            ]
+        );
+
+        // Cocktail Sets - Products
+        $cocktailSetsProducts = [
+            'Suitcase Bar Set',
+            '3D Printed Cocktail Set',
+        ];
+
+        foreach ($cocktailSetsProducts as $index => $productName) {
+            Category::updateOrCreate(
+                ['slug' => Str::slug($productName)],
+                [
+                    'name' => $productName,
+                    'description' => $productName . ' - Cocktail set',
+                    'parent_id' => $cocktailSets->id,
                     'main_category_id' => $mainBarware->id,
                     'sort_order' => $index + 1,
                     'is_active' => true,
