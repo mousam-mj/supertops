@@ -47,18 +47,29 @@ class MobileAuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+        ], [
+            'mobile.required' => 'Mobile number is required.',
+            'mobile.digits' => 'Mobile number must be exactly 10 digits.',
+            'mobile.regex' => 'Enter a valid 10-digit mobile number starting with 6-9.',
+            'name.required' => 'Full name is required.',
+            'email.email' => 'Enter a valid email address.',
+            'email.unique' => 'This email is already registered. Please use login or a different email.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password and confirm password do not match.',
         ]);
 
         if ($validator->fails()) {
+            $errors = $validator->errors();
             \Log::info('Registration OTP validation failed:', [
-                'request_data' => $payload,
-                'errors' => $validator->errors()->toArray()
+                'request_data' => collect($payload)->except(['password', 'password_confirmation'])->all(),
+                'errors' => $errors->toArray(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'message' => $errors->first() ?: 'Please fix the highlighted fields and try again.',
+                'errors' => $errors,
             ], 400);
         }
 
@@ -72,8 +83,8 @@ class MobileAuthController extends Controller
         if ($existingUser) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mobile number is already registered. Please use login instead.',
-                'errors' => ['mobile' => ['This mobile number is already registered']]
+                'message' => 'This mobile number is already registered. Please use login instead.',
+                'errors' => ['mobile' => ['This mobile number is already registered. Please use login instead.']]
             ], 400);
         }
 

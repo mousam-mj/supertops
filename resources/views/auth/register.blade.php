@@ -657,6 +657,10 @@
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Verify Your Mobile Number</h3>
                                 <p class="text-gray-600">We've sent a 6-digit OTP to</p>
                                 <p class="font-semibold text-gray-900" id="reg-mobile-display">+91 XXXXXXXXXX</p>
+                                <div id="reg-debug-otp-box" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-left">
+                                    <div class="text-sm font-medium text-amber-900">SMS may be delayed. Use this OTP for local testing:</div>
+                                    <div class="mt-1 text-2xl font-mono font-bold tracking-widest text-amber-950" id="reg-debug-otp-value"></div>
+                                </div>
                             </div>
                             
                             <form id="otp-verify-form">
@@ -759,9 +763,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (element) element.classList.add('hidden');
         });
     }
+
+    function clearFieldErrorsOnly() {
+        ['name-error', 'mobile-error', 'email-error', 'password-error', 'confirm-password-error'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.classList.add('hidden');
+        });
+    }
     
-    function showGeneralError(message, title = 'Registration Failed') {
-        clearAllErrors();
+    function showGeneralError(message, title = 'Registration Failed', { clearFields = true } = {}) {
+        if (clearFields) {
+            clearAllErrors();
+        }
         const titleElement = document.getElementById('general-error-title');
         const messageElement = document.getElementById('general-error-message');
         const containerElement = document.getElementById('general-error');
@@ -783,38 +796,69 @@ document.addEventListener('DOMContentLoaded', function() {
             errorContainer.classList.remove('hidden');
         }
     }
+
+    function firstErrorMessage(errors) {
+        if (!errors || typeof errors !== 'object') return null;
+        for (const msgs of Object.values(errors)) {
+            if (Array.isArray(msgs) && msgs.length) return msgs[0];
+            if (typeof msgs === 'string' && msgs) return msgs;
+        }
+        return null;
+    }
     
     function showRegistrationErrors(data) {
         clearAllErrors();
         
-        let mainMessage = data.message || 'Registration failed';
+        let mainMessage = data.message || firstErrorMessage(data.errors) || 'Registration failed. Please check the form and try again.';
+        let hasFieldErrors = false;
         
-        // Show field-specific errors
+        // Show field-specific errors (do not clear them afterwards)
         if (data.errors) {
             console.log('Validation errors:', data.errors);
             
             if (data.errors.mobile) {
-                showFieldError('mobile', data.errors.mobile.join(', '));
+                showFieldError('mobile', Array.isArray(data.errors.mobile) ? data.errors.mobile.join(', ') : data.errors.mobile);
+                hasFieldErrors = true;
             }
             if (data.errors.name) {
-                showFieldError('name', data.errors.name.join(', '));
+                showFieldError('name', Array.isArray(data.errors.name) ? data.errors.name.join(', ') : data.errors.name);
+                hasFieldErrors = true;
             }
             if (data.errors.email) {
-                showFieldError('email', data.errors.email.join(', '));
+                showFieldError('email', Array.isArray(data.errors.email) ? data.errors.email.join(', ') : data.errors.email);
+                hasFieldErrors = true;
             }
             if (data.errors.password) {
-                showFieldError('password', data.errors.password.join(', '));
+                showFieldError('password', Array.isArray(data.errors.password) ? data.errors.password.join(', ') : data.errors.password);
+                hasFieldErrors = true;
             }
             if (data.errors.password_confirmation) {
-                showFieldError('confirm-password', data.errors.password_confirmation.join(', '));
+                showFieldError('confirm-password', Array.isArray(data.errors.password_confirmation) ? data.errors.password_confirmation.join(', ') : data.errors.password_confirmation);
+                hasFieldErrors = true;
             }
         }
+
+        const lower = String(mainMessage).toLowerCase();
+        let title = 'Registration Failed';
+        if (lower.includes('already registered') || lower.includes('already been taken')) {
+            title = 'Account Already Exists';
+        } else if (hasFieldErrors) {
+            title = 'Please Fix The Form';
+        }
         
-        // Show general error with helpful message
-        if (mainMessage.includes('already registered')) {
-            showGeneralError('This mobile number or email is already registered. Please use the login option instead.', 'Account Already Exists');
+        showGeneralError(mainMessage, title, { clearFields: false });
+    }
+
+    function showDebugOtp(otp) {
+        const box = document.getElementById('reg-debug-otp-box');
+        const value = document.getElementById('reg-debug-otp-value');
+        if (!box || !value) return;
+        if (otp) {
+            value.textContent = String(otp);
+            box.classList.remove('hidden');
         } else {
-            showGeneralError(mainMessage);
+            value.textContent = '';
+            box.classList.add('hidden');
         }
     }
     
@@ -980,6 +1024,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('mobile-register-form').style.display = 'none';
                 document.getElementById('otp-verification-section').classList.remove('hidden');
                 document.getElementById('reg-mobile-display').textContent = `+91 ${mobile}`;
+                showDebugOtp(data.debug_otp || data.otp || null);
                 document.getElementById('reg-otp-input').focus();
                 startRegistrationTimer();
             } else if (data && data.success === false) {
@@ -1071,10 +1116,14 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                showDebugOtp(data.debug_otp || data.otp || null);
                 startRegistrationTimer();
-                showPopupMessage('Success', 'OTP resent successfully! Check your mobile for the new OTP.', 'success');
+                const otpHint = (data.debug_otp || data.otp)
+                    ? ` OTP for testing: ${data.debug_otp || data.otp}`
+                    : '';
+                showPopupMessage('Success', 'OTP resent successfully! Check your mobile for the new OTP.' + otpHint, 'success');
             } else {
-                const msg = data.message || 'Failed to resend OTP';
+                const msg = data.message || firstErrorMessage(data.errors) || 'Failed to resend OTP';
                 showPopupMessage('Resend Failed', msg, 'error', data.errors || null);
             }
         })
