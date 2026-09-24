@@ -657,10 +657,12 @@
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Verify Your Mobile Number</h3>
                                 <p class="text-gray-600">We've sent a 6-digit OTP to</p>
                                 <p class="font-semibold text-gray-900" id="reg-mobile-display">+91 XXXXXXXXXX</p>
+                                @if (app()->environment('local'))
                                 <div id="reg-debug-otp-box" class="hidden mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-left">
                                     <div class="text-sm font-medium text-amber-900">SMS may be delayed. Use this OTP for local testing:</div>
                                     <div class="mt-1 text-2xl font-mono font-bold tracking-widest text-amber-950" id="reg-debug-otp-value"></div>
                                 </div>
+                                @endif
                             </div>
                             
                             <form id="otp-verify-form">
@@ -849,10 +851,21 @@ document.addEventListener('DOMContentLoaded', function() {
         showGeneralError(mainMessage, title, { clearFields: false });
     }
 
-    function showDebugOtp(otp) {
+    function isLocalHost() {
+        const host = window.location.hostname;
+        return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+    }
+
+    function showDebugOtp(otp, force = false) {
         const box = document.getElementById('reg-debug-otp-box');
         const value = document.getElementById('reg-debug-otp-value');
         if (!box || !value) return;
+        // Never show OTP on live domains (perchlife.in etc.)
+        if (!force && !isLocalHost()) {
+            value.textContent = '';
+            box.classList.add('hidden');
+            return;
+        }
         if (otp) {
             value.textContent = String(otp);
             box.classList.remove('hidden');
@@ -1024,7 +1037,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('mobile-register-form').style.display = 'none';
                 document.getElementById('otp-verification-section').classList.remove('hidden');
                 document.getElementById('reg-mobile-display').textContent = `+91 ${mobile}`;
-                showDebugOtp(data.debug_otp || data.otp || null);
+                showDebugOtp(
+                    (data.show_debug_otp && (data.debug_otp || data.otp)) || null,
+                    !!data.show_debug_otp
+                );
                 document.getElementById('reg-otp-input').focus();
                 startRegistrationTimer();
             } else if (data && data.success === false) {
@@ -1116,9 +1132,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showDebugOtp(data.debug_otp || data.otp || null);
+                showDebugOtp(
+                    (data.show_debug_otp && (data.debug_otp || data.otp)) || null,
+                    !!data.show_debug_otp
+                );
                 startRegistrationTimer();
-                const otpHint = (data.debug_otp || data.otp)
+                const otpHint = (data.show_debug_otp && (data.debug_otp || data.otp))
                     ? ` OTP for testing: ${data.debug_otp || data.otp}`
                     : '';
                 showPopupMessage('Success', 'OTP resent successfully! Check your mobile for the new OTP.' + otpHint, 'success');

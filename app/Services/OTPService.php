@@ -106,10 +106,12 @@ class OTPService
                 $result['delivery_warning'] = 'MSG91 IP not whitelisted (error 418). SMS may not arrive on phone.';
             }
 
-            if (config('app.env') === 'local' || config('app.debug')) {
+            // Never expose OTP on production/staging — local env only.
+            if (config('app.env') === 'local') {
                 $result['otp'] = $otp;
                 $result['debug_otp'] = $otp;
                 $result['template_id'] = $this->templateId;
+                $result['show_debug_otp'] = true;
             }
 
             return $result;
