@@ -2,16 +2,20 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class OTPService
 {
     private $authKey;
+
     private $senderId;
+
     private $route;
+
     private $country;
+
     private $templateId;
 
     private string $otpVariable;
@@ -23,7 +27,7 @@ class OTPService
         $this->route = config('services.msg91.route', 4);
         $this->country = config('services.msg91.country', 91);
         $this->templateId = config('services.msg91.template_id');
-        $this->otpVariable = config('services.msg91.otp_variable', 'var1');
+        $this->otpVariable = (string) config('services.msg91.otp_variable', 'OTP');
     }
 
     /**
@@ -32,54 +36,55 @@ class OTPService
     public function sendOTP($mobile, $otp = null)
     {
         try {
-            // Validate mobile number
-            if (empty($mobile) || !preg_match('/^[6-9]\d{9}$/', $mobile)) {
+            if (empty($mobile) || ! preg_match('/^[6-9]\d{9}$/', $mobile)) {
                 return [
                     'success' => false,
                     'message' => 'Invalid mobile number format',
-                    'error' => 'Mobile number must be 10 digits starting with 6-9'
+                    'error' => 'Mobile number must be 10 digits starting with 6-9',
                 ];
             }
 
-            // Generate 6-digit OTP if not provided
-            if (!$otp) {
-                $otp = rand(100000, 999999);
+            if (! $otp) {
+                $otp = random_int(100000, 999999);
             }
 
-            // Store OTP in cache for 10 minutes
-            $cacheKey = "otp_" . $mobile;
-            Cache::put($cacheKey, $otp, 600); // 10 minutes
+            $cacheKey = 'otp_'.$mobile;
+            Cache::put($cacheKey, $otp, 600);
 
-            // Log OTP for debugging (remove in production)
             Log::info('OTP Generated:', [
                 'mobile' => $mobile,
                 'otp' => $otp,
-                'cache_key' => $cacheKey
+                'cache_key' => $cacheKey,
+                'template_id' => $this->templateId,
+                'otp_variable' => $this->otpVariable,
             ]);
 
-            // Validate MSG91 configuration
             if (empty($this->authKey)) {
                 Log::error('MSG91 Auth Key missing');
+
                 return [
                     'success' => false,
                     'message' => 'SMS service configuration error',
-                    'error' => 'MSG91 Auth Key not configured'
+                    'error' => 'MSG91 Auth Key not configured',
                 ];
             }
 
             Log::info('MSG91 OTP Send Request:', [
                 'mobile' => $mobile,
                 'template_id' => $this->templateId,
-                'has_template' => !empty($this->templateId)
+                'has_template' => ! empty($this->templateId),
             ]);
 
-            // Prefer MSG91 OTP API, then Flow template, then legacy SMS fallback
             if (! empty($this->templateId) && $this->templateId !== 'your_template_id_here') {
+                // 1) Official OTP API (best for ##OTP## templates)
                 $result = $this->sendOtpApi($mobile, $otp);
+
+                // 2) Flow API fallback (useful for ##number## / custom vars)
                 if (! $result['success']) {
                     $result = $this->sendFlowOTP($mobile, $otp);
                 }
-                // Always fallback to SMS if template-based methods fail to ensure OTP is delivered
+
+                // 3) Legacy sendotp.php fallback
                 if (! $result['success']) {
                     Log::warning('MSG91 OTP/Flow failed, falling back to SMS API', [
                         'mobile' => $mobile,
@@ -91,46 +96,58 @@ class OTPService
                 $result = $this->sendSMSOTP($mobile, $otp);
             }
 
-            // Add OTP to response for debugging in development (remove in production)
             if (config('app.env') === 'local' || config('app.debug')) {
                 $result['otp'] = $otp;
                 $result['debug_otp'] = $otp;
+                $result['template_id'] = $this->templateId;
             }
 
             return $result;
-
         } catch (\Exception $e) {
             Log::error('MSG91 OTP Send Error:', [
                 'mobile' => $mobile,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'success' => false,
                 'message' => 'Failed to send OTP due to system error',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
 
     /**
-     * Send OTP using MSG91 OTP API (recommended for OTP templates)
+     * Send OTP using MSG91 OTP API (recommended for ##OTP## templates)
      */
     private function sendOtpApi($mobile, $otp)
     {
-        $response = Http::withHeaders([
-            'accept' => 'application/json',
-            'authkey' => $this->authKey,
-            'content-type' => 'application/json',
-        ])->post('https://control.msg91.com/api/v5/otp', [
+        $payload = [
             'template_id' => $this->templateId,
             'mobile' => $this->country.$mobile,
             'otp' => (string) $otp,
-        ]);
+            'otp_length' => 6,
+            'otp_expiry' => 10,
+        ];
+
+        // Only needed when template placeholder is NOT ##OTP## (e.g. ##number##)
+        $variable = trim($this->otpVariable);
+        if ($variable !== '' && strcasecmp($variable, 'OTP') !== 0) {
+            $payload['extra_param'] = [
+                $variable => (string) $otp,
+            ];
+        }
+
+        $response = Http::timeout(20)->withHeaders([
+            'accept' => 'application/json',
+            'authkey' => $this->authKey,
+            'content-type' => 'application/json',
+        ])->post('https://control.msg91.com/api/v5/otp', $payload);
 
         Log::info('MSG91 OTP API Response:', [
             'mobile' => $mobile,
+            'template_id' => $this->templateId,
             'status' => $response->status(),
             'response' => $response->json() ?? $response->body(),
         ]);
@@ -149,49 +166,36 @@ class OTPService
                 'success' => true,
                 'message' => 'OTP sent successfully',
                 'request_id' => $responseData['request_id'] ?? $responseData['message'] ?? null,
+                'channel' => 'otp_api',
             ];
         }
 
-        $errorMessage = $this->getErrorMessage($responseData['message'] ?? 'Unknown error');
-
         return [
             'success' => false,
-            'message' => $errorMessage,
+            'message' => $this->getErrorMessage($responseData['message'] ?? 'Unknown error'),
             'error' => $responseData,
         ];
     }
 
     /**
-     * Send OTP using MSG91 Flow API (Template based)
+     * Send OTP using MSG91 Flow API (custom template variables)
      */
     private function sendFlowOTP($mobile, $otp)
     {
-        $url = "https://control.msg91.com/api/v5/flow";
-
         $recipient = [
             'mobiles' => $this->country.$mobile,
         ];
 
-        // Try multiple common variable names for MSG91 templates
-        $otpVariables = array_filter([
+        // Send only the configured variable (+ common aliases), avoid dumping every alias.
+        $aliases = array_unique(array_filter([
             $this->otpVariable,
-            'var1',
-            'VAR1',
-            '{{var1}}',
-            '#var1#',
             'OTP',
             'otp',
-            '{{otp}}',
-            '#otp#',
-            'code',
-            '{{code}}',
-            '#code#',
-            'verification_code',
-            '{{verification_code}}',
-            '#verification_code#',
-        ]);
+            'number',
+            'var1',
+        ]));
 
-        foreach ($otpVariables as $key) {
+        foreach ($aliases as $key) {
             $recipient[$key] = (string) $otp;
         }
 
@@ -205,121 +209,67 @@ class OTPService
         Log::info('MSG91 Flow API Request:', [
             'mobile' => $mobile,
             'template_id' => $this->templateId,
-            'otp' => $otp,
             'variables_used' => array_keys($recipient),
         ]);
 
-        $response = Http::withHeaders([
+        $response = Http::timeout(20)->withHeaders([
             'accept' => 'application/json',
             'authkey' => $this->authKey,
-            'content-type' => 'application/json'
-        ])->post($url, $payload);
+            'content-type' => 'application/json',
+        ])->post('https://control.msg91.com/api/v5/flow', $payload);
 
         Log::info('MSG91 Flow API Response:', [
             'mobile' => $mobile,
             'status' => $response->status(),
-            'response' => $response->json()
+            'response' => $response->json() ?? $response->body(),
         ]);
 
-        return $this->handleFlowResponse($response, $otp);
+        return $this->handleFlowResponse($response);
     }
 
     /**
-     * Send OTP using MSG91 SMS API (Direct SMS)
+     * Legacy MSG91 sendotp.php fallback — message must match approved DLT text.
      */
     private function sendSMSOTP($mobile, $otp)
     {
-        $url = "https://control.msg91.com/api/sendotp.php";
-
-        // Ensure OTP is clearly visible in the message
-        $message = "Your verification code is {$otp}. Please keep it confidential. PADIA BRANDWORKS";
+        // Matches old working DLT text that uses ##OTP##
+        $message = "Your OTP for verification is {$otp}. Do not share this OTP with anyone. PADIA BRANDWORKS";
 
         $data = [
             'authkey' => $this->authKey,
-            'mobile' => $this->country . $mobile,
+            'mobile' => $this->country.$mobile,
             'message' => $message,
             'sender' => $this->senderId,
             'otp' => $otp,
-            'route' => $this->route
+            'otp_length' => 6,
+            'otp_expiry' => 10,
+            'route' => $this->route,
         ];
 
         Log::info('MSG91 SMS API Request:', [
             'mobile' => $mobile,
-            'otp' => $otp,
+            'sender' => $this->senderId,
             'message' => $message,
-            'sender' => $this->senderId
         ]);
 
-        $response = Http::asForm()->post($url, $data);
+        $response = Http::timeout(20)->asForm()->post('https://control.msg91.com/api/sendotp.php', $data);
 
         Log::info('MSG91 SMS API Response:', [
             'mobile' => $mobile,
             'status' => $response->status(),
-            'response' => $response->body()
+            'response' => $response->json() ?? $response->body(),
         ]);
 
-        return $this->handleSMSResponse($response, $otp);
+        return $this->handleSMSResponse($response);
     }
 
-    /**
-     * Check if we should fallback to SMS API when Flow API fails
-     */
-    private function shouldFallbackToSMS(array $result): bool
+    private function handleFlowResponse($response)
     {
-        // Always fallback to SMS for template issues to ensure OTP delivery
-        return true;
-    }
-
-    /**
-     * Handle MSG91 Flow API Response
-     */
-    private function handleFlowResponse($response, $otp)
-    {
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return [
                 'success' => false,
                 'message' => 'Failed to send OTP: Network error',
-                'error' => 'HTTP Status: ' . $response->status()
-            ];
-        }
-
-        $responseData = $response->json();
-
-        if (isset($responseData['type'])) {
-            if ($responseData['type'] === 'success') {
-                return [
-                    'success' => true,
-                    'message' => 'OTP sent successfully',
-                    'request_id' => $responseData['message'] ?? null
-                ];
-            } else {
-                // Handle specific MSG91 errors
-                $errorMessage = $this->getErrorMessage($responseData['message'] ?? 'Unknown error');
-                return [
-                    'success' => false,
-                    'message' => $errorMessage,
-                    'error' => $responseData
-                ];
-            }
-        }
-
-        return [
-            'success' => false,
-            'message' => 'Invalid response from SMS service',
-            'error' => $responseData
-        ];
-    }
-
-    /**
-     * Handle MSG91 SMS API Response
-     */
-    private function handleSMSResponse($response, $otp)
-    {
-        if (!$response->successful()) {
-            return [
-                'success' => false,
-                'message' => 'Failed to send OTP: Network error',
-                'error' => 'HTTP Status: ' . $response->status()
+                'error' => 'HTTP Status: '.$response->status(),
             ];
         }
 
@@ -329,22 +279,49 @@ class OTPService
             return [
                 'success' => true,
                 'message' => 'OTP sent successfully',
-                'request_id' => $responseData['message'] ?? null
+                'request_id' => $responseData['message'] ?? null,
+                'channel' => 'flow_api',
             ];
         }
 
-        // Handle SMS API errors
-        $errorMessage = $this->getErrorMessage($responseData['message'] ?? 'Unknown error');
         return [
             'success' => false,
-            'message' => $errorMessage,
-            'error' => $responseData
+            'message' => $this->getErrorMessage($responseData['message'] ?? 'Unknown error'),
+            'error' => $responseData,
         ];
     }
 
-    /**
-     * Get user-friendly error messages
-     */
+    private function handleSMSResponse($response)
+    {
+        if (! $response->successful()) {
+            return [
+                'success' => false,
+                'message' => 'Failed to send OTP: Network error',
+                'error' => 'HTTP Status: '.$response->status(),
+            ];
+        }
+
+        $responseData = $response->json();
+        if (! is_array($responseData) && is_string($response->body())) {
+            $responseData = json_decode($response->body(), true);
+        }
+
+        if (is_array($responseData) && ($responseData['type'] ?? '') === 'success') {
+            return [
+                'success' => true,
+                'message' => 'OTP sent successfully',
+                'request_id' => $responseData['message'] ?? null,
+                'channel' => 'sms_api',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => $this->getErrorMessage(is_array($responseData) ? ($responseData['message'] ?? 'Unknown error') : 'Unknown error'),
+            'error' => $responseData,
+        ];
+    }
+
     private function getErrorMessage($errorCode)
     {
         $errorMessages = [
@@ -361,96 +338,81 @@ class OTPService
         return $errorMessages[$errorCode] ?? 'Failed to send OTP. Please try again.';
     }
 
-    /**
-     * Verify OTP
-     */
     public function verifyOTP($mobile, $otp)
     {
         try {
-            // Validate inputs
             if (empty($mobile) || empty($otp)) {
                 return [
                     'success' => false,
-                    'message' => 'Mobile number and OTP are required'
+                    'message' => 'Mobile number and OTP are required',
                 ];
             }
 
-            $cacheKey = "otp_" . $mobile;
+            $cacheKey = 'otp_'.$mobile;
             $storedOTP = Cache::get($cacheKey);
 
-            if (!$storedOTP) {
+            if (! $storedOTP) {
                 return [
                     'success' => false,
-                    'message' => 'OTP expired or not found. Please request a new OTP.'
+                    'message' => 'OTP expired or not found. Please request a new OTP.',
                 ];
             }
 
-            if ($storedOTP == $otp) {
-                // OTP verified, remove from cache
+            if ((string) $storedOTP === (string) $otp) {
                 Cache::forget($cacheKey);
-                
-                // Mark mobile as verified
-                Cache::put("mobile_verified_" . $mobile, true, 3600); // 1 hour
+                Cache::put('mobile_verified_'.$mobile, true, 3600);
 
                 return [
                     'success' => true,
-                    'message' => 'OTP verified successfully'
-                ];
-            } else {
-                return [
-                    'success' => false,
-                    'message' => 'Invalid OTP. Please check and try again.'
+                    'message' => 'OTP verified successfully',
                 ];
             }
+
+            return [
+                'success' => false,
+                'message' => 'Invalid OTP. Please check and try again.',
+            ];
         } catch (\Exception $e) {
             Log::error('OTP Verification Error:', [
                 'mobile' => $mobile,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'OTP verification failed. Please try again.'
+                'message' => 'OTP verification failed. Please try again.',
             ];
         }
     }
 
-    /**
-     * Check if mobile is verified
-     */
     public function isMobileVerified($mobile)
     {
-        return Cache::has("mobile_verified_" . $mobile);
+        return Cache::has('mobile_verified_'.$mobile);
     }
 
-    /**
-     * Resend OTP with rate limiting
-     */
     public function resendOTP($mobile)
     {
         try {
-            // Check rate limiting
-            $rateLimitKey = "otp_rate_limit_" . $mobile;
+            $rateLimitKey = 'otp_rate_limit_'.$mobile;
             if (Cache::has($rateLimitKey)) {
                 return [
                     'success' => false,
-                    'message' => 'Please wait 60 seconds before requesting another OTP'
+                    'message' => 'Please wait 60 seconds before requesting another OTP',
                 ];
             }
 
-            // Set rate limit for 1 minute
             Cache::put($rateLimitKey, true, 60);
 
             return $this->sendOTP($mobile);
         } catch (\Exception $e) {
             Log::error('OTP Resend Error:', [
                 'mobile' => $mobile,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Failed to resend OTP. Please try again.'
+                'message' => 'Failed to resend OTP. Please try again.',
             ];
         }
     }
