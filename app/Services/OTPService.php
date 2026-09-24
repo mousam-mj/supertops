@@ -96,6 +96,16 @@ class OTPService
                 $result = $this->sendSMSOTP($mobile, $otp);
             }
 
+            // MSG91 OTP API can return type=success even when IP security blocks delivery (418).
+            if (($result['success'] ?? false) && $this->isAuthIpBlocked()) {
+                Log::error('MSG91 accepted OTP request but IP security is blocking delivery (418)', [
+                    'mobile' => $mobile,
+                    'template_id' => $this->templateId,
+                    'request_id' => $result['request_id'] ?? null,
+                ]);
+                $result['delivery_warning'] = 'MSG91 IP not whitelisted (error 418). SMS may not arrive on phone.';
+            }
+
             if (config('app.env') === 'local' || config('app.debug')) {
                 $result['otp'] = $otp;
                 $result['debug_otp'] = $otp;
@@ -161,6 +171,10 @@ class OTPService
         }
 
         $responseData = $response->json();
+        if ($blocked = $this->detectIpSecurityBlock($responseData, $response->body())) {
+            return $blocked;
+        }
+
         if (is_array($responseData) && (($responseData['type'] ?? '') === 'success' || ($responseData['message'] ?? '') === 'OTP sent successfully')) {
             return [
                 'success' => true,
@@ -274,6 +288,9 @@ class OTPService
         }
 
         $responseData = $response->json();
+        if ($blocked = $this->detectIpSecurityBlock($responseData, $response->body())) {
+            return $blocked;
+        }
 
         if (isset($responseData['type']) && $responseData['type'] === 'success') {
             return [
@@ -322,11 +339,73 @@ class OTPService
         ];
     }
 
+    /**
+     * MSG91 error 418 = IP not whitelisted (API security enabled).
+     */
+    private function isAuthIpBlocked(): bool
+    {
+        static $cached = null;
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $response = Http::timeout(10)->get('https://control.msg91.com/api/balance.php', [
+                'authkey' => $this->authKey,
+                'type' => 4,
+            ]);
+            $body = $response->json() ?? $response->body();
+            $cached = (is_array($body) && (string) ($body['msg'] ?? '') === '418')
+                || stripos((string) $response->body(), 'IP is not whitelisted') !== false;
+        } catch (\Throwable $e) {
+            $cached = false;
+        }
+
+        return $cached;
+    }
+
+    /**
+     * MSG91 error 418 = IP not whitelisted (API security enabled).
+     */
+    private function detectIpSecurityBlock($responseData, $rawBody = null): ?array
+    {
+        $message = is_array($responseData)
+            ? (string) ($responseData['message'] ?? $responseData['msg'] ?? $responseData['errors'] ?? '')
+            : (string) $responseData;
+
+        $code = is_array($responseData)
+            ? (string) ($responseData['msg'] ?? $responseData['code'] ?? $responseData['apiError'] ?? '')
+            : '';
+
+        $is418 = $code === '418'
+            || stripos($message, 'IP is not whitelisted') !== false;
+
+        if (! $is418) {
+            return null;
+        }
+
+        Log::error('MSG91 IP security blocked request (418)', [
+            'response' => $responseData,
+            'raw' => $rawBody,
+        ]);
+
+        return [
+            'success' => false,
+            'message' => 'SMS blocked: this server IP is not whitelisted in MSG91. Add your public IP in MSG91 Authkey → Whitelisted IPs, then retry.',
+            'error' => [
+                'code' => 418,
+                'message' => 'IP is not whitelisted',
+                'response' => $responseData,
+            ],
+        ];
+    }
+
     private function getErrorMessage($errorCode)
     {
         $errorMessages = [
             'Authentication failure' => 'SMS service authentication failed. Please try again.',
-            'IP is not whitelisted' => 'Service temporarily unavailable. Please try again later.',
+            'IP is not whitelisted' => 'SMS blocked: server IP is not whitelisted in MSG91. Please contact support.',
+            '418' => 'SMS blocked: server IP is not whitelisted in MSG91. Please contact support.',
             'template id missing' => 'SMS template configuration error. Please contact support.',
             'Invalid template id' => 'SMS template configuration error. Please contact support.',
             'Invalid mobile number' => 'Please enter a valid mobile number.',
