@@ -37,15 +37,22 @@ class ShiprocketOrderSyncService
         }
 
         $shippingAddress = $this->normalizeShippingAddress($order);
-        if (empty($shippingAddress['pincode']) || empty($shippingAddress['address_line_1'])) {
+        $missing = array_values(array_filter([
+            $shippingAddress['address_line_1'] === '' ? 'address line' : null,
+            $shippingAddress['pincode'] === '' ? 'pincode' : null,
+            $shippingAddress['city'] === '' ? 'city' : null,
+            $shippingAddress['state'] === '' ? 'state' : null,
+        ]));
+        if ($missing !== []) {
             Log::warning('Shiprocket sync skipped: incomplete shipping address', [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
+                'missing' => $missing,
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Shipping address incomplete',
+                'message' => 'Shipping address is missing: '.implode(', ', $missing),
             ];
         }
 
@@ -115,16 +122,21 @@ class ShiprocketOrderSyncService
 
     private function normalizeShippingAddress(Order $order): array
     {
-        $addr = is_array($order->shipping_address) ? $order->shipping_address : [];
+        $addr = $this->addressArray($order->shipping_address);
 
         $firstName = trim((string) ($addr['first_name'] ?? ''));
         $lastName = trim((string) ($addr['last_name'] ?? ''));
-        $addressLine = trim((string) ($addr['address_line_1'] ?? $addr['address'] ?? ''));
+        $addressLine = trim((string) ($addr['address_line_1'] ?? $addr['address'] ?? $addr['address1'] ?? ''));
         $phone = trim((string) ($addr['phone'] ?? $order->customer_phone ?? ''));
         $email = trim((string) ($addr['email'] ?? $order->customer_email ?? ''));
+        $pincode = trim((string) ($addr['pincode'] ?? $addr['pin_code'] ?? $addr['postal_code'] ?? $addr['zip'] ?? ''));
 
-        if ($firstName === '' && $lastName === '' && ! empty($order->customer_name)) {
-            $parts = preg_split('/\s+/', trim((string) $order->customer_name), 2);
+        $fullName = trim((string) ($addr['full_name'] ?? ''));
+        if ($firstName === '' && $lastName === '' && $fullName === '' && ! empty($order->customer_name)) {
+            $fullName = trim((string) $order->customer_name);
+        }
+        if ($firstName === '' && $lastName === '' && $fullName !== '') {
+            $parts = preg_split('/\s+/', $fullName, 2);
             $firstName = $parts[0] ?? 'Customer';
             $lastName = $parts[1] ?? '';
         }
@@ -145,9 +157,24 @@ class ShiprocketOrderSyncService
             'address_line_2' => trim((string) ($addr['address_line_2'] ?? '')),
             'city' => trim((string) ($addr['city'] ?? '')),
             'state' => trim((string) ($addr['state'] ?? '')),
-            'pincode' => trim((string) ($addr['pincode'] ?? '')),
+            'pincode' => $pincode,
             'phone' => $digits,
             'email' => $email,
         ];
+    }
+
+    private function addressArray(mixed $address): array
+    {
+        $value = $address;
+
+        for ($i = 0; $i < 3 && is_string($value); $i++) {
+            $decoded = json_decode($value, true);
+            if (! is_array($decoded) && ! is_string($decoded)) {
+                break;
+            }
+            $value = $decoded;
+        }
+
+        return is_array($value) ? $value : [];
     }
 }
