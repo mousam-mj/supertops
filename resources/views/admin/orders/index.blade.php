@@ -198,7 +198,9 @@
 <script>
 // Track order function
 function trackOrder(orderId, provider) {
-    const url = `/api/admin/orders/${orderId}/${provider}/track`;
+    const url = provider === 'shiprocket'
+        ? `/admin/orders/${orderId}/shiprocket/track`
+        : `/api/admin/orders/${orderId}/${provider}/track`;
     
     fetch(url, {
         method: 'GET',
@@ -227,7 +229,7 @@ function trackOrder(orderId, provider) {
 function createShipment(orderId) {
     if (!confirm('Create shipment for this order?')) return;
     
-    const url = `/api/admin/orders/${orderId}/shiprocket/create-shipment`;
+    const url = `/admin/orders/${orderId}/shiprocket/create-shipment`;
     
     fetch(url, {
         method: 'POST',

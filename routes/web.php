@@ -619,6 +619,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('orders', OrderController::class)->except(['create', 'store']);
+        Route::post('/orders/{id}/shiprocket/create-shipment', [\App\Http\Controllers\Api\Admin\ShiprocketController::class, 'createShipment'])->name('orders.shiprocket.create');
+        Route::get('/orders/{id}/shiprocket/track', [\App\Http\Controllers\Api\Admin\ShiprocketController::class, 'track'])->name('orders.shiprocket.track');
         Route::resource('hero-banners', HeroBannerController::class)->except(['show']);
 
         // Settings

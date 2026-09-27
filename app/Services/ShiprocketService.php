@@ -15,6 +15,8 @@ class ShiprocketService
 
     protected string $pickupLocation;
 
+    protected ?string $authError = null;
+
     public function __construct()
     {
         $config = config('services.shiprocket', []);
@@ -28,6 +30,11 @@ class ShiprocketService
     public function isConfigured(): bool
     {
         return ! empty($this->email) && ! empty($this->password);
+    }
+
+    public function getAuthError(): ?string
+    {
+        return $this->authError;
     }
 
     /**
@@ -55,12 +62,22 @@ class ShiprocketService
                 $data = $response->json();
                 $token = $data['token'] ?? null;
                 if ($token) {
+                    $this->authError = null;
                     Cache::put($cacheKey, $token, now()->addHours(24));
                     return $token;
                 }
             }
-            Log::warning('Shiprocket login failed', ['response' => $response->body()]);
+
+            $body = $response->json();
+            $apiMessage = is_string($body['message'] ?? null) ? $body['message'] : $response->body();
+            if ($response->status() === 403) {
+                $this->authError = 'Shiprocket blocked this login. The panel email cannot create orders. In Shiprocket open Settings → API → Create API User (use a different email), then put that API email and password in SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD.';
+            } else {
+                $this->authError = 'Shiprocket login failed: '.$apiMessage;
+            }
+            Log::warning('Shiprocket login failed', ['status' => $response->status(), 'response' => $response->body()]);
         } catch (\Throwable $e) {
+            $this->authError = 'Shiprocket auth error: '.$e->getMessage();
             Log::error('Shiprocket auth error: ' . $e->getMessage());
         }
 
@@ -148,8 +165,10 @@ class ShiprocketService
     {
         $token = $this->getToken();
         if (! $token) {
-            return ['success' => false, 'message' => 'Shiprocket not configured or auth failed'];
+            return ['success' => false, 'message' => $this->authError ?? 'Shiprocket not configured or auth failed'];
         }
+
+        $pickupLocation = $this->resolvePickupLocation($token);
 
         $addr = $order['shipping_address'] ?? [];
         $firstName = trim((string) ($addr['first_name'] ?? ''));
@@ -191,7 +210,7 @@ class ShiprocketService
         $payload = [
             'order_id' => $order['order_number'],
             'order_date' => now()->format('Y-m-d H:i:s'),
-            'pickup_location' => $this->pickupLocation,
+            'pickup_location' => $pickupLocation,
             'channel_id' => '',
             'billing_customer_name' => $firstName,
             'billing_last_name' => $lastName,
@@ -278,6 +297,49 @@ class ShiprocketService
     public function getPickupPostcode(): string
     {
         return $this->pickupPostcode;
+    }
+
+    /**
+     * Shiprocket rejects orders unless pickup_location matches a saved warehouse nickname.
+     */
+    private function resolvePickupLocation(string $token): string
+    {
+        $cacheKey = 'shiprocket_pickup_location_'.$this->pickupPostcode;
+
+        $resolved = Cache::get($cacheKey);
+        if (is_string($resolved) && $resolved !== '') {
+            return $resolved;
+        }
+
+        try {
+            $response = Http::withToken($token)
+                ->get("{$this->baseUrl}/v1/external/settings/company/pickup");
+
+            $addresses = $response->json('data.shipping_address') ?? [];
+            $match = null;
+            foreach ($addresses as $address) {
+                $pin = (string) ($address['pin_code'] ?? '');
+                $name = trim((string) ($address['pickup_location'] ?? ''));
+                if ($name === '') {
+                    continue;
+                }
+                if ($pin === $this->pickupPostcode) {
+                    $match = $name;
+                    break;
+                }
+                $match ??= $name;
+            }
+
+            if ($match) {
+                Cache::put($cacheKey, $match, now()->addHours(12));
+
+                return $match;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Shiprocket pickup location lookup failed: '.$e->getMessage());
+        }
+
+        return $this->pickupLocation;
     }
 
     private function normalizePhone(string $phone): string
