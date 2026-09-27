@@ -225,13 +225,107 @@ function trackOrder(orderId, provider) {
     });
 }
 
-// Create shipment function
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function (char) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+    });
+}
+
+function shipmentSteps(data) {
+    if (Array.isArray(data.steps) && data.steps.length) {
+        return data.steps;
+    }
+
+    const reason = String(data.reason || data.message || '').toLowerCase();
+    if (reason.includes('access forbidden') || reason.includes('api user') || reason.includes('blocked this login')) {
+        return [
+            'In Shiprocket open Settings → API → Create API User. Use an email different from the panel login.',
+            'Put that API email and password in the server .env as SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD.',
+            'On the server run php artisan config:clear, then click the truck icon again.'
+        ];
+    }
+
+    return [
+        'Read the reason below. That is what the server or Shiprocket returned.',
+        'Fix the field it names, then click the truck icon again.'
+    ];
+}
+
+function showShipmentResult(data) {
+    const status = data.status || (data.success ? 'success' : 'failed');
+    const titles = {
+        success: 'Success',
+        already_sent: 'Already sent',
+        failed: 'Failed'
+    };
+    const colors = {
+        success: 'success',
+        already_sent: 'warning',
+        failed: 'danger'
+    };
+    const title = titles[status] || 'Failed';
+    const color = colors[status] || 'danger';
+    const steps = shipmentSteps(data).map(function (step, index) {
+        return '<li class="mb-1">' + escapeHtml(step) + '</li>';
+    }).join('');
+    const ids = data.data || {};
+    const detailLines = [
+        data.order_number ? 'Order: ' + data.order_number : '',
+        ids.shiprocket_order_id ? 'Shiprocket order id: ' + ids.shiprocket_order_id : '',
+        ids.shiprocket_shipment_id ? 'Shipment id: ' + ids.shiprocket_shipment_id : '',
+        ids.shiprocket_awb ? 'AWB: ' + ids.shiprocket_awb : ''
+    ].filter(Boolean);
+
+    const existing = document.getElementById('shipmentResultModal');
+    if (existing) {
+        const instance = bootstrap.Modal.getInstance(existing);
+        if (instance) instance.hide();
+        existing.remove();
+    }
+
+    const reloadButton = status === 'success'
+        ? '<button type="button" class="btn btn-primary" onclick="location.reload()">Reload orders</button>'
+        : '';
+
+    document.body.insertAdjacentHTML('beforeend', `
+        <div class="modal fade" id="shipmentResultModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create shipment: ${escapeHtml(title)}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-${color} mb-3">
+                            <strong>${escapeHtml(title)}.</strong> ${escapeHtml(data.message || '')}
+                        </div>
+                        <p class="mb-1"><strong>Reason</strong></p>
+                        <p>${escapeHtml(data.reason || data.message || 'No reason returned.')}</p>
+                        <p class="mb-1"><strong>${status === 'failed' ? 'Steps to fix' : 'What to do next'}</strong></p>
+                        <ol class="mb-3">${steps}</ol>
+                        ${detailLines.length ? '<p class="mb-1"><strong>Details</strong></p><pre class="bg-light border rounded p-2 mb-0 small">' + escapeHtml(detailLines.join('\n')) + '</pre>' : ''}
+                    </div>
+                    <div class="modal-footer">
+                        ${reloadButton}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+
+    new bootstrap.Modal(document.getElementById('shipmentResultModal')).show();
+}
+
 function createShipment(orderId) {
     if (!confirm('Create shipment for this order?')) return;
-    
-    const url = `/admin/orders/${orderId}/shiprocket/create-shipment`;
-    
-    fetch(url, {
+
+    const button = document.querySelector('button[onclick="createShipment(' + orderId + ')"]');
+    if (button) {
+        button.disabled = true;
+    }
+
+    fetch('/admin/orders/' + orderId + '/shiprocket/create-shipment', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -240,18 +334,44 @@ function createShipment(orderId) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Shipment created successfully!');
-            location.reload();
-        } else {
-            alert('Failed to create shipment: ' + (data.message || 'Unknown error'));
+    .then(async function (response) {
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (error) {
+            data = {
+                success: false,
+                status: 'failed',
+                message: 'Shipment was not created.',
+                reason: response.status + ' ' + response.statusText + '. The server did not return a result.',
+                steps: [
+                    'Refresh the admin orders page and try the truck icon again.',
+                    'If this keeps happening, the create-shipment update is not deployed on perchlife.in yet.'
+                ]
+            };
         }
+        if (!data.status) {
+            data.status = data.success ? 'success' : 'failed';
+        }
+        showShipmentResult(data);
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error creating shipment');
+    .catch(function (error) {
+        showShipmentResult({
+            success: false,
+            status: 'failed',
+            message: 'Shipment was not created.',
+            reason: error && error.message ? error.message : 'The request did not reach the server.',
+            steps: [
+                'Check that you are still logged in to the admin panel.',
+                'Refresh the page and click the truck icon again.'
+            ]
+        });
+    })
+    .finally(function () {
+        if (button) {
+            button.disabled = false;
+        }
     });
 }
 

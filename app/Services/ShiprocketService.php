@@ -261,7 +261,7 @@ class ShiprocketService
 
             return [
                 'success' => false,
-                'message' => $body['message'] ?? $response->body(),
+                'message' => $this->readableMessage($body['message'] ?? null, (string) $response->body()),
                 'data' => $body,
             ];
         } catch (\Throwable $e) {
@@ -340,6 +340,30 @@ class ShiprocketService
         }
 
         return $this->pickupLocation;
+    }
+
+    private function readableMessage(mixed $message, string $fallback): string
+    {
+        if (is_string($message) && trim($message) !== '') {
+            return trim($message);
+        }
+
+        if (is_array($message)) {
+            $parts = [];
+            foreach ($message as $key => $value) {
+                $text = is_array($value)
+                    ? implode(', ', array_map(fn ($item) => is_scalar($item) ? (string) $item : json_encode($item), $value))
+                    : (is_scalar($value) ? (string) $value : json_encode($value));
+                $parts[] = is_string($key) ? $key.': '.$text : $text;
+            }
+
+            $joined = implode(' | ', array_filter($parts));
+            if ($joined !== '') {
+                return $joined;
+            }
+        }
+
+        return $fallback !== '' ? $fallback : 'Shiprocket rejected the shipment';
     }
 
     private function normalizePhone(string $phone): string
