@@ -225,6 +225,11 @@ function trackOrder(orderId, provider) {
     });
 }
 
+function csrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, function (char) {
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
@@ -253,15 +258,17 @@ function shipmentSteps(data) {
 
 function showShipmentResult(data) {
     const status = data.status || (data.success ? 'success' : 'failed');
-    const titles = {
-        success: 'Success',
-        already_sent: 'Already sent',
-        failed: 'Failed'
-    };
     const colors = {
         success: 'success',
         already_sent: 'warning',
+        working: 'info',
         failed: 'danger'
+    };
+    const titles = {
+        success: 'Success',
+        already_sent: 'Already sent',
+        working: 'Working',
+        failed: 'Failed'
     };
     const title = titles[status] || 'Failed';
     const color = colors[status] || 'danger';
@@ -279,8 +286,11 @@ function showShipmentResult(data) {
     const existing = document.getElementById('shipmentResultModal');
     if (existing) {
         const instance = bootstrap.Modal.getInstance(existing);
-        if (instance) instance.hide();
+        if (instance) instance.dispose();
         existing.remove();
+        document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
     }
 
     const reloadButton = status === 'success'
@@ -320,10 +330,32 @@ function showShipmentResult(data) {
 function createShipment(orderId) {
     if (!confirm('Create shipment for this order?')) return;
 
+    const token = csrfToken();
+    if (!token) {
+        showShipmentResult({
+            success: false,
+            status: 'failed',
+            message: 'Shipment was not created.',
+            reason: 'This admin page has no CSRF token, so the request was blocked before it started.',
+            steps: [
+                'Hard refresh this page (Cmd+Shift+R).',
+                'If it still fails, deploy the latest admin layout and run php artisan view:clear on the server.'
+            ]
+        });
+        return;
+    }
+
     const button = document.querySelector('button[onclick="createShipment(' + orderId + ')"]');
     if (button) {
         button.disabled = true;
     }
+
+    showShipmentResult({
+        status: 'working',
+        message: 'Creating shipment. Please wait.',
+        reason: 'The order is being sent to Shiprocket.',
+        steps: ['Leave this box open. The result will replace this message.']
+    });
 
     fetch('/admin/orders/' + orderId + '/shiprocket/create-shipment', {
         method: 'POST',
@@ -331,7 +363,7 @@ function createShipment(orderId) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': token
         }
     })
     .then(async function (response) {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel') - Anvogue</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
         $siteFavicon = \App\Models\Setting::get('site_favicon');
         $siteFaviconUrl = $siteFavicon ? storage_asset($siteFavicon) : asset('favicon.ico');
