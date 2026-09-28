@@ -64,6 +64,8 @@ class ShiprocketController extends Controller
                 'shiprocket_order_id' => $order->shiprocket_order_id,
                 'shiprocket_shipment_id' => $order->shiprocket_shipment_id,
                 'shiprocket_awb' => $order->shiprocket_awb,
+                'sent_address' => $result['sent_address'] ?? null,
+                'pickup_location' => $result['pickup_location'] ?? null,
             ],
         ];
     }
@@ -133,12 +135,12 @@ class ShiprocketController extends Controller
             ];
         }
 
-        if (str_contains($reason, 'pickup')) {
+        if (str_contains($reason, 'billing/shipping address') || str_contains($reason, 'pickup warehouse') || str_contains($reason, 'pickup address') || str_contains($reason, 'pickup')) {
             return [
-                'In Shiprocket open Settings → Pickup Addresses and confirm a warehouse is saved.',
-                'Set SHIPROCKET_PICKUP_LOCATION to that warehouse nickname, exactly as Shiprocket shows it.',
-                'Set SHIPROCKET_PICKUP_POSTCODE to that warehouse pincode.',
-                'Run php artisan config:clear, then create the shipment again.',
+                'The customer address on this order is already saved. Do not edit it for this error.',
+                'In Shiprocket open Settings → Pickup Addresses → Add New and save your warehouse. Orders cannot be created until that warehouse exists.',
+                'Use the warehouse pincode 452010, or change SHIPROCKET_PICKUP_POSTCODE on the server to the pincode you save.',
+                'Click the truck icon again.',
             ];
         }
 

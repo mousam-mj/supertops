@@ -280,7 +280,9 @@ function showShipmentResult(data) {
         data.order_number ? 'Order: ' + data.order_number : '',
         ids.shiprocket_order_id ? 'Shiprocket order id: ' + ids.shiprocket_order_id : '',
         ids.shiprocket_shipment_id ? 'Shipment id: ' + ids.shiprocket_shipment_id : '',
-        ids.shiprocket_awb ? 'AWB: ' + ids.shiprocket_awb : ''
+        ids.shiprocket_awb ? 'AWB: ' + ids.shiprocket_awb : '',
+        ids.sent_address ? 'Address sent: ' + ids.sent_address : '',
+        ids.pickup_location ? 'Pickup location: ' + ids.pickup_location : ''
     ].filter(Boolean);
 
     const existing = document.getElementById('shipmentResultModal');

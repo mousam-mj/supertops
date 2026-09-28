@@ -168,7 +168,14 @@ class ShiprocketService
             return ['success' => false, 'message' => $this->authError ?? 'Shiprocket not configured or auth failed'];
         }
 
-        $pickupLocation = $this->resolvePickupLocation($token);
+        $pickup = $this->resolvePickupLocation($token);
+        if ($pickup['name'] === null) {
+            return [
+                'success' => false,
+                'message' => 'Shiprocket has no pickup warehouse. The customer address on this order is already filled. In Shiprocket open Settings → Pickup Addresses → Add New, save your warehouse (pincode '.$this->pickupPostcode.'), then click the truck icon again.',
+            ];
+        }
+        $pickupLocation = $pickup['name'];
 
         $addr = $order['shipping_address'] ?? [];
         $firstName = trim((string) ($addr['first_name'] ?? ''));
@@ -188,7 +195,10 @@ class ShiprocketService
         $address2 = trim((string) ($addr['address_line_2'] ?? ''));
         $city = trim((string) ($addr['city'] ?? ''));
         $state = trim((string) ($addr['state'] ?? ''));
-        $pincode = trim((string) ($addr['pincode'] ?? ''));
+        $pincode = preg_replace('/\D+/', '', (string) ($addr['pincode'] ?? '')) ?? '';
+        if (strlen($address1) < 3 && $city !== '') {
+            $address1 = trim($address1.' '.$city);
+        }
         $phone = $this->normalizePhone((string) ($addr['phone'] ?? $order['customer_phone'] ?? ''));
         $email = trim((string) ($addr['email'] ?? $order['customer_email'] ?? ''));
 
@@ -207,39 +217,40 @@ class ShiprocketService
             ];
         }
 
+        $sentAddress = trim($address1.', '.$city.', '.$state.' '.$pincode);
+
         $payload = [
             'order_id' => $order['order_number'],
-            'order_date' => now()->format('Y-m-d H:i:s'),
+            'order_date' => now()->format('Y-m-d H:i'),
             'pickup_location' => $pickupLocation,
-            'channel_id' => '',
             'billing_customer_name' => $firstName,
-            'billing_last_name' => $lastName,
+            'billing_last_name' => $lastName !== '' ? $lastName : $firstName,
             'billing_address' => $address1,
             'billing_address_2' => $address2,
             'billing_city' => $city,
-            'billing_pincode' => $pincode,
+            'billing_pincode' => (int) $pincode,
             'billing_state' => $state,
             'billing_country' => 'India',
             'billing_email' => $email ?: 'noreply@perchlife.in',
             'billing_phone' => $phone,
-            'shipping_is_billing' => true,
+            'shipping_is_billing' => 1,
             'shipping_customer_name' => $firstName,
-            'shipping_last_name' => $lastName,
+            'shipping_last_name' => $lastName !== '' ? $lastName : $firstName,
             'shipping_address' => $address1,
             'shipping_address_2' => $address2,
             'shipping_city' => $city,
-            'shipping_pincode' => $pincode,
+            'shipping_pincode' => (int) $pincode,
             'shipping_state' => $state,
             'shipping_country' => 'India',
+            'shipping_email' => $email ?: 'noreply@perchlife.in',
             'shipping_phone' => $phone,
             'order_items' => $orderItems,
             'payment_method' => (strtolower($order['payment_method'] ?? '') === 'cod') ? 'COD' : 'Prepaid',
             'sub_total' => (float) ($order['subtotal'] ?? $order['total_amount'] ?? 0),
             'length' => 10,
-            'width' => 10,
+            'breadth' => 10,
             'height' => 10,
-            'weight' => max(0.1, $weightKg),
-            'courier_id' => '',
+            'weight' => max(0.5, $weightKg),
         ];
 
         try {
@@ -259,9 +270,16 @@ class ShiprocketService
                 ];
             }
 
+            $message = $this->readableMessage($body['message'] ?? null, (string) $response->body());
+            if (str_contains(strtolower($message), 'billing/shipping address')) {
+                $message = 'Shiprocket rejected the warehouse, not this customer. Sent customer address: '.$sentAddress.'. Add a pickup address in Shiprocket under Settings → Pickup Addresses, then try again.';
+            }
+
             return [
                 'success' => false,
-                'message' => $this->readableMessage($body['message'] ?? null, (string) $response->body()),
+                'message' => $message,
+                'sent_address' => $sentAddress,
+                'pickup_location' => $pickupLocation,
                 'data' => $body,
             ];
         } catch (\Throwable $e) {
@@ -301,24 +319,40 @@ class ShiprocketService
 
     /**
      * Shiprocket rejects orders unless pickup_location matches a saved warehouse nickname.
+     *
+     * @return array{name: ?string, checked: bool}
      */
-    private function resolvePickupLocation(string $token): string
+    private function resolvePickupLocation(string $token): array
     {
         $cacheKey = 'shiprocket_pickup_location_'.$this->pickupPostcode;
 
         $resolved = Cache::get($cacheKey);
         if (is_string($resolved) && $resolved !== '') {
-            return $resolved;
+            return ['name' => $resolved, 'checked' => true];
         }
 
         try {
             $response = Http::withToken($token)
                 ->get("{$this->baseUrl}/v1/external/settings/company/pickup");
 
-            $addresses = $response->json('data.shipping_address') ?? [];
+            if (! $response->successful()) {
+                return ['name' => $this->pickupLocation, 'checked' => false];
+            }
+
+            $raw = $response->json('data.shipping_address');
+            if (! is_array($raw)) {
+                $raw = $response->json('data') ?? [];
+            }
+            if (isset($raw['pickup_location'])) {
+                $raw = [$raw];
+            }
+
             $match = null;
-            foreach ($addresses as $address) {
-                $pin = (string) ($address['pin_code'] ?? '');
+            foreach ($raw as $address) {
+                if (! is_array($address)) {
+                    continue;
+                }
+                $pin = (string) ($address['pin_code'] ?? $address['pincode'] ?? '');
                 $name = trim((string) ($address['pickup_location'] ?? ''));
                 if ($name === '') {
                     continue;
@@ -333,13 +367,15 @@ class ShiprocketService
             if ($match) {
                 Cache::put($cacheKey, $match, now()->addHours(12));
 
-                return $match;
+                return ['name' => $match, 'checked' => true];
             }
+
+            return ['name' => null, 'checked' => true];
         } catch (\Throwable $e) {
             Log::warning('Shiprocket pickup location lookup failed: '.$e->getMessage());
         }
 
-        return $this->pickupLocation;
+        return ['name' => $this->pickupLocation, 'checked' => false];
     }
 
     private function readableMessage(mixed $message, string $fallback): string
