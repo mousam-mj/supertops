@@ -203,7 +203,7 @@
                             @auth
                                 <div class="left flex items-center"><span class="text-on-surface-variant1">You're already logged in with {{ auth()->user()->email }}</span></div>
                             @else
-                                <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Already have an account? </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
+                                <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Please login to continue checkout. </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
                                 <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
                             @endauth
                         </div>
@@ -597,25 +597,32 @@ function validateForm() {
             };
         }
     } else {
-        // For guests, send guest_info - ensure all fields are present
         orderData = {
-            guest_info: {
-                first_name: formData.first_name || '',
-                last_name: formData.last_name || '',
-                email: formData.email || '',
-                phone: formData.phone || '',
-                address: formData.address || '',
-                city: formData.city || '',
-                state: formData.state || '',
-                pincode: formData.pincode || ''
+            shipping_address: {
+                first_name: formData.first_name,
+                last_name: formData.last_name,
+                email: formData.email,
+                phone: formData.phone,
+                address_line_1: formData.address,
+                city: formData.city,
+                state: formData.state,
+                pincode: formData.pincode
             },
-            payment_method: formData.payment_method || 'test',
+            guest_info: {
+                first_name: formData.first_name,
+                last_name: formData.last_name,
+                email: formData.email,
+                phone: formData.phone,
+                address: formData.address,
+                city: formData.city,
+                state: formData.state,
+                pincode: formData.pincode
+            },
+            payment_method: formData.payment_method || 'razorpay',
             notes: formData.notes || '',
             shipping_charge: shipping || 0,
             cod_charge: codCharge
         };
-        
-        console.log('Guest order data:', orderData);
     }
     
     // Get CSRF token

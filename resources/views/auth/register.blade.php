@@ -1093,7 +1093,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 // Redirect to My Account with welcome message
+                const requestedNext = new URLSearchParams(window.location.search).get('redirect');
                 let redirectUrl = data.redirect_url || '{{ route("my-account") }}';
+                if (requestedNext) {
+                    try {
+                        const nextUrl = new URL(requestedNext, window.location.origin);
+                        if (nextUrl.origin === window.location.origin) {
+                            redirectUrl = nextUrl.pathname + nextUrl.search;
+                        }
+                    } catch (e) {}
+                }
                 if (data.welcome_message) {
                     redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + 'welcome_message=' + encodeURIComponent(data.welcome_message);
                 }

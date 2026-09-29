@@ -111,37 +111,30 @@ class CheckoutController extends Controller
      */
     public function index(Request $request)
     {
+        if (! $request->user()) {
+            return redirect()->route('login', ['redirect' => route('checkout.index')]);
+        }
+
         $query = Cart::with('product.category');
 
         if ($request->user()) {
+            $guestSessionId = $request->cookie('cart_session_id');
+            if ($guestSessionId) {
+                Cart::where('session_id', $guestSessionId)
+                    ->whereNull('user_id')
+                    ->update([
+                        'user_id' => $request->user()->id,
+                        'session_id' => null,
+                    ]);
+            }
+
             $query->where('user_id', $request->user()->id);
             $addresses = Address::where('user_id', $request->user()->id)
                 ->orderBy('is_default', 'desc')
                 ->get();
         } else {
-            // First, find the best session ID (one with most items)
-            $bestSession = Cart::whereNull('user_id')
-                ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                ->groupBy('session_id')
-                ->orderBy('total_quantity', 'desc')
-                ->orderBy('item_count', 'desc')
-                ->orderBy('latest_created_at', 'desc')
-                ->first();
-            
-            // Use cookie session ID if available, otherwise use best session
-            $cookieSessionId = $request->cookie('cart_session_id');
-            $sessionId = $cookieSessionId ?: ($bestSession ? $bestSession->session_id : Str::random(40));
-            
-            // If cookie session is different from best session, consolidate to best session
-            if ($bestSession && $bestSession->session_id !== $sessionId) {
-                $sessionId = $bestSession->session_id;
-            }
-            
-            // Consolidate all guest cart items to this session
-            $this->consolidateGuestCart($sessionId);
-            
-            $query->where('session_id', $sessionId);
+            $sessionId = $request->cookie('cart_session_id') ?: Str::random(40);
+            $query->where('session_id', $sessionId)->whereNull('user_id');
             $addresses = collect([]);
         }
 
@@ -165,7 +158,9 @@ class CheckoutController extends Controller
         $shipping = 0; // Can be calculated dynamically
         $total = $subtotal + $shipping;
 
-        $sessionId = $this->getSessionId($request);
+        if (! isset($sessionId)) {
+            $sessionId = $request->user() ? null : ($request->cookie('cart_session_id') ?: Str::random(40));
+        }
         
         // Get user data and default address for auto-fill
         $user = $request->user();
@@ -201,9 +196,13 @@ class CheckoutController extends Controller
             }
         }
         
-        return response()
-            ->view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'addresses', 'user', 'defaultAddress', 'userFirstName', 'userLastName'))
-            ->cookie('cart_session_id', $sessionId, 60 * 24 * 30);
+        $response = response()->view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'addresses', 'user', 'defaultAddress', 'userFirstName', 'userLastName'));
+
+        if ($sessionId) {
+            $response->cookie('cart_session_id', $sessionId, 60 * 24 * 30);
+        }
+
+        return $response;
     }
 }
 

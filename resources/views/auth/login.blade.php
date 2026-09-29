@@ -684,7 +684,7 @@
                             <div class="heading4">New Customer</div>
                             <div class="mt-2 text-secondary">Be part of our growing family of new customers! Join us today and unlock a world of exclusive benefits, offers, and personalized experiences.</div>
                             <div class="block-button md:mt-7 mt-4">
-                                <a href="{{ route('register') }}" class="button-main" style="background-color: #B09FE6; border: none; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#9B8AD0'" onmouseout="this.style.backgroundColor='#B09FE6'">Register</a>
+                                <a href="{{ route('register', array_filter(['redirect' => request()->get('redirect')])) }}" class="button-main" style="background-color: #B09FE6; border: none; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#9B8AD0'" onmouseout="this.style.backgroundColor='#B09FE6'">Register</a>
                             </div>
                         </div>
                 </div>
@@ -943,8 +943,18 @@
                                 console.log('User data stored:', data.user);
                             }
                             
-                            // Redirect to My Account with welcome message
-                            let redirectUrl = data.redirect_url || '{{ route("my-account") }}';
+                            const requestedNext = new URLSearchParams(window.location.search).get('redirect');
+                            let redirectUrl = '{{ route("my-account") }}';
+                            if (requestedNext) {
+                                try {
+                                    const nextUrl = new URL(requestedNext, window.location.origin);
+                                    if (nextUrl.origin === window.location.origin) {
+                                        redirectUrl = nextUrl.pathname + nextUrl.search;
+                                    }
+                                } catch (e) {}
+                            } else if (data.redirect_url) {
+                                redirectUrl = data.redirect_url;
+                            }
                             if (data.login_success) {
                                 redirectUrl += (redirectUrl.includes('?') ? '&' : '?') + 'login_success=' + encodeURIComponent(data.login_success);
                             }

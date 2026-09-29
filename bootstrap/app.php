@@ -16,6 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'log.auth' => \App\Http\Middleware\LogAuthMiddleware::class,
         ]);
+
+        // Cart and checkout call /api from the same browser. Share the
+        // encrypted cart cookie and the login session with those routes
+        // so a guest cart is the same cart used at checkout.
+        $middleware->api(prepend: [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

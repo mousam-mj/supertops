@@ -39,6 +39,13 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login to place an order.',
+            ], 401);
+        }
         
         $validationRules = [
             'payment_method' => 'required|in:razorpay,cod,test',
@@ -200,65 +207,15 @@ class OrderController extends Controller
             }
             
         } else {
-            // Guest cart - use same logic as CheckoutController
-            // First, find the best session ID (one with most items)
-            $bestSession = Cart::whereNull('user_id')
-                ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                ->groupBy('session_id')
-                ->orderBy('total_quantity', 'desc')
-                ->orderBy('item_count', 'desc')
-                ->orderBy('latest_created_at', 'desc')
-                ->first();
-            
-            // Use cookie session ID if available, otherwise use best session
-            $cookieSessionId = $request->cookie('cart_session_id');
-            
-            // Try to find cart items with cookie session ID first
-            if ($cookieSessionId) {
-                $cartItems = Cart::where('session_id', $cookieSessionId)
-                    ->whereNull('user_id')
-                    ->with('product')
-                    ->get();
-            } else {
-                $cartItems = collect([]);
-            }
-            
-            // If no items found with cookie session, try best session
-            if ($cartItems->isEmpty() && $bestSession) {
-                $cartItems = Cart::where('session_id', $bestSession->session_id)
-                    ->whereNull('user_id')
-                    ->with('product')
-                    ->get();
-                
-                // Update session ID to best session for consistency
-                $sessionId = $bestSession->session_id;
-            } else {
-                $sessionId = $cookieSessionId;
-            }
-            
-            // If still no items, check if there are ANY guest cart items
-            if ($cartItems->isEmpty()) {
-                $anyGuestItems = Cart::whereNull('user_id')
-                    ->whereNotNull('session_id')
-                    ->with('product')
-                    ->get();
-                
-                if (!$anyGuestItems->isEmpty()) {
-                    // Use the session_id from the first item found
-                    $firstItem = $anyGuestItems->first();
-                    $cartItems = Cart::where('session_id', $firstItem->session_id)
-                        ->whereNull('user_id')
-                        ->with('product')
-                        ->get();
-                    $sessionId = $firstItem->session_id;
-                }
-            }
-            
+            $sessionId = $request->cookie('cart_session_id');
+            $cartItems = $sessionId
+                ? Cart::where('session_id', $sessionId)->whereNull('user_id')->with('product')->get()
+                : collect([]);
+
             if ($cartItems->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cart is empty. Please add items to your cart before placing an order. Go to the shop page and add products to your cart first.',
+                    'message' => 'Cart is empty. Add the product again, then place the order. An account is not required.',
                 ], 400);
             }
         }
