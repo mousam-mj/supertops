@@ -56,7 +56,9 @@ class PaymentController extends Controller
         }
 
         try {
-            $amount = $request->amount * 100; // Convert to paise
+            // Razorpay requires amount in paise as an integer. Multiplying a
+            // rupee float (e.g. 1.15 * 100 = 114.99999999999999) is rejected.
+            $amount = (int) round(((float) $request->amount) * 100);
             $currency = $request->currency ?? 'INR';
 
             $razorpayOrder = $this->razorpay->order->create([
