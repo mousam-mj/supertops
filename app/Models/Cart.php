@@ -56,10 +56,7 @@ class Cart extends Model
             return 0;
         }
         if (($this->color !== null && $this->color !== '') || ($this->size !== null && $this->size !== '')) {
-            $inventory = \App\Models\Inventory::where('product_id', $product->id)
-                ->where('color', $this->color ?? '')
-                ->where('size', $this->size ?? '')
-                ->first();
+            $inventory = $product->findInventoryForColorSize($this->color, $this->size);
             if ($inventory) {
                 $price = $inventory->sale_price ?? $inventory->price ?? null;
                 if ($price !== null && (float) $price > 0) {

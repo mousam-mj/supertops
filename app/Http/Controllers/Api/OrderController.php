@@ -381,12 +381,10 @@ class OrderController extends Controller
                     if ($stock < $cartItem->quantity) {
                         throw new \Exception("Insufficient stock for {$product->name}. Available: {$stock}, Requested: {$cartItem->quantity}");
                     }
-                    
-                    // Update inventory (deduct stock for this variant)
-                    $inventory = Inventory::where('product_id', $product->id)
-                        ->where('color', $cartItem->color ?? '')
-                        ->where('size', $cartItem->size ?? '')
-                        ->first();
+
+                    // Resolve inventory even when cart color is the display label
+                    // (e.g. "Black & Grey") but inventory color is shorter ("Black").
+                    $inventory = $product->findInventoryForColorSize($cartItem->color, $cartItem->size);
 
                     if ($inventory) {
                         $inventory->quantity -= $cartItem->quantity;
@@ -394,9 +392,13 @@ class OrderController extends Controller
                         $inventory->save();
                         $product->syncStockFromInventories();
                     } else {
-                        // If no inventory record exists, create one with negative quantity (for tracking)
-                        // Or throw error if inventory is required
-                        throw new \Exception("Inventory record not found for {$product->name} with color: {$cartItem->color}, size: {$cartItem->size}");
+                        // No variant row — deduct product-level stock (same as getStockForColorSize fallback)
+                        if ($product->stock_quantity !== null) {
+                            $product->stock_quantity -= $cartItem->quantity;
+                        } else {
+                            $product->stock -= $cartItem->quantity;
+                        }
+                        $product->save();
                     }
                 } else {
                     // Check main product stock

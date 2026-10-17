@@ -3359,7 +3359,6 @@ input[type=file]::-webkit-file-upload-button {
     padding-top: 0;
   }
 }
-.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item,
 .product-detail.out-of-stock .product-infor.style-out-of-stock .size-item {
   filter: grayscale(0.9);
   overflow: hidden;
@@ -3367,7 +3366,6 @@ input[type=file]::-webkit-file-upload-button {
   cursor: default;
   pointer-events: none;
 }
-.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item::before, .product-detail.out-of-stock .product-infor.style-out-of-stock .color-item::after,
 .product-detail.out-of-stock .product-infor.style-out-of-stock .size-item::before,
 .product-detail.out-of-stock .product-infor.style-out-of-stock .size-item::after {
   content: "";
@@ -3376,19 +3374,31 @@ input[type=file]::-webkit-file-upload-button {
   width: 150%;
   height: 150%;
 }
-.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item::before,
 .product-detail.out-of-stock .product-infor.style-out-of-stock .size-item::before {
   left: 0;
   border-right: 2px dashed var(--line);
   transform: rotate(45deg) translateX(-70%);
 }
-.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item::after,
 .product-detail.out-of-stock .product-infor.style-out-of-stock .size-item::after {
   right: 0;
   border-left: 2px dashed var(--line);
   transform: rotate(-45deg) translateX(70%);
 }
-.product-detail.out-of-stock .product-infor.style-out-of-stock .button-main {
+.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item:not([data-product-url]) {
+  filter: grayscale(0.9);
+  overflow: hidden;
+  cursor: default;
+}
+.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item[data-product-url] {
+  filter: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item[data-product-url]::before,
+.product-detail.out-of-stock .product-infor.style-out-of-stock .color-item[data-product-url]::after {
+  content: none;
+}
+.product-detail.out-of-stock .product-infor.style-out-of-stock .add-cart-btn.is-out-of-stock {
   background-color: var(--surface) !important;
   color: var(--secondary2) !important;
   cursor: default;

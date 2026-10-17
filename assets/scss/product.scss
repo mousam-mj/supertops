@@ -863,7 +863,9 @@
         .product-infor {
             &.style-out-of-stock {
 
-                .color-item,
+                // Only disable THIS product's unavailable sizes — linked group
+                // color chips must stay clickable so shoppers can switch to an
+                // in-stock variant product.
                 .size-item {
                     filter: grayscale(0.9);
                     overflow: hidden;
@@ -893,7 +895,25 @@
                     }
                 }
 
-                .button-main {
+                .color-item:not([data-product-url]) {
+                    filter: grayscale(0.9);
+                    overflow: hidden;
+                    cursor: default;
+                }
+
+                .color-item[data-product-url] {
+                    filter: none;
+                    pointer-events: auto;
+                    cursor: pointer;
+
+                    &::before,
+                    &::after {
+                        content: none;
+                    }
+                }
+
+                .button-main:not(.buy-it-now-btn):not(.add-cart-btn),
+                .add-cart-btn.is-out-of-stock {
                     background-color: var(--surface) !important;
                     color: var(--secondary2) !important;
                     cursor: default;

@@ -164,6 +164,8 @@ class Product extends Model
 
     public function getSwatchUrlForDisplayColor(): ?string
     {
+        $this->loadMissing('inventories');
+
         $label = $this->getDisplayColorLabel();
         $swatch = $this->getSwatchImageForColor($label);
         if ($swatch) {
@@ -171,8 +173,15 @@ class Product extends Model
         }
 
         $inventory = $this->inventories->first(fn ($inv) => trim((string) ($inv->color ?? '')) === $label);
+        if (! $inventory) {
+            $inventory = $this->findInventoryForColorSize($label, null);
+        }
+        if ($inventory?->image) {
+            return $inventory->image;
+        }
 
-        return $inventory?->image;
+        // Group color chips should always show the variant product photo when no swatch is set
+        return $this->image ?: null;
     }
 
     /**
@@ -263,11 +272,11 @@ class Product extends Model
     }
 
     /**
-     * Get stock for specific color and size.
-     * Falls back to product-level stock when no inventory row exists for that combo
-     * (common for linked color variants that track stock only on the product).
+     * Normalize blank color/size strings to null.
+     *
+     * @return array{0: ?string, 1: ?string}
      */
-    public function getStockForColorSize($color = null, $size = null)
+    public static function normalizeColorSize($color = null, $size = null): array
     {
         $color = is_string($color) ? trim($color) : $color;
         $size = is_string($size) ? trim($size) : $size;
@@ -278,21 +287,94 @@ class Product extends Model
             $size = null;
         }
 
-        $query = $this->inventories();
+        return [$color, $size];
+    }
 
+    /**
+     * Resolve the inventory row for a cart/order color+size.
+     * Cart often stores the display label (variant_color_label) while inventory
+     * may use a shorter color name (e.g. "Black & Grey" vs "Black").
+     */
+    public function findInventoryForColorSize($color = null, $size = null): ?Inventory
+    {
+        [$color, $size] = static::normalizeColorSize($color, $size);
+
+        $this->loadMissing('inventories');
+        $rows = $this->inventories;
+
+        if ($rows->isEmpty()) {
+            return null;
+        }
+
+        $norm = static fn ($value) => strtolower(trim((string) ($value ?? '')));
+
+        $matchExact = $rows->first(function ($inv) use ($color, $size, $norm) {
+            $colorOk = $color === null || $norm($inv->color) === $norm($color);
+            $sizeOk = $size === null || $norm($inv->size) === $norm($size);
+
+            return $colorOk && $sizeOk;
+        });
+        if ($matchExact) {
+            return $matchExact;
+        }
+
+        // Display label on this product (e.g. "Black & Grey") vs inventory "Black"
+        $displayLabel = $norm($this->getDisplayColorLabel());
+        if ($color && $displayLabel !== '' && $norm($color) === $displayLabel) {
+            $bySize = $size
+                ? $rows->first(fn ($inv) => $norm($inv->size) === $norm($size))
+                : null;
+            if ($bySize) {
+                return $bySize;
+            }
+            if ($rows->count() === 1) {
+                return $rows->first();
+            }
+        }
+
+        // Fuzzy: "Black" inside "Black & Grey", or "Pink" inside "Baby Pink"
         if ($color) {
-            $query->where('color', $color);
+            $fuzzy = $rows->first(function ($inv) use ($color, $size, $norm) {
+                $invColor = $norm($inv->color);
+                $want = $norm($color);
+                if ($invColor === '' || $want === '') {
+                    return false;
+                }
+                $colorOk = str_contains($want, $invColor) || str_contains($invColor, $want);
+                $sizeOk = $size === null || $norm($inv->size) === $norm($size);
+
+                return $colorOk && $sizeOk;
+            });
+            if ($fuzzy) {
+                return $fuzzy;
+            }
         }
 
+        // Single row for this size on the product
         if ($size) {
-            $query->where('size', $size);
+            $sizeMatches = $rows->filter(fn ($inv) => $norm($inv->size) === $norm($size));
+            if ($sizeMatches->count() === 1) {
+                return $sizeMatches->first();
+            }
         }
 
-        $hasMatchingRows = (clone $query)->exists();
-        $qty = (int) $query->sum('quantity');
+        if ($rows->count() === 1 && ($color || $size)) {
+            return $rows->first();
+        }
 
-        if ($hasMatchingRows) {
-            return $qty;
+        return null;
+    }
+
+    /**
+     * Get stock for specific color and size.
+     * Falls back to product-level stock when no inventory row exists for that combo
+     * (common for linked color variants that track stock only on the product).
+     */
+    public function getStockForColorSize($color = null, $size = null)
+    {
+        $inventory = $this->findInventoryForColorSize($color, $size);
+        if ($inventory) {
+            return (int) $inventory->quantity;
         }
 
         // No inventory rows for this color/size — use product stock

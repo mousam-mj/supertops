@@ -41,7 +41,8 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL'), '/').'/'.ltrim(env('STORAGE_PUBLIC_PATH', 'storage'), '/'),
+            // STORAGE_URL overrides APP_URL + STORAGE_PUBLIC_PATH (useful locally with production media).
+            'url' => rtrim(env('STORAGE_URL') ?: (rtrim(env('APP_URL'), '/').'/'.ltrim(env('STORAGE_PUBLIC_PATH', 'storage'), '/')), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

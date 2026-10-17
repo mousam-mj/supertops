@@ -182,14 +182,12 @@ class OrderController extends Controller
             foreach ($order->items as $item) {
                 if ($item->product) {
                     // Find inventory record and restore stock
-                    $inventory = \App\Models\Inventory::where('product_id', $item->product_id)
-                        ->where('color', $item->color)
-                        ->where('size', $item->size)
-                        ->first();
-                    
+                    $inventory = $item->product->findInventoryForColorSize($item->color, $item->size);
+
                     if ($inventory) {
-                        $inventory->stock_quantity += $item->quantity;
+                        $inventory->quantity = ($inventory->quantity ?? 0) + $item->quantity;
                         $inventory->save();
+                        $item->product->syncStockFromInventories();
                     }
                 }
             }

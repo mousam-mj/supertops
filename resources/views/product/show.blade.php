@@ -92,36 +92,73 @@
     $variantGroupMembers = $product->variantGroupMembers();
     if ($variantGroupMembers->count() > 1) {
         foreach ($variantGroupMembers as $variantProduct) {
+            $variantProduct->loadMissing('inventories');
             $colorLabel = $variantProduct->getDisplayColorLabel();
             $variantCustomNames = is_array($variantProduct->color_variant_names ?? null) ? $variantProduct->color_variant_names : [];
             $variantCustomTitle = trim((string) ($variantCustomNames[$colorLabel] ?? ''));
             $swatchPath = $variantProduct->getSwatchUrlForDisplayColor();
-            $variantImagePath = $variantProduct->image;
-            foreach ($variantProduct->inventories as $inv) {
-                if ($inv->color && trim((string) $inv->color) === $colorLabel && $inv->image) {
-                    $variantImagePath = $inv->image;
-                    break;
+            $matchedInv = $variantProduct->findInventoryForColorSize($colorLabel, null);
+            $variantImagePath = $matchedInv?->image ?: $variantProduct->image;
+            $toAssetUrl = static function (?string $path): ?string {
+                if (! $path) {
+                    return null;
                 }
-            }
+
+                return str_starts_with($path, 'http') ? $path : storage_asset($path);
+            };
+            $variantStock = max(0, (int) ($variantProduct->stock_quantity ?? 0));
+            $variantInStock = ($variantProduct->in_stock ?? true) && $variantStock > 0;
             $linkedVariantProducts[] = [
                 'product_id' => $variantProduct->id,
                 'color' => $colorLabel,
                 'url' => route('product.show', $variantProduct->slug),
                 'is_current' => $variantProduct->id === $product->id,
                 'title' => $variantCustomTitle !== '' ? $variantCustomTitle : $variantProduct->name,
-                'swatch_url' => $swatchPath ? (str_starts_with($swatchPath, 'http') ? $swatchPath : storage_asset($swatchPath)) : null,
-                'image_url' => $variantImagePath ? storage_asset($variantImagePath) : null,
+                'swatch_url' => $toAssetUrl($swatchPath),
+                'image_url' => $toAssetUrl($variantImagePath),
+                'in_stock' => $variantInStock,
+                'stock_quantity' => $variantStock,
             ];
         }
-        $linkedColorKeys = collect($linkedVariantProducts)->pluck('color')->map(fn ($c) => strtolower(trim($c)))->all();
-        $availableColors = array_values(array_filter($availableColors, fn ($c) => ! in_array(strtolower(trim($c)), $linkedColorKeys, true)));
+        // Disambiguate duplicate color labels (e.g. two "Beige" prints)
+        $labelCounts = array_count_values(array_map(
+            fn ($v) => strtolower(trim((string) $v['color'])),
+            $linkedVariantProducts
+        ));
+        foreach ($linkedVariantProducts as &$linkedVariant) {
+            $key = strtolower(trim((string) $linkedVariant['color']));
+            if (($labelCounts[$key] ?? 0) <= 1) {
+                continue;
+            }
+            $title = (string) $linkedVariant['title'];
+            if (str_contains($title, ',')) {
+                $linkedVariant['color'] = trim(substr($title, strrpos($title, ',') + 1));
+            } elseif (preg_match('/\bBottle\s+(.+)$/i', $title, $m)) {
+                $linkedVariant['color'] = trim($m[1]);
+            } else {
+                $words = preg_split('/\s+/', trim($title)) ?: [];
+                $linkedVariant['color'] = implode(' ', array_slice($words, -2)) ?: $title;
+            }
+        }
+        unset($linkedVariant);
+
+        // Group products own the color row — don't also show this product's
+        // leftover inventory colors (e.g. "Black" when label is "Black & Grey").
+        $availableColors = [];
         $currentLinked = collect($linkedVariantProducts)->firstWhere('is_current', true);
         if ($currentLinked) {
             $initialProductTitle = $currentLinked['title'];
         }
     }
-    $initialSelectedColor = $product->getDisplayColorLabel() ?: ($firstColor ?? '');
+    $initialSelectedColor = collect($linkedVariantProducts)->firstWhere('is_current', true)['color']
+        ?? ($product->getDisplayColorLabel() ?: ($firstColor ?? ''));
     $showColorPicker = count($linkedVariantProducts) > 0 || count($availableColors) > 0;
+    $hasLinkedVariantImages = collect($linkedVariantProducts)->contains(
+        fn ($v) => ! empty($v['swatch_url']) || ! empty($v['image_url'])
+    );
+    if ($hasLinkedVariantImages) {
+        $hasColorSwatchImages = true;
+    }
     $realStock = max(0, (int) ($product->stock_quantity ?? 0));
     $isInStock = ($product->in_stock ?? true) && $realStock > 0;
 @endphp
@@ -141,6 +178,23 @@
     width: 2.75rem;
     height: 2.75rem;
     flex-shrink: 0;
+}
+/* Out-of-stock pages must still allow switching to other group products */
+.product-detail.out-of-stock .product-infor.style-out-of-stock .choose-color .color-item[data-product-url] {
+    filter: none !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    border: 2px solid transparent;
+}
+.product-detail.out-of-stock .product-infor.style-out-of-stock .choose-color .color-item[data-product-url]::before,
+.product-detail.out-of-stock .product-infor.style-out-of-stock .choose-color .color-item[data-product-url]::after {
+    content: none !important;
+}
+.product-detail.out-of-stock .product-infor.style-out-of-stock .choose-color .color-item.is-variant-oos {
+    opacity: 0.55;
+}
+.choose-color .color-item.is-variant-oos:not(.active) {
+    opacity: 0.55;
 }
 /* Product gallery: thumbs + square main image that stays inside left column */
 .product-detail.style-grouped .product-gallery-wrap {
@@ -463,12 +517,15 @@
                                                     $hexCode = trim((string) ($masterColorCodes[strtolower(trim((string) $color))] ?? ''));
                                                     $isValidHex = $hexCode !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $hexCode);
                                                     $swatchStyle = (!$swatchUrl && $isValidHex) ? 'background-color: '.$hexCode.';' : ((!$swatchUrl) ? 'background-color: #e5e7eb;' : '');
+                                                    $variantInStock = ! empty($variant['in_stock']);
+                                                    $swatchTitle = $color.($variantInStock ? '' : ' (Out of Stock)');
                                                 @endphp
-                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $variant['is_current'] ? 'active border-black' : '' }}"
+                                                <div class="color-item w-10 h-10 rounded-full border-2 border-transparent hover:border-black cursor-pointer duration-300 {{ $variant['is_current'] ? 'active border-black' : '' }}{{ $variantInStock ? '' : ' is-variant-oos' }}"
                                                      @if($swatchStyle !== '') style="{{ $swatchStyle }}" @endif
                                                      data-color="{{ $color }}"
+                                                     data-in-stock="{{ $variantInStock ? '1' : '0' }}"
                                                      @if(!$variant['is_current']) data-product-url="{{ $variant['url'] }}" @endif
-                                                     title="{{ $color }}">
+                                                     title="{{ $swatchTitle }}">
                                                     @if($swatchUrl)
                                                         <img src="{{ $swatchUrl }}" alt="{{ $color }}" class="w-full h-full object-cover rounded-full">
                                                     @endif
@@ -494,22 +551,26 @@
                     </div>
                 @endif
                                 <div class="text-title mt-5">Quantity:</div>
-                                <div class="choose-quantity flex items-center max-xl:flex-wrap lg:justify-between gap-5 mt-3">
+                                <div class="choose-quantity flex items-center max-xl:flex-wrap gap-3 mt-3">
                                     @if($isInStock)
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0">
                                         <i class="ph-bold ph-minus cursor-pointer body1"></i>
                                         <input type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 focus:ring-0 focus:outline-none" />
                                         <i class="ph-bold ph-plus cursor-pointer body1"></i>
                                     </div>
-                                    <button type="button" class="add-cart-btn button-main whitespace-nowrap w-full text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</button>
+                                    <button type="button" class="add-cart-btn button-main whitespace-nowrap flex-1 min-w-[120px] text-center bg-white text-black border border-black cursor-pointer" data-product-id="{{ $product->id }}">Add To Cart</button>
+                                    <button type="button" class="buy-it-now-btn button-main whitespace-nowrap flex-1 min-w-[120px] text-center border-0 cursor-pointer bg-black text-white font-semibold uppercase" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
                                     @else
                                     <div class="quantity-block md:p-3 max-md:py-1.5 max-md:px-3 flex items-center justify-between rounded-lg border border-line sm:w-[140px] w-[120px] flex-shrink-0 opacity-60 pointer-events-none">
                                         <i class="ph-bold ph-minus body1"></i>
                                         <input type="number" min="0" max="0" step="1" value="0" readonly tabindex="-1" aria-label="Quantity" class="quantity body1 font-semibold w-12 min-w-[3rem] text-center bg-transparent border-0 p-0 opacity-60 cursor-not-allowed" />
                                         <i class="ph-bold ph-plus body1"></i>
                                     </div>
-                                    <button type="button" class="add-cart-btn is-out-of-stock button-main whitespace-nowrap w-full text-center bg-white text-black border border-black opacity-50 cursor-not-allowed select-none" data-product-id="{{ $product->id }}" data-out-of-stock="1" aria-disabled="true" disabled>Out of Stock</button>
+                                    <button type="button" class="add-cart-btn is-out-of-stock button-main whitespace-nowrap flex-1 min-w-[120px] text-center bg-white text-black border border-black opacity-50 cursor-not-allowed select-none" data-product-id="{{ $product->id }}" data-out-of-stock="1" aria-disabled="true" disabled>Out of Stock</button>
                                     @endif
+                                    <button type="button" class="share-product-btn w-12 h-12 flex-shrink-0 flex items-center justify-center border border-line rounded-lg cursor-pointer hover:bg-black hover:text-white duration-300" data-share-url="{{ route('product.show', $product->slug) }}" data-share-title="{{ $product->name }}" title="Share">
+                                        <i class="ph ph-share-network text-xl"></i>
+                                    </button>
                                 </div>
                                 <!-- Pincode Checker -->
                                 <div class="pincode-checker mt-5 p-4 border border-line rounded-lg">
@@ -535,17 +596,11 @@
                                     </div>
                                 </div>
 
+                                @if(setting_flag('show_customize_product_button', true))
                                 <div class="button-block mt-5 flex gap-3 flex-wrap">
-                                    @if(setting_flag('show_customize_product_button', true))
                                     <a href="{{ route('customize') }}" class="button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase no-underline min-w-[140px]">Customize</a>
-                                    @endif
-                                    @if($isInStock)
-                                    <button type="button" class="buy-it-now-btn button-main flex-1 text-center border-0 cursor-pointer bg-black text-white font-semibold py-3 px-4 uppercase min-w-[140px]" data-product-id="{{ $product->id }}" data-checkout-url="{{ route('checkout.index') }}">Buy It Now</button>
-                                    @endif
-                                    <button type="button" class="share-product-btn w-12 h-12 flex-shrink-0 flex items-center justify-center border border-line rounded-lg cursor-pointer hover:bg-black hover:text-white duration-300" data-share-url="{{ route('product.show', $product->slug) }}" data-share-title="{{ $product->name }}" title="Share">
-                                        <i class="ph ph-share-network text-xl"></i>
-                                    </button>
                                 </div>
+                                @endif
                             </div>
                             @include('partials.product-benefit-items')
                         </div>
