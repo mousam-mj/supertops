@@ -142,16 +142,105 @@
         }
         unset($linkedVariant);
 
-        // Group products own the color row — don't also show this product's
-        // leftover inventory colors (e.g. "Black" when label is "Black & Grey").
+        // Keep group swatches clean — inventory color/size options render separately below.
         $availableColors = [];
         $currentLinked = collect($linkedVariantProducts)->firstWhere('is_current', true);
         if ($currentLinked) {
             $initialProductTitle = $currentLinked['title'];
         }
     }
+
+    // Fallback hex when MasterColor table has no match
+    $fallbackColorHex = [
+        'black' => '#111111',
+        'white' => '#f5f5f5',
+        'grey' => '#9ca3af',
+        'gray' => '#9ca3af',
+        'black & grey' => '#4b5563',
+        'black and grey' => '#4b5563',
+        'red' => '#dc2626',
+        'blue' => '#2563eb',
+        'green' => '#16a34a',
+        'pink' => '#ec4899',
+        'purple' => '#7c3aed',
+        'cyan' => '#06b6d4',
+        'amber brown' => '#b45309',
+        'baby pink' => '#f9a8d4',
+        'beige' => '#d6c3a8',
+    ];
+    $resolveColorHex = function (?string $name) use ($masterColorCodes, $fallbackColorHex): string {
+        $key = strtolower(trim((string) $name));
+        if ($key === '') {
+            return '#e5e7eb';
+        }
+        $fromMaster = trim((string) ($masterColorCodes[$key] ?? ''));
+        if ($fromMaster !== '' && preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/', $fromMaster)) {
+            return $fromMaster;
+        }
+
+        return $fallbackColorHex[$key] ?? '#e5e7eb';
+    };
+
+    // Prefer local /storage file when present (new admin uploads), else CDN/STORAGE_URL.
+    $publicMediaUrl = static function (?string $path): ?string {
+        if (! $path) {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        $relative = ltrim($path, '/');
+        if (is_file(storage_path('app/public/'.$relative))) {
+            return asset('storage/'.$relative);
+        }
+
+        return storage_asset($relative);
+    };
+
+    // This product's own inventory rows (color + size) — always shown when present.
+    $inventoryOptions = [];
+    foreach ($product->inventories as $inv) {
+        $invColor = trim((string) ($inv->color ?? ''));
+        $invSize = trim((string) ($inv->size ?? ''));
+        if ($invColor === '' && $invSize === '') {
+            continue;
+        }
+        $invQty = max(0, (int) ($inv->quantity ?? 0));
+        $invPrice = $inv->price !== null && (float) $inv->price > 0 ? (float) $inv->price : $productPrice;
+        $invSale = $inv->sale_price !== null && (float) $inv->sale_price > 0 ? (float) $inv->sale_price : $productSalePrice;
+        $displayColor = $invColor !== '' ? ucwords(strtolower($invColor)) : '';
+        $inventoryOptions[] = [
+            'color' => $invColor,
+            'display_color' => $displayColor,
+            'size' => $invSize,
+            'quantity' => $invQty,
+            'in_stock' => $invQty > 0,
+            'price' => $invPrice,
+            'sale_price' => $invSale,
+            'image' => $publicMediaUrl($inv->image),
+            'hex' => $resolveColorHex($invColor),
+            'label' => trim($displayColor.($displayColor !== '' && $invSize !== '' ? ' · ' : '').$invSize),
+        ];
+    }
+    $inventoryOptionColors = collect($inventoryOptions)->pluck('color')->filter()->unique()->values()->all();
+    $inventoryOptionSizes = collect($inventoryOptions)->pluck('size')->filter()->unique()->values()->all();
+    // One chip per inventory row (Color+Size together) — avoids Black/1000 vs White/7200 mixups
+    $showInventoryOptionPicker = count($inventoryOptions) > 0;
+
     $initialSelectedColor = collect($linkedVariantProducts)->firstWhere('is_current', true)['color']
         ?? ($product->getDisplayColorLabel() ?: ($firstColor ?? ''));
+    // Prefer first in-stock inventory row for default size/color on this product
+    $defaultInventoryOption = collect($inventoryOptions)->firstWhere('in_stock', true)
+        ?? ($inventoryOptions[0] ?? null);
+    $initialInventoryColor = '';
+    $initialInventoryLabel = '';
+    if ($defaultInventoryOption) {
+        if (! empty($defaultInventoryOption['size'])) {
+            $firstSize = $defaultInventoryOption['size'];
+        }
+        $initialInventoryColor = (string) ($defaultInventoryOption['color'] ?? '');
+        $initialInventoryLabel = (string) ($defaultInventoryOption['label'] ?? '');
+    }
     $showColorPicker = count($linkedVariantProducts) > 0 || count($availableColors) > 0;
     $hasLinkedVariantImages = collect($linkedVariantProducts)->contains(
         fn ($v) => ! empty($v['swatch_url']) || ! empty($v['image_url'])
@@ -159,8 +248,19 @@
     if ($hasLinkedVariantImages) {
         $hasColorSwatchImages = true;
     }
-    $realStock = max(0, (int) ($product->stock_quantity ?? 0));
-    $isInStock = ($product->in_stock ?? true) && $realStock > 0;
+    $realStock = $defaultInventoryOption
+        ? (int) $defaultInventoryOption['quantity']
+        : max(0, (int) ($product->stock_quantity ?? 0));
+    $isInStock = $defaultInventoryOption
+        ? (bool) $defaultInventoryOption['in_stock']
+        : (($product->in_stock ?? true) && $realStock > 0);
+    if ($defaultInventoryOption) {
+        $initialPrice = (float) $defaultInventoryOption['price'];
+        $initialSalePrice = $defaultInventoryOption['sale_price'];
+        $initialDisplayPrice = ($initialSalePrice !== null && $initialSalePrice > 0 && $initialSalePrice < $initialPrice)
+            ? $initialSalePrice
+            : $initialPrice;
+    }
 @endphp
 <style>
 .desc-truncated { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
@@ -195,6 +295,59 @@
 }
 .choose-color .color-item.is-variant-oos:not(.active) {
     opacity: 0.55;
+}
+.product-stock-badge.text-stock-in {
+    color: #15803d !important;
+}
+.product-stock-badge.text-stock-out {
+    color: #b91c1c !important;
+}
+.choose-inventory-option .inventory-option-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 10rem;
+    text-align: left;
+    padding: 0.65rem 0.9rem;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+}
+.choose-inventory-option .inventory-option-item .opt-swatch {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,.12);
+    background-size: cover;
+    background-position: center;
+}
+.choose-inventory-option .inventory-option-item .opt-swatch.is-light {
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
+}
+.choose-inventory-option .inventory-option-item .opt-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+.choose-inventory-option .inventory-option-item .opt-name {
+    font-weight: 600;
+    line-height: 1.2;
+}
+.choose-inventory-option .inventory-option-item .opt-stock {
+    font-size: 11px;
+    opacity: 0.7;
+}
+.choose-inventory-option .inventory-option-item.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+.choose-inventory-option .inventory-option-item.active .opt-swatch {
+    border-color: rgba(255,255,255,.35);
+}
+.choose-inventory-option .inventory-option-item.is-variant-oos:not(.active) {
+    opacity: 0.5;
 }
 /* Product gallery: thumbs + square main image that stays inside left column */
 .product-detail.style-grouped .product-gallery-wrap {
@@ -400,12 +553,12 @@
                     }
                     $allImages = array_unique($allImages);
                 @endphp
-                        <div class="product-gallery-inner md:sticky">
+                        <div class="product-gallery-inner md:sticky" data-default-main-image="{{ $mainImage }}">
                             <div class="swiper mySwiper2 product-gallery-main rounded-2xl overflow-hidden">
                                 <div class="swiper-wrapper">
                                     @foreach($allImages as $img)
                                         <div class="swiper-slide">
-                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                            <img src="{{ $img }}" alt="{{ $product->name }}" class="w-full h-full object-cover" data-default-src="{{ $img }}" />
                                         </div>
                                     @endforeach
                                 </div>
@@ -435,17 +588,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="product-infor{{ $isInStock ? '' : ' style-out-of-stock' }} md:w-1/2 w-full lg:pl-[15px] md:pl-2" data-default-size="{{ $firstSize ?? $availableSizes[0] ?? '' }}" data-in-stock="{{ $isInStock ? '1' : '0' }}">
+                    <div class="product-infor{{ $isInStock ? '' : ' style-out-of-stock' }} md:w-1/2 w-full lg:pl-[15px] md:pl-2"
+                         data-default-size="{{ $firstSize ?? $availableSizes[0] ?? '' }}"
+                         data-default-inventory-color="{{ $initialInventoryColor ?? '' }}"
+                         data-in-stock="{{ $isInStock ? '1' : '0' }}"
+                         data-inventory-options="{{ e(json_encode($inventoryOptions)) }}"
+                         data-sizes-by-color="{{ e(json_encode($sizesByColor)) }}"
+                         data-all-sizes="{{ e(json_encode($inventoryOptionSizes ?: $availableSizes)) }}">
                         <div class="sticky">
                             <div class="flex justify-between">
                                 <div>
                                     <div class="product-category caption2 text-secondary font-semibold uppercase">{{ $product->category->name ?? 'Product' }}</div>
                                     <div class="product-name heading4 mt-1" @if(!empty($colorTitles)) data-color-titles="{{ e(json_encode($colorTitles)) }}" @endif>{{ $initialProductTitle }}</div>
-                                    @unless($isInStock)
-                                        <div class="product-stock-badge caption2 font-semibold text-red inline-flex items-center gap-1.5 mt-2">
-                                            <i class="ph ph-x-circle text-base"></i> Out of Stock
-                                        </div>
-                                    @endunless
+                                    @php
+                                        $stockBadgeText = $isInStock
+                                            ? ('In Stock'.($realStock > 0 ? ': '.$realStock.' left' : ''))
+                                            : 'Out of Stock';
+                                    @endphp
+                                    <div class="product-stock-badge caption2 font-semibold inline-flex items-center gap-1.5 mt-2 {{ $isInStock ? 'text-stock-in' : 'text-stock-out' }}"
+                                         data-stock-qty="{{ $realStock }}">
+                                        <i class="ph {{ $isInStock ? 'ph-check-circle' : 'ph-x-circle' }} text-base"></i>
+                                        <span class="stock-badge-text">{{ $stockBadgeText }}</span>
+                                    </div>
                                 </div>
                                 <div class="add-wishlist-btn w-10 h-10 flex-shrink-0 flex items-center justify-center border border-line cursor-pointer rounded-lg duration-300 hover:bg-black hover:text-white" data-product-id="{{ $product->id }}">
                                     <i class="ph ph-heart text-xl"></i>
@@ -550,6 +714,54 @@
                                         </div>
                     </div>
                 @endif
+                                {{-- One option per inventory row: Color + Size stay paired --}}
+                                @if($showInventoryOptionPicker)
+                                    <div class="choose-inventory-option mt-5">
+                                        <div class="text-title">Options: <span class="text-title selected-inventory-option">{{ $initialInventoryLabel }}</span></div>
+                                        <div class="list-inventory-option flex items-center gap-2 flex-wrap mt-3">
+                                            @foreach($inventoryOptions as $opt)
+                                                @php
+                                                    $isActiveOpt = $defaultInventoryOption
+                                                        && strcasecmp((string) ($opt['color'] ?? ''), (string) ($defaultInventoryOption['color'] ?? '')) === 0
+                                                        && strcasecmp((string) ($opt['size'] ?? ''), (string) ($defaultInventoryOption['size'] ?? '')) === 0;
+                                                    $optHex = $opt['hex'] ?? '#e5e7eb';
+                                                    $isLightSwatch = in_array(strtolower($optHex), ['#fff', '#ffffff', '#f5f5f5', '#fafafa', '#e5e7eb'], true);
+                                                    $swatchBg = ! empty($opt['image'])
+                                                        ? 'background-image:url('.e($opt['image']).');'
+                                                        : 'background-color:'.$optHex.';';
+                                                @endphp
+                                                <button type="button"
+                                                    class="inventory-option-item size-item rounded-lg caption1 cursor-pointer duration-300 hover:border-black {{ $isActiveOpt ? 'active' : '' }}{{ ! empty($opt['in_stock']) ? '' : ' is-variant-oos size-unavailable' }}"
+                                                    data-color="{{ $opt['color'] }}"
+                                                    data-size="{{ $opt['size'] }}"
+                                                    data-stock="{{ $opt['quantity'] }}"
+                                                    data-in-stock="{{ ! empty($opt['in_stock']) ? '1' : '0' }}"
+                                                    data-price="{{ $opt['price'] }}"
+                                                    data-sale-price="{{ $opt['sale_price'] ?? '' }}"
+                                                    data-label="{{ $opt['label'] }}"
+                                                    @if(! empty($opt['image'])) data-image="{{ $opt['image'] }}" @endif
+                                                    title="{{ $opt['label'] }}{{ ! empty($opt['in_stock']) ? '' : ' (Out of Stock)' }}">
+                                                    <span class="opt-swatch {{ $isLightSwatch ? 'is-light' : '' }}" style="{{ $swatchBg }}"></span>
+                                                    <span class="opt-meta">
+                                                        <span class="opt-name">{{ $opt['display_color'] ?: 'Option' }}@if(!empty($opt['size'])) · {{ $opt['size'] }}@endif</span>
+                                                        <span class="opt-stock">{{ ! empty($opt['in_stock']) ? ($opt['quantity'].' left') : 'Out of stock' }}</span>
+                                                    </span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                        {{-- Hidden active mirrors so existing cart/price JS keeps working --}}
+                                        <div class="choose-inventory-color sr-only" aria-hidden="true">
+                                            <div class="inventory-color-item color-item active" data-color="{{ $initialInventoryColor }}"></div>
+                                        </div>
+                                        <div class="choose-size sr-only" aria-hidden="true"
+                                             data-sizes-by-color="{{ e(json_encode($sizesByColor)) }}"
+                                             data-all-sizes="{{ e(json_encode($inventoryOptionSizes)) }}">
+                                            <div class="list-size">
+                                                <div class="size-item active" data-size="{{ $firstSize }}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="text-title mt-5">Quantity:</div>
                                 <div class="choose-quantity flex items-center max-xl:flex-wrap gap-3 mt-3">
                                     @if($isInStock)
@@ -1080,6 +1292,99 @@ document.addEventListener('DOMContentLoaded', function () {
     (function() {
         'use strict';
         
+        function getSelectedInventoryColor() {
+            const optEl = document.querySelector('.inventory-option-item.active');
+            if (optEl) return optEl.getAttribute('data-color') || '';
+            const invColorEl = document.querySelector('.inventory-color-item.active')
+                || document.querySelector('.choose-inventory-color .color-item.active');
+            if (invColorEl) return invColorEl.getAttribute('data-color') || '';
+            const productInfor = document.querySelector('.product-infor');
+            return productInfor ? (productInfor.getAttribute('data-default-inventory-color') || '') : '';
+        }
+
+        function getSelectedInventorySize() {
+            const optEl = document.querySelector('.inventory-option-item.active');
+            if (optEl) return optEl.getAttribute('data-size') || '';
+            const sizeEl = document.querySelector('.choose-size .size-item.active, .size-item.active:not(.size-unavailable)');
+            if (sizeEl) return sizeEl.getAttribute('data-size') || '';
+            const productInfor = document.querySelector('.product-infor');
+            return productInfor ? (productInfor.getAttribute('data-default-size') || '') : '';
+        }
+
+        function syncHiddenInventoryMirrors(color, size) {
+            const colorMirror = document.querySelector('.choose-inventory-color .inventory-color-item');
+            if (colorMirror) {
+                colorMirror.setAttribute('data-color', color || '');
+                colorMirror.classList.add('active');
+            }
+            const sizeMirror = document.querySelector('.choose-size .size-item');
+            if (sizeMirror) {
+                sizeMirror.setAttribute('data-size', size || '');
+                sizeMirror.classList.add('active');
+            }
+            const productInfor = document.querySelector('.product-infor');
+            if (productInfor) {
+                productInfor.setAttribute('data-default-inventory-color', color || '');
+                productInfor.setAttribute('data-default-size', size || '');
+            }
+        }
+
+        function getInventoryOptions() {
+            const productInfor = document.querySelector('.product-infor');
+            if (!productInfor) return [];
+            try {
+                return JSON.parse(productInfor.getAttribute('data-inventory-options') || '[]') || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function findInventoryOption(color, size) {
+            const options = getInventoryOptions();
+            const colorNorm = String(color || '').trim().toLowerCase();
+            const sizeNorm = String(size || '').trim().toLowerCase();
+            let match = options.find(function(o) {
+                return String(o.color || '').trim().toLowerCase() === colorNorm
+                    && String(o.size || '').trim().toLowerCase() === sizeNorm;
+            });
+            if (match) return match;
+            if (sizeNorm) {
+                match = options.find(function(o) {
+                    return String(o.size || '').trim().toLowerCase() === sizeNorm;
+                });
+                if (match) return match;
+            }
+            if (colorNorm) {
+                match = options.find(function(o) {
+                    return String(o.color || '').trim().toLowerCase() === colorNorm;
+                });
+            }
+            return match || null;
+        }
+
+        function updateStockBadge(qty, inStock) {
+            const badge = document.querySelector('.product-stock-badge');
+            if (!badge) return;
+            const textEl = badge.querySelector('.stock-badge-text');
+            badge.setAttribute('data-stock-qty', String(qty || 0));
+            badge.classList.toggle('text-stock-in', !!inStock);
+            badge.classList.toggle('text-stock-out', !inStock);
+            badge.classList.remove('text-green', 'text-red');
+            const icon = badge.querySelector('i');
+            if (icon) {
+                icon.className = inStock ? 'ph ph-check-circle text-base' : 'ph ph-x-circle text-base';
+            }
+            if (textEl) {
+                textEl.textContent = inStock
+                    ? ('In Stock' + (qty > 0 ? (': ' + qty + ' left') : ''))
+                    : 'Out of Stock';
+            }
+            const productInfor = document.querySelector('.product-infor');
+            if (productInfor) {
+                productInfor.setAttribute('data-in-stock', inStock ? '1' : '0');
+            }
+        }
+
         function updateProductVariantPrice() {
             const block = document.querySelector('.product-price-block');
             if (!block) return;
@@ -1091,21 +1396,28 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 if (variantPricesJson) variantPrices = JSON.parse(variantPricesJson);
             } catch (e) { return; }
-            const colorEl = document.querySelector('.color-item.active');
-            const sizeEl = document.querySelector('.size-item.active');
             const productInfor = document.querySelector('.product-infor');
-            const color = colorEl ? (colorEl.getAttribute('data-color') || '') : '';
-            const size = sizeEl ? (sizeEl.getAttribute('data-size') || '') : (productInfor?.getAttribute('data-default-size') || '');
+            const color = getSelectedInventoryColor();
+            const size = getSelectedInventorySize() || (productInfor?.getAttribute('data-default-size') || '');
+            const inv = findInventoryOption(color, size);
             let price = productPrice;
             let salePrice = productSalePrice;
-            for (let i = 0; i < variantPrices.length; i++) {
-                const v = variantPrices[i];
-                const vColor = v.color || '';
-                const vSize = v.size || '';
-                if (vColor === color && vSize === size) {
-                    price = parseFloat(v.price) || price;
-                    salePrice = (v.sale_price !== null && v.sale_price !== undefined && v.sale_price !== '') ? (parseFloat(v.sale_price) || null) : null;
-                    break;
+            if (inv) {
+                price = parseFloat(inv.price) || price;
+                salePrice = (inv.sale_price !== null && inv.sale_price !== undefined && inv.sale_price !== '')
+                    ? (parseFloat(inv.sale_price) || null)
+                    : null;
+                updateStockBadge(parseInt(inv.quantity, 10) || 0, !!inv.in_stock);
+            } else {
+                for (let i = 0; i < variantPrices.length; i++) {
+                    const v = variantPrices[i];
+                    const vColor = v.color || '';
+                    const vSize = v.size || '';
+                    if (vColor === color && vSize === size) {
+                        price = parseFloat(v.price) || price;
+                        salePrice = (v.sale_price !== null && v.sale_price !== undefined && v.sale_price !== '') ? (parseFloat(v.sale_price) || null) : null;
+                        break;
+                    }
                 }
             }
             const displayPrice = (salePrice !== null && salePrice > 0 && salePrice < price) ? salePrice : price;
@@ -1133,10 +1445,131 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         window.updateProductVariantPrice = updateProductVariantPrice;
         
-        // Color selection + switch main image when color has a dedicated image
+        function syncSizesForInventoryColor(selectedColor) {
+            var chooseSizeBlock = document.querySelector('.choose-size');
+            if (!chooseSizeBlock) return;
+            var sizesByColorJson = chooseSizeBlock.getAttribute('data-sizes-by-color');
+            var allSizesJson = chooseSizeBlock.getAttribute('data-all-sizes');
+            try {
+                var sizesByColor = sizesByColorJson ? JSON.parse(sizesByColorJson) : {};
+                var allSizes = allSizesJson ? JSON.parse(allSizesJson) : [];
+                var sizesForColor = (selectedColor && sizesByColor[selectedColor])
+                    ? sizesByColor[selectedColor]
+                    : (sizesByColor[''] || allSizes);
+                var listSize = chooseSizeBlock.querySelector('.list-size');
+                if (!listSize) return;
+                var sizeItems = listSize.querySelectorAll('.size-item');
+                var firstAvailable = null;
+                sizeItems.forEach(function(si) {
+                    var s = si.getAttribute('data-size');
+                    var available = sizesForColor.indexOf(s) !== -1;
+                    if (available) {
+                        si.classList.remove('size-unavailable', 'opacity-50', 'opacity-60');
+                        si.setAttribute('title', s || '');
+                        if (!firstAvailable) firstAvailable = si;
+                    } else {
+                        si.classList.add('size-unavailable', 'opacity-50');
+                        si.setAttribute('title', 'This size is not available for this variant');
+                        si.classList.remove('active', 'border-black', 'bg-black', 'text-white');
+                    }
+                });
+                var activeSize = listSize.querySelector('.size-item.active:not(.size-unavailable)');
+                if (!activeSize && firstAvailable) {
+                    sizeItems.forEach(function(si) { si.classList.remove('active', 'border-black'); });
+                    firstAvailable.classList.add('active', 'border-black');
+                    var sizeText = document.querySelector('.selected-size');
+                    if (sizeText) sizeText.textContent = firstAvailable.getAttribute('data-size') || '';
+                }
+            } catch (err) { /* ignore */ }
+        }
+
+        function getDefaultMainImage() {
+            const wrap = document.querySelector('.product-gallery-inner');
+            if (wrap && wrap.getAttribute('data-default-main-image')) {
+                return wrap.getAttribute('data-default-main-image');
+            }
+            const first = document.querySelector('.product-detail .mySwiper2 .swiper-slide img');
+            return first ? (first.getAttribute('data-default-src') || first.getAttribute('src') || '') : '';
+        }
+
+        function setGalleryMainImage(url) {
+            const fallback = getDefaultMainImage();
+            const target = (url && String(url).trim() !== '') ? String(url).trim() : fallback;
+            if (!target) return;
+
+            const mainImg = document.querySelector('.product-detail .mySwiper2 .swiper-slide-active img')
+                || document.querySelector('.product-detail .mySwiper2 .swiper-slide img');
+            const thumbImg = document.querySelector('.product-detail .mySwiper .swiper-slide-active img')
+                || document.querySelector('.product-detail .mySwiper .swiper-slide img');
+            const popupImg = document.querySelector('.product-detail .popup-img .swiper-slide img');
+
+            function applySrc(img) {
+                if (!img) return;
+                img.onerror = function() {
+                    img.onerror = null;
+                    if (fallback && img.src !== fallback) {
+                        img.src = fallback;
+                    }
+                };
+                if (img.src !== target) {
+                    img.src = target;
+                }
+            }
+
+            applySrc(mainImg);
+            applySrc(thumbImg);
+            applySrc(popupImg);
+
+            // Keep swiper on first slide when swapping option image
+            try {
+                var gallerySwiper = window.swiper2 || window.productGalleryMainSwiper;
+                if (gallerySwiper && typeof gallerySwiper.slideTo === 'function') {
+                    gallerySwiper.slideTo(0);
+                }
+            } catch (err) { /* ignore */ }
+        }
+
+        // Inventory option = Color + Size pair (e.g. white / 7200ml)
+        document.addEventListener('click', function(e) {
+            const optItem = e.target.closest('.inventory-option-item');
+            if (!optItem || !optItem.closest('.choose-inventory-option')) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (optItem.classList.contains('size-unavailable') || optItem.getAttribute('data-in-stock') === '0') {
+                return;
+            }
+
+            const siblings = optItem.parentElement.querySelectorAll('.inventory-option-item');
+            siblings.forEach(sib => sib.classList.remove('active'));
+            optItem.classList.add('active');
+
+            const color = optItem.getAttribute('data-color') || '';
+            const size = optItem.getAttribute('data-size') || '';
+            const label = optItem.getAttribute('data-label') || (color + (color && size ? ' / ' : '') + size);
+            const labelEl = document.querySelector('.selected-inventory-option');
+            if (labelEl) labelEl.textContent = label;
+
+            syncHiddenInventoryMirrors(color, size);
+
+            // Use option image when present; otherwise restore original product gallery image
+            const optImage = optItem.getAttribute('data-image');
+            setGalleryMainImage(optImage || '');
+
+            const stockQty = parseInt(optItem.getAttribute('data-stock') || '0', 10) || 0;
+            const inStock = optItem.getAttribute('data-in-stock') === '1';
+            updateStockBadge(stockQty, inStock);
+
+            if (typeof window.updateProductVariantPrice === 'function') {
+                window.updateProductVariantPrice();
+            }
+        });
+
+        // Group product color selection + switch main image when color has a dedicated image
         document.addEventListener('click', function(e) {
             const colorItem = e.target.closest('.color-item');
             if (!colorItem || !colorItem.closest('.choose-color')) return;
+            if (colorItem.classList.contains('inventory-color-item')) return;
             
             e.preventDefault();
             e.stopPropagation();
@@ -1251,14 +1684,15 @@ document.addEventListener('DOMContentLoaded', function () {
             var sizesByColorJson = chooseSizeBlock.getAttribute('data-sizes-by-color');
             var allSizesJson = chooseSizeBlock.getAttribute('data-all-sizes');
             var clickedSize = sizeItem.getAttribute('data-size');
-            var colorEl = document.querySelector('.color-item.active');
-            var selectedColor = colorEl ? (colorEl.getAttribute('data-color') || '') : '';
+            var selectedColor = getSelectedInventoryColor();
             var isAvailable = true;
             try {
                 if (sizesByColorJson && allSizesJson) {
                     var sizesByColor = JSON.parse(sizesByColorJson);
                     var allSizes = JSON.parse(allSizesJson);
-                    var sizesForColor = sizesByColor[selectedColor] || sizesByColor[''] || allSizes;
+                    var sizesForColor = (selectedColor && sizesByColor[selectedColor])
+                        ? sizesByColor[selectedColor]
+                        : (sizesByColor[''] || allSizes);
                     isAvailable = sizesForColor.indexOf(clickedSize) !== -1;
                 }
             } catch (err) { }
@@ -1301,6 +1735,25 @@ document.addEventListener('DOMContentLoaded', function () {
             if (sizeText) {
                 sizeText.textContent = selectedSize;
             }
+
+            // Auto-select inventory color that matches this size (if needed)
+            const currentInvColor = getSelectedInventoryColor();
+            const matchForSize = findInventoryOption(currentInvColor, selectedSize)
+                || findInventoryOption('', selectedSize);
+            if (matchForSize && matchForSize.color) {
+                const invItems = document.querySelectorAll('.inventory-color-item');
+                invItems.forEach(function(el) {
+                    const isMatch = String(el.getAttribute('data-color') || '').toLowerCase()
+                        === String(matchForSize.color || '').toLowerCase();
+                    el.classList.toggle('active', isMatch);
+                    el.classList.toggle('border-black', isMatch);
+                });
+                const invLabel = document.querySelector('.selected-inventory-color');
+                if (invLabel) invLabel.textContent = matchForSize.color;
+                const productInfor = document.querySelector('.product-infor');
+                if (productInfor) productInfor.setAttribute('data-default-inventory-color', matchForSize.color);
+            }
+
             if (typeof window.updateProductVariantPrice === 'function') {
                 window.updateProductVariantPrice();
             }

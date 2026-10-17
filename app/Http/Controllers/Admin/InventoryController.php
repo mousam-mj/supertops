@@ -117,6 +117,9 @@ class InventoryController extends Controller
         $inventory->color = $request->filled('color') ? trim($request->color) : null;
         $inventory->size = $request->filled('size') ? trim($request->size) : null;
         $inventory->quantity = (int) $validated['quantity'];
+        // Keep initial/sold coherent when admin manually sets available qty
+        $sold = (int) ($inventory->sold_quantity ?? 0);
+        $inventory->initial_quantity = max($sold + $inventory->quantity, (int) ($inventory->initial_quantity ?? 0));
         $inventory->price = $request->filled('price') ? $request->price : null;
         $inventory->sale_price = $request->filled('sale_price') ? $request->sale_price : null;
 

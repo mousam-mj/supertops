@@ -82,6 +82,23 @@
     $inventories = $product->inventories()->orderBy('color')->orderBy('size')->get();
 @endphp
 
+{{-- How this maps to the storefront --}}
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="alert alert-info border-0 shadow-sm mb-0">
+            <div class="fw-semibold mb-1"><i class="bi bi-info-circle me-1"></i> How inventory shows on the product page</div>
+            <ul class="mb-0 small ps-3">
+                <li><strong>Color</strong> here = <strong>Variant</strong> swatches on the website (e.g. Black, white).</li>
+                <li><strong>Size</strong> here = <strong>Size</strong> pills on the website (e.g. 1000ml, 7200ml).</li>
+                <li><strong>Current quantity</strong> drives In Stock / Out of Stock and “X left”.</li>
+                <li><strong>Group / linked products</strong> (other Magic colors) are managed in
+                    <a href="{{ route('admin.products.edit', $product) }}" class="alert-link">Edit Product → Linked variants</a>, not here.</li>
+                <li>Use one row per Color + Size combo. Same combo again only adds more stock to that row.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 {{-- Total Stock --}}
 <div class="row mb-4">
     <div class="col-12">
@@ -89,8 +106,9 @@
             <div class="card-body text-white py-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="small opacity-90">Total Stock</div>
+                        <div class="small opacity-90">Total Stock (sum of all variants)</div>
                         <h3 class="mb-0 fw-bold">{{ $totalStock }} <span class="fw-normal small">items in stock</span></h3>
+                        <div class="small opacity-90 mt-1">Website shows this product as {{ $totalStock > 0 ? 'In Stock' : 'Out of Stock' }}</div>
                     </div>
                     <div style="font-size: 2.5rem; opacity: 0.3;"><i class="bi bi-box-seam"></i></div>
                 </div>
@@ -287,9 +305,12 @@
                                     @endforeach
                                 </div>
                             @endif
-                            <div class="small mb-1"><strong>Initial Stock:</strong> {{ $inv->initial_quantity }}</div>
-                            <div class="small mb-1 text-danger"><strong>Sold:</strong> {{ $inv->sold_quantity }}</div>
-                            <div class="small mb-2"><span class="badge bg-success">Current: {{ $inv->quantity }}</span> <span class="text-muted">(Initial − Sold)</span></div>
+                            <div class="small mb-1"><strong>Initial Stock:</strong> {{ $inv->initial_quantity ?? 0 }}</div>
+                            <div class="small mb-1 text-danger"><strong>Sold:</strong> {{ $inv->sold_quantity ?? 0 }}</div>
+                            <div class="small mb-2">
+                                <span class="badge {{ ($inv->quantity ?? 0) > 0 ? 'bg-success' : 'bg-danger' }}">Available now: {{ $inv->quantity ?? 0 }}</span>
+                                <span class="text-muted">← this number shows on the website</span>
+                            </div>
                             @if($inv->price !== null || $inv->sale_price !== null)
                                 <div class="small mb-1"><strong>Price:</strong> ₹{{ number_format($inv->price ?? 0, 2) }}</div>
                                 @if($inv->sale_price !== null)
@@ -330,8 +351,9 @@
                                         <input type="text" name="size" class="form-control" value="{{ old('size', $inv->size) }}">
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label">Current Quantity *</label>
+                                        <label class="form-label">Available quantity (website stock) *</label>
                                         <input type="number" name="quantity" class="form-control" min="0" value="{{ old('quantity', $inv->quantity) }}" required>
+                                        <small class="text-muted">This is what customers see as “In Stock: X left”.</small>
                                     </div>
                                     <div class="mb-2">
                                         <label class="form-label">Price (₹)</label>

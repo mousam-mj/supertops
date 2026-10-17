@@ -18,10 +18,28 @@
 
     function readProductDetailVariant(productInfor) {
         if (!productInfor) return { size: null, color: null };
-        var selectedSizeItem = productInfor.querySelector('.size-item.active:not(.size-unavailable)');
-        var selectedColorItem = productInfor.querySelector('.color-item.active');
+        // Prefer paired inventory option (Color + Size together)
+        var paired = productInfor.querySelector('.inventory-option-item.active');
+        if (paired) {
+            var pairedSize = paired.getAttribute('data-size');
+            var pairedColor = paired.getAttribute('data-color');
+            return {
+                size: pairedSize && String(pairedSize).trim() !== '' ? String(pairedSize).trim() : null,
+                color: pairedColor && String(pairedColor).trim() !== '' ? String(pairedColor).trim() : null
+            };
+        }
+        var selectedSizeItem = productInfor.querySelector('.choose-size .size-item.active:not(.size-unavailable)')
+            || productInfor.querySelector('.size-item.active:not(.size-unavailable)');
+        // Prefer this product's inventory color over group-product swatches
+        var selectedColorItem = productInfor.querySelector('.inventory-color-item.active')
+            || productInfor.querySelector('.choose-inventory-color .color-item.active')
+            || productInfor.querySelector('.choose-color .color-item.active:not([data-product-url])')
+            || productInfor.querySelector('.color-item.active');
         var size = selectedSizeItem ? selectedSizeItem.getAttribute('data-size') : null;
         var color = selectedColorItem ? selectedColorItem.getAttribute('data-color') : null;
+        if (!color) {
+            color = productInfor.getAttribute('data-default-inventory-color') || null;
+        }
         if (!size) {
             size = productInfor.getAttribute('data-default-size') || null;
         }
