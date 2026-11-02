@@ -576,6 +576,15 @@
 @endif
 <script>
 // Define functions IMMEDIATELY - NO IIFE, execute directly
+const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+let isMobileVerified = false;
+let currentMobile = '';
+
+function normalizeMobile(value) {
+    const digits = String(value || '').replace(/\D/g, '');
+    return digits.length > 10 ? digits.slice(-10) : digits;
+}
+
 // Function to validate form
 function validateForm() {
         const errors = [];
@@ -649,7 +658,7 @@ function validateForm() {
             alert('Enter a valid 10-digit mobile number, then verify it with OTP.');
             return false;
         }
-        sendOTP(mobile);
+        window.sendOTP(mobile);
         return false;
     }
     
@@ -1057,15 +1066,6 @@ if (testBtn) {
     let currentShippingCharge = 0;
     let isAddressComplete = false;
     let isDeliveryCalculated = false;
-    let isMobileVerified = false;
-    let currentMobile = '';
-    const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
-
-    function normalizeMobile(value) {
-        const digits = String(value || '').replace(/\D/g, '');
-        return digits.length > 10 ? digits.slice(-10) : digits;
-    }
-    
     // Ensure variables are globally accessible
     window.cartSubtotal = cartSubtotal;
     window.currentShippingCharge = currentShippingCharge;
@@ -1612,6 +1612,7 @@ if (testBtn) {
             alert('Failed to send OTP. Please try again.');
         });
     }
+    window.sendOTP = sendOTP;
 
     function verifyOTP(mobile, otp) {
         return fetch('/api/otp/verify', {
