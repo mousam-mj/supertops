@@ -102,6 +102,68 @@
         border-color: #000 !important;
     }
 
+    .guest-checkout-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        border: 1px solid #e7e5e4;
+        border-radius: 12px;
+        background: #fafaf9;
+    }
+    .guest-checkout-bar p {
+        margin: 0;
+        color: #44403c;
+        line-height: 1.45;
+    }
+    .guest-phone-row {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+    }
+    .guest-phone-row input {
+        flex: 1;
+        min-width: 0;
+    }
+    #verify-mobile-btn {
+        flex: 0 0 auto;
+        min-width: 118px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 10px;
+        background: #111;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    #verify-mobile-btn:disabled {
+        background: #e7e5e4;
+        color: #78716c;
+        cursor: not-allowed;
+    }
+    .guest-phone-hint {
+        margin: 8px 0 0;
+        color: #78716c;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .guest-verified {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 8px 0 0;
+        color: #15803d;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .guest-verified.hidden,
+    #verify-mobile-btn.hidden,
+    .guest-phone-hint.hidden {
+        display: none;
+    }
+
     /* Payment Method — explicit spacing (utility padding may not compile) */
     .checkout-page-content .payment-block .payment-card-header {
         padding: 20px 22px;
@@ -199,14 +261,16 @@
             <div class="container">
                 <div class="content-main flex max-lg:flex-col-reverse gap-y-10 justify-between">
                     <div class="left lg:w-1/2">
+                        @auth
                         <div class="login bg-surface py-3 px-4 flex justify-between rounded-lg">
-                            @auth
-                                <div class="left flex items-center"><span class="text-on-surface-variant1">You're already logged in with {{ auth()->user()->email }}</span></div>
-                            @else
-                                <div class="left flex items-center"><span class="text-on-surface-variant1 pr-4">Please login to continue checkout. </span><a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline cursor-pointer">Login</a></div>
-                                <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="right flex items-center"><i class="ph ph-caret-right fs-20 cursor-pointer"></i></a>
-                            @endauth
+                            <div class="left flex items-center"><span class="text-on-surface-variant1">You're already logged in with {{ auth()->user()->email }}</span></div>
                         </div>
+                        @else
+                        <div class="guest-checkout-bar">
+                            <p>No account needed. Add your details, verify your phone, then pay.</p>
+                            <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="text-button text-on-surface hover:underline whitespace-nowrap">Login</a>
+                        </div>
+                        @endauth
                         <div class="form-login-block mt-3">
                             <form class="p-5 border border-line rounded-lg">
                                 <div class="grid sm:grid-cols-2 gap-5">
@@ -251,26 +315,37 @@
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="lastName" type="text" placeholder="Last Name *" value="{{ $userLastName ?? ($defaultAddress ? (explode(' ', $defaultAddress->full_name)[1] ?? '') : '') }}" required />
                                         </div>
-                                        <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="email" type="email" placeholder="Email Address *" value="{{ $user->email ?? '' }}" required />
+                                        @guest
+                                        <div class="col-span-full">
+                                            <div class="guest-phone-row">
+                                                <input class="border-line px-4 py-3 w-full rounded-lg" id="phoneNumber" type="tel" inputmode="numeric" placeholder="10-digit mobile number *" value="{{ $user->phone ?? ($defaultAddress->phone ?? '') }}" required />
+                                                <button type="button" id="verify-mobile-btn" disabled>Send OTP</button>
+                                            </div>
+                                            <p id="guest-phone-hint" class="guest-phone-hint">Enter your mobile number, then tap Send OTP.</p>
+                                            <p id="mobile-verified-label" class="guest-verified hidden"><i class="ph ph-check-circle"></i> Phone verified</p>
                                         </div>
+                                        @else
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="phoneNumber" type="tel" placeholder="Phone Number *" value="{{ $user->phone ?? ($defaultAddress->phone ?? '') }}" required />
                                         </div>
-                                        <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="region" name="region" type="text" placeholder="Country *" value="{{ $defaultAddress->country ?? 'India' }}" required />
+                                        @endguest
+                                        <div class="{{ auth()->check() ? '' : 'col-span-full' }}">
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="email" type="email" placeholder="Email Address *" value="{{ $user->email ?? '' }}" required />
                                         </div>
-                                        <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="Town/City *" value="{{ $defaultAddress->city ?? '' }}" required />
-                                        </div>
-                                        <div class="">
+                                        <div class="col-span-full">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="apartment" type="text" placeholder="Full Address *" value="{{ $defaultAddress->address_line_1 ?? '' }}" required />
+                                        </div>
+                                        <div class="">
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="city" type="text" placeholder="City *" value="{{ $defaultAddress->city ?? '' }}" required />
                                         </div>
                                         <div class="">
                                             <input class="border-line px-4 py-3 w-full rounded-lg" id="country" name="country" type="text" placeholder="State *" value="{{ $defaultAddress->state ?? '' }}" required />
                                         </div>
                                         <div class="">
-                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="postal" type="text" placeholder="Postal Code *" value="{{ $defaultAddress->pincode ?? '' }}" required />
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="postal" type="text" inputmode="numeric" maxlength="6" placeholder="Pincode *" value="{{ $defaultAddress->pincode ?? '' }}" required />
+                                        </div>
+                                        <div class="">
+                                            <input class="border-line px-4 py-3 w-full rounded-lg" id="region" name="region" type="text" placeholder="Country *" value="{{ $defaultAddress->country ?? 'India' }}" required />
                                         </div>
                                         <div class="col-span-full">
                                             <textarea class="border border-line px-4 py-3 w-full rounded-lg" id="note" name="note" placeholder="Write note..."></textarea>
@@ -355,8 +430,8 @@
                                                 <div class="flex items-start gap-3">
                                                     <i class="ph ph-info text-amber-600 text-lg mt-0.5"></i>
                                                     <div class="flex-1">
-                                                        <h4 class="font-medium text-amber-800 mb-2">Complete Your Address</h4>
-                                                        <p class="text-sm text-amber-700 mb-3">Please fill your complete address and enter pincode to calculate delivery charges before payment.</p>
+                                                        <h4 class="font-medium text-amber-800 mb-2" id="payment-message-title">Finish these steps to pay</h4>
+                                                        <p class="text-sm text-amber-700 mb-3">Add your address and pincode. Guests also verify their phone with OTP.</p>
                                                         
                                                         <!-- Progress Steps -->
                                                         <div class="space-y-2">
@@ -372,6 +447,12 @@
                                                                 <i class="ph ph-circle text-amber-600"></i>
                                                                 <span class="text-amber-700">Calculate delivery charges</span>
                                                             </div>
+                                                            @guest
+                                                            <div class="flex items-center gap-2 text-sm" id="step-mobile">
+                                                                <i class="ph ph-circle text-amber-600"></i>
+                                                                <span class="text-amber-700">Verify mobile number with OTP</span>
+                                                            </div>
+                                                            @endguest
                                                         </div>
                                                     </div>
                                                 </div>
@@ -489,7 +570,11 @@ function validateForm() {
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             errors.push('Please enter a valid email address');
         }
-        if (!phone) errors.push('Phone Number is required');
+        if (!phone) {
+            errors.push('Phone Number is required');
+        } else if (!isLoggedIn && !/^[6-9]\d{9}$/.test(normalizeMobile(phone))) {
+            errors.push('Enter a valid 10-digit mobile number');
+        }
         if (!city) errors.push('City is required');
         if (!address) errors.push('Address is required');
         if (!state || state === 'default') errors.push('Please select a State');
@@ -531,6 +616,16 @@ function validateForm() {
         showErrorPopup(validationErrors);
         return false;
     }
+
+    if (!isLoggedIn && !isMobileVerified) {
+        const mobile = normalizeMobile(document.getElementById('phoneNumber')?.value);
+        if (!/^[6-9]\d{9}$/.test(mobile)) {
+            alert('Enter a valid 10-digit mobile number, then verify it with OTP.');
+            return false;
+        }
+        sendOTP(mobile);
+        return false;
+    }
     
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin text-xl"></i> Placing Order...';
@@ -541,7 +636,7 @@ function validateForm() {
         first_name: document.getElementById('firstName').value.trim(),
         last_name: document.getElementById('lastName').value.trim(),
         email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phoneNumber').value.trim(),
+        phone: normalizeMobile(document.getElementById('phoneNumber').value.trim()) || document.getElementById('phoneNumber').value.trim(),
         region: document.getElementById('region').value,
         city: document.getElementById('city').value.trim(),
         address: document.getElementById('apartment').value.trim(),
@@ -559,9 +654,6 @@ function validateForm() {
     
     // Discount removed from UI - use 0
     const discount = 0;
-    
-    // Check if user is logged in
-    const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
     
     // Get selected address ID if available
     const selectedAddressId = document.getElementById('selectedAddressId')?.value;
@@ -941,6 +1033,12 @@ if (testBtn) {
     let isDeliveryCalculated = false;
     let isMobileVerified = false;
     let currentMobile = '';
+    const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+
+    function normalizeMobile(value) {
+        const digits = String(value || '').replace(/\D/g, '');
+        return digits.length > 10 ? digits.slice(-10) : digits;
+    }
     
     // Ensure variables are globally accessible
     window.cartSubtotal = cartSubtotal;
@@ -1055,7 +1153,7 @@ if (testBtn) {
         const firstName = document.getElementById('firstName')?.value?.trim();
         const lastName = document.getElementById('lastName')?.value?.trim();
         const email = document.getElementById('email')?.value?.trim();
-        const phone = document.getElementById('phoneNumber')?.value?.trim();
+        const phone = normalizeMobile(document.getElementById('phoneNumber')?.value);
         const address = document.getElementById('apartment')?.value?.trim();
         const city = document.getElementById('city')?.value?.trim();
         const state = document.getElementById('country')?.value?.trim();
@@ -1066,18 +1164,19 @@ if (testBtn) {
         const isComplete = isBasicComplete && isPincodeValid;
         
         // Check if mobile number changed and needs verification
-        if (phone && phone !== currentMobile && phone.length === 10) {
+        if (phone !== currentMobile) {
             isMobileVerified = false;
             currentMobile = phone;
+            const verifiedLabel = document.getElementById('mobile-verified-label');
+            if (verifiedLabel) verifiedLabel.classList.add('hidden');
+            const hint = document.getElementById('guest-phone-hint');
+            if (hint) hint.classList.remove('hidden');
         }
         
         // Update progress indicators
         updateProgressSteps(isBasicComplete, isPincodeValid);
-        
-        if (isComplete !== isAddressComplete) {
-            isAddressComplete = isComplete;
-            updatePaymentAvailability();
-        }
+        isAddressComplete = isComplete;
+        updatePaymentAvailability();
         
         return isComplete;
     }
@@ -1137,15 +1236,23 @@ if (testBtn) {
             if (isMobileVerified) {
                 icon.className = 'ph ph-check-circle text-green-600';
                 text.className = 'text-green-700 line-through';
-                verifyMobileBtn.classList.add('hidden');
-            } else if (isBasicComplete && currentMobile && currentMobile.length === 10) {
+            } else if (/^[6-9]\d{9}$/.test(currentMobile)) {
                 icon.className = 'ph ph-circle text-blue-600';
                 text.className = 'text-blue-700';
-                verifyMobileBtn.classList.remove('hidden');
             } else {
                 icon.className = 'ph ph-circle text-amber-600';
                 text.className = 'text-amber-700';
+            }
+        }
+
+        if (verifyMobileBtn) {
+            const phoneReady = /^[6-9]\d{9}$/.test(currentMobile);
+            if (isMobileVerified) {
                 verifyMobileBtn.classList.add('hidden');
+            } else {
+                verifyMobileBtn.classList.remove('hidden');
+                verifyMobileBtn.disabled = !phoneReady;
+                verifyMobileBtn.textContent = 'Send OTP';
             }
         }
     }
@@ -1159,7 +1266,9 @@ if (testBtn) {
         const btnText = document.getElementById('btn-text');
         const btnIcon = document.getElementById('btn-icon');
         
-        if (isAddressComplete && isDeliveryCalculated) {
+        const mobileReady = isLoggedIn || isMobileVerified;
+
+        if (isAddressComplete && isDeliveryCalculated && mobileReady) {
             // Enable payment
             if (paymentSection) {
                 paymentSection.style.opacity = '1';
@@ -1197,13 +1306,17 @@ if (testBtn) {
             
             if (paymentMessage) {
                 paymentMessage.style.display = 'block';
+                const messageTitle = document.getElementById('payment-message-title');
                 const messageText = paymentMessage.querySelector('p');
-                if (messageText) {
-                    if (!isAddressComplete) {
-                        messageText.textContent = 'Please fill your complete address and enter pincode to calculate delivery charges before payment.';
-                    } else if (!isDeliveryCalculated) {
-                        messageText.textContent = 'Calculating delivery charges... Please wait.';
-                    }
+                if (!isAddressComplete) {
+                    if (messageTitle) messageTitle.textContent = 'Add your delivery details';
+                    if (messageText) messageText.textContent = 'Fill your name, phone, address, and 6-digit pincode.';
+                } else if (!isDeliveryCalculated) {
+                    if (messageTitle) messageTitle.textContent = 'Checking delivery';
+                    if (messageText) messageText.textContent = 'Calculating delivery charges for your pincode.';
+                } else if (!mobileReady) {
+                    if (messageTitle) messageTitle.textContent = 'Verify your phone';
+                    if (messageText) messageText.textContent = 'Tap Send OTP, enter the 6-digit code, then you can pay.';
                 }
             }
             
@@ -1475,8 +1588,14 @@ if (testBtn) {
         .then(data => {
             if (data.success) {
                 isMobileVerified = true;
+                const verifiedLabel = document.getElementById('mobile-verified-label');
+                if (verifiedLabel) verifiedLabel.classList.remove('hidden');
+                const hint = document.getElementById('guest-phone-hint');
+                if (hint) hint.classList.add('hidden');
+                const verifyMobileBtn = document.getElementById('verify-mobile-btn');
+                if (verifyMobileBtn) verifyMobileBtn.classList.add('hidden');
                 hideOTPModal();
-                updatePaymentAvailability();
+                checkAddressCompletion();
                 alert('Mobile number verified successfully!');
             } else {
                 document.getElementById('otp-error').textContent = data.message;
@@ -1576,11 +1695,10 @@ if (testBtn) {
             }
         });
         
-        // Verify mobile button (removed - mobile verification no longer required at checkout)
         const verifyMobileBtn = document.getElementById('verify-mobile-btn');
         if (verifyMobileBtn) verifyMobileBtn.addEventListener('click', function() {
-            const mobile = document.getElementById('phoneNumber')?.value?.trim();
-            if (mobile && mobile.length === 10) {
+            const mobile = normalizeMobile(document.getElementById('phoneNumber')?.value);
+            if (/^[6-9]\d{9}$/.test(mobile)) {
                 sendOTP(mobile);
             } else {
                 alert('Please enter a valid 10-digit mobile number');

@@ -111,10 +111,6 @@ class CheckoutController extends Controller
      */
     public function index(Request $request)
     {
-        if (! $request->user()) {
-            return redirect()->route('login', ['redirect' => route('checkout.index')]);
-        }
-
         $query = Cart::with('product.category');
 
         if ($request->user()) {

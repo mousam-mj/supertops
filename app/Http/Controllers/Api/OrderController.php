@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Services\OrderNotificationService;
+use App\Services\OTPService;
 use App\Services\ShiprocketOrderSyncService;
 use Illuminate\Support\Facades\App;
 
@@ -40,13 +41,13 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        if (! $user) {
+        if (! $user && ! $this->guestMobileIsVerified($request)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to place an order.',
-            ], 401);
+                'message' => 'Verify your mobile number with OTP before placing the order.',
+            ], 403);
         }
-        
+
         $validationRules = [
             'payment_method' => 'required|in:razorpay,cod,test',
             'coupon_code' => 'nullable|string',
@@ -497,6 +498,26 @@ class OrderController extends Controller
                 'message' => 'Order creation failed: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Guests may place an order only after the checkout phone OTP is verified.
+     */
+    private function guestMobileIsVerified(Request $request): bool
+    {
+        $phone = data_get($request->input('guest_info'), 'phone')
+            ?? data_get($request->input('shipping_address'), 'phone');
+
+        $mobile = preg_replace('/\D/', '', (string) $phone);
+        if (strlen($mobile) > 10) {
+            $mobile = substr($mobile, -10);
+        }
+
+        if (! preg_match('/^[6-9]\d{9}$/', $mobile)) {
+            return false;
+        }
+
+        return app(OTPService::class)->isMobileVerified($mobile);
     }
 
     /**
