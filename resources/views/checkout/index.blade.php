@@ -160,8 +160,61 @@
     }
     .guest-verified.hidden,
     #verify-mobile-btn.hidden,
-    .guest-phone-hint.hidden {
-        display: none;
+    .guest-phone-hint.hidden,
+    .guest-otp-box.hidden,
+    #otp-error.hidden {
+        display: none !important;
+    }
+    .guest-otp-box {
+        display: block;
+        margin-top: 12px;
+        padding: 14px;
+        border: 1px solid #111;
+        border-radius: 12px;
+        background: #fff;
+    }
+    .guest-otp-box .guest-phone-row input {
+        letter-spacing: 0.18em;
+        font-size: 18px;
+    }
+    #verify-otp-btn {
+        flex: 0 0 auto;
+        min-width: 110px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 10px;
+        background: #111;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    #otp-error {
+        margin: 8px 0 0;
+        color: #b91c1c;
+        font-size: 13px;
+    }
+    .guest-otp-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 10px;
+        color: #57534e;
+        font-size: 13px;
+    }
+    #resend-otp-btn {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #111;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    #resend-otp-btn:disabled {
+        color: #a8a29e;
+        text-decoration: none;
+        cursor: not-allowed;
     }
 
     /* Payment Method — explicit spacing (utility padding may not compile) */
@@ -322,6 +375,18 @@
                                                 <button type="button" id="verify-mobile-btn" disabled>Send OTP</button>
                                             </div>
                                             <p id="guest-phone-hint" class="guest-phone-hint">Enter your mobile number, then tap Send OTP.</p>
+                                            <div id="otp-entry" class="guest-otp-box hidden">
+                                                <p class="guest-phone-hint" style="margin-top:0;">OTP sent to <strong id="otp-mobile-display">your phone</strong>. Enter the 6-digit code here.</p>
+                                                <div class="guest-phone-row">
+                                                    <input class="border-line px-4 py-3 w-full rounded-lg" id="otp-input" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Enter OTP" />
+                                                    <button type="button" id="verify-otp-btn">Verify</button>
+                                                </div>
+                                                <p id="otp-error" class="hidden"></p>
+                                                <div class="guest-otp-actions">
+                                                    <button type="button" id="resend-otp-btn" disabled>Resend OTP</button>
+                                                    <span id="otp-timer">Resend in <span id="timer-count">60</span>s</span>
+                                                </div>
+                                            </div>
                                             <p id="mobile-verified-label" class="guest-verified hidden"><i class="ph ph-check-circle"></i> Phone verified</p>
                                         </div>
                                         @else
@@ -496,45 +561,6 @@
         </div>
     </div>
 </div>
-<!-- OTP Verification Modal -->
-<div id="otp-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl max-w-md w-full p-6 relative">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="ph ph-device-mobile text-blue-600 text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Verify Your Mobile Number</h3>
-            <p class="text-gray-600">We've sent a 6-digit OTP to</p>
-            <p class="font-semibold text-gray-900" id="otp-mobile-display">+91 XXXXXXXXXX</p>
-        </div>
-        
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Enter OTP</label>
-            <input type="text" id="otp-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-lg font-mono tracking-widest" placeholder="000000" maxlength="6">
-            <div id="otp-error" class="text-red-600 text-sm mt-2 hidden"></div>
-        </div>
-        
-        <div class="flex gap-3 mb-4">
-            <button type="button" id="verify-otp-btn" class="flex-1 bg-black text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
-                Verify OTP
-            </button>
-            <button type="button" id="resend-otp-btn" class="px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50" disabled>
-                Resend
-            </button>
-        </div>
-        
-        <div class="text-center">
-            <button type="button" id="close-otp-modal" class="text-gray-500 hover:text-gray-700">
-                Cancel
-            </button>
-        </div>
-        
-        <div id="otp-timer" class="text-center text-sm text-gray-500 mt-4">
-            Resend OTP in <span id="timer-count">60</span> seconds
-        </div>
-    </div>
-</div>
-
 @endsection
 @section('scripts')
 @if(($cartItems ?? collect())->isNotEmpty())
@@ -1171,6 +1197,8 @@ if (testBtn) {
             if (verifiedLabel) verifiedLabel.classList.add('hidden');
             const hint = document.getElementById('guest-phone-hint');
             if (hint) hint.classList.remove('hidden');
+            const otpEntry = document.getElementById('otp-entry');
+            if (otpEntry) otpEntry.classList.add('hidden');
         }
         
         // Update progress indicators
@@ -1533,19 +1561,32 @@ if (testBtn) {
     // OTP Verification Functions
     function showOTPModal(mobile) {
         currentMobile = mobile;
-        document.getElementById('otp-mobile-display').textContent = `+91 ${mobile}`;
-        document.getElementById('otp-modal').classList.remove('hidden');
-        document.getElementById('otp-input').focus();
+        const entry = document.getElementById('otp-entry');
+        const display = document.getElementById('otp-mobile-display');
+        const input = document.getElementById('otp-input');
+        if (display) display.textContent = `+91 ${mobile}`;
+        if (entry) {
+            entry.classList.remove('hidden');
+            entry.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
         startOTPTimer();
     }
 
     function hideOTPModal() {
-        document.getElementById('otp-modal').classList.add('hidden');
-        document.getElementById('otp-input').value = '';
-        document.getElementById('otp-error').classList.add('hidden');
+        const entry = document.getElementById('otp-entry');
+        const input = document.getElementById('otp-input');
+        const error = document.getElementById('otp-error');
+        if (entry) entry.classList.add('hidden');
+        if (input) input.value = '';
+        if (error) error.classList.add('hidden');
     }
 
     function sendOTP(mobile) {
+        showOTPModal(mobile);
         return fetch('/api/otp/send', {
             method: 'POST',
             headers: {
@@ -1557,11 +1598,12 @@ if (testBtn) {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                console.log('OTP sent successfully:', data);
-                showOTPModal(mobile);
-            } else {
-                alert('Failed to send OTP: ' + data.message);
+            if (!data.success) {
+                const error = document.getElementById('otp-error');
+                if (error) {
+                    error.textContent = data.message || 'Could not send OTP. Try again.';
+                    error.classList.remove('hidden');
+                }
             }
             return data;
         })
@@ -1638,30 +1680,32 @@ if (testBtn) {
 
     function startOTPTimer() {
         let timeLeft = 60;
-        const timerElement = document.getElementById('timer-count');
+        const timerElement = document.getElementById('otp-timer');
         const resendBtn = document.getElementById('resend-otp-btn');
-        
+        if (!timerElement || !resendBtn) return;
+
         resendBtn.disabled = true;
-        
-        const timer = setInterval(() => {
+        if (window.otpCountdown) clearInterval(window.otpCountdown);
+        timerElement.textContent = 'Resend in 60s';
+
+        window.otpCountdown = setInterval(() => {
             timeLeft--;
-            timerElement.textContent = timeLeft;
-            
             if (timeLeft <= 0) {
-                clearInterval(timer);
+                clearInterval(window.otpCountdown);
                 resendBtn.disabled = false;
-                document.getElementById('otp-timer').innerHTML = 'You can now resend OTP';
+                timerElement.textContent = 'You can resend the OTP';
+            } else {
+                timerElement.textContent = 'Resend in ' + timeLeft + 's';
             }
         }, 1000);
     }
 
-    // OTP Modal Event Listeners
+    // OTP entry listeners
     document.addEventListener('DOMContentLoaded', function() {
-        // Close modal
-        document.getElementById('close-otp-modal').addEventListener('click', hideOTPModal);
-        
-        // Verify OTP button
-        document.getElementById('verify-otp-btn').addEventListener('click', function() {
+        const verifyOtpBtn = document.getElementById('verify-otp-btn');
+        if (!verifyOtpBtn) return;
+
+        verifyOtpBtn.addEventListener('click', function() {
             const otp = document.getElementById('otp-input').value.trim();
             if (otp.length === 6) {
                 verifyOTP(currentMobile, otp);
@@ -1686,13 +1730,6 @@ if (testBtn) {
             }
             // Clear error on input
             document.getElementById('otp-error').classList.add('hidden');
-        });
-        
-        // Close modal on outside click
-        document.getElementById('otp-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideOTPModal();
-            }
         });
         
         const verifyMobileBtn = document.getElementById('verify-mobile-btn');
