@@ -66,18 +66,12 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{{ route('home') }}}" class="button-main">
+                    <a href="{{ route('home') }}" class="button-main">
                         Continue Shopping
                     </a>
-                    @if(auth()->check())
-                        <a href="{{ route('account.orders.show', $order->id) }}" class="button-secondary">
-                            View Order Details
-                        </a>
-                    @else
-                        <a href="/order/track?order_number={{ $order->order_number }}&email={{ $order->customer_email }}" class="button-secondary">
-                            Track Order
-                        </a>
-                    @endif
+                    <a href="{{ route('order.track', ['order_number' => $order->order_number, 'email' => $order->customer_email]) }}" class="button-secondary">
+                        Track Order
+                    </a>
                 </div>
                 
                 <div class="mt-8 pt-8 border-t border-line">

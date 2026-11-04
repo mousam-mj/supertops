@@ -18,28 +18,7 @@ class CheckoutController extends Controller
             return null;
         }
 
-        $sessionId = $request->cookie('cart_session_id');
-        
-        // If no cookie, try to get from existing cart items
-        // Use the session_id that has the most total quantity
-        if (!$sessionId) {
-            $sessionCounts = Cart::whereNull('user_id')
-                ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                ->groupBy('session_id')
-                ->orderBy('total_quantity', 'desc')
-                ->orderBy('item_count', 'desc')
-                ->orderBy('latest_created_at', 'desc')
-                ->first();
-            
-            if ($sessionCounts) {
-                $sessionId = $sessionCounts->session_id;
-            } else {
-                $sessionId = Str::random(40);
-            }
-        }
-
-        return $sessionId;
+        return $request->cookie('cart_session_id') ?: Str::random(40);
     }
     
     /**
@@ -47,6 +26,7 @@ class CheckoutController extends Controller
      */
     private function consolidateGuestCart($targetSessionId)
     {
+        return;
         // Get all guest cart items with different session IDs
         $otherCarts = Cart::whereNull('user_id')
             ->whereNotNull('session_id')

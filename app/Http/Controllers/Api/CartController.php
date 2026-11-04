@@ -47,7 +47,6 @@ class CartController extends Controller
             $cookieSessionId = $request->cookie('cart_session_id');
             $guestItems = collect();
             if ($cookieSessionId) {
-                $this->consolidateGuestCart($cookieSessionId);
                 $guestItems = Cart::with('product')
                     ->where('session_id', $cookieSessionId)
                     ->whereNull('user_id')
@@ -57,28 +56,7 @@ class CartController extends Controller
             $cartItems = $userItems->concat($guestItems)->unique('id')->values();
             $sessionCookieValue = $cookieSessionId;
         } else {
-            // First, find the best session ID (one with most items)
-            $bestSession = Cart::whereNull('user_id')
-                ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                ->groupBy('session_id')
-                ->orderBy('total_quantity', 'desc')
-                ->orderBy('item_count', 'desc')
-                ->orderBy('latest_created_at', 'desc')
-                ->first();
-            
-            // Use cookie session ID if available, otherwise use best session
-            $cookieSessionId = $request->cookie('cart_session_id');
-            $sessionId = $cookieSessionId ?: ($bestSession ? $bestSession->session_id : Str::random(40));
-            
-            // If cookie session is different from best session, consolidate to best session
-            if ($bestSession && $bestSession->session_id !== $sessionId) {
-                $sessionId = $bestSession->session_id;
-            }
-            
-            // Consolidate all guest cart items to this session
-            $this->consolidateGuestCart($sessionId);
-            
+            $sessionId = $request->cookie('cart_session_id') ?: Str::random(40);
             $cartItems = Cart::with('product')
                 ->where('session_id', $sessionId)
                 ->whereNull('user_id')
@@ -123,7 +101,6 @@ class CartController extends Controller
             $cookieSessionId = $request->cookie('cart_session_id');
             $guestItems = collect();
             if ($cookieSessionId) {
-                $this->consolidateGuestCart($cookieSessionId);
                 $guestItems = Cart::with('product.category')
                     ->where('session_id', $cookieSessionId)
                     ->whereNull('user_id')
@@ -133,28 +110,7 @@ class CartController extends Controller
             $cartItems = $userItems->concat($guestItems)->unique('id')->values();
             $sessionCookieValue = $cookieSessionId;
         } else {
-            // First, find the best session ID (one with most items)
-            $bestSession = Cart::whereNull('user_id')
-                ->whereNotNull('session_id')
-                ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                ->groupBy('session_id')
-                ->orderBy('total_quantity', 'desc')
-                ->orderBy('item_count', 'desc')
-                ->orderBy('latest_created_at', 'desc')
-                ->first();
-            
-            // Use cookie session ID if available, otherwise use best session
-            $cookieSessionId = $request->cookie('cart_session_id');
-            $sessionId = $cookieSessionId ?: ($bestSession ? $bestSession->session_id : Str::random(40));
-            
-            // If cookie session is different from best session, consolidate to best session
-            if ($bestSession && $bestSession->session_id !== $sessionId) {
-                $sessionId = $bestSession->session_id;
-            }
-            
-            // Consolidate all guest cart items to this session
-            $this->consolidateGuestCart($sessionId);
-            
+            $sessionId = $request->cookie('cart_session_id') ?: Str::random(40);
             $cartItems = Cart::with('product.category')
                 ->where('session_id', $sessionId)
                 ->whereNull('user_id')
@@ -672,6 +628,7 @@ class CartController extends Controller
      */
     private function consolidateGuestCart($targetSessionId)
     {
+        return;
         // Get all guest cart items with different session IDs
         $otherCarts = Cart::whereNull('user_id')
             ->whereNotNull('session_id')

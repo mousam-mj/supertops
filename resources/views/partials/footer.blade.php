@@ -47,7 +47,7 @@
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('contact') }}">Contact us</a>
                             <!-- <a class="caption1 has-line-before duration-300 w-fit pt-2" href="#!"> Career </a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('my-account') }}}"> My Account</a> -->
-                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('order-tracking') }}}"> Orders & Returns</a>
+                            <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{ route('order-tracking') }}"> Orders & Returns</a>
                             <a class="caption1 has-line-before duration-300 w-fit pt-2" href="{{{ route('faqs') }}}">FAQs </a>
                         </div>
                         <div class="item flex flex-col basis-1/3">

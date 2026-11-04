@@ -553,18 +553,44 @@
                 <div class="content-main flex gap-y-8 max-md:flex-col">
                     <div class="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r border-line">
                         <div class="heading4">Order Tracking</div>
-                        <div class="mt-2">To track your order please enter your Order ID in the box below and press the "Track" button. This was given to you on your receipt and in the confirmation email you should have received.</div>
-                        <form class="md:mt-7 mt-4">
-                            <div class="email">
-                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username" type="email" placeholder="Username or email address *" required />
+                        <div class="mt-2">Enter the order number from your confirmation email and the email you used at checkout.</div>
+                        <form class="md:mt-7 mt-4" method="GET" action="{{ route('order-tracking') }}">
+                            <div>
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" name="order_number" type="text" placeholder="Order number *" value="{{ $orderNumber ?? '' }}" required />
                             </div>
-                            <div class="billing mt-5">
-                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="billing" type="email" placeholder="Billing Email *" required />
+                            <div class="mt-5">
+                                <input class="border-line px-4 pt-3 pb-3 w-full rounded-lg" name="email" type="email" placeholder="Email used at checkout *" value="{{ $email ?? '' }}" required />
                             </div>
                             <div class="block-button md:mt-7 mt-4">
-                                <button class="button-main">Tracking Orders</button>
+                                <button class="button-main" type="submit">Track Order</button>
                             </div>
                         </form>
+                        @if(!empty($lookupError))
+                            <p class="mt-5 text-red-600">{{ $lookupError }}</p>
+                        @endif
+                        @if(!empty($order))
+                            <div class="mt-6 border border-line rounded-lg p-5">
+                                <div class="flex justify-between gap-4">
+                                    <div>
+                                        <div class="caption1 text-secondary">Order</div>
+                                        <div class="font-semibold">{{ $order->order_number }}</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="caption1 text-secondary">Status</div>
+                                        <div class="font-semibold capitalize">{{ str_replace('_', ' ', $order->status) }}</div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-sm text-secondary">{{ $order->created_at?->format('d M Y') }} · ₹{{ number_format((float) ($order->total_amount ?? $order->total ?? 0), 2) }}</div>
+                                <div class="mt-4 border-t border-line pt-4 space-y-2">
+                                    @foreach($order->items as $item)
+                                        <div class="flex justify-between gap-3 text-sm">
+                                            <span>{{ $item->product_name ?? $item->product->name ?? 'Item' }} × {{ $item->quantity }}</span>
+                                            <span>₹{{ number_format((float) ($item->total ?? ($item->price * $item->quantity)), 2) }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     <div class="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
                         <div class="text-content">

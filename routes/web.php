@@ -217,16 +217,36 @@ Route::get('/reset-password', function () {
 })->name('reset-password');
 
 // Order Tracking Route
-Route::get('/order-tracking', function () {
+$trackOrder = function () {
+    $orderNumber = trim((string) request('order_number', request('order_id', '')));
+    $email = trim((string) request('email', ''));
     $order = null;
-    if (request()->has('order_id') && request()->has('email')) {
-        $order = Order::where('id', request()->get('order_id'))
-            ->where('customer_email', request()->get('email'))
-            ->first();
+    $lookupError = null;
+
+    if ($orderNumber !== '' || $email !== '') {
+        if ($orderNumber === '' || $email === '') {
+            $lookupError = 'Enter both the order number and the email used at checkout.';
+        } else {
+            $order = Order::with('items')
+                ->where(function ($query) use ($orderNumber) {
+                    $query->where('order_number', $orderNumber);
+                    if (ctype_digit($orderNumber)) {
+                        $query->orWhere('id', (int) $orderNumber);
+                    }
+                })
+                ->whereRaw('LOWER(customer_email) = ?', [strtolower($email)])
+                ->first();
+
+            if (! $order) {
+                $lookupError = 'No order found for that order number and email.';
+            }
+        }
     }
 
-    return view('order-tracking', compact('order'));
-})->name('order-tracking');
+    return view('order-tracking', compact('order', 'lookupError', 'orderNumber', 'email'));
+};
+Route::get('/order-tracking', $trackOrder)->name('order-tracking');
+Route::get('/order/track', $trackOrder)->name('order.track');
 
 // Wishlist Route
 Route::get('/wishlist', function () {

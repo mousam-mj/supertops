@@ -120,34 +120,6 @@ class OrderController extends Controller
                 }
             }
             
-            // Strategy 2b: If still empty, use "best" guest session (same as Cart API / checkout)
-            // Cart API uses guest cart when no session auth; checkout display can show those items.
-            if ($cartItems->isEmpty()) {
-                $bestSession = Cart::whereNull('user_id')
-                    ->whereNotNull('session_id')
-                    ->selectRaw('session_id, COUNT(*) as item_count, SUM(quantity) as total_quantity, MAX(created_at) as latest_created_at')
-                    ->groupBy('session_id')
-                    ->orderBy('total_quantity', 'desc')
-                    ->orderBy('item_count', 'desc')
-                    ->orderBy('latest_created_at', 'desc')
-                    ->first();
-                if ($bestSession) {
-                    $sessionId = $bestSession->session_id;
-                    $guestCartItems = Cart::where('session_id', $sessionId)
-                        ->whereNull('user_id')
-                        ->with('product')
-                        ->get();
-                    foreach ($guestCartItems as $guestItem) {
-                        if ($guestItem->product) {
-                            $guestItem->user_id = $user->id;
-                            $guestItem->session_id = null;
-                            $guestItem->save();
-                            $cartItems->push($guestItem);
-                        }
-                    }
-                }
-            }
-            
             // Strategy 3: If still empty, try to find ANY cart items with this user_id (even with session_id)
             if ($cartItems->isEmpty()) {
                 $cartItems = Cart::where('user_id', $user->id)
