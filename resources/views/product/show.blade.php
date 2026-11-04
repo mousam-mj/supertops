@@ -1766,9 +1766,36 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isNaN(n) || n < 1) n = 1;
             return Math.min(n, 9999);
         }
+        function selectedStockLimit() {
+            var opt = document.querySelector('.product-detail .inventory-option-item.active');
+            if (opt && opt.getAttribute('data-stock') !== null && opt.getAttribute('data-stock') !== '') {
+                return parseInt(opt.getAttribute('data-stock'), 10) || 0;
+            }
+            var badge = document.querySelector('.product-detail .product-stock-badge');
+            if (badge && badge.getAttribute('data-stock-qty') !== null) {
+                return parseInt(badge.getAttribute('data-stock-qty'), 10) || 0;
+            }
+            return null;
+        }
+        function showStockLimit(stock) {
+            var message = (!stock || stock <= 0)
+                ? 'This item is out of stock.'
+                : 'Only ' + stock + ' left in stock.';
+            if (typeof window.showCartAlert === 'function') {
+                window.showCartAlert(message, 'Not enough stock');
+            } else {
+                alert(message);
+            }
+        }
         function writeProductQty(el, n) {
             if (!el) return;
-            n = Math.max(1, Math.min(parseInt(n, 10) || 1, 9999));
+            var requested = parseInt(n, 10) || 1;
+            var max = selectedStockLimit();
+            if (max !== null && requested > max) {
+                showStockLimit(max);
+                requested = max > 0 ? max : 1;
+            }
+            n = Math.max(1, Math.min(requested, 9999));
             if (el.tagName === 'INPUT') el.value = String(n);
             else el.textContent = String(n);
         }

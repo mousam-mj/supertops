@@ -115,7 +115,21 @@
             if (typeof loadCartItems === 'function') loadCartItems();
             return;
         }
-        showCartAlert(extractCartErrorMessage(data, result.status));
+        var message = extractCartErrorMessage(data, result.status);
+        var title = /stock/i.test(message) ? 'Not enough stock' : 'Could not add to cart';
+        showCartAlert(message, title);
+    }
+
+    function stockLimitMessage(stock) {
+        var n = parseInt(stock, 10);
+        if (isNaN(n) || n <= 0) return 'This item is out of stock.';
+        return 'Only ' + n + ' left in stock.';
+    }
+
+    function overStock(quantity, stock) {
+        var max = parseInt(stock, 10);
+        if (isNaN(max)) return false;
+        return quantity > max;
     }
 
     function trackAddToCartFromApi(result) {
@@ -254,6 +268,23 @@
                 if (qvModal) {
                     var qvQtyEl = qvModal.querySelector('.choose-quantity .quantity');
                     if (qvQtyEl) quantity = readQtyControl(qvQtyEl);
+                }
+            }
+
+            if (isProductDetail && productInfor) {
+                var stockLimit = null;
+                var activeOption = productInfor.querySelector('.inventory-option-item.active');
+                if (activeOption && activeOption.getAttribute('data-stock') !== null && activeOption.getAttribute('data-stock') !== '') {
+                    stockLimit = parseInt(activeOption.getAttribute('data-stock'), 10) || 0;
+                } else {
+                    var stockBadge = productInfor.querySelector('.product-stock-badge');
+                    if (stockBadge && stockBadge.getAttribute('data-stock-qty') !== null) {
+                        stockLimit = parseInt(stockBadge.getAttribute('data-stock-qty'), 10) || 0;
+                    }
+                }
+                if (stockLimit !== null && quantity > stockLimit) {
+                    showCartAlert(stockLimitMessage(stockLimit), 'Not enough stock');
+                    return;
                 }
             }
 
@@ -883,6 +914,10 @@
                 e.preventDefault();
                 e.stopPropagation();
                 let qty = readQtyControl(quantityElement) + 1;
+                if (overStock(qty, item.available_stock)) {
+                    showCartAlert(stockLimitMessage(item.available_stock), 'Not enough stock');
+                    return;
+                }
                 updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
             });
         }
@@ -890,6 +925,11 @@
         if (quantityElement && quantityElement.tagName === 'INPUT') {
             quantityElement.addEventListener('change', function() {
                 var qty = readQtyControl(quantityElement);
+                if (overStock(qty, item.available_stock)) {
+                    showCartAlert(stockLimitMessage(item.available_stock), 'Not enough stock');
+                    writeQtyControl(quantityElement, item.quantity);
+                    return;
+                }
                 updateCartItemQuantityInModal(item.id, qty, quantityElement, totalPriceElement, price);
             });
         }
@@ -1042,7 +1082,8 @@
     // Show notification
     function showNotification(message, type = 'success') {
         if (type === 'error') {
-            showCartAlert(message);
+            var title = /stock/i.test(String(message || '')) ? 'Not enough stock' : 'Could not update cart';
+            showCartAlert(message, title);
             return;
         }
 
@@ -1391,6 +1432,10 @@
                 e.stopPropagation();
                 const cartId = this.getAttribute('data-cart-id');
                 let qty = readQtyControl(quantityElement) + 1;
+                if (overStock(qty, item.available_stock)) {
+                    showCartAlert(stockLimitMessage(item.available_stock), 'Not enough stock');
+                    return;
+                }
                 updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
             });
         }
@@ -1399,6 +1444,11 @@
             quantityElement.addEventListener('change', function() {
                 const cartId = quantityElement.getAttribute('data-cart-id');
                 var qty = readQtyControl(quantityElement);
+                if (overStock(qty, item.available_stock)) {
+                    showCartAlert(stockLimitMessage(item.available_stock), 'Not enough stock');
+                    writeQtyControl(quantityElement, item.quantity);
+                    return;
+                }
                 updateCartItemQuantity(cartId, qty, quantityElement, totalPriceElement, price);
             });
         }

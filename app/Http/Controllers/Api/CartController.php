@@ -164,6 +164,9 @@ class CartController extends Controller
                 'id' => $item->id,
                 'product_id' => $item->product_id,
                 'quantity' => $item->quantity,
+                'available_stock' => (int) ($item->customization_json
+                    ? ($product->stock_quantity ?? 0)
+                    : $product->getStockForColorSize($item->color, $item->size)),
                 'size' => $item->size,
                 'color' => $item->color,
                 'display_name' => $displayName,
@@ -331,7 +334,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $availableStock > 0
-                        ? "Only {$availableStock} item(s) available in stock."
+                        ? "Only {$availableStock} left in stock."
                         : 'This item is out of stock.',
                 ], 400);
             }
@@ -341,7 +344,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $stock > 0
-                        ? "Only {$stock} item(s) available in stock."
+                        ? "Only {$stock} left in stock."
                         : 'This item is out of stock.',
                 ], 400);
             }
@@ -351,7 +354,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $availableStock > 0
-                        ? "Only {$availableStock} item(s) available in stock."
+                        ? "Only {$availableStock} left in stock."
                         : 'This item is out of stock.',
                 ], 400);
             }
@@ -383,7 +386,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $availableStock > 0
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$availableStock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -393,7 +396,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $stock > 0
-                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$stock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -403,7 +406,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $availableStock > 0
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$availableStock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -447,7 +450,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $availableStock > 0
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$availableStock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -457,7 +460,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $stock > 0
-                                ? "Only {$stock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$stock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -467,7 +470,7 @@ class CartController extends Controller
                         return response()->json([
                             'success' => false,
                             'message' => $availableStock > 0
-                                ? "Only {$availableStock} item(s) available in stock. You already have {$existingCart->quantity} in your cart."
+                                ? "Only {$availableStock} left in stock. You already have {$existingCart->quantity} in your cart."
                                 : 'This item is out of stock.',
                         ], 400);
                     }
@@ -529,7 +532,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $availableStock > 0
-                        ? "Only {$availableStock} item(s) available in stock."
+                        ? "Only {$availableStock} left in stock."
                         : 'This item is out of stock.',
                 ], 400);
             }
@@ -539,7 +542,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $stock > 0 
-                        ? "Only {$stock} item(s) available in stock." 
+                        ? "Only {$stock} left in stock." 
                         : 'This item is out of stock.',
                 ], 400);
             }
@@ -549,7 +552,7 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $availableStock > 0 
-                        ? "Only {$availableStock} item(s) available in stock." 
+                        ? "Only {$availableStock} left in stock." 
                         : 'This item is out of stock.',
                 ], 400);
             }

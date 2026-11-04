@@ -2951,6 +2951,7 @@ const handleQuantity = () => {
     const plus = item.querySelector(".ph-plus");
     const quantity = item.querySelector(".quantity");
     if (!minus || !plus || !quantity) return;
+    if (item.closest(".product-detail") || item.closest(".product-infor")) return;
     if (quantity.tagName === "INPUT" && (quantity.disabled || quantity.readOnly)) {
       return;
     }
